@@ -1,6 +1,8 @@
 ﻿# Moon
 一个轻量级的游戏服务器框架，底层采用C++17编写,逻辑层采用Lua脚本。
 
+基于：https://github.com/sniper00/moon
+
 ## 主要特性有
 - **async** lua协程封装异步操作，取代传统的回调模式。
   
