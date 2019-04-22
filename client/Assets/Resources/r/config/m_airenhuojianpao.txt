@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ModelParam model="m_airenhuojianpao" assetID="20002" maxhp="100" movespeed="10" attackspeed="2" attackDistance="50" searchDistance="100" radius="1" scale="1" hitPosition="(0.0, 1.5, 0.0)" name="Model" rect="(15,140,240,20)">
+  <ActionParam state="2" weight="1" duration="1.566667" useAnimationLength="1" name="Action" rect="(299,369,240,20)">
+    <AnimationParam animationClip="attack01" length="1.566667" mode="0" triggerAt="0" default="1" name="Animation" rect="(613,415,240,20)">
+      <EffectParabolaParam speed="20" gravity="9.8" heightOffset="0" heightLimit="20" effectType="4" arise="0" on="0" assetID="30010" delay="0.61" offset="(0.3, 1.4, 0.6)" name="ParabolaEffect" rect="(968,372,240,20)">
+        <EffectTimeParam duration="2" triggerAt="0" bone="0" bind="0" syncAnimationSpeed="0" effectType="1" arise="1" on="2" assetID="30009" delay="0" offset="(0.0, 0.0, 0.0)" name="TimeEffect" rect="(1296,411,240,20)" />
+      </EffectParabolaParam>
+    </AnimationParam>
+    <RotatePluginParam name="RotatePlugin" rect="(611,365,240,20)" />
+  </ActionParam>
+  <ActionParam state="3" weight="10" duration="4.733334" useAnimationLength="1" name="Action" rect="(204,539,240,20)">
+    <AnimationParam animationClip="die" length="4.733334" mode="8" triggerAt="0" default="1" name="Animation" rect="(589,538,240,20)" />
+  </ActionParam>
+  <ActionParam state="0" weight="0" duration="86400" useAnimationLength="1" name="Action" rect="(292,53,240,20)">
+    <AnimationParam animationClip="idle" length="1" mode="2" triggerAt="0" default="1" name="Animation" rect="(642,16,240,20)" />
+    <RotatePluginParam name="RotatePlugin" rect="(913,54,240,20)" />
+  </ActionParam>
+  <ActionParam state="1" weight="1" duration="86400" useAnimationLength="1" name="Action" rect="(301,260,240,20)">
+    <AnimationParam animationClip="run" length="0.9333334" mode="2" triggerAt="0" default="1" name="Animation" rect="(634,233,240,20)" />
+    <RunPluginParam name="RunPlugin" rect="(1087,180,240,20)" />
+    <RotatePluginParam name="RotatePlugin" rect="(1049,291,240,20)" />
+  </ActionParam>
+</ModelParam>

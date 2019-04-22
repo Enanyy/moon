@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 9ee1259319f13e34aa66ffb0bd9fb93d
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _opa_tex: {fileID: 2800000, guid: 5256c0f985816994082dd09e5ceba31e, type: 3}
+  - _diffuse: {fileID: 2800000, guid: 0b999d3471bc4934eaba8d78fc5570da, type: 3}
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

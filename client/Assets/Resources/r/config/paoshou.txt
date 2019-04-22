@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ModelParam model="paoshou" assetID="20004" maxhp="100" movespeed="10" attackspeed="2" attackDistance="20" searchDistance="100" radius="1" scale="1" hitPosition="(0.0, 1.0, 0.0)" name="Model" rect="(20,20,240,20)">
+  <ActionParam state="2" weight="2" duration="1.133333" useAnimationLength="1" name="Action" rect="(279,161,240,20)">
+    <AnimationParam animationClip="attack01" length="1.133333" mode="0" triggerAt="0" default="1" name="Animation" rect="(609,154,240,20)">
+      <EffectFollowParam speed="50" effectType="3" arise="0" on="0" assetID="30008" delay="0.27" offset="(0.3, 1.6, 1.0)" name="FollowEffect" rect="(912,135,240,20)">
+        <EffectTimeParam duration="2" triggerAt="0" bone="0" bind="0" syncAnimationSpeed="0" effectType="1" arise="1" on="2" assetID="30007" delay="0" offset="(0.0, 0.0, 0.0)" name="TimeEffect" rect="(1252,67,240,20)" />
+      </EffectFollowParam>
+    </AnimationParam>
+    <RotatePluginParam name="RotatePlugin" rect="(780,272,240,20)" />
+  </ActionParam>
+  <ActionParam state="3" weight="10" duration="2.866667" useAnimationLength="1" name="Action" rect="(275,405,240,20)">
+    <AnimationParam animationClip="die" length="2.866667" mode="8" triggerAt="0" default="1" name="Animation" rect="(596,459,240,20)" />
+  </ActionParam>
+  <ActionParam state="0" weight="0" duration="86400" useAnimationLength="1" name="Action" rect="(300,64,240,20)">
+    <AnimationParam animationClip="idle" length="1" mode="2" triggerAt="0" default="1" name="Animation" rect="(612,7,240,20)" />
+    <RotatePluginParam name="RotatePlugin" rect="(1009,64,240,20)" />
+  </ActionParam>
+  <ActionParam state="1" weight="2" duration="86400" useAnimationLength="1" name="Action" rect="(283,272,240,20)">
+    <AnimationParam animationClip="run" length="0.9333334" mode="2" triggerAt="0" default="1" name="Animation" rect="(600,297,240,20)" />
+    <RunPluginParam name="RunPlugin" rect="(901,397,240,20)" />
+    <RotatePluginParam name="RotatePlugin" rect="(994,439,240,20)" />
+  </ActionParam>
+</ModelParam>

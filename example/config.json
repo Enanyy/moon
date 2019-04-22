@@ -1,0 +1,271 @@
+[
+    {
+        "sid": 1,
+        "name": "server_#sid",
+        "outer_host": "127.0.0.1",
+        "inner_host": "127.0.0.1",
+        "thread": 4,
+        "startup": "main.lua",
+        "log": "log/#sid_#date.log",
+        "path":"./example", 
+        "services": [
+            {
+                "unique": true,
+                "name": "network_example",
+                "file": "network_example.lua",
+                "network": {
+                    "type": "listen",
+                    "ip": "#inner_host",
+                    "port": "12345"
+                }
+            },
+            {
+                "unique": true,
+                "name": "websocket_example",
+                "file": "websocket_example.lua",
+                "network-ws": {
+                    "type": "listen",
+                    "ip": "#inner_host",
+                    "port": "12346",
+                    "protocol":"websocket"
+                }
+            },
+            {
+                "unique": true,
+                "name": "tcp_client",
+                "file": "tcp_client.lua",
+                "network": {
+                    "ip": "#inner_host",
+                    "port": "12345"
+                }
+            }
+        ]
+    },
+    {
+        "sid": 2,
+        "name": "server_#sid",
+        "log": "log/#sid_#date.log",
+        "path":"./example",
+        "services": [
+            {
+                "name": "redis_example",
+                "file": "redis_example.lua"
+            }
+        ]
+    },
+    {
+        "sid": 3,
+        "loglevel":"INFO",
+        "name": "server_#sid",
+        "log": "log/#sid_#date.log",
+        "path":"./example",
+        "services": [
+            {
+                "unique": true,
+                "name": "send_example_sender",
+                "file": "send_example_sender.lua"       
+            },
+            {
+                "unique": true,
+                "name": "send_example_receiver1",
+                "file": "send_example_receiver.lua"
+            },
+            {
+                "unique": true,
+                "name": "send_example_receiver2",
+                "file": "send_example_receiver.lua"
+            },
+            {
+                "unique": true,
+                "name": "send_example_receiver3",
+                "file": "send_example_receiver.lua"
+            },
+            {
+                "unique": true,
+                "name": "send_example_receiver4",
+                "file": "send_example_receiver.lua"
+            }
+        ]
+    }
+    ,
+    {
+        "sid": 4,
+        "name": "server_#sid",
+        "log": "log/#sid_#date.log",
+        "path":"./example",
+        "services": [
+            {
+                "name": "call_example_sender",
+                "file": "call_example_sender.lua"
+            }
+        ]
+    },
+    {
+        "sid": 5,
+        "name": "server_#sid",
+        "log": "log/#sid_#date.log",
+        "path":"./example",
+        "services": [
+            {
+                "unique": true,
+                "name": "clusterd",
+                "file": "service/clusterd.lua",
+                "network": {
+                    "type": "listen",
+                    "ip": "#inner_host",
+                    "port": "10001"
+                }
+            },
+            {
+                "unique": true,
+                "name": "cluster_example_receiver",
+                "file": "cluster_example_receiver.lua"
+            }
+        ]
+    },
+    {
+        "sid": 6,
+        "name": "server_#sid",
+        "outer_host": "127.0.0.1",
+        "inner_host": "127.0.0.1",
+        "path":"./example",
+        "services": [
+            {
+                "unique": true,
+                "name": "clusterd",
+                "file": "service/clusterd.lua",
+                "network": {
+                    "type": "listen",
+                    "ip": "#inner_host",
+                    "port": "10002"
+                }
+            },
+            {
+                "unique": true,
+                "name": "cluster_example_sender",
+                "file": "cluster_example_sender.lua"
+            }
+        ]
+    },
+    {
+        "sid": 7,
+        "name": "server_#sid",
+        "log": "log/#sid_#date.log",
+        "path":"./example",
+        "services": [
+            {
+                "unique": true,
+                "name": "example_mysql",
+                "file": "example_mysql.lua"
+            }
+        ]
+    },
+    {
+        "sid": 8,
+        "name": "server_#sid",
+        "inner_host": "127.0.0.1",
+        "log_level": "DEBUG",
+        "log": "log/#sid_#date.log",
+        "path":"./example",
+        "services": [
+            {
+                "unique": true,
+                "name": "test",
+                "file": "test_moon.lua"
+            }
+        ]
+    },
+    {
+        "sid": 100,
+        "name": "server_#sid",
+        "inner_host": "127.0.0.1",
+        "log_level": "DEBUG",
+        "log": "log/#sid_#date.log",
+        "path":"./server",
+        "services": [
+            {
+                "unique": true,
+                "name": "clusterd",
+                "file": "service/clusterd.lua",
+                "network": {
+                    "type": "listen",
+                    "ip": "#inner_host",
+                    "port": "10001"
+                }
+            },
+            {
+                "unique": true,
+                "name": "logic",
+                "file": "logic_service.lua",
+                "network": {
+                    "type": "listen",
+                    "ip": "#inner_host",
+                    "port": "5000"
+                }
+            }
+        ]
+    },
+    {
+        "sid": 101,
+        "name": "server_#sid",
+        "inner_host": "127.0.0.1",
+        "log_level": "DEBUG",
+        "log": "log/#sid_#date.log",
+        "path":"./server",
+        "services": [
+            {
+                "unique": true,
+                "name": "clusterd",
+                "file": "service/clusterd.lua",
+                "network": {
+                    "type": "listen",
+                    "ip": "#inner_host",
+                    "port": "10002"
+                }
+            },
+            {
+                "unique": true,
+                "name": "game",
+                "file": "game_service.lua",
+                "network": {
+                    "type": "listen",
+                    "ip": "#inner_host",
+                    "port": "5001"
+                }
+            }
+        ]
+    },
+    {
+        "sid": 102,
+        "name": "server_#sid",
+        "inner_host": "127.0.0.1",
+        "log_level": "DEBUG",
+        "log": "log/#sid_#date.log",
+        "path":"./server",
+        "services": [
+            {
+                "unique": true,
+                "name": "clusterd",
+                "file": "service/clusterd.lua",
+                "network": {
+                    "type": "listen",
+                    "ip": "#inner_host",
+                    "port": "10003"
+                }
+            },
+            {
+                "unique": true,
+                "name": "db",
+                "file": "db_service.lua",
+                "mysql":{
+                    "ip":"#inner_host",
+                    "port":"3306",
+                    "database":"game",
+                    "user":"root",
+                    "password":"mm0426",
+                    "timeout":"0"
+                }
+            }
+        ]
+    }
+]
