@@ -4,6 +4,8 @@ local M = setmetatable({}, cmd_handler)
 
 M.INIT = function (sender,header,responseid, data )
     
+    copy.init(data)
+
     print("init copy data:",data.copyname)
 
     local result = 0

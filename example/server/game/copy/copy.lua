@@ -18,6 +18,27 @@ moon.exports.ai  = require("game.battle.component.ai")
 
 moon.exports.rvo2 = require("game.battle.rvo2")
 
+local copy = {
+    sid = -1,
+    data = nil,
+    handler =  nil,
+}
+function copy.init(data)
+    copy.sid = data.sid
+    copy.data = data
+    copy.handler = require("msg_handler")
+end
+function copy.send(sessionid, id, data)
+    if copy.id > 0 and copy.handler ~= nil then
+        local buffer = copy.handler.encode(id,data)
+        moon.async(function ()
+            moon.co_call("lua", copy.sid, "SEND", sessionid, data)            
+        end)
+    end
+end
+
+moon.exports.copy = copy
+
 local delta = 100
 
 moon.init(function(cfg) 

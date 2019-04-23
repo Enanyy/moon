@@ -6,12 +6,13 @@ local M = setmetatable({}, cmd_handler)
 M.CREATE_COPY = function ( sender,header,responseid, data)
     print("begin create copy :"..data.copyname)
 
+    data.sid = moon.sid()
     copymgr:create(data,  function(copyid) 
        
         print("create copy success:",copyid)
        
          --设置副本数据
-        moon.co_call("lua", copyid, "INIT",  data)
+        local result =  moon.co_call("lua", copyid, "INIT",  data)
 
         --返回给logic
         moon.response('lua',sender,responseid, copyid)
