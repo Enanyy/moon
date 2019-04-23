@@ -1,21 +1,9 @@
 local moon = require("moon")
 local tcp = require("moon.net.tcpserver")
-local protobuf = require("protobuf")
-local protoloader = require("protoloader")
-
-
-local encode = protobuf.encode
-local decode = protobuf.decode
-local pack = string.pack
-local unpack = string.unpack
-
-require("msgid")
-
 local M = 
 {
     handler = nil
 }
-
 
 
 function M:init(handler)
@@ -25,7 +13,7 @@ function M:init(handler)
         self.handler.init()
     end
 
-    protoloader.loadall()
+    
 
     tcp.settimeout(300)
 
@@ -34,6 +22,8 @@ function M:init(handler)
        
         if self.handler then
             self.handler.onaccept(sessionid)
+        else
+            print("msg_handler is nil")
         end
     end)
 
@@ -41,24 +31,14 @@ function M:init(handler)
         print("message ", sessionid, msg:bytes())
 
         if self.handler ~= nil then
-            local size = msg:size()
-            if size >= 4 then
-            
-                --id 4个字节
-                local bytes = msg:substr(0, 4)
-                local data = msg:substr(4, size - 4)
-
-                --id小端编码，有符号
-                local id = unpack("<i",bytes)
-                
-                local def = self.handler.get_def(id)
-
-                if def ~= nil  then
-                    local msg = decode(def.name, data)
-                    --这里派发消息
-                    self.handler.ondispatch(sessionid, id, msg)
-                end
+           
+            local data = self.handler.decode(msg:bytes())
+            if data ~= nil then
+                --这里派发消息
+                self.handler.ondispatch(sessionid, data.id, data.msg)   
             end
+        else
+            print("msg_handler is nil")
         end
     end)
 
@@ -66,6 +46,8 @@ function M:init(handler)
         print("close ", sessionid, msg:bytes())
         if self.handler ~= nil then
             self.handler.onclose(sessionid)
+        else
+            print("msg_handler is nil")
         end
     end)
 
@@ -74,38 +56,29 @@ function M:init(handler)
 
         if self.handler ~= nil then
             self.handler.onerror(sessionid)
+        else
+            print("msg_handler is nil")
         end
     end)
 end
 
-function M:encode(id, data)
-
-    if self.handler == nil then
-        return
-    end
-    local def = self.handler.get_def(id) 
-
-    if def == nil then
-        print("can not find msg def:"..id)
-        return
-    end
-
-    local pbdata = encode(def.name,data)
-    --id小端编码 4个字节,有符号
-    local buffer = pack("<i", id)..pbdata
-
-    return buffer
-end
-
-
+--sessionid 会话id
+--id msgid
+--data msgdata
 function M:send(sessionid, id, data)
 
-    local buffer = self:encode(id,data)
+    if self.handler == nil then
+        error("Do not register msg_handler")
+        return
+    end
+    local buffer = self.handler.encode(id,data)
     --发送str
     tcp.send(sessionid, buffer)
 end
 
-function M:send_buffer(sessionid,buffer)
+--sessionid 会话id
+--buffer encoded msg
+function M:sendbuffer(sessionid,buffer)
 
     if buffer == nil then
         return

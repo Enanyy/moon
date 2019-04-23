@@ -32,7 +32,6 @@ M.isconnected = function() return M.conn ~= nil and M.conn:connected() end
 M.LOGIN = function (sender,header,responseid, name,password )
 
     local id = errordef.SYSTEM
-
     if M.isconnected() then
         local db_config = config.get_service("db")
         if db_config ~= nil and db_config.mysql ~= nil then
@@ -40,7 +39,7 @@ M.LOGIN = function (sender,header,responseid, name,password )
         
             local result = M.conn:query(sql)
 
-            if result and #result > 0 then
+            if type(result) =="number" and #result > 0 then
                 local row = result[1]
 
                 if row[2] == name and row[3] == password then

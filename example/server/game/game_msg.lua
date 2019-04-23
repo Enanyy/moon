@@ -4,8 +4,8 @@ local copymgr = require("game.copy.copymgr")
 local M = setmetatable({}, msg_handler)
 --注册要监听的消息
 function M.init()
-    M.register(msgid.LOGIN_GAME_REQUEST,{name = "LoginGameRequest",func = M.login_game_request})
-    M.register(msgid.LOGIN_GAME_RETURN,{name = "LoginGameReturn",func = nil})
+    msg_handler.init()
+    M.register(msgid.LOGIN_GAME_REQUEST, M.login_game_request)
 end
 --重写ondispatch方法
 function M.ondispatch(sessionid, id, msg )

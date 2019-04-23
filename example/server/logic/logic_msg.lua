@@ -4,11 +4,8 @@ local msg_handler = require("msg_handler")
 local M = setmetatable({}, msg_handler)
 --注册要监听的消息
 function M.init()
-
-    M.register(msgid.LOGIN_REQUEST,{name = "LoginRequest",func = M.login_request})
-    M.register(msgid.LOGIN_RETURN,{name = "LoginReturn",func = nil})
-    M.register(msgid.LOGIN_GAME_NOTIFY,{name = "LoginGameNotify",func = nil})
-
+    msg_handler.init()
+    M.register(msgid.LOGIN_REQUEST, M.login_request)
 end
 --重写ondispatch方法
 function M.ondispatch(sessionid, id, msg )
@@ -17,6 +14,8 @@ function M.ondispatch(sessionid, id, msg )
     if def ~= nil and def.func ~= nil then
         local u = usermgr:getuser_by_sessionid(sessionid)
         def.func(sessionid, u, msg)
+    else
+        print("can not find def or func:" ..id)
     end
 end
 
@@ -45,7 +44,7 @@ function M.login_request(sessionid, user, msg )
             local name = data[2]
             local password =data[3]
             --print(table.tostring(data))
-            if id > 0 then
+            if type(id) == "number" and id > 0 then
                 print("db login result:"..id)
                 local u =  usermgr:adduser(sessionid,id)
                 u:onlogin()
