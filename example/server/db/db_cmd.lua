@@ -39,7 +39,7 @@ M.LOGIN = function (sender,header,responseid, name,password )
         
             local result = M.conn:query(sql)
 
-            if type(result) =="number" and #result > 0 then
+            if type(result) =="table" and #result > 0 then
                 local row = result[1]
 
                 if row[2] == name and row[3] == password then

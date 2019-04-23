@@ -27,7 +27,7 @@ function M.register(id, func )
     if def then
         def.func = func
     else
-        error("Can not find msgid:"..id)
+        error("Can not find msgid:"..tostring(id))
     end
 end
 
@@ -51,12 +51,12 @@ function M.ondispatch(sessionid, id, msg )
     
 end
 
-function M:encode(id, data)
+function M.encode(id, data)
 
     local def = M.get_def(id) 
 
     if def == nil then
-        error("can not find msg def:"..id)
+        error("can not find msg def:"..tostring(id))
         return nil
     end
 
@@ -80,7 +80,7 @@ function M.decode(buffer)
         
         local def = M.get_def(id)
         if def == nil then
-            error("can not find msg def:"..id)
+            error("can not find msg def:"..tostring(id))
             return nil
          end
 

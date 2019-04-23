@@ -4,7 +4,9 @@ require("server")
 require("config")
 require("def")
 require("netmgr")
-require("logic.usermgr")
+--注册全局的
+moon.exports.user =  require("logic.logic_user")
+moon.exports.usermgr = require("logic.logic_usermgr")
 
 
 
@@ -16,11 +18,11 @@ end)
 moon.start(function ()   
     local msg_handler = require("logic.logic_msg")
     netmgr:init(msg_handler)
-    moon.async(function() 
+    -- moon.async(function() 
     
-        server.call(serverdef.GAME, "CREATE_COPY", table.unpack({"AAA","abc"}))
+    --     server.call(serverdef.GAME, "CREATE_COPY", table.unpack({"AAA","abc"}))
        
-    end)
+    -- end)
     
 end)
 

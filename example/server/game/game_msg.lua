@@ -1,5 +1,5 @@
 local msg_handler = require("msg_handler")
-local copymgr = require("game.copy.copymgr")
+
 
 local M = setmetatable({}, msg_handler)
 --注册要监听的消息
@@ -12,8 +12,8 @@ function M.ondispatch(sessionid, id, msg )
     
     local def = M.get_def(id)
     if def ~= nil and def.func ~= nil then
-        
-        def.func(sessionid, msg)
+        local u = usermgr:getuser_by_sessionid(sessionid)
+        def.func(sessionid, u, msg)
     end
 end
 
@@ -29,8 +29,11 @@ function M.onerror( sessionid )
        
 end
 
-function M.login_game_request(sessionid, msg)
+function M.login_game_request(sessionid, u, msg)
 
+    print("登陆game:"..table.tostring(msg))
+    local u = user.new(sessionid,msg.id)
+    usermgr:adduser(u)
     
 end
 

@@ -31,7 +31,7 @@ function M.onerror( sessionid )
     usermgr:removeuser_by_sessionid(sessionid)    
 end
 
-function M.login_request(sessionid, user, msg )
+function M.login_request(sessionid, u, msg )
     -- body
     print("user login:".. msg.name..","..msg.password)
     moon.async(function() 
@@ -46,14 +46,16 @@ function M.login_request(sessionid, user, msg )
             --print(table.tostring(data))
             if type(id) == "number" and id > 0 then
                 print("db login result:"..id)
-                local u =  usermgr:adduser(sessionid,id)
+
+                local u = user.new(sessionid,id)
+                usermgr:adduser(u)
                 u:onlogin()
                 local userdata = {
                     id = id,
                     name = name 
                 }
                 u:send(msgid.LOGIN_RETURN,{result = errordef.SUCCESS, userdata = userdata})
-
+        
                 local game_config = config.get_service("game")
                 if game_config and game_config.network then
                     print("return login game")

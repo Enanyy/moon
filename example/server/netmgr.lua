@@ -13,8 +13,6 @@ function M:init(handler)
         self.handler.init()
     end
 
-    
-
     tcp.settimeout(300)
 
     tcp.on("accept",function(sessionid, msg)
@@ -68,12 +66,14 @@ end
 function M:send(sessionid, id, data)
 
     if self.handler == nil then
-        error("Do not register msg_handler")
+        error("netmgr:send: do not register msg_handler")
         return
     end
     local buffer = self.handler.encode(id,data)
     --发送str
     tcp.send(sessionid, buffer)
+
+    print("netmgr:send sessionid:",sessionid, " id:",id," size:",#buffer)
 end
 
 --sessionid 会话id

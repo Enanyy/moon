@@ -1,14 +1,16 @@
+--usermgr 基类
 local moon = require("moon")
-local user = require("logic.user")
 
 local M = 
 {
     users = {}
 }
+M.__index = M
 
-function  M:adduser(sessionid,id)
-    local u = user.new(sessionid,id)
-   
+function  M:adduser(u)
+    if u == nil then
+        return nil
+    end
     u:oninit()
 
     self.users[u.id] = u
@@ -60,10 +62,9 @@ function M:broadcast(id, data, condition)
 
 end
 
+return M
 
 
 
---注册全局的usermgr
-moon.exports.usermgr = M
 
 
