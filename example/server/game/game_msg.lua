@@ -31,7 +31,7 @@ end
 
 function M.login_game_request(sessionid, u, msg)
 
-    print("登陆game:"..table.tostring(msg))
+    print("login game service:"..tostring(msg.id))
     local u = user.new(sessionid,msg.id)
     usermgr:adduser(u)
     

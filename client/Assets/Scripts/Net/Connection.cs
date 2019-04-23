@@ -431,8 +431,19 @@ public class Connection
                 }
                 else    // 如果超过两个字节
                 {
-                    mLengthData[0] = mRecvData[nReadPos];
-                    mLengthData[1] = mRecvData[nReadPos + 1];
+                    // 读出两个字节表示的数据长度
+                    if (IsLittleEndian == false)
+                    {
+                        //大端
+                        mLengthData[0] = mRecvData[nReadPos + 1];
+                        mLengthData[1] = mRecvData[nReadPos];
+                    }
+                    else
+                    {
+                        //小端
+                        mLengthData[0] = mRecvData[nReadPos];
+                        mLengthData[1] = mRecvData[nReadPos + 1];
+                    }
                     nPackageLen = BitConverter.ToUInt16(mLengthData, 0);       // 得到下一个包的数据长度
 
                     // 否则就把数据拷贝回去，等待剩余数据

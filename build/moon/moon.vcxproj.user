@@ -8,6 +8,6 @@
     <LocalDebuggerWorkingDirectory>..\..\example</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-r 5</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-r 100</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

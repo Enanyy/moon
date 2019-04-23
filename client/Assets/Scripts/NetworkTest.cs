@@ -97,7 +97,7 @@ public class NetworkTest : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        NetworkManager.Instance().Close(ConnectID.Logic);
+        NetworkManager.Instance().Close();
     }
 }
 
