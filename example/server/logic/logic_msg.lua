@@ -6,6 +6,7 @@ local M = setmetatable({}, msg_handler)
 function M.init()
     msg_handler.init()
     M.register(msgid.LOGIN_REQUEST, M.login_request)
+    M.register(msgid.BATTLE_BEGIN_REQUEST, M.battle_begin_request)
 end
 --重写ondispatch方法
 function M.ondispatch(sessionid, id, msg )
@@ -55,18 +56,37 @@ function M.login_request(sessionid, u, msg )
                     name = name 
                 }
                 u:send(msgid.LOGIN_RETURN,{result = errordef.SUCCESS, userdata = userdata})
-        
-                local game_config = config.get_service("game")
-                if game_config and game_config.network then
-                    print("return login game")
-                    u:send(msgid.LOGIN_GAME_NOTIFY,{ip = game_config.network.ip,port = game_config.network.port})
-                end
+                       
             end
         else
             print("can not find db service")
             netmgr:send(sessionid,msgid.LOGIN_RETURN,{result = errordef.SYSTEM})
         end
     end)
+end
+
+function M.battle_begin_request(sessionid, u, msg )
+
+     moon.async(function() 
+        
+        local data ={
+            id = u.id
+        }
+
+        local copyid = server.call(serverdef.GAME, "CREATE_COPY","copy_test", table.unpack(data) )
+       
+    end)
+    
+    local result = errordef.SUCCESS
+    local game_config = config.get_service("game")
+    if game_config and game_config.network then
+        print("return login game")
+        u:send(msgid.LOGIN_GAME_NOTIFY,{ip = game_config.network.ip,port = game_config.network.port})
+    else
+        result = errordef.SYSTEM
+    end
+
+    u:send(msgid.BATTLE_BEGIN_RETURN,{result = result})
 end
 
 return M

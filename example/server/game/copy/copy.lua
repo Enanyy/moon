@@ -29,13 +29,7 @@ end)
 moon.start(function ()   
     
     rvo2:init(delta/ 1000,vector2.new(0,0))
-    local obstacles = {}
-    table.insert( obstacles, vector2.new(0,0) )
-    table.insert( obstacles, vector2.new(1,0) )
-    table.insert( obstacles, vector2.new(1,1) )
-    table.insert( obstacles, vector2.new(0,1) )
-    rvo2:addObstacle(obstacles)
-
+   
     for i=1,1 do
         local  a = agent.new()
         a.id = i

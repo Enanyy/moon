@@ -35,10 +35,7 @@ message LoginGameReturn
 	required int32 result = 1;
 }
 
-message BattleGMRequest
-{
-	
-}
+
 
 message Point2D
 {
@@ -70,6 +67,14 @@ message BattleEntity
 	
 	required BattleEntityData data = 7;
 	
+}
+message BattleBeginRequest
+{
+	
+}
+message BattleBeginReturn
+{
+	required int32 result = 1;
 }
 
 message BattleBeginNotify
@@ -106,6 +111,11 @@ message BattleEntityDie
 {
 	required int32 id = 1;
 	required int32 copy = 2;
+}
+
+message BattleEndNotify
+{
+	required int32 copy = 1;
 }
 
 

@@ -20,6 +20,16 @@ function M.init()
     M.msg_def[msgid.LOGIN_GAME_NOTIFY]       = {name = "LoginGameNotify",func = nil}
     M.msg_def[msgid.LOGIN_GAME_REQUEST]      = {name = "LoginGameRequest",func = nil}
     M.msg_def[msgid.LOGIN_GAME_RETURN]       = {name = "LoginGameReturn",func = nil}
+
+    M.msg_def[msgid.BATTLE_BEGIN_REQUEST]    = {name = "BattleBeginRequest",func = nil}
+    M.msg_def[msgid.BATTLE_BEGIN_RETURN]     = {name = "BattleBeginReturn",func = nil}
+    M.msg_def[msgid.BATTLE_BEGIN_NOTIFY]     = {name = "BattleBeginNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_IDLE]      = {name = "BattleEntityIdle",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_RUN]       = {name = "BattleEntityRun",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_ATTACK]    = {name = "BattleEntityAttack",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_DIE]       = {name = "BattleEntityDie",func = nil}
+    M.msg_def[msgid.BATTLE_END_NOTIFY]       = {name = "BattleEndNotify",func = nil}
+
 end
 
 function M.register(id, func )

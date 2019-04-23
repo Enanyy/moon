@@ -18,11 +18,6 @@ end)
 moon.start(function ()   
     local msg_handler = require("logic.logic_msg")
     netmgr:init(msg_handler)
-    -- moon.async(function() 
-    
-    --     server.call(serverdef.GAME, "CREATE_COPY", table.unpack({"AAA","abc"}))
-       
-    -- end)
     
 end)
 

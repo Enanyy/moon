@@ -17,10 +17,6 @@ end)
 moon.start(function ()   
     local msg_handler = require("game.game_msg")
     netmgr:init(msg_handler)
-
-    -- copymgr:create("test",function(copyid) 
-        
-    -- end)
 end)
 
 

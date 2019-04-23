@@ -9,28 +9,36 @@ local M =
 function M:create(name, callback )
     
     moon.async(function()
-        local copy_name = "copy_"..name
-        local serviceid = moon.co_new_service("lua",
+        local copy_name = name
+        local copyid = moon.co_new_service("lua",
         {
                 unique = false,
                 name = copy_name,
                 file = "copy.lua",
-                id = i
         })
-        
-        table.insert( self.copies, {id = serviceid, name = copy_name} )
 
+        table.insert( self.copies, {id = copyid, name = copy_name} )
+ 
         if callback then
-            callback(serviceid)
+            callback(copyid)
         end
    end)
 end
 
-function M:remove(serviceid)
+function M:get(copyid)
+    for i,v in ipairs(self.copies) do
+        if v.id == copyid then
+            return v
+        end
+    end
+    return nil
+end
+
+function M:remove(copyid)
     moon.async(function() 
 
-        local ret =  moon.remove_service(serviceid,true)
-        table.removewhere(self.copies, function (data) return serviceid == data.id end)
+        local ret =  moon.remove_service(copyid,true)
+        table.removewhere(self.copies, function (data) return copyid == data.id end)
         
     end)
 

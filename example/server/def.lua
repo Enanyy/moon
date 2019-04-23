@@ -9,6 +9,7 @@ local error =
     LOGIN_USERNAME_ERROR = -100, --登陆用户名错误
     LOGIN_PASSWORD_ERROR = -101, --登陆密码错误
 
+
 }
 
 
