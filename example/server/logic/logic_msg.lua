@@ -38,25 +38,25 @@ function M.login_request(sessionid, u, msg )
     moon.async(function() 
          
         print("request db login ")
-        local data = server.call(serverdef.DB, "LOGIN",msg.name,msg.password)
-        
+        local data = server.call(serverdef.DB, "LOGIN",msg)
+        print("login db result:",table.tostring(data))
         if data then
-            local id = data[1]
-            local name = data[2]
-            local password =data[3]
+            
             --print(table.tostring(data))
-            if type(id) == "number" and id > 0 then
-                print("db login result:"..id)
+            if type(data.id) == "number" and data.id > 0 then
+                print("db login result:"..tostring(data.id))
 
-                local u = user.new(sessionid,id)
+                local u = user.new(sessionid,data.id)
                 usermgr:adduser(u)
                 u:onlogin()
                 local userdata = {
-                    id = id,
-                    name = name 
+                    id = data.id,
+                    name = data.name 
                 }
                 u:send(msgid.LOGIN_RETURN,{result = errordef.SUCCESS, userdata = userdata})
-                       
+            else
+                print("login db error:",data.id)
+                netmgr:send(sessionid,msgid.LOGIN_RETURN,{result = data.id})        
             end
         else
             print("can not find db service")
@@ -70,10 +70,29 @@ function M.battle_begin_request(sessionid, u, msg )
      moon.async(function() 
         
         local data ={
-            id = u.id
+            copyname = "copy_test",
+            users ={
+                {
+                    id = u.id,
+                    camp = 1,
+                    heros = {
+                        {config = 1, count = 1},
+                        {config = 2, count = 2},
+                    }
+                },
+                {
+                    id = 0,
+                    camp = 2,
+                    heros = {
+                        {config = 1, count = 1},
+                        {config = 2, count = 2},
+                    }
+                },
+            }
+            
         }
 
-        local copyid = server.call(serverdef.GAME, "CREATE_COPY","copy_test", table.unpack(data) )
+        local copyid = server.call(serverdef.GAME, "CREATE_COPY", data  )
        
     end)
     

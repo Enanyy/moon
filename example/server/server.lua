@@ -6,7 +6,7 @@ function  M.call(name, cmd, ...)
     local config = config.get_service(name)
     if config then 
         local data = { cluster.call(string.format( "server_%d", config.sid),name,cmd, ...) }
-        return data
+        return table.unpack(data)
     end
     return nil
 end

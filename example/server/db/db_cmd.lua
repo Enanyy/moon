@@ -29,7 +29,7 @@ end
 
 M.isconnected = function() return M.conn ~= nil and M.conn:connected() end
 
-M.LOGIN = function (sender,header,responseid, name,password )
+M.LOGIN = function (sender,header,responseid, msg )
 
     local id = errordef.SYSTEM
     if M.isconnected() then
@@ -42,7 +42,7 @@ M.LOGIN = function (sender,header,responseid, name,password )
             if type(result) =="table" and #result > 0 then
                 local row = result[1]
 
-                if row[2] == name and row[3] == password then
+                if row[2] == msg.name and row[3] == msg.password then
                     id = row[1]
                 else
                     id = errordef.LOGIN_PASSWORD_ERROR
@@ -60,7 +60,13 @@ M.LOGIN = function (sender,header,responseid, name,password )
         end
           
     end
-    moon.response('lua',sender,responseid, id, name, password)
+    local data = {
+        id = id,
+        name = msg.name,
+        password = msg.password
+    }
+    print("db login return:",table.tostring(data))
+    moon.response('lua',sender,responseid, data)
 
 end
 

@@ -6,18 +6,18 @@ local M =
 }
 
 
-function M:create(name, callback )
+function M:create(data, callback )
     
     moon.async(function()
-        local copy_name = name
+        
         local copyid = moon.co_new_service("lua",
         {
                 unique = false,
-                name = copy_name,
+                name = data.copyname,
                 file = "copy.lua",
         })
 
-        table.insert( self.copies, {id = copyid, name = copy_name} )
+        table.insert( self.copies, {id = copyid, data = data} )
  
         if callback then
             callback(copyid)
