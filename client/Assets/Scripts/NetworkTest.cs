@@ -196,9 +196,21 @@ public class NetworkTest : MonoBehaviour
                 var entity = BattleManager.Instance.GetEntity(ret.id);
                 if (entity != null)
                 {
+                    if (entity.machine != null && entity.machine.current != null &&
+                        entity.machine.current.type == (int) ActionType.Run)
+                    {
+                        var run = entity.machine.current as EntityAction;
+                        if (run != null && run.paths.Count == 0)
+                        {
+                            run.Done();
+                        }
+                    }
+
                     EntityAction action = ObjectPool.GetInstance<EntityAction>();
-                    action.skillid = 1;
+                    action.skillid = ret.skill;
                     action.duration = ret.attackspeed;
+                    action.target = ret.target;
+                    
 
                     entity.PlayAction(ActionType.Attack, action);
                 }
