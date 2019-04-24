@@ -489,6 +489,44 @@ namespace PBMessage
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityBlood")]
+  public partial class BattleEntityBlood : global::ProtoBuf.IExtensible
+  {
+    public BattleEntityBlood() {}
+    
+    private uint _id;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint id
+    {
+      get { return _id; }
+      set { _id = value; }
+    }
+    private uint _copy;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint copy
+    {
+      get { return _copy; }
+      set { _copy = value; }
+    }
+    private uint _hp;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"hp", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint hp
+    {
+      get { return _hp; }
+      set { _hp = value; }
+    }
+    private int _value;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int value
+    {
+      get { return _value; }
+      set { _value = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEndNotify")]
   public partial class BattleEndNotify : global::ProtoBuf.IExtensible
   {

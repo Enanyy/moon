@@ -34,6 +34,7 @@ public class BattleManager
     /// </summary>
     public Dictionary<uint, BattleEntity> entities { get; private set; }
 
+    private List<uint> mRemoveList = new List<uint>();
     public List<EffectEntity> mEffectList ;
 #if UNITY_EDITOR
     public bool GM_BATTLE = false;
@@ -138,15 +139,8 @@ public class BattleManager
 
     public void RemoveEntity(uint id)
     {
-        if (entities.ContainsKey(id))
-        {
-            var entity = entities[id];
-            
-           
-            ObjectPool.ReturnInstance(entity);
-
-            entities.Remove(id);
-        }    
+        mRemoveList.Add(id);
+       
     }
 
     public BattleEntity FindClosestTarget(BattleEntity entity)
@@ -284,6 +278,22 @@ public class BattleManager
                 entity.OnUpdate(deltaTime);
             }
         }
+
+        for (int i = 0; i < mRemoveList.Count; i++)
+        {
+            uint id = mRemoveList[i];
+            if (entities.ContainsKey(id))
+            {
+                var entity = entities[id];
+
+
+                ObjectPool.ReturnInstance(entity);
+
+                entities.Remove(id);
+            }
+        }
+        mRemoveList.Clear();
+
         for (int i = mEffectList.Count - 1; i >= 0; --i)
         {
             if (mEffectList[i] == null)

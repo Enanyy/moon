@@ -178,6 +178,15 @@ function M:hurtby( attacker )
 
     print(attacker.id, " attack ",self.id, " hurt:",hurtvalue," hp:",self.hp)
 
+    local data = {
+        id = self.id,
+        copy = copy.copyid,
+        hp = self.hp,
+        value = hurtvalue
+    }
+
+    copy:broadcast(msgid.BATTLE_ENTITY_BLOOD,data)
+
     if self.hp <= 0 then
         self.isdie = true
 

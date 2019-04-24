@@ -1,5 +1,5 @@
 
-ô
+¾	
 message.proto".
 LoginRequest
 name (	
@@ -70,6 +70,13 @@
 BattleEntityDie
 
 id (
-copy ("
+copy ("H
+BattleEntityBlood
+
+id (
+copy (
+
+hp (
+value ("
 BattleEndNotify
 copy (

@@ -276,7 +276,9 @@ public class BattleEntity:
 
         DropBlood(value);
 
-       
+        EntityAction action = ObjectPool.GetInstance<EntityAction>();
+        PlayAction(ActionType.Die,action);
+
     }
 
     
