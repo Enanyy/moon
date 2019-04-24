@@ -54,7 +54,6 @@ function M:execute(action, delta)
 
                 else
                     run:setdestination(destination)
-
                 end
 
             else
@@ -82,7 +81,8 @@ function M:execute(action, delta)
                 local attack = actionattack.new()
                 self.agent:play(attack)
             end
-
+        else
+            action:done()
         end
     end
 end
