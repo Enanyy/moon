@@ -1,5 +1,5 @@
 
-™
+ã
 message.proto".
 LoginRequest
 name (	
@@ -19,8 +19,7 @@
 
 id ("!
 LoginGameReturn
-result ("
-BattleGMRequest"
+result ("
 Point2D	
 x (	
 y ("¯
@@ -33,16 +32,19 @@
 	movespeed (
 attackspeed (
 position (2.Point2D
-	direction (2.Point2D"„
+	direction (2.Point2D"…
 BattleEntity
 
-id (
-owner (
+id (
+userid (
 camp (
 name (	
 type (
 config (
-data (2.BattleEntityData">
+data (2.BattleEntityData"
+BattleBeginRequest"#
+BattleBeginReturn
+result (">
 BattleBeginNotify
 copy (
 list (2.BattleEntity"M
@@ -67,4 +69,6 @@
 BattleEntityDie
 
 id (
-copy (
+copy ("
+BattleEndNotify
+copy (

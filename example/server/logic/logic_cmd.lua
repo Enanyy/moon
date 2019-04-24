@@ -3,8 +3,12 @@ local M = setmetatable({}, cmd_handler)
 
 --通过逻辑服务器发送给客户端
 
-M.SEND = function ( sender,header,responseid, sessionid, buffer )
-    netmgr:sendbuffer(sessionid, buffer)
+M.SEND = function ( sender,responseid, userid, id, data )
+    local u = usermgr:getuser(userid)
+
+    if u ~= nil then
+        u:send(id, data)
+    end
 end
 
 

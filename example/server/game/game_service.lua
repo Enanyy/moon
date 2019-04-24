@@ -3,9 +3,8 @@ local cmd = require("game.game_cmd")
 require("server")
 require("config")
 require("netmgr")
+require("def")
 --注册全局的
-moon.exports.user = require("game.game_user")
-moon.exports.usermgr = require("game.game_usermgr")
 moon.exports.copymgr = require("game.copy.copymgr")
 
 
@@ -25,7 +24,5 @@ end)
 moon.dispatch('lua',function(msg, p) 
 
     cmd.oncommand(cmd,msg,p)
-   
-
    
 end)

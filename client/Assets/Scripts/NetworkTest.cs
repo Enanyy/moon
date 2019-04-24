@@ -44,6 +44,12 @@ public class NetworkTest : MonoBehaviour
 
            NetworkManager.Instance().Send(ConnectID.Logic,MessageID.LOGIN_REQUEST,request);
         }
+
+        if (user !=null&&GUI.Button(new Rect(20, 140, 100, 40), "Battle"))
+        {
+            BattleBeginRequest request = new BattleBeginRequest();
+            NetworkManager.Instance().Send(ConnectID.Logic, MessageID.BATTLE_BEGIN_REQUEST, request);
+        }
     }
 
     private UserData user = null;
@@ -62,7 +68,7 @@ public class NetworkTest : MonoBehaviour
 
                 user = ret.userdata;
             }
-            break;
+                break;
             case MessageID.LOGIN_GAME_NOTIFY:
             {
                 LoginGameNotify ret = ProtoTransfer.DeserializeProtoBuf<LoginGameNotify>(packet.data,
@@ -83,14 +89,36 @@ public class NetworkTest : MonoBehaviour
                 }, (c) => { Debug.Log("Connect Game Fail"); });
 
             }
-            break;
+                break;
             case MessageID.LOGIN_GAME_RETURN:
             {
                 LoginGameReturn ret = ProtoTransfer.DeserializeProtoBuf<LoginGameReturn>(packet.data,
                     NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
 
             }
-            break;
+                break;
+            case MessageID.BATTLE_BEGIN_RETURN:
+            {
+                BattleBeginReturn ret = ProtoTransfer.DeserializeProtoBuf<BattleBeginReturn>(packet.data,
+                    NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
+
+                Debug.Log("Battle begin result:" + ret.result);
+            }
+                break;
+            case MessageID.BATTLE_BEGIN_NOTIFY:
+            {
+                BattleBeginNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleBeginNotify>(packet.data,
+                    NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
+                Debug.Log("Battle begin:"+ret.copy);
+            }
+                break;
+            case MessageID.BATTLE_END_NOTIFY:
+            {
+                    BattleEndNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEndNotify>(packet.data,
+                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
+                    Debug.Log("Battle end:" + ret.copy);
+                }
+                break;
         }
     }
 

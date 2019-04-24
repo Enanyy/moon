@@ -59,7 +59,7 @@ message BattleEntityData
 message BattleEntity
 {
 	required int32 id = 1;
-	required int32 owner = 2;
+	required int32 userid = 2;
 	required int32 camp = 3;
 	required string name = 4;
 	required int32 type = 5;

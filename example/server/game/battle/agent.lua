@@ -3,6 +3,7 @@ local components = require("game.battle.component.components")
 local hero_config = require("config.hero_config")
 local M = setmetatable({
     id = 0,
+    userid = 0,
     sid = -1,
     camp = 0,
     name = "",
@@ -195,5 +196,32 @@ function M:needsync( )
     return false
 end
 
+
+function M:get_send_agent()
+
+    return {
+        id = self.id,
+        userid = self.userid,
+        camp = self.camp,
+        name = self.name,
+        type = 1,
+        config = self.config,
+        data = self:get_send_data()
+    }
+
+end
+
+function M:get_send_data()
+    return {
+        hp = self.hp,
+        maxhp = self.maxhp,
+        attack = self.attackvalue,
+        defense = self.defensevalue,
+        movespeed = self.movespeed,
+        attackspeed = self.attackspeed,
+        position = {x = self.position.x, y =self.position.y},
+        direction = {x = self.direction.x, y =self.direction.y}
+    }
+end
 
 return M

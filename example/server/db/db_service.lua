@@ -15,8 +15,9 @@ moon.start(function ()
     if cfg and cfg.mysql then
         local conn = mysql.create()
         local ret,errmsg = conn:connect(cfg.mysql.ip, cfg.mysql.port, cfg.mysql.user, cfg.mysql.password, cfg.mysql.database,cfg.mysql.timeout)
-        if ret then
-            print("connect mysql success:",cfg.mysql.ip, cfg.mysql.port, cfg.mysql.user, cfg.mysql.password, cfg.mysql.database)
+        print("db_service:connect mysql:",ret)
+        if ret == true then
+            print("db_service:connect mysql success:",cfg.mysql.ip, cfg.mysql.port, cfg.mysql.user, cfg.mysql.password, cfg.mysql.database)
             cmd.init(conn)
         else
             print(ret,errmsg)

@@ -86,5 +86,24 @@ function M:sendbuffer(sessionid,buffer)
     tcp.send(sessionid, buffer)
 end
 
+function M:send_then_close(sessionid,id, data)
+    if self.handler == nil then
+        error("netmgr:send: do not register msg_handler")
+        self:close(sessionid)
+        return
+    end
+    local buffer = self.handler.encode(id,data)
+    --发送str
+    tcp.send_then_close(sessionid, buffer)
+
+    print("netmgr:send sessionid:",sessionid, " id:",id," size:",#buffer)
+end
+
+function M:close(sessionid)
+
+    tcp:close(sessionid)
+
+end
+
 moon.exports.netmgr = M
 

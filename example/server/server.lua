@@ -7,6 +7,8 @@ function  M.call(name, cmd, ...)
     if config then 
         local data = { cluster.call(string.format( "server_%d", config.sid),name,cmd, ...) }
         return table.unpack(data)
+    else
+        error("server.call: can not service ",name)
     end
     return nil
 end

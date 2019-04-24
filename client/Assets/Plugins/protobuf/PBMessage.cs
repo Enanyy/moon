@@ -141,16 +141,6 @@ namespace PBMessage
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleGMRequest")]
-  public partial class BattleGMRequest : global::ProtoBuf.IExtensible
-  {
-    public BattleGMRequest() {}
-    
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Point2D")]
   public partial class Point2D : global::ProtoBuf.IExtensible
   {
@@ -253,12 +243,12 @@ namespace PBMessage
       get { return _id; }
       set { _id = value; }
     }
-    private int _owner;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"owner", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int owner
+    private int _userid;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"userid", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int userid
     {
-      get { return _owner; }
-      set { _owner = value; }
+      get { return _userid; }
+      set { _userid = value; }
     }
     private int _camp;
     [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"camp", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
@@ -294,6 +284,33 @@ namespace PBMessage
     {
       get { return _data; }
       set { _data = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleBeginRequest")]
+  public partial class BattleBeginRequest : global::ProtoBuf.IExtensible
+  {
+    public BattleBeginRequest() {}
+    
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleBeginReturn")]
+  public partial class BattleBeginReturn : global::ProtoBuf.IExtensible
+  {
+    public BattleBeginReturn() {}
+    
+    private int _result;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"result", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int result
+    {
+      get { return _result; }
+      set { _result = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -455,6 +472,23 @@ namespace PBMessage
     }
     private int _copy;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int copy
+    {
+      get { return _copy; }
+      set { _copy = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEndNotify")]
+  public partial class BattleEndNotify : global::ProtoBuf.IExtensible
+  {
+    public BattleEndNotify() {}
+    
+    private int _copy;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public int copy
     {
       get { return _copy; }

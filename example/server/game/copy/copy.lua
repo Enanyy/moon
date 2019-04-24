@@ -1,8 +1,10 @@
 --副本
 local moon = require("moon")
 local core = require("moon.core")
-
+local cmd = require("game.copy.copy_cmd")
 require("config")
+require("def")
+require("msgid")
 moon.exports.vector2 = require("base.vector2")
 moon.exports.agent = require("game.battle.agent")
 moon.exports.agentmgr = require("game.battle.agentmgr")
@@ -18,28 +20,136 @@ moon.exports.ai  = require("game.battle.component.ai")
 
 moon.exports.rvo2 = require("game.battle.rvo2")
 
-local copy = {
+local delta = 100
+
+
+local M = {
     sid = -1,
-    data = nil,
-    handler =  nil,
+    copyname = "",
+    users = nil,
+    isdestroy = false,
 }
-function copy.init(data)
-    copy.sid = data.sid
-    copy.data = data
-    copy.handler = require("msg_handler")
+function M:init(data)
+    print("copy:init-> copy",table.tostring(data))
+    self.sid = data.sid
+    self.copyid = moon.sid()
+    self.copyname = data.copyname
+    self.users = data.users
+    self.isdestroy = false
 end
-function copy.send(sessionid, id, data)
-    if copy.id > 0 and copy.handler ~= nil then
-        local buffer = copy.handler.encode(id,data)
-        moon.async(function ()
-            moon.co_call("lua", copy.sid, "SEND", sessionid, data)            
-        end)
+function M:login(userid,sessionid)
+
+    local result = false
+
+    if self.users ~= nil then
+        for i,v in ipairs(self.users) do
+            if v.userid == userid then
+                v.sessionid = sessionid
+                result = true
+            end
+        end
+    end
+
+    if result then 
+        print("copy:login->copy ", self.copyname, " start")
+        self:start()
+    end
+
+    return result
+    
+end
+
+function M:getuser(userid)
+    if self.users ~= nil then
+        for i,v in ipairs(self.users) do
+            if v.userid == userid then
+               return v
+            end
+        end
+    end
+    return nil
+end
+
+
+function M:send(userid, id, data)
+    if self.sid > 0  then
+        local user = self:getuser(userid)
+        if user and user.sessionid then
+            moon.async(function ()
+                local result,err = moon.co_call("lua", self.sid, "SEND", user.sessionid, id, data)            
+            end)
+        end
     end
 end
 
-moon.exports.copy = copy
+function M:start()
+    rvo2:init(delta/ 1000,vector2.new(0,0))
+   
+    local data = {
+        copy = self.copyid,
+        list = {}
+    }
 
-local delta = 100
+    for i,user in ipairs(self.users) do
+        for j, hero in ipairs(user.heros) do
+           for k = 1,hero.count do
+                local  a = agent.new()
+                a.id = user.userid * 100 + k
+                a.userid = user.userid
+                a.config = hero.config
+                a.camp = user.camp
+            
+                a.position = vector2.new(k*5, (i-1)*100 +j*5)
+                a.direction = vector2.new(1, 0)
+        
+                a:addcomponent(ai.new())
+        
+                if agentmgr:addagent(a) then
+                    table.insert( data.list, a:get_send_agent() )
+                end
+           end
+        end
+    end
+
+
+    self:broadcast(msgid.BATTLE_BEGIN_NOTIFY,data)
+
+end
+
+function M:broadcast(id, data)
+    for i,user in ipairs(self.users) do
+        if user.userid > 0 then
+            self:send(user.userid,id,data)
+        end
+    end
+    
+end
+
+function M:destroy()
+    if self.isdestroy ==true then
+        return
+    end
+    agentmgr:destroy()
+    local data = {
+        copy = self.copyid
+    }
+    self:broadcast(msgid.BATTLE_END_NOTIFY,data)
+    self.isdestroy = true
+    moon.async(function ()
+        moon.co_call("lua", self.sid, "DESTROY_COPY", self.copyid)            
+    end)
+end
+
+function M:update(delta)
+    if self.isdestroy then
+        return
+    end
+    rvo2:doStep()
+    agentmgr:update(delta )
+end
+
+moon.exports.copy = M
+
 
 moon.init(function(cfg) 
     config.load_config(cfg)
@@ -49,57 +159,21 @@ end)
 
 moon.start(function ()   
     
-    rvo2:init(delta/ 1000,vector2.new(0,0))
-   
-    for i=1,1 do
-        local  a = agent.new()
-        a.id = i
-        a.config = 1
-        a.camp = 1
-       
-        a.position = vector2.new(i*5, 0)
-        a.direction = vector2.new(1, 0)
-
-        a:addcomponent(ai.new())
-
-        agentmgr:addagent(a)
-
-    end
-
-    for i=100,100 do
-        local  a = agent.new()
-        a.id = i
-        a.config = 2
-        a.camp = 2
-       
-        a.position = vector2.new(i/100*5, 20)
-        a.direction = vector2.new(-1, 0)
-
-        a:addcomponent(ai.new())
-       
-        agentmgr:addagent(a)
-
-    end
-
-   
-
 end)
 
 moon.dispatch('lua',function(msg, p) 
-
-
+    cmd.oncommand(cmd,msg,p)
 end)
 
 moon.exit(function() 
-    agentmgr:destroy()
+    copy:destroy()
 end)
 
 moon.destroy(function() 
-    agentmgr:destroy()
+    copy:destroy()
 end)
 
 
 moon.repeated(delta, -1, function() 
-    rvo2:doStep()
-    agentmgr:update(delta / 1000)
+   copy:update(delta / 1000)
 end)

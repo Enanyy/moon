@@ -29,18 +29,20 @@ end
 
 M.isconnected = function() return M.conn ~= nil and M.conn:connected() end
 
-M.LOGIN = function (sender,header,responseid, msg )
+M.LOGIN = function (sender,responseid, msg )
 
     local id = errordef.SYSTEM
     if M.isconnected() then
         local db_config = config.get_service("db")
         if db_config ~= nil and db_config.mysql ~= nil then
-            local sql = string.format( "select * from %s.user where name = '%s';",db_config.mysql.database,name)
-        
+            local sql = string.format( "select * from %s.user where name = '%s';",db_config.mysql.database,msg.name)
+            print("db_cmd.LOGIN->",sql)
             local result = M.conn:query(sql)
 
+            print("db_cmd.LOGIN->select result:",table.tostring(result))
             if type(result) =="table" and #result > 0 then
                 local row = result[1]
+                print("db_cmd.LOGIN->select row:",table.tostring(row))
 
                 if row[2] == msg.name and row[3] == msg.password then
                     id = row[1]
@@ -51,7 +53,7 @@ M.LOGIN = function (sender,header,responseid, msg )
                 local sql = string.format("insert into %s.user (name,password) values('%s', '%s');",db_config.mysql.database,name, password)
                 local result = M.conn:execute(sql)
 
-                print("register user result:"..table.tostring(result))
+                print("db_cmd.LOGIN->register user result:"..table.tostring(result))
                 if result then
                     local data = M.conn:query("select @@IDENTITY;")
                     id = data[1][1]             
@@ -65,7 +67,7 @@ M.LOGIN = function (sender,header,responseid, msg )
         name = msg.name,
         password = msg.password
     }
-    print("db login return:",table.tostring(data))
+    print("db_cmd.LOGIN->db login return:",table.tostring(data))
     moon.response('lua',sender,responseid, data)
 
 end
