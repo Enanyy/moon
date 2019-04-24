@@ -118,7 +118,7 @@ end
 
 function M:broadcast(id, data)
     for i,user in ipairs(self.users) do
-        if user.userid > 0 then
+        if user.type == userdef.USER then
             self:send(user.userid,id,data)
         end
     end

@@ -14,7 +14,7 @@ message LoginReturn
 
 message UserData
 {
-	required int32 id = 1;
+	required uint32 id = 1;
 	required string name = 2;
 	
 }
@@ -27,7 +27,7 @@ message LoginGameNotify
 
 message LoginGameRequest
 {
-	required int32 id = 1; 
+	required uint32 id = 1; 
 }
 
 message LoginGameReturn
@@ -45,10 +45,10 @@ message Point2D
 
 message BattleEntityData
 {
-	required int32 hp =1;
-	required int32 maxhp = 2;
-	required int32 attack = 3;
-	required int32 defense = 4;
+	required uint32 hp =1;
+	required uint32 maxhp = 2;
+	required uint32 attack = 3;
+	required uint32 defense = 4;
 	required float movespeed = 5;
 	required float attackspeed = 6;
 
@@ -58,12 +58,12 @@ message BattleEntityData
 
 message BattleEntity
 {
-	required int32 id = 1;
-	required int32 userid = 2;
-	required int32 camp = 3;
+	required uint32 id = 1;
+	required uint32 userid = 2;
+	required uint32 camp = 3;
 	required string name = 4;
-	required int32 type = 5;
-	required int32 config = 6;
+	required uint32 type = 5;
+	required uint32 config = 6;
 	
 	required BattleEntityData data = 7;
 	
@@ -79,43 +79,44 @@ message BattleBeginReturn
 
 message BattleBeginNotify
 {
-    required int32 copy = 1;
+    required uint32 copy = 1;
 	repeated BattleEntity list = 2;
 }
 
 message BattleEntityIdle
 {	
-	required int32 id = 1;
-	required int32 copy = 2;
+	required uint32 id = 1;
+	required uint32 copy = 2;
 	optional BattleEntityData data =3;
 }
 
 message BattleEntityRun
 {
-	required int32 id = 1;
-	required int32 copy = 2;
+	required uint32 id = 1;
+	required uint32 copy = 2;
 	required Point2D velocity = 3;
 	optional BattleEntityData data = 4;
 }
 
 message BattleEntityAttack
 {
-	required int32 id = 1;
-	required int32 copy = 2;
-	required int32 skill = 3;
-	required int32 attackspeed = 4;
-	optional BattleEntityData data = 5;
+	required uint32 id = 1;
+	required uint32 copy = 2;
+	required uint32 skill = 3;
+	required uint32 attackspeed = 4;
+	required uint32 target = 5;
+	optional BattleEntityData data = 6;
 }
 
 message BattleEntityDie
 {
-	required int32 id = 1;
-	required int32 copy = 2;
+	required uint32 id = 1;
+	required uint32 copy = 2;
 }
 
 message BattleEndNotify
 {
-	required int32 copy = 1;
+	required uint32 copy = 1;
 }
 
 

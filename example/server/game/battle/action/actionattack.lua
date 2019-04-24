@@ -21,6 +21,15 @@ function M:enter()
 
     end
 
+    local data = {
+        id = self.agent.id,
+        copy = copy.copyid,
+        skill = 1,
+        attackspeed = self.agent.attackspeed,
+        target = self.agent.target.id,
+        data = self.agent:get_send_data()
+    }
+    copy:broadcast(msgid.BATTLE_ENTITY_ATTACK,data)
 end
 
 function M:execute(delta)

@@ -64,9 +64,9 @@ namespace PBMessage
   {
     public UserData() {}
     
-    private int _id;
+    private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int id
+    public uint id
     {
       get { return _id; }
       set { _id = value; }
@@ -112,9 +112,9 @@ namespace PBMessage
   {
     public LoginGameRequest() {}
     
-    private int _id;
+    private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int id
+    public uint id
     {
       get { return _id; }
       set { _id = value; }
@@ -170,30 +170,30 @@ namespace PBMessage
   {
     public BattleEntityData() {}
     
-    private int _hp;
+    private uint _hp;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"hp", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int hp
+    public uint hp
     {
       get { return _hp; }
       set { _hp = value; }
     }
-    private int _maxhp;
+    private uint _maxhp;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"maxhp", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int maxhp
+    public uint maxhp
     {
       get { return _maxhp; }
       set { _maxhp = value; }
     }
-    private int _attack;
+    private uint _attack;
     [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"attack", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int attack
+    public uint attack
     {
       get { return _attack; }
       set { _attack = value; }
     }
-    private int _defense;
+    private uint _defense;
     [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"defense", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int defense
+    public uint defense
     {
       get { return _defense; }
       set { _defense = value; }
@@ -236,23 +236,23 @@ namespace PBMessage
   {
     public BattleEntity() {}
     
-    private int _id;
+    private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int id
+    public uint id
     {
       get { return _id; }
       set { _id = value; }
     }
-    private int _userid;
+    private uint _userid;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"userid", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int userid
+    public uint userid
     {
       get { return _userid; }
       set { _userid = value; }
     }
-    private int _camp;
+    private uint _camp;
     [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"camp", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int camp
+    public uint camp
     {
       get { return _camp; }
       set { _camp = value; }
@@ -264,16 +264,16 @@ namespace PBMessage
       get { return _name; }
       set { _name = value; }
     }
-    private int _type;
+    private uint _type;
     [global::ProtoBuf.ProtoMember(5, IsRequired = true, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int type
+    public uint type
     {
       get { return _type; }
       set { _type = value; }
     }
-    private int _config;
+    private uint _config;
     [global::ProtoBuf.ProtoMember(6, IsRequired = true, Name=@"config", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int config
+    public uint config
     {
       get { return _config; }
       set { _config = value; }
@@ -322,9 +322,9 @@ namespace PBMessage
   {
     public BattleBeginNotify() {}
     
-    private int _copy;
+    private uint _copy;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int copy
+    public uint copy
     {
       get { return _copy; }
       set { _copy = value; }
@@ -346,16 +346,16 @@ namespace PBMessage
   {
     public BattleEntityIdle() {}
     
-    private int _id;
+    private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int id
+    public uint id
     {
       get { return _id; }
       set { _id = value; }
     }
-    private int _copy;
+    private uint _copy;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int copy
+    public uint copy
     {
       get { return _copy; }
       set { _copy = value; }
@@ -378,16 +378,16 @@ namespace PBMessage
   {
     public BattleEntityRun() {}
     
-    private int _id;
+    private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int id
+    public uint id
     {
       get { return _id; }
       set { _id = value; }
     }
-    private int _copy;
+    private uint _copy;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int copy
+    public uint copy
     {
       get { return _copy; }
       set { _copy = value; }
@@ -417,36 +417,43 @@ namespace PBMessage
   {
     public BattleEntityAttack() {}
     
-    private int _id;
+    private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int id
+    public uint id
     {
       get { return _id; }
       set { _id = value; }
     }
-    private int _copy;
+    private uint _copy;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int copy
+    public uint copy
     {
       get { return _copy; }
       set { _copy = value; }
     }
-    private int _skill;
+    private uint _skill;
     [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"skill", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int skill
+    public uint skill
     {
       get { return _skill; }
       set { _skill = value; }
     }
-    private int _attackspeed;
+    private uint _attackspeed;
     [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"attackspeed", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int attackspeed
+    public uint attackspeed
     {
       get { return _attackspeed; }
       set { _attackspeed = value; }
     }
+    private uint _target;
+    [global::ProtoBuf.ProtoMember(5, IsRequired = true, Name=@"target", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint target
+    {
+      get { return _target; }
+      set { _target = value; }
+    }
     private BattleEntityData _data = null;
-    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
     public BattleEntityData data
     {
@@ -463,16 +470,16 @@ namespace PBMessage
   {
     public BattleEntityDie() {}
     
-    private int _id;
+    private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int id
+    public uint id
     {
       get { return _id; }
       set { _id = value; }
     }
-    private int _copy;
+    private uint _copy;
     [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int copy
+    public uint copy
     {
       get { return _copy; }
       set { _copy = value; }
@@ -487,9 +494,9 @@ namespace PBMessage
   {
     public BattleEndNotify() {}
     
-    private int _copy;
+    private uint _copy;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int copy
+    public uint copy
     {
       get { return _copy; }
       set { _copy = value; }

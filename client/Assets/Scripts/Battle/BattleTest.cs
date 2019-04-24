@@ -35,7 +35,7 @@ public class BattleTest : MonoBehaviour
     private List<BattleTestRenderer> battleTestRadius = new List<BattleTestRenderer>();
     void Awake()
     {
-        BattleManager.Instance.Init(0.02f);
+        
     }
     // Use this for initialization
     void Start()

@@ -15,6 +15,13 @@ function M:enter()
     print(self.agent.id ," enter idle:"..tostring(self.agent.position))
     --     end
     action.enter(self)
+
+    local data = {
+        id = self.agent.id,
+        copy = copy.copyid,
+        data = self.agent:get_send_data()
+    }
+    copy:broadcast(msgid.BATTLE_ENTITY_IDLE,data)
 end
 
 function M:execute(delta)

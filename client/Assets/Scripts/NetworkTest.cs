@@ -6,9 +6,9 @@ using PBMessage;
 public class NetworkTest : MonoBehaviour
 {
     public string ip = "127.0.0.1";
-    public int port = 12345;
+    public int port = 5000;
     public string username = "lwg";
-    public string pwd = "";
+    public string pwd = "1234";
 
     void Start()
     {
@@ -20,6 +20,12 @@ public class NetworkTest : MonoBehaviour
     {
         NetworkManager.Instance().Update();
     }
+
+    void Update()
+    {
+        NetworkManager.Instance().Update();
+    }
+
     void OnGUI()
     {
         if (GUI.Button(new Rect(20, 20, 100, 40), "Connect"))
@@ -56,8 +62,9 @@ public class NetworkTest : MonoBehaviour
 
     void OnReceive(NetPacket packet)
     {
-        Debug.Log(packet.ID);
+       
         var id = (MessageID) packet.ID;
+        Debug.Log("recv:"+id.ToString());
         switch (id)
         {
             case MessageID.LOGIN_RETURN:
@@ -94,7 +101,7 @@ public class NetworkTest : MonoBehaviour
             {
                 LoginGameReturn ret = ProtoTransfer.DeserializeProtoBuf<LoginGameReturn>(packet.data,
                     NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-
+                Debug.Log("Login Game result:"+ret.result);
             }
                 break;
             case MessageID.BATTLE_BEGIN_RETURN:
@@ -109,7 +116,104 @@ public class NetworkTest : MonoBehaviour
             {
                 BattleBeginNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleBeginNotify>(packet.data,
                     NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-                Debug.Log("Battle begin:"+ret.copy);
+                Debug.Log("Battle begin:" + ret.copy);
+
+                for (int i = 0; i < ret.list.Count; ++i)
+                {
+                    var data = ret.list[i];
+                    BattleEntity entity = ObjectPool.GetInstance<BattleEntity>();
+
+                    entity.id = data.id;
+
+                    entity.configid = 10000+data.config;
+                    entity.campflag =  data.camp;
+
+                    entity.type = data.type;
+
+                    entity.hp = data.data.hp;
+                   
+                    entity.position = new Vector3(data.data.position.x, 0, data.data.position.y);
+                    entity.rotation = Quaternion.LookRotation(new Vector3(data.data.direction.x, 0, data.data.direction.y));
+                    if (BattleManager.Instance.AddEntity(entity))
+                    {
+                        entity.active = true;
+                    }
+                }
+            }
+                break;
+            case MessageID.BATTLE_ENTITY_IDLE:
+            {
+                    BattleEntityIdle ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityIdle>(packet.data,
+                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
+
+                    Debug.Log(ret.id+" idle");
+                    var entity = BattleManager.Instance.GetEntity(ret.id);
+                    if (entity != null)
+                    {
+                        if (entity.machine != null && entity.machine.current != null &&
+                            entity.machine.current.type == (int) ActionType.Run)
+                        {
+                            var action = entity.machine.current as EntityAction;
+                            if (action != null && action.paths.Count == 0)
+                            {
+                                action.Done();
+                            }
+                        }
+                    }
+            }
+                break;
+            case MessageID.BATTLE_ENTITY_RUN:
+                {
+                    BattleEntityRun ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityRun>(packet.data,
+                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
+
+                    Debug.Log(ret.id + " run");
+
+                    Vector3 velocity = new Vector3(ret.velocity.x, 0 ,ret.velocity.y);
+                    var entity = BattleManager.Instance.GetEntity(ret.id);
+                    if (entity != null)
+                    {
+                        EntityAction action = entity.GetFirst(ActionType.Run);
+
+                        if (action != null)
+                        {
+                            action.velocity = velocity;
+                        }
+                        else
+                        {
+                            action = ObjectPool.GetInstance<EntityAction>();
+                            action.velocity = velocity;
+                            entity.PlayAction(ActionType.Run, action);
+                        }
+                    }
+                }
+                break;
+            case MessageID.BATTLE_ENTITY_ATTACK:
+            {
+                BattleEntityAttack ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityAttack>(packet.data,
+                    NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
+                Debug.Log(ret.id + " attack");
+                var entity = BattleManager.Instance.GetEntity(ret.id);
+                if (entity != null)
+                {
+                    EntityAction action = ObjectPool.GetInstance<EntityAction>();
+                    action.skillid = 1;
+                    action.duration = ret.attackspeed;
+
+                    entity.PlayAction(ActionType.Attack, action);
+                }
+            }
+                break;
+            case MessageID.BATTLE_ENTITY_DIE:
+            {
+                BattleEntityDie ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityDie>(packet.data,
+                    NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
+                Debug.Log(ret.id + " die");
+                var entity = BattleManager.Instance.GetEntity(ret.id);
+                if (entity != null)
+                {
+                    entity.Die();
+                }
             }
                 break;
             case MessageID.BATTLE_END_NOTIFY:

@@ -38,3 +38,11 @@ local server=
     DB = "db",       --数据服务器
 }
 moon.exports.serverdef = server
+
+--玩家类型
+local userdef ={
+    USER = 1,
+    MONSTER = 2,
+}
+
+moon.exports.userdef = userdef

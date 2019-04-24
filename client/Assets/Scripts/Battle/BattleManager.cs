@@ -49,9 +49,7 @@ public class BattleManager
         mEffectList = new List<EffectEntity>();
 
     }
-    public void Init(float timeStep)
-    { 
-    }
+   
 
     public bool AddEntity(BattleEntity entity)
     {

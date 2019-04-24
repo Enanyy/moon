@@ -76,14 +76,16 @@ function M.battle_begin_request(sessionid, u, msg )
                 {
                     userid = u.id,
                     camp = 1,
+                    type = userdef.USER,
                     heros = {
                         {config = 1, count = 1},
                         {config = 2, count = 2},
                     }
                 },
                 {
-                    userid = -1,
+                    userid = 1000,
                     camp = 2,
+                    type = userdef.MONSTER,
                     heros = {
                         {config = 1, count = 1},
                         {config = 2, count = 2},

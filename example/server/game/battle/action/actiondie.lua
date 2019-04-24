@@ -14,6 +14,12 @@ end
 function M:enter()
     print(self.agent.id ," enter die:"..tostring(self.agent.position))
     action.enter(self)
+
+    local data = {
+        id = self.agent.id,
+        copy = copy.copyid,
+    }
+    copy:broadcast(msgid.BATTLE_ENTITY_DIE,data)
 end
 
 function M:execute(delta)

@@ -31,6 +31,7 @@ function M:enter()
     if self.agent:needsync() then
         self.sync = true
     end
+    
 end
 
 function M:execute(delta)
@@ -49,8 +50,10 @@ function M:execute(delta)
             if direction:magnitude() >= displacement then
                 
                 self.agent.direction = direction:normalized()
-                self.agent.position = self.agent.position + self.agent.direction * displacement
-            
+                local velocity = self.agent.direction * displacement
+                self.agent.position = self.agent.position + velocity
+    
+                self:broadcast(velocity)
             else
                 self.sync = false
             end
@@ -69,11 +72,15 @@ function M:execute(delta)
             self.agent.position = rvo2:getAgentPosition(self.agent.sid)
          
             local v =  rvo2:getAgentPrefVelocity(self.agent.sid)
+            
+            self:broadcast(v)
+            
             if math.abs( v.x ) < 0.01 and math.abs( v.y ) < 0.01 then
                 self:done()
             else
                 self.agent.direction = v
             end
+            
         end
     
     else
@@ -113,6 +120,18 @@ function M:pause()
     if self.agent.sid >= 0 then
         rvo2:setAgentPrefVelocity(self.agent.sid, vector2.new(0,0))
     end
+end
+
+
+function M:broadcast(velocity)
+
+    local data = {
+        id = self.agent.id,
+        copy = copy.copyid,
+        velocity = {x =velocity.x, y = velocity.y },
+        data = self.agent:get_send_data()
+    }
+    copy:broadcast(msgid.BATTLE_ENTITY_RUN,data)
 end
 
 return M

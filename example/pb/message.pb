@@ -1,5 +1,5 @@
 
-ã
+ô
 message.proto".
 LoginRequest
 name (	
@@ -9,7 +9,7 @@
 userdata (2	.UserData"$
 UserData
 
-id (
+id (
 name (	"+
 LoginGameNotify
 
@@ -17,7 +17,7 @@
 port ("
 LoginGameRequest
 
-id ("!
+id ("!
 LoginGameReturn
 result ("
 Point2D	
@@ -25,50 +25,51 @@
 y ("¯
 BattleEntityData
 
-hp (
-maxhp (
-attack (
-defense (
+hp (
+maxhp (
+attack (
+defense (
 	movespeed (
 attackspeed (
 position (2.Point2D
 	direction (2.Point2D"…
 BattleEntity
 
-id (
-userid (
-camp (
+id (
+userid (
+camp (
 name (	
-type (
-config (
+type (
+config (
 data (2.BattleEntityData"
 BattleBeginRequest"#
 BattleBeginReturn
 result (">
 BattleBeginNotify
-copy (
+copy (
 list (2.BattleEntity"M
 BattleEntityIdle
 
-id (
-copy (
+id (
+copy (
 data (2.BattleEntityData"h
 BattleEntityRun
 
-id (
-copy (
+id (
+copy (
 velocity (2.Point2D
-data (2.BattleEntityData"s
+data (2.BattleEntityData"ƒ
 BattleEntityAttack
 
-id (
-copy (
-skill (
-attackspeed (
-data (2.BattleEntityData"+
+id (
+copy (
+skill (
+attackspeed (
+target (
+data (2.BattleEntityData"+
 BattleEntityDie
 
-id (
-copy ("
+id (
+copy ("
 BattleEndNotify
-copy (
+copy (

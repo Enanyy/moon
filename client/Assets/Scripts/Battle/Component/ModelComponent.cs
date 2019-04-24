@@ -117,6 +117,8 @@ public class ModelComponent :
         if(gameObject!= null)
         {
             gameObject.name = agent.id.ToString();
+            gameObject.transform.position = agent.position;
+            gameObject.transform.rotation = agent.rotation;
         }
 
         return result;
