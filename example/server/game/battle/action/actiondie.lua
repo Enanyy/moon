@@ -7,6 +7,7 @@ function M.new()
     o.type = actiondef.die
     o.duration = 2
     o.weight = 10
+    o.senddata = {}
     return o
 end
 
@@ -15,11 +16,7 @@ function M:enter()
     print(self.agent.id ," enter die:"..tostring(self.agent.position))
     action.enter(self)
 
-    local data = {
-        id = self.agent.id,
-        copy = copy.copyid,
-    }
-    copy:broadcast(msgid.BATTLE_ENTITY_DIE,data)
+    self:broadcast()
 end
 
 function M:execute(delta)
@@ -32,6 +29,14 @@ function M:exit()
     --print(self.agent.id ," exit die")
 
     agentmgr:removeagent(self.agent.id)
+end
+
+function M:broadcast()
+
+    self.senddata.id = self.agent.id
+    self.senddata.copy = copy.copyid
+    
+    copy:broadcast(msgid.BATTLE_ENTITY_DIE,self.senddata)
 end
 
 return M

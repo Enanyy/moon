@@ -42,7 +42,7 @@ function M:getclosetagent(a)
     local agent = nil
     for camp, list in pairs(self.agents) do
         for i, v in ipairs(list) do
-            if v.camp ~= a.camp and a ~= v  then
+            if v.isdie == false and v.camp ~= a.camp and a ~= v  then
                 local d = vector2.distance(a.position, v.position)
                 if agent == nil or d < distance then
                     agent = v

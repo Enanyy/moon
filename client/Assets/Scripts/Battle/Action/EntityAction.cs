@@ -11,8 +11,7 @@ public class EntityAction : State<BattleEntity>,IPoolObject
 
     public LinkedList<Vector3> paths = new LinkedList<Vector3>();
 
-    public bool syncPosition = false;
-
+   
     public ActionParam param { get; private set; }
     public AnimationParam animation { get; private set; }
 
@@ -84,7 +83,6 @@ public class EntityAction : State<BattleEntity>,IPoolObject
         skillid = 0;
         target = 0;
         paths.Clear();
-        syncPosition = false;
     }
 
     public override bool IsValid()
@@ -92,7 +90,11 @@ public class EntityAction : State<BattleEntity>,IPoolObject
         switch (type)
         {
             case ActionType.Attack:
-                {                
+                {             
+                    if(agent.isDie)
+                    {
+                        return false;
+                    }
                     var entity = BattleManager.Instance.GetEntity(target);
                     if (entity == null || Vector3.Distance(entity.position,agent.position)>= agent.param.attackDistance)
                     {
@@ -102,7 +104,11 @@ public class EntityAction : State<BattleEntity>,IPoolObject
                 }break;
             case ActionType.Run:
                 {
-                    return velocity != Vector3.zero || paths.Count > 0|| syncPosition;
+                    if (agent.isDie)
+                    {
+                        return false;
+                    }
+                    return velocity != Vector3.zero || paths.Count > 0;
                 }
         }
 

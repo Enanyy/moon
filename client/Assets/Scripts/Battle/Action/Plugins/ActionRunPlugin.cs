@@ -10,10 +10,6 @@ public class ActionRunPlugin : ActionPlugin
     {
         base.OnEnter();
        
-        if (agent.NeedSyncPosition())
-        {
-            action.syncPosition = true;
-        }
     }
 
     public override void OnExcute(float deltaTime)

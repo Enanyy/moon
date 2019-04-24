@@ -176,7 +176,7 @@ function M:hurtby( attacker )
     local hurtvalue = (attacker.attackvalue - self.defensevalue)
     self.hp = self.hp - hurtvalue
 
-    print(attacker.id, " attack ",self.id, " hurt:",hurtvalue," hp:",self.hp)
+    --print(attacker.id, " attack ",self.id, " hurt:",hurtvalue," hp:",self.hp)
 
     local data = {
         id = self.id,

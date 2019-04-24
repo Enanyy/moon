@@ -13,6 +13,8 @@ function M.new()
     o.destination = vector2.zero()
 
     o.sync = false
+
+    o.senddata = {}
     return o
 end
 
@@ -25,7 +27,7 @@ end
 function M:enter()
     action.enter(self)
         -- if self.agent.id == 1 then
-            print(self.agent.id.. ' enter run'.." position:"..tostring(self.agent.position).. "destination:"..tostring(self.destination))
+        --    print(self.agent.id.. ' enter run'.." position:"..tostring(self.agent.position).. "destination:"..tostring(self.destination))
         -- end
 
     if self.agent:needsync() then
@@ -98,9 +100,9 @@ function M:execute(delta)
         self:done()
     end
 --]]
-    --if self.agent.id == 1 then
+    if self.agent.type == userdef.USER then
         print(self.agent.id.. ' execute run:'..tostring(self.agent.position).." destination:"..tostring(self.destination).." distance:"..tostring((self.destination - self.agent.position):magnitude()))
-    --end
+    end
 end
 
 function M:exit()
@@ -125,13 +127,16 @@ end
 
 function M:broadcast(velocity)
 
-    local data = {
-        id = self.agent.id,
-        copy = copy.copyid,
-        velocity = {x =velocity.x, y = velocity.y },
-        data = self.agent:get_send_data()
-    }
-    copy:broadcast(msgid.BATTLE_ENTITY_RUN,data)
+    if self.senddata.velocity ~= nil and (self.senddata.velocity.x == velocity.x and self.senddata.velocity.y == velocity.y) then
+        return
+    end
+    
+    self.senddata.id = self.agent.id
+    self.senddata.copy = copy.copyid
+    self.senddata.velocity = {x =velocity.x, y = velocity.y }
+    self.senddata.data = self.agent:get_send_data()
+    
+    copy:broadcast(msgid.BATTLE_ENTITY_RUN,self.senddata)
 end
 
 return M

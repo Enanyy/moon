@@ -91,13 +91,15 @@ function M:start()
     }
 
     for i,user in ipairs(self.users) do
+        local index = 1
         for j, hero in ipairs(user.heros) do
            for k = 1,hero.count do
                 local  a = agent.new()
-                a.id = user.userid * 100 + k
+                a.id = user.userid * 100 + index
                 a.userid = user.userid
                 a.config = hero.config
                 a.camp = user.camp
+                a.type = user.type
             
                 a.position = vector2.new(k*5, (i-1)*100 +j*5)
                 a.direction = vector2.new(1, 0)
@@ -107,6 +109,9 @@ function M:start()
                 if agentmgr:addagent(a) then
                     table.insert( data.list, a:get_send_agent() )
                 end
+
+
+                index = index + 1
            end
         end
     end

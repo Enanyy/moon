@@ -83,10 +83,7 @@ public class BattleEntity:
             }
         }
     }
-    public bool isDie
-    {
-        get { return hp <= 0; }
-    }
+    public bool isDie{get; private set;}
 
     public uint target
     {
@@ -215,50 +212,11 @@ public class BattleEntity:
             }
             machine.OnUpdate(deltaTime);
 
-            SyncPosition();
+            
         }
     }
 
-    private void SyncPosition()
-    {
-        if (NeedSyncPosition())
-        {
-            EntityAction action = null;
-            if (machine.current != null && machine.current.type == (int)ActionType.Run)
-            {
-                action = machine.current as EntityAction;
-
-            }
-            if (action == null)
-            {
-                if (machine.next != null && machine.next.type == (int)ActionType.Run)
-                {
-                    action = machine.next as EntityAction;
-                    machine.current.speed = 5;
-                }
-            }
-            if (action != null)
-            {
-                action.syncPosition = true;
-            }
-            else
-            {
-                if (machine.current != null)
-                {
-                    machine.current.speed = 5;
-                }
-                action = ObjectPool.GetInstance<EntityAction>();
-                action.syncPosition = true;
-                PlayAction(ActionType.Run, action, true);
-            }
-        }
-    }
-
-    public bool NeedSyncPosition()
-    {
-        return false;
-    }
-
+  
     public void DropBlood(int value)
     {
         if (active)
@@ -274,10 +232,12 @@ public class BattleEntity:
 
         hp = 0;
 
+        isDie = true;
+
         DropBlood(value);
 
         EntityAction action = ObjectPool.GetInstance<EntityAction>();
-        PlayAction(ActionType.Die,action);
+        PlayAction(ActionType.Die,action,true);
 
     }
 

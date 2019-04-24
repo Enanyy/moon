@@ -79,7 +79,7 @@ function M.battle_begin_request(sessionid, u, msg )
                     type = userdef.USER,
                     heros = {
                         {config = 1, count = 1},
-                        {config = 2, count = 2},
+                        {config = 2, count = 1},
                     }
                 },
                 {
@@ -88,7 +88,7 @@ function M.battle_begin_request(sessionid, u, msg )
                     type = userdef.MONSTER,
                     heros = {
                         {config = 1, count = 1},
-                        {config = 2, count = 2},
+                        {config = 2, count = 1},
                     }
                 },
             }
