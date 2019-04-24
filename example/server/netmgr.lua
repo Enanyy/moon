@@ -73,7 +73,7 @@ function M:send(sessionid, id, data)
     --发送str
     tcp.send(sessionid, buffer)
 
-    print("netmgr:send sessionid:",sessionid, " id:",id," size:",#buffer)
+    --print("netmgr:send sessionid:",sessionid, " id:",id," size:",#buffer)
 end
 
 --sessionid 会话id
@@ -96,7 +96,7 @@ function M:send_then_close(sessionid,id, data)
     --发送str
     tcp.send_then_close(sessionid, buffer)
 
-    print("netmgr:send sessionid:",sessionid, " id:",id," size:",#buffer)
+    --print("netmgr:send sessionid:",sessionid, " id:",id," size:",#buffer)
 end
 
 function M:close(sessionid)

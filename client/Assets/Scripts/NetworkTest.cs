@@ -23,7 +23,7 @@ public class NetworkTest : MonoBehaviour
 
     void Update()
     {
-        NetworkManager.Instance().Update();
+        BattleManager.Instance.Update(Time.deltaTime);
     }
 
     void OnGUI()

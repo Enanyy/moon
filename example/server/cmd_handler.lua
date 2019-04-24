@@ -8,10 +8,10 @@ function M.oncommand(self, msg, p)
 end
 
 function M.docommand(self, sender,responseid,CMD, ...)
-    print("sender",sender)
+    -- print("sender",sender)
 
-    print("responseid",responseid)
-    print("CMD",CMD)
+    -- print("responseid",responseid)
+    -- print("CMD",CMD)
     local func = self[CMD]
     if func ~= nil then
         func(sender,responseid,...)
