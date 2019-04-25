@@ -158,17 +158,6 @@ public class NetworkManager
         Debug.Log("NetworkManager.Send,id=" + packet.ID);
     }
 
-
-    public void Send<T>(ConnectID connectid,MessageID msgid, T data) where T : class, ProtoBuf.IExtensible
-    {
-        byte[] buffer = ProtoTransfer.SerializeProtoBuf<T>(data);
-
-        NetPacket packet = NetPacket.Create((int)msgid, buffer);
-
-        Send(connectid, packet);
-    }
-
-
     /// <summary>
     /// 断开连接
     /// </summary>

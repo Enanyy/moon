@@ -23,12 +23,16 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
 
     public void Send(ConnectID connectid)
     {
-        NetworkManager.Instance.Send(connectid, id, message);
+        byte[] buffer = ProtoTransfer.SerializeProtoBuf(message);
+
+        NetPacket packet = NetPacket.Create((int)id, buffer);
+
+        NetworkManager.Instance.Send(connectid, packet);
     }
 
     public void OnReceive(NetPacket packet)
     {
-        message = ProtoTransfer.DeserializeProtoBuf<T>(packet.data,
+        message = ProtoTransfer.DeserializeProtoBuf(packet.data,
             NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET,message);
         OnMessage();
     }
