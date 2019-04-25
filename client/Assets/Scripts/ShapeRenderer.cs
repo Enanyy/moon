@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum RadiusType
+public enum ShapeType
 {
     All,
     AttackDistance, // 攻击距离
@@ -17,7 +17,7 @@ public enum RadiusType
 [RequireComponent(typeof(LineRenderer))]
 public class ShapeRenderer : MonoBehaviour
 {
-    public RadiusType type;
+    public ShapeType type;
 
     protected LineRenderer mRenderer;
     public uint id;

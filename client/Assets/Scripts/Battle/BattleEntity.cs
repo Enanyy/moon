@@ -229,8 +229,8 @@ public class BattleEntity:
 
     public void UpdateEntity(PBMessage.BattleEntityData data)
     {
-        position = new Vector3(data.position.x,0, data.position.y);
-        rotation = Quaternion.LookRotation(new Vector3(data.direction.x, 0, data.direction.y));
+        //position = new Vector3(data.position.x,0, data.position.y);
+        //rotation = Quaternion.LookRotation(new Vector3(data.direction.x, 0, data.direction.y));
 
         hp = data.hp;
     }

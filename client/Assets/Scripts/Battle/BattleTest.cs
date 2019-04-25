@@ -30,7 +30,7 @@ public class BattleTest : MonoBehaviour
 
     public static bool TEST = false;
 
-    public RadiusType radiusType;
+    public ShapeType radiusType;
     
     private List<ShapeRenderer> battleTestRadius = new List<ShapeRenderer>();
     void Awake()
@@ -94,27 +94,27 @@ public class BattleTest : MonoBehaviour
                     line.transform.localPosition = new Vector3(0, 0.2f, 0);
                     line.transform.localScale = Vector3.one;
 
-                    ShowRadius(line.transform,  RadiusType.AttackDistance, entity, entity.param.attackDistance, Color.red);
-                    ShowRadius(line.transform, RadiusType.SearchDistance, entity, entity.param.searchDistance, Color.yellow);
-                    ShowRadius(line.transform,  RadiusType.Radius, entity, entity.param.radius, Color.green);
-                    ShowRadius(line.transform,  RadiusType. Rectangle, entity, entity.param.radius, Color.blue);
+                    ShowRadius(line.transform,  ShapeType.AttackDistance, entity, entity.param.attackDistance, Color.red);
+                    ShowRadius(line.transform, ShapeType.SearchDistance, entity, entity.param.searchDistance, Color.yellow);
+                    ShowRadius(line.transform,  ShapeType.Radius, entity, entity.param.radius, Color.green);
+                    ShowRadius(line.transform,  ShapeType. Rectangle, entity, entity.param.radius, Color.blue);
                 }
             }
         }
     }
-    void ShowRadius(Transform parent, RadiusType type, BattleEntity entity, float distance, Color color)
+    void ShowRadius(Transform parent, ShapeType type, BattleEntity entity, float distance, Color color)
     {
         GameObject go = new GameObject(type.ToString());
         go.transform.SetParent(parent);
         go.transform.localPosition = Vector3.zero;
-        if (type == RadiusType.Rectangle)
+        if (type == ShapeType.Rectangle)
         {
             var r = go.AddComponent<RectangleRenderer>();
             r.type = type;
             r.id = entity.configid;
             r.entity = entity;
             r.color = color;
-            r.rendering = radiusType == RadiusType.All || radiusType == type;
+            r.rendering = radiusType == ShapeType.All || radiusType == type;
 
             battleTestRadius.Add(r);
         }
@@ -125,7 +125,7 @@ public class BattleTest : MonoBehaviour
             r.id = entity.configid;
             r.radius = distance;
             r.color = color;
-            r.rendering = radiusType == RadiusType.All || radiusType == type;
+            r.rendering = radiusType == ShapeType.All || radiusType == type;
 
             battleTestRadius.Add(r);
         }
@@ -255,18 +255,18 @@ public class BattleTest : MonoBehaviour
                 {
                     switch (battleTestRadius[i].type)
                     {
-                        case RadiusType.AttackDistance:
+                        case ShapeType.AttackDistance:
                             {
                                 var radius = battleTestRadius[i] as CircularRenderer;
                                 radius.radius = data.param.attackDistance;
                             }
                             break;
-                        case RadiusType.SearchDistance:
+                        case ShapeType.SearchDistance:
                             {
                                 var radius = battleTestRadius[i] as CircularRenderer;
                                 radius.radius = data.param.searchDistance;
                             } break;
-                        case RadiusType.Radius:
+                        case ShapeType.Radius:
                             {
                                 var radius = battleTestRadius[i] as CircularRenderer;
                                 radius.radius = data.param.radius;
@@ -274,7 +274,7 @@ public class BattleTest : MonoBehaviour
                     }
                 }
 
-                battleTestRadius[i].rendering = radiusType == RadiusType.All || battleTestRadius[i].type == radiusType;
+                battleTestRadius[i].rendering = radiusType == ShapeType.All || battleTestRadius[i].type == radiusType;
             }
         }
     }

@@ -7,7 +7,7 @@ function M.new()
     o.type = actiondef.die
     o.duration = 2
     o.weight = 10
-    o.senddata = {}
+  
     return o
 end
 
@@ -33,10 +33,12 @@ end
 
 function M:broadcast()
 
-    self.senddata.id = self.agent.id
-    self.senddata.copy = copy.copyid
+    local data = {
+        id = self.agent.id,
+        copy = self.agent.copyid
+    }
     
-    copy:broadcast(msgid.BATTLE_ENTITY_DIE,self.senddata)
+    copy:broadcast(msgid.BATTLE_ENTITY_DIE,data)
 end
 
 return M

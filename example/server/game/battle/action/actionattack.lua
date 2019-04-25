@@ -7,7 +7,6 @@ function M.new()
     o.type = actiondef.attack
     o.duration = 2
     o.weight = 2
-    o.senddata= {}
     return o
 end
 --
@@ -47,14 +46,16 @@ function M:exit()
 end
 
 function M:broadcast()
-    self.senddata.id = self.agent.id
-    self.senddata.copy = copy.copyid
-    self.senddata.skill = 1
-    self.senddata.attackspeed = self.agent.attackspeed
-    self.senddata.target = self.agent.target.id
-    self.senddata.data = self.agent:get_send_data()
-    
-    copy:broadcast(msgid.BATTLE_ENTITY_ATTACK,self.senddata)
+    local data = {
+        id = self.agent.id,
+        copy = copy.copyid,
+        skill = 1,
+        attackspeed = self.agent.attackspeed,
+        target = self.agent.target.id,
+        data = self.agent:get_send_data()
+    }
+
+    copy:broadcast(msgid.BATTLE_ENTITY_ATTACK,data)
 end
 
 return M

@@ -144,6 +144,14 @@ public class ModelComponent :
 
             gameObject.transform.localScale = agent.scale * Vector3.one;            
         }
+
+#if UNITY_EDITOR
+        var type = Main.Instance.showType;
+        for (int i = 0; i < mShapeRenderers.Count; i++)
+        {
+            mShapeRenderers[i].gameObject.SetActive(mShapeRenderers[i].type == type || type == ShapeType.All);
+        }
+#endif
     }
     public void OnCancel(State<BattleEntity> state)
     {
@@ -333,12 +341,12 @@ public class ModelComponent :
         {
             return;
         }
-        ShowRadius(RadiusType.Radius, agent.radius, Color.green);
-        ShowRadius(RadiusType.SearchDistance, agent.searchDistance, Color.yellow);
-        ShowRadius(RadiusType.AttackDistance, agent.attackDistance, Color.red);
+        ShowRadius(ShapeType.Radius, agent.radius, Color.green);
+        ShowRadius(ShapeType.SearchDistance, agent.searchDistance, Color.yellow);
+        ShowRadius(ShapeType.AttackDistance, agent.attackDistance, Color.red);
     }
 
-    void ShowRadius(RadiusType type, float radius, Color color)
+    void ShowRadius(ShapeType type, float radius, Color color)
     {
         GameObject go = new GameObject(type.ToString());
         go.transform.SetParent(gameObject.transform);

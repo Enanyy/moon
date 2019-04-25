@@ -14,7 +14,6 @@ function M.new()
 
     o.sync = false
 
-    o.senddata = {}
     return o
 end
 
@@ -127,16 +126,13 @@ function M:broadcast(velocity)
         return
     end
 
-    if self.senddata.velocity ~= nil and (self.senddata.velocity.x == velocity.x and self.senddata.velocity.y == velocity.y) then
-        return
-    end
-    
-    self.senddata.id = self.agent.id
-    self.senddata.copy = copy.copyid
-    self.senddata.velocity = {x =velocity.x, y = velocity.y }
-    self.senddata.data = self.agent:get_send_data()
-    
-    copy:broadcast(msgid.BATTLE_ENTITY_RUN,self.senddata)
+    local data ={ 
+        id = self.agent.id,
+        copy = copy.copyid,
+        velocity ={x= velocity.x,y = velocity.y},
+        data = self.agent:get_send_data()
+    }
+    copy:broadcast(msgid.BATTLE_ENTITY_RUN,data)
 end
 
 return M

@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using PBMessage;
 
-public class NetworkTest : MonoBehaviour
+public class Main : MonoBehaviour
 {
     public string ip = "127.0.0.1";
     public int port = 5000;
     public string username = "lwg";
     public string pwd = "1234";
+
+    public ShapeType showType = ShapeType.None;
+
+    public static Main Instance { get; private set; }
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -161,17 +170,17 @@ public class NetworkTest : MonoBehaviour
                     if (entity != null)
                     {
                         entity.UpdateEntity(ret.data);
-                        //if (entity.machine != null && entity.machine.current != null &&
-                        //    entity.machine.current.type == (int)ActionType.Run)
-                        //{
-                        //    var action = entity.machine.current as EntityAction;
-                        //    if (action != null)
-                        //    {
-                        //        action.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
-                        //        action.doneWhenSync = true;
-                        //        action.sync = true;
-                        //    }
-                        //}
+                        if (entity.machine != null && entity.machine.current != null &&
+                            entity.machine.current.type == (int)ActionType.Run)
+                        {
+                            var action = entity.machine.current as EntityAction;
+                            if (action != null)
+                            {
+                                action.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
+                                action.doneWhenSync = true;
+                                action.sync = true;
+                            }
+                        }
                     }
                 }
                 break;
@@ -187,28 +196,28 @@ public class NetworkTest : MonoBehaviour
                     if (entity != null)
                     {
                         entity.UpdateEntity(ret.data);
-                        //EntityAction action = entity.GetFirst(ActionType.Run);
+                        EntityAction action = entity.GetFirst(ActionType.Run);
 
-                        //if (action != null)
-                        //{
-                        //    //Vector3 position = new Vector3(ret.data.position.x, 0, ret.data.position.y);
-                        //    //Vector3 direction = position - entity.position;
-                        //    //float angle = Vector3.Angle(velocity, direction);
-                        //    //if (angle > 10)
-                        //    //{
-                        //    //    action.destination = position;
-                        //    //    action.sync = true;
-                        //    //    action.doneWhenSync = false;
-                        //    //}
-                           
-                        //    action.velocity = velocity;
-                        //}
-                        //else
-                        //{
-                        //    action = ObjectPool.GetInstance<EntityAction>();
-                        //    action.velocity = velocity;
-                        //    entity.PlayAction(ActionType.Run, action);
-                        //}
+                        if (action != null)
+                        {
+                            //Vector3 position = new Vector3(ret.data.position.x, 0, ret.data.position.y);
+                            //Vector3 direction = position - entity.position;
+                            //float angle = Vector3.Angle(velocity, direction);
+                            //if (angle > 10)
+                            //{
+                            //    action.destination = position;
+                            //    action.sync = true;
+                            //    action.doneWhenSync = false;
+                            //}
+
+                            action.velocity = velocity;
+                        }
+                        else
+                        {
+                            action = ObjectPool.GetInstance<EntityAction>();
+                            action.velocity = velocity;
+                            entity.PlayAction(ActionType.Run, action);
+                        }
                     }
                 }
                 break;
@@ -220,17 +229,17 @@ public class NetworkTest : MonoBehaviour
                     var entity = BattleManager.Instance.GetEntity(ret.id);
                     if (entity != null)
                     {
-                        //if (entity.machine != null && entity.machine.current != null &&
-                        //    entity.machine.current.type == (int)ActionType.Run)
-                        //{
-                        //    var run = entity.machine.current as EntityAction;
-                        //    if (run != null )
-                        //    {
-                        //        run.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
-                        //        run.doneWhenSync = true;
-                        //        run.sync = true;
-                        //    }
-                        //}
+                        if (entity.machine != null && entity.machine.current != null &&
+                            entity.machine.current.type == (int)ActionType.Run)
+                        {
+                            var run = entity.machine.current as EntityAction;
+                            if (run != null)
+                            {
+                                run.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
+                                run.doneWhenSync = true;
+                                run.sync = true;
+                            }
+                        }
                         entity.UpdateEntity(ret.data);
 
                         EntityAction action = ObjectPool.GetInstance<EntityAction>();
