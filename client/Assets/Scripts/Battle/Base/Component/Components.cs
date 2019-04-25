@@ -60,6 +60,17 @@ public abstract class Components<C> where C : Components<C>
         }
     }
 
+    public void RemoveComponent(IComponent<C> component)
+    {
+        for (int i = mComponentList.Count - 1; i >= 0; --i)
+        {
+            if (mComponentList[i] == component)
+            {
+                mComponentList.RemoveAt(i);
+            }
+        }
+    }
+
     public virtual void OnUpdate(float deltaTime)
     {
         for (int i = 0; i < mComponentList.Count; ++i)
@@ -67,12 +78,17 @@ public abstract class Components<C> where C : Components<C>
             mComponentList[i].OnUpdate(deltaTime);
         }
     }
-    public virtual void Clear()
+    public virtual void Destroy()
     {
         for(int i = 0; i < mComponentList.Count;++i)
         {
             mComponentList[i].OnDestroy();
         }
+        mComponentList.Clear();
+    }
+
+    public virtual void Clear()
+    {
         mComponentList.Clear();
     }
 }

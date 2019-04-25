@@ -74,15 +74,13 @@ function M:execute(delta)
             self.agent.position = rvo2:getAgentPosition(self.agent.sid)
          
             local v =  rvo2:getAgentPrefVelocity(self.agent.sid)
-            
-            self:broadcast(v)
-            
+                  
             if math.abs( v.x ) < 0.01 and math.abs( v.y ) < 0.01 then
                 self:done()
             else
                 self.agent.direction = v
             end
-            
+            self:broadcast(v)
         end
     
     else
@@ -100,9 +98,9 @@ function M:execute(delta)
         self:done()
     end
 --]]
-    if self.agent.type == userdef.USER then
-        print(self.agent.id.. ' execute run:'..tostring(self.agent.position).." destination:"..tostring(self.destination).." distance:"..tostring((self.destination - self.agent.position):magnitude()))
-    end
+    --if self.agent.type == userdef.USER then
+      --  print(self.agent.id.. ' execute run:'..tostring(self.agent.position).." destination:"..tostring(self.destination).." distance:"..tostring((self.destination - self.agent.position):magnitude()))
+    --end
 end
 
 function M:exit()
@@ -126,6 +124,10 @@ end
 
 
 function M:broadcast(velocity)
+
+    if velocity == nil then
+        return
+    end
 
     if self.senddata.velocity ~= nil and (self.senddata.velocity.x == velocity.x and self.senddata.velocity.y == velocity.y) then
         return

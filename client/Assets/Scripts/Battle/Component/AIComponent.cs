@@ -5,14 +5,15 @@ using UnityEngine;
 /// <summary>
 /// AI组件
 /// </summary>
-public class AIComponent : IComponent<BattleEntity>,IStateAgent<BattleEntity>
+public class AIComponent : IComponent<BattleEntity>,IStateAgent<BattleEntity>,IPoolObject
 {
     public BattleEntity agent { get; set; }
 
+    public bool isPool { get; set; }
+
     private BattleEntity mTarget;
 
-    private BattleEntity mBlock;
-
+   
     private float mTurnTime = 0;
     private Vector3 mTurnDirection;
    
@@ -52,18 +53,7 @@ public class AIComponent : IComponent<BattleEntity>,IStateAgent<BattleEntity>
                         EntityAction run = ObjectPool.GetInstance<EntityAction>();
                         run.velocity = direction * agent.param.movespeed;
                        
-                        //mBlock = BattleManager.Instance.GetBlockEntity(agent);
-
-                        //if (mBlock != null && mBlock.id != mTarget.id)
-                        //{
-                        //    Vector3 forward = BattleManager.Instance.MoveToWards(agent, mBlock);
-                        //    if (forward != Vector3.zero)
-                        //    {
-                        //        mTurnTime = (agent.param.radius + mBlock.param.radius) / agent.param.movespeed;
-                        //        mTurnDirection = forward;
-                        //        run.velocity = mTurnDirection * agent.param.movespeed;
-                        //    }
-                        //}
+                       
 
                         agent.PlayAction(ActionType.Run, run);
                     }
@@ -100,28 +90,12 @@ public class AIComponent : IComponent<BattleEntity>,IStateAgent<BattleEntity>
                             mTarget = target;
                         }
 
-
-
-
                         if (mTurnDirection == Vector3.zero)
                         {
                             Vector3 direction = (mTarget.position - agent.position).normalized;
 
                             action.velocity = direction * agent.param.movespeed;
-
-                            //var block = BattleManager.Instance.GetBlockEntity(agent);
-
-                            //if (block != null && block.id != mTarget.id && (mBlock == null || mBlock.id != block.id))
-                            //{
-                            //    mBlock = block;
-
-                            //    Vector3 forward = BattleManager.Instance.MoveToWards(agent, mBlock);
-                            //    if (forward != Vector3.zero)
-                            //    {
-                            //        mTurnTime = (agent.param.radius + block.param.radius) / agent.param.movespeed;
-                            //        mTurnDirection = forward;
-                            //    }
-                            //}
+                    
                         }
                         else
                         {
@@ -185,6 +159,15 @@ public class AIComponent : IComponent<BattleEntity>,IStateAgent<BattleEntity>
 
     }
 
-   
+    public void OnCreate()
+    {
+        
+    }
+
+    public void OnReturn()
+    {
+        agent = null;
+        mTarget = null;
+    }
 }
 

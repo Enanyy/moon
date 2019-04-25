@@ -130,6 +130,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         {
             if(mStateList.First.Value.IsValid()==false)
             {
+                mStateList.First.Value.OnDestroy();
                 mStateList.RemoveFirst();
             }
             else

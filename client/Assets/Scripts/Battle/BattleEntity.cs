@@ -19,12 +19,6 @@ public class BattleEntity:
     IStateAgent<BattleEntity>,
     IPoolObject
 {
-    public const float DEFAULT_NEIGHBOR_DIST = 4;
-    public const int DEFAULT_MAX_NEIGHBOR = 5;
-    public const float DEFAULT_TIME_HORIZON = 5f;
-    public const float DEFAULT_TIME_HORIZONOBST = 5f;
-    public const float DEFAULT_RADIUS = 1f;
-    public const float DEFAULT_MAX_SPEED = 20f;
 
     public uint id;             //唯一ID  
     public uint campflag;       //阵营
@@ -62,24 +56,28 @@ public class BattleEntity:
             }
         }
     }
+    public  ModelComponent model { get; private set; }
     public bool active
     {
-        get { return GetComponent<ModelComponent>()!= null; }
+        get { return model!= null; }
         set
         {
             if(value)
             {
-                if(GetComponent<ModelComponent>() == null)
+                if(model == null)
                 {
-                    var component = ObjectPool.GetInstance<ModelComponent>();
-                    AddComponent(component);
+                    model = ObjectPool.GetInstance<ModelComponent>();
+                    AddComponent(model);
                 }
             }
             else
             {
-                var component = GetComponent<ModelComponent>();
-                ObjectPool.ReturnInstance(component);
-                RemoveComponent<ModelComponent>();
+                if (model != null)
+                {
+                    ObjectPool.ReturnInstance(model);
+                    RemoveComponent(model);
+                    model = null;
+                }
             }
         }
     }
@@ -152,8 +150,21 @@ public class BattleEntity:
         syncPosition =Vector3.zero;
 
         machine.Clear();
+        model = null;
+
+        for (int i = 0; i < components.Count; ++i)
+        {
+            var component = components[i] as IPoolObject;
+            if (component != null)
+            {
+                ObjectPool.ReturnInstance(component);
+
+                RemoveComponent(component as IComponent<BattleEntity>);
+            }
+        }
 
         base.Clear();
+      
     }
 
     public bool Init(ModelParam param)
@@ -249,12 +260,12 @@ public class BattleEntity:
   
     public void OnReturn()
     {
-       
+        Clear();
     }
     
     public void OnDestroy()
     {
-        
+       
     }
 
     public void OnEnter(State<BattleEntity> state)

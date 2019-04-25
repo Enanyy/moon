@@ -50,7 +50,6 @@ function M:checknext()
     if self.states:count() > 1 and self.states.items[2].weight > self.states.items[1].weight then
         if self.current.isdone ==false then
             self.current:done()
-            self:donext()
         end
     end
 end
@@ -93,7 +92,8 @@ function M:donext()
 
     while self.states:count() > 0 do
         if self.states:peek():isvalid() == false then
-            self.states:dequeue()
+           local state = self.states:dequeue()
+           state:destroy()
         else    
             break
         end

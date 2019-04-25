@@ -199,7 +199,8 @@ function M:needsync( )
     if self.sid >= 0 then
         local position = rvo2:getAgentPosition(self.sid)
         
-        return position:sqrmagnitude() > 0.1
+        local result = (position-self.position):sqrmagnitude() > 0.1
+        return result
     end
 
     return false

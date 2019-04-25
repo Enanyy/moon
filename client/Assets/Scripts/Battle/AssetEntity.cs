@@ -78,6 +78,7 @@ public class AssetEntity : IPoolObject
     {
         if (gameObject != null)
         {
+            gameObject.SetActive(false);
             AssetPool.ReturnInstance(assetID, gameObject);
         }
         assetID = 0;
@@ -86,7 +87,8 @@ public class AssetEntity : IPoolObject
     public virtual void OnReturn()
     {
         if (gameObject != null)
-        {
+        { 
+            gameObject.SetActive(false);
             AssetPool.ReturnInstance(assetID, gameObject);
         }
         assetID = 0;

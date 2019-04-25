@@ -1,4 +1,5 @@
 local core = require("moon.core")
+local Vector2 = core.Vector2
 local M = {
     DEFAULT_NEIGHBOR_DIST = 4,
     DEFAULT_MAX_NEIGHBOR = 5,
@@ -17,7 +18,7 @@ function M:init(timestep, position)
         self.DEFAULT_TIME_HORIZON,
         self.DEFAULT_TIME_HORIZONOBST,
         self.DEFAULT_RADIUS,
-        self.DEFAULT_MAX_SPEED,core.Vector2.new(position.x, position.y))
+        self.DEFAULT_MAX_SPEED,Vector2.new(position.x, position.y))
 
 end
 
@@ -26,14 +27,14 @@ function M:addAgent(position,radius)
     if self.simulator == nil then
         return -1
     end
-    return self.simulator:addAgent(core.Vector2.new(position.x,position.y),
+    return self.simulator:addAgent(Vector2.new(position.x,position.y),
                                     self.DEFAULT_NEIGHBOR_DIST,
                                     self.DEFAULT_MAX_NEIGHBOR,
                                     self.DEFAULT_TIME_HORIZON,
                                     self.DEFAULT_TIME_HORIZONOBST,
                                     radius,
                                     self.DEFAULT_MAX_SPEED,
-                                    core.Vector2.new(0,0))
+                                    Vector2.new(0,0))
 end
 
 
@@ -58,7 +59,7 @@ function M:setAgentPrefVelocity(sid, velocity)
     if self.simulator == nil then
         return 
     end
-    self.simulator:setAgentPrefVelocity(sid, core.Vector2.new(velocity.x, velocity.y))
+    self.simulator:setAgentPrefVelocity(sid, Vector2.new(velocity.x, velocity.y))
 end
 
 
@@ -74,7 +75,7 @@ function M:setAgentVelocity(sid, velocity)
     if self.simulator == nil then
         return 
     end
-    self.simulator:setAgentVelocity(sid, core.Vector2.new(velocity.x, velocity.y))
+    self.simulator:setAgentVelocity(sid, Vector2.new(velocity.x, velocity.y))
 end
 
 function M:getAgentRadius( sid )
@@ -119,7 +120,7 @@ function M:addObstacle( obstacles )
 
     local rvoobstacles = core.RVOObstacle.new()
     for i,v in ipairs(obstacles) do
-        rvoobstacles:push_back(core.Vector2.new(v.x, v.y))
+        rvoobstacles:push_back(Vector2.new(v.x, v.y))
     end
     
     return rvo2.simulator:addRVOObstacle(rvoobstacles)
