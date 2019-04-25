@@ -123,7 +123,7 @@ function M:addObstacle( obstacles )
         rvoobstacles:push_back(Vector2.new(v.x, v.y))
     end
     
-    return rvo2.simulator:addRVOObstacle(rvoobstacles)
+    return self.simulator:addRVOObstacle(rvoobstacles)
 end
 
 return M

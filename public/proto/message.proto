@@ -64,8 +64,11 @@ message BattleEntity
 	required string name = 4;
 	required uint32 type = 5;
 	required uint32 config = 6;
+	required float searchdistance = 7;
+	required float attackdistance = 8;
+	required float radius = 9;
 	
-	required BattleEntityData data = 7;
+	required BattleEntityData data = 10;
 	
 }
 message BattleBeginRequest

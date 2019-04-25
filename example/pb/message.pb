@@ -1,5 +1,5 @@
 
-¾	
+þ	
 message.proto".
 LoginRequest
 name (	
@@ -32,7 +32,7 @@
 	movespeed (
 attackspeed (
 position (2.Point2D
-	direction (2.Point2D"…
+	direction (2.Point2D"Å
 BattleEntity
 
 id (
@@ -40,8 +40,12 @@
 camp (
 name (	
 type (
-config (
-data (2.BattleEntityData"
+config (
+searchdistance (
+attackdistance (
+radius	 (
+data
+ (2.BattleEntityData"
 BattleBeginRequest"#
 BattleBeginReturn
 result (">

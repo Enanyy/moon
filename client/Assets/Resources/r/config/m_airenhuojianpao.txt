@@ -10,6 +10,7 @@
   </ActionParam>
   <ActionParam state="3" weight="10" duration="4.733334" useAnimationLength="1" name="Action" rect="(204,539,240,20)">
     <AnimationParam animationClip="die" length="4.733334" mode="8" triggerAt="0" default="1" name="Animation" rect="(589,538,240,20)" />
+    <RemovePluginParam name="RunPlugin" rect="(637,718,240,20)" />
   </ActionParam>
   <ActionParam state="0" weight="0" duration="86400" useAnimationLength="1" name="Action" rect="(292,53,240,20)">
     <AnimationParam animationClip="idle" length="1" mode="2" triggerAt="0" default="1" name="Animation" rect="(642,16,240,20)" />

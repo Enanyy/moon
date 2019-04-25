@@ -216,6 +216,9 @@ function M:get_send_agent()
         name = self.name,
         type = 1,
         config = self.config,
+        searchdistance = self.searchdistance,
+        attackdistance = self.attackdistance,
+        radius = self.radius,
         data = self:get_send_data()
     }
 

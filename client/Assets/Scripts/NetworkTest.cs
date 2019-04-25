@@ -225,7 +225,7 @@ public class NetworkTest : MonoBehaviour
                 {
                     BattleEntityDie ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityDie>(packet.data,
                         NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-                    //Debug.Log(ret.id + " die");
+                    Debug.Log(ret.id + " die");
                     var entity = BattleManager.Instance.GetEntity(ret.id);
                     if (entity != null)
                     {

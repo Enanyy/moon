@@ -278,8 +278,29 @@ namespace PBMessage
       get { return _config; }
       set { _config = value; }
     }
+    private float _searchdistance;
+    [global::ProtoBuf.ProtoMember(7, IsRequired = true, Name=@"searchdistance", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    public float searchdistance
+    {
+      get { return _searchdistance; }
+      set { _searchdistance = value; }
+    }
+    private float _attackdistance;
+    [global::ProtoBuf.ProtoMember(8, IsRequired = true, Name=@"attackdistance", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    public float attackdistance
+    {
+      get { return _attackdistance; }
+      set { _attackdistance = value; }
+    }
+    private float _radius;
+    [global::ProtoBuf.ProtoMember(9, IsRequired = true, Name=@"radius", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    public float radius
+    {
+      get { return _radius; }
+      set { _radius = value; }
+    }
     private BattleEntityData _data;
-    [global::ProtoBuf.ProtoMember(7, IsRequired = true, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(10, IsRequired = true, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public BattleEntityData data
     {
       get { return _data; }
