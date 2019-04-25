@@ -6,7 +6,10 @@ public class MSG_BattleEntityAttackNotify : Message<BattleEntityAttackNotify>
     {
 
     }
-
+    public static MSG_BattleEntityAttackNotify Get()
+    {
+        return MessageManager.Instance.Get<MSG_BattleEntityAttackNotify>(MessageID.BATTLE_ENTITY_ATTACK_NOTIFY);
+    }
     protected override void OnMessage()
     {
         var entity = BattleManager.Instance.GetEntity(message.id);

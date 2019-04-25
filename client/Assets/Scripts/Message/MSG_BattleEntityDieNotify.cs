@@ -1,3 +1,4 @@
+using UnityEngine;
 using PBMessage;
 public class MSG_BattleEntityDieNotify : Message<BattleEntityDieNotify>
 {
@@ -5,7 +6,10 @@ public class MSG_BattleEntityDieNotify : Message<BattleEntityDieNotify>
     {
 
     }
-
+    public static MSG_BattleEntityDieNotify Get()
+    {
+        return MessageManager.Instance.Get<MSG_BattleEntityDieNotify>(MessageID.BATTLE_ENTITY_DIE_NOTIFY);
+    }
     protected override void OnMessage()
     {
         var entity = BattleManager.Instance.GetEntity(message.id);

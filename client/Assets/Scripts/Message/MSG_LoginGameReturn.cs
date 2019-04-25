@@ -1,3 +1,4 @@
+using UnityEngine;
 using PBMessage;
 public class MSG_LoginGameReturn : Message<LoginGameReturn>
 {
@@ -5,7 +6,10 @@ public class MSG_LoginGameReturn : Message<LoginGameReturn>
     {
 
     }
-
+    public static MSG_LoginGameReturn Get()
+    {
+        return MessageManager.Instance.Get<MSG_LoginGameReturn>(MessageID.LOGIN_GAME_RETURN);
+    }
     protected override void OnMessage()
     {
        

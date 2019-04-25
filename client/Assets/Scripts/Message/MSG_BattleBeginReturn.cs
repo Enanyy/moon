@@ -1,3 +1,4 @@
+using UnityEngine;
 using PBMessage;
 public class MSG_BattleBeginReturn : Message<BattleBeginReturn>
 {
@@ -5,7 +6,10 @@ public class MSG_BattleBeginReturn : Message<BattleBeginReturn>
     {
 
     }
-
+    public static MSG_BattleBeginReturn Get()
+    {
+        return MessageManager.Instance.Get<MSG_BattleBeginReturn>(MessageID.BATTLE_BEGIN_RETURN);
+    }
     protected override void OnMessage()
     {
        

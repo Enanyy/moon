@@ -6,7 +6,10 @@ public class MSG_BattleEntityIdleNotify : Message<BattleEntityIdleNotify>
     {
 
     }
-
+    public static MSG_BattleEntityIdleNotify Get()
+    {
+        return MessageManager.Instance.Get<MSG_BattleEntityIdleNotify>(MessageID.BATTLE_ENTITY_IDLE_NOTIFY);
+    }
     protected override void OnMessage()
     {
         //Debug.Log(ret.id+" idle");

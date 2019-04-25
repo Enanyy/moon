@@ -1,3 +1,4 @@
+using UnityEngine;
 using PBMessage;
 public class MSG_LoginRequest : Message<LoginRequest>
 {
@@ -5,7 +6,10 @@ public class MSG_LoginRequest : Message<LoginRequest>
     {
 
     }
-
+    public static MSG_LoginRequest Get()
+    {
+        return MessageManager.Instance.Get<MSG_LoginRequest>(MessageID.LOGIN_REQUEST);
+    }
     protected override void OnMessage()
     {
        

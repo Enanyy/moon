@@ -56,7 +56,7 @@ public class Main : MonoBehaviour
 
         if (GUI.Button(new Rect(20, 80, 100, 40), "Login"))
         {
-            MSG_LoginRequest request = MessageManager.Instance.Get<MSG_LoginRequest>(MessageID.LOGIN_REQUEST);
+            MSG_LoginRequest request = MSG_LoginRequest.Get();
 
             request.message.name = username;
             request.message.password = pwd;
@@ -67,7 +67,7 @@ public class Main : MonoBehaviour
         if (user !=null&&GUI.Button(new Rect(20, 140, 100, 40), "Battle"))
         {
 
-            MSG_BattleBeginRequest request = MessageManager.Instance.Get<MSG_BattleBeginRequest>(MessageID.BATTLE_BEGIN_REQUEST);
+            MSG_BattleBeginRequest request = MSG_BattleBeginRequest.Get();
             request.Send(ConnectID.Logic);
         }
     }

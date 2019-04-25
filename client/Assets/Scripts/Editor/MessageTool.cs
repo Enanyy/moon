@@ -86,13 +86,18 @@ public class {0} : Message<{1}>
 
     }}
 
+    public static {4} Get()
+    {{
+        return MessageManager.Instance.Get<{5}>(MessageID.{6});
+    }}
+
     protected override void OnMessage()
     {{
        
     }}
 }}
 ";
-                            string code = string.Format(fm, filename, classname, filename, ID);
+                            string code = string.Format(fm, filename, classname, filename, ID, filename, filename, ID);
                             File.WriteAllText(file, code);
                         }
                         register += "\t\tRegister(new " + filename + "());\n";

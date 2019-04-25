@@ -1,3 +1,4 @@
+using UnityEngine;
 using PBMessage;
 public class MSG_BattleEntityBloodNotify : Message<BattleEntityBloodNotify>
 {
@@ -5,7 +6,10 @@ public class MSG_BattleEntityBloodNotify : Message<BattleEntityBloodNotify>
     {
 
     }
-
+    public static MSG_BattleEntityBloodNotify Get()
+    {
+        return MessageManager.Instance.Get<MSG_BattleEntityBloodNotify>(MessageID.BATTLE_ENTITY_BLOOD_NOTIFY);
+    }
     protected override void OnMessage()
     {
         var entity = BattleManager.Instance.GetEntity(message.id);

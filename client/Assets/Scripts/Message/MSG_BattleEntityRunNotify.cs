@@ -6,7 +6,10 @@ public class MSG_BattleEntityRunNotify : Message<BattleEntityRunNotify>
     {
 
     }
-
+    public static MSG_BattleEntityRunNotify Get()
+    {
+        return MessageManager.Instance.Get<MSG_BattleEntityRunNotify>(MessageID.BATTLE_ENTITY_RUN_NOTIFY);
+    }
     protected override void OnMessage()
     {
         Vector3 velocity = new Vector3(message.velocity.x, 0, message.velocity.y);
