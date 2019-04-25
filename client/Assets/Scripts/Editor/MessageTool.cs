@@ -50,28 +50,46 @@ public class MessageTool
                                 || classname.EndsWith("Return")
                                 || classname.EndsWith("Notify"))
                             {
-                                Debug.Log(classname);
-                                string file = Application.dataPath + "/Scripts/Message/MSG_"+classname+".cs";
+                                string filename = "MSG_" + classname;
+                                string file = Application.dataPath + "/Scripts/Message/"+ filename + ".cs";
 
                                 if (File.Exists(file) == false)
                                 {
 
-                                    string name = "";
+                                    string ID = "";
                                     for (int k = 0; k < classname.Length; k++)
                                     {
 
                                         if (k > 0 && classname[k] >= 'A' && classname[k] <= 'Z')
                                         {
-                                            name += "_";
-                                            name += classname[k];
+                                            ID += "_";
+                                            ID += classname[k];
                                         }
                                         else
                                         {
-                                            name += classname[k];
+                                            ID += classname[k];
                                         }
                                     }
+                                    ID = ID.ToUpper();
 
-                                    ///Debug.Log(name.ToUpper());
+                                    string fm = @"
+using  PBMessage;
+public class {0} : Message<{1}>
+{{
+    public {2}() : base(MessageID.{3})
+    {{
+
+    }}
+
+    protected override void OnMessage()
+    {{
+       
+    }}
+}}
+";
+                                    string code = string.Format(fm, filename, classname, filename, ID);
+                                    File.WriteAllText(file, code);
+                                  
                                 }
                             }
                         }
