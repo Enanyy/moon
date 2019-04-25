@@ -238,6 +238,7 @@ public class Main : MonoBehaviour
                                 run.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
                                 run.doneWhenSync = true;
                                 run.sync = true;
+                                run.Done();
                             }
                         }
                         entity.UpdateEntity(ret.data);
