@@ -17,9 +17,9 @@ public class MSG_LoginGameNotify : Message<LoginGameNotify>
 
             if ( Main.Instance.user != null)
             {
-                LoginGameRequest request = new LoginGameRequest();
-                request.id = Main.Instance.user.id;
-                NetworkManager.Instance.Send(ConnectID.Game, MessageID.LOGIN_GAME_REQUEST, request);
+                MSG_LoginGameRequest request = MessageManager.Instance.Get<MSG_LoginGameRequest>(MessageID.LOGIN_GAME_REQUEST);
+                request.message.id = Main.Instance.user.id;
+                request.Send(ConnectID.Game);
             }
 
         }, (c) =>
