@@ -29,7 +29,7 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
     public void OnReceive(NetPacket packet)
     {
         message = ProtoTransfer.DeserializeProtoBuf<T>(packet.data,
-            NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
+            NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET,message);
         OnMessage();
     }
 }

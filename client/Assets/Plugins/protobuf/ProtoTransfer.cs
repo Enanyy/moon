@@ -23,19 +23,7 @@ public static class ProtoTransfer
 
     
 
-    public static T DeserializeProtoBuf<T>(byte[] data) where T : class, ProtoBuf.IExtensible
-    {
-        if (data == null)
-        {
-            return null;
-        }
-        using (MemoryStream ms = new MemoryStream(data))
-        {
-            T t = DeserializeProtoBuf<T>(ms);
-            return t;
-        }
-    }
-    public static T DeserializeProtoBuf<T>(byte[] data,int index, int count) where T : class, ProtoBuf.IExtensible
+    public static T DeserializeProtoBuf<T>(byte[] data,int index, int count,T instance) where T : class, ProtoBuf.IExtensible
     {
         if (data == null)
         {
@@ -43,38 +31,10 @@ public static class ProtoTransfer
         }
         using (MemoryStream ms = new MemoryStream(data,index,count))
         {
-            T t = DeserializeProtoBuf<T>(ms);
+            T t = (T)ProtoBuf.Meta.RuntimeTypeModel.Default.Deserialize(ms, instance, typeof(T));
             return t;
         }
     }
-    public static T DeserializeProtoBuf<T>(MemoryStream ms) where T : class, ProtoBuf.IExtensible
-    {
-        T t = ProtoBuf.Serializer.Deserialize<T>(ms);
-        ms.Dispose();
-        return t;
-    }
-    public static object DeserializeProtoBuf(byte[] data, Type type)
-    {
-        if (data == null)
-        {
-            return null;
-        }
-
-        using (MemoryStream ms = new MemoryStream(data))
-        {
-            return DeserializeProtoBuf(ms,type);
-        }
-    }
-    public static object DeserializeProtoBuf(MemoryStream ms, Type type)
-    {
-        if (ms == null)
-        {
-            return null;
-        }
-
-        object o = ProtoBuf.Meta.RuntimeTypeModel.Default.Deserialize(ms, null, type);
-        ms.Dispose();
-        return o;
-    }
+    
 }
 
