@@ -22,12 +22,13 @@ public class Main : MonoBehaviour
     void Start()
     {
         Debug.Log("IsLittleEndian:"+BitConverter.IsLittleEndian);
-        NetworkManager.Instance().onReceive += OnReceive;
+        MessageManager.Instance.Init();
+        NetworkManager.Instance.onReceive += MessageManager.Instance.OnReceive;
     }
 
     void LateUpdate()
     {
-        NetworkManager.Instance().Update();
+        NetworkManager.Instance.Update();
     }
 
     void Update()
@@ -42,7 +43,7 @@ public class Main : MonoBehaviour
     {
         if (GUI.Button(new Rect(20, 20, 100, 40), "Connect"))
         {
-            NetworkManager.Instance().Connect(ConnectID.Logic, ip, port,
+            NetworkManager.Instance.Connect(ConnectID.Logic, ip, port,
                 delegate(Connection connection)
                 {
                     Debug.Log("Connect");
@@ -55,248 +56,28 @@ public class Main : MonoBehaviour
 
         if (GUI.Button(new Rect(20, 80, 100, 40), "Login"))
         {
-            LoginRequest request = new LoginRequest();
-            request.name = username;
-            request.password = pwd;
+            MSG_LoginRequest request = MessageManager.Instance.Get<MSG_LoginRequest>(MessageID.LOGIN_REQUEST);
+
+            request.message.name = username;
+            request.message.password = pwd;
 
 
-           NetworkManager.Instance().Send(ConnectID.Logic,MessageID.LOGIN_REQUEST,request);
+            request.Send(ConnectID.Logic);
         }
-
         if (user !=null&&GUI.Button(new Rect(20, 140, 100, 40), "Battle"))
         {
-            BattleBeginRequest request = new BattleBeginRequest();
-            NetworkManager.Instance().Send(ConnectID.Logic, MessageID.BATTLE_BEGIN_REQUEST, request);
+
+            MSG_BattleBeginRequest request = MessageManager.Instance.Get<MSG_BattleBeginRequest>(MessageID.BATTLE_BEGIN_REQUEST);
+            request.Send(ConnectID.Logic);
         }
     }
 
-    private UserData user = null;
+    public UserData user = null;
 
-    void OnReceive(NetPacket packet)
-    {
-       
-        var id = (MessageID) packet.ID;
-        //Debug.Log("recv:"+id.ToString());
-        switch (id)
-        {
-            case MessageID.LOGIN_RETURN:
-                {
-                    LoginReturn ret = ProtoTransfer.DeserializeProtoBuf<LoginReturn>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-                    Debug.Log("Login result:" + ret.result);
-
-                    user = ret.userdata;
-                }
-                break;
-            case MessageID.LOGIN_GAME_NOTIFY:
-                {
-                    LoginGameNotify ret = ProtoTransfer.DeserializeProtoBuf<LoginGameNotify>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-                    Debug.Log(ret.ip + ":" + ret.port);
-
-                    NetworkManager.Instance().Connect(ConnectID.Game, ret.ip, ret.port, (c) =>
-                    {
-                        Debug.Log("Connect Game Success");
-
-                        if (user != null)
-                        {
-                            LoginGameRequest request = new LoginGameRequest();
-                            request.id = user.id;
-                            NetworkManager.Instance().Send(ConnectID.Game, MessageID.LOGIN_GAME_REQUEST, request);
-                        }
-
-                    }, (c) =>
-                    {
-                        Debug.Log("Connect Game Fail");
-                        NetworkManager.Instance().Close(c.ID);
-                    });
-
-                }
-                break;
-            case MessageID.LOGIN_GAME_RETURN:
-                {
-                    LoginGameReturn ret = ProtoTransfer.DeserializeProtoBuf<LoginGameReturn>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-                    //Debug.Log("Login Game result:"+ret.result);
-                }
-                break;
-            case MessageID.BATTLE_BEGIN_RETURN:
-                {
-                    BattleBeginReturn ret = ProtoTransfer.DeserializeProtoBuf<BattleBeginReturn>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-
-                    //Debug.Log("Battle begin result:" + ret.result);
-                }
-                break;
-            case MessageID.BATTLE_BEGIN_NOTIFY:
-                {
-                    BattleBeginNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleBeginNotify>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-                    //Debug.Log("Battle begin:" + ret.copy);
-
-                    for (int i = 0; i < ret.list.Count; ++i)
-                    {
-                        var data = ret.list[i];
-                        BattleEntity entity = ObjectPool.GetInstance<BattleEntity>();
-
-                        entity.id = data.id;
-
-                        entity.configid = 10000 + data.config;
-                        entity.campflag = data.camp;
-
-                        entity.type = data.type;
-
-                        entity.hp = data.data.hp;
-                        entity.searchDistance = data.searchdistance;
-                        entity.attackDistance = data.attackdistance;
-                        entity.radius = data.radius;
-
-                        entity.position = new Vector3(data.data.position.x, 0, data.data.position.y);
-                        entity.rotation = Quaternion.LookRotation(new Vector3(data.data.direction.x, 0, data.data.direction.y));
-                        if (BattleManager.Instance.AddEntity(entity))
-                        {
-                            entity.active = true;
-                        }
-                    }
-                }
-                break;
-            case MessageID.BATTLE_ENTITY_IDLE_NOTIFY:
-                {
-                    BattleEntityIdleNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityIdleNotify>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-
-                    //Debug.Log(ret.id+" idle");
-                    var entity = BattleManager.Instance.GetEntity(ret.id);
-                    if (entity != null)
-                    {
-                        entity.UpdateEntity(ret.data);
-                        if (entity.machine != null && entity.machine.current != null &&
-                            entity.machine.current.type == (int)ActionType.Run)
-                        {
-                            var action = entity.machine.current as EntityAction;
-                            if (action != null)
-                            {
-                                action.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
-                                action.doneWhenSync = true;
-                                action.sync = true;
-                            }
-                        }
-                    }
-                }
-                break;
-            case MessageID.BATTLE_ENTITY_RUN_NOTIFY:
-                {
-                    BattleEntityRunNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityRunNotify>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-
-                    //Debug.Log(ret.id + " run");
-
-                    Vector3 velocity = new Vector3(ret.velocity.x, 0 ,ret.velocity.y);
-                    var entity = BattleManager.Instance.GetEntity(ret.id);
-                    if (entity != null)
-                    {
-                        entity.UpdateEntity(ret.data);
-                        EntityAction action = entity.GetFirst(ActionType.Run);
-
-                        if (action != null)
-                        {
-                            //Vector3 position = new Vector3(ret.data.position.x, 0, ret.data.position.y);
-                            //Vector3 direction = position - entity.position;
-                            //float angle = Vector3.Angle(velocity, direction);
-                            //if (angle > 10)
-                            //{
-                            //    action.destination = position;
-                            //    action.sync = true;
-                            //    action.doneWhenSync = false;
-                            //}
-
-                            action.velocity = velocity;
-                        }
-                        else
-                        {
-                            action = ObjectPool.GetInstance<EntityAction>();
-                            action.velocity = velocity;
-                            entity.PlayAction(ActionType.Run, action);
-                        }
-                    }
-                }
-                break;
-            case MessageID.BATTLE_ENTITY_ATTACK_NOTIFY:
-                {
-                    BattleEntityAttackNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityAttackNotify>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-                    //Debug.Log(ret.id + " attack");
-                    var entity = BattleManager.Instance.GetEntity(ret.id);
-                    if (entity != null)
-                    {
-                        if (entity.machine != null && entity.machine.current != null &&
-                            entity.machine.current.type == (int)ActionType.Run)
-                        {
-                            var run = entity.machine.current as EntityAction;
-                            if (run != null)
-                            {
-                                run.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
-                                run.doneWhenSync = true;
-                                run.sync = true;
-                                run.Done();
-                            }
-                        }
-                        entity.UpdateEntity(ret.data);
-
-                        EntityAction action = ObjectPool.GetInstance<EntityAction>();
-                        action.skillid = ret.skill;
-                        action.duration = ret.attackspeed;
-                        action.target = ret.target;
-
-
-                        entity.PlayAction(ActionType.Attack, action);
-                    }
-                }
-                break;
-            case MessageID.BATTLE_ENTITY_DIE_NOTIFY:
-                {
-                    BattleEntityDieNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityDieNotify>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-                    Debug.Log(ret.id + " die");
-                    var entity = BattleManager.Instance.GetEntity(ret.id);
-                    if (entity != null)
-                    {
-                        //entity.UpdateEntity(ret.data);
-                        entity.Die();
-                    }
-                }
-                break;
-            case MessageID.BATTLE_ENTITY_BLOOD_NOTIFY:
-                {
-                    BattleEntityBloodNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityBloodNotify>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-
-                    var entity = BattleManager.Instance.GetEntity(ret.id);
-                    if (entity != null)
-                    {
-                        entity.DropBlood(ret.value);
-                    }
-                }
-                break;
-                
-            case MessageID.BATTLE_END_NOTIFY:
-                {
-                    BattleEndNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEndNotify>(packet.data,
-                        NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
-                    Debug.Log("Battle end:" + ret.copy);
-
-                    BattleManager.Instance.Destroy();
-                   
-                    NetworkManager.Instance().Close(ConnectID.Game);
-                }
-                break;
-        }
-    }
-
-
+    
     void OnApplicationQuit()
     {
-        NetworkManager.Instance().Close();
+        NetworkManager.Instance.Close();
     }
 
     Vector3 oldMousePosition;

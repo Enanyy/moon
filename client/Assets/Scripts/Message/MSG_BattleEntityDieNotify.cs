@@ -9,6 +9,11 @@ public class MSG_BattleEntityDieNotify : Message<BattleEntityDieNotify>
 
     protected override void OnMessage()
     {
-       
+        var entity = BattleManager.Instance.GetEntity(message.id);
+        if (entity != null)
+        {
+            //entity.UpdateEntity(ret.data);
+            entity.Die();
+        }
     }
 }

@@ -9,6 +9,9 @@ public class MSG_LoginReturn : Message<LoginReturn>
 
     protected override void OnMessage()
     {
-       
+      
+        UnityEngine. Debug.Log("Login result:" + message.result);
+
+       Main.Instance. user = message.userdata;
     }
 }

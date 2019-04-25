@@ -1,4 +1,4 @@
-
+using UnityEngine;
 using  PBMessage;
 public class MSG_BattleEndNotify : Message<BattleEndNotify>
 {
@@ -9,6 +9,10 @@ public class MSG_BattleEndNotify : Message<BattleEndNotify>
 
     protected override void OnMessage()
     {
-       
+        Debug.Log("Battle end:" + message.copy);
+
+        BattleManager.Instance.Destroy();
+
+        NetworkManager.Instance.Close(ConnectID.Game);
     }
 }

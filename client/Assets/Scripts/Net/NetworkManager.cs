@@ -17,14 +17,17 @@ public class NetworkManager
 
     private static NetworkManager _instance;
 
-    public static NetworkManager Instance()
+    public static NetworkManager Instance
     {
-        if (_instance == null)
+        get
         {
-            _instance = new NetworkManager();
-        }
+            if (_instance == null)
+            {
+                _instance = new NetworkManager();
+            }
 
-        return _instance;
+            return _instance;
+        }
     }
 
     #endregion

@@ -9,6 +9,10 @@ public class MSG_BattleEntityBloodNotify : Message<BattleEntityBloodNotify>
 
     protected override void OnMessage()
     {
-       
+        var entity = BattleManager.Instance.GetEntity(message.id);
+        if (entity != null)
+        {
+            entity.DropBlood(message.value);
+        }
     }
 }

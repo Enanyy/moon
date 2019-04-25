@@ -10,12 +10,12 @@ public interface IMessage
 public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensible, new()
 {
     public MessageID id { get; set; }
-    public T data { get; set; }
+    public T message { get; set; }
 
     public Message(MessageID id)
     {
         this.id = id;
-        this.data = new T();
+        this.message = new T();
     }
 
     protected abstract void OnMessage();
@@ -23,12 +23,12 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
 
     public void Send(ConnectID connectid)
     {
-        NetworkManager.Instance().Send(connectid, id, data);
+        NetworkManager.Instance.Send(connectid, id, message);
     }
 
     public void OnReceive(NetPacket packet)
     {
-        data = ProtoTransfer.DeserializeProtoBuf<T>(packet.data,
+        message = ProtoTransfer.DeserializeProtoBuf<T>(packet.data,
             NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
         OnMessage();
     }
