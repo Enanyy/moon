@@ -9,8 +9,9 @@ public class EntityAction : State<BattleEntity>,IPoolObject
     public uint skillid;
     public uint target;
 
-    public LinkedList<Vector3> paths = new LinkedList<Vector3>();
-
+    public Vector3 destination;
+    public bool sync = false;
+    public bool doneWhenSync = false;
    
     public ActionParam param { get; private set; }
     public AnimationParam animation { get; private set; }
@@ -82,7 +83,9 @@ public class EntityAction : State<BattleEntity>,IPoolObject
         velocity = Vector3.zero;
         skillid = 0;
         target = 0;
-        paths.Clear();
+        destination = Vector3.zero;
+        sync = false;
+        doneWhenSync = false;
     }
 
     public override bool IsValid()
@@ -108,7 +111,7 @@ public class EntityAction : State<BattleEntity>,IPoolObject
                     {
                         return false;
                     }
-                    return velocity != Vector3.zero || paths.Count > 0;
+                    return velocity != Vector3.zero || (sync && destination != Vector3.zero);
                 }
         }
 

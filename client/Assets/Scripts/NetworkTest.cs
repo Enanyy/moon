@@ -157,9 +157,11 @@ public class NetworkTest : MonoBehaviour
                             entity.machine.current.type == (int)ActionType.Run)
                         {
                             var action = entity.machine.current as EntityAction;
-                            if (action != null && action.paths.Count == 0)
+                            if (action != null)
                             {
-                                action.Done();
+                                action.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
+                                action.doneWhenSync = true;
+                                action.sync = true;
                             }
                         }
                     }
@@ -180,8 +182,9 @@ public class NetworkTest : MonoBehaviour
 
                         if (action != null)
                         {
-                            action.paths.Clear();
-                            action.paths.AddLast(new Vector3(ret.data.position.x, 0, ret.data.position.y));
+                            //Vector3 position = new Vector3(ret.data.position.x, 0, ret.data.position.y);
+
+                           
                             action.velocity = velocity;
                         }
                         else
@@ -205,9 +208,11 @@ public class NetworkTest : MonoBehaviour
                             entity.machine.current.type == (int)ActionType.Run)
                         {
                             var run = entity.machine.current as EntityAction;
-                            if (run != null && run.paths.Count == 0)
+                            if (run != null )
                             {
-                                run.Done();
+                                run.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
+                                run.doneWhenSync = true;
+                                run.sync = true;
                             }
                         }
 

@@ -6,24 +6,23 @@ public class ActionRunPlugin : ActionPlugin
 { 
     private System.Random mRandom = new System.Random();
 
-    public override void OnEnter()
-    {
-        base.OnEnter();
-       
-    }
-
     public override void OnExcute(float deltaTime)
     {
         base.OnExcute(deltaTime);
 
-        if (action.paths.Count > 0)
+        if (action.sync)
         {
-            Vector3 destination = action.paths.First.Value;
-            Vector3 direction = destination - agent.position;
+            Vector3 direction =action.destination - agent.position;
             float displacement = deltaTime * agent.param.movespeed;
             if (direction.magnitude < displacement)
             {
-                action.paths.RemoveFirst();
+                action.sync = false;
+                agent.position = action.destination;
+
+                if (action.doneWhenSync)
+                {
+                    action.Done();
+                }
             }
             else
             {
@@ -43,15 +42,5 @@ public class ActionRunPlugin : ActionPlugin
         }
     }
 
-    public override void OnExit()
-    {
-        base.OnExit();
-        
-    }
-
-    public override void OnPause()
-    {
-        base.OnPause();
-    }
 }
 

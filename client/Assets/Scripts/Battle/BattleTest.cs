@@ -385,7 +385,7 @@ public class BattleTest : MonoBehaviour
             if (entity.machine != null && entity.machine.current != null && entity.machine.current.type == (int)ActionType.Run)
             {
                 var action = entity.machine.current as EntityAction;
-                if (action != null && action.paths.Count == 0)
+                if (action != null && action.sync==false)
                 {
                     action.Done();
                 }
