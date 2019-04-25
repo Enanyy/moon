@@ -1,5 +1,5 @@
 using UnityEngine;
-using  PBMessage;
+using PBMessage;
 public class MSG_BattleEndNotify : Message<BattleEndNotify>
 {
     public MSG_BattleEndNotify() : base(MessageID.BATTLE_END_NOTIFY)

@@ -77,8 +77,8 @@ public class MessageTool
                             }
                             ID = ID.ToUpper();
 
-                            string fm = @"
-using  PBMessage;
+                            string fm = @"using UnityEngine;
+using PBMessage;
 public class {0} : Message<{1}>
 {{
     public {2}() : base(MessageID.{3})
