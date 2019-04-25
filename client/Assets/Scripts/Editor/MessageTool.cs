@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Reflection;
+using System.IO;
 
 public class MessageTool
 { 
@@ -49,22 +50,29 @@ public class MessageTool
                                 || classname.EndsWith("Return")
                                 || classname.EndsWith("Notify"))
                             {
-                                //Debug.Log(classname);
-                                string name = "";
-                                for (int k = 0; k < classname.Length; k++)
+                                Debug.Log(classname);
+                                string file = Application.dataPath + "/Scripts/Message/MSG_"+classname+".cs";
+
+                                if (File.Exists(file) == false)
                                 {
-                                    
-                                    if (k>0 && classname[k] >= 'A' && classname[k] <= 'Z')
+
+                                    string name = "";
+                                    for (int k = 0; k < classname.Length; k++)
                                     {
-                                        name += "_";
-                                        name += classname[k];
+
+                                        if (k > 0 && classname[k] >= 'A' && classname[k] <= 'Z')
+                                        {
+                                            name += "_";
+                                            name += classname[k];
+                                        }
+                                        else
+                                        {
+                                            name += classname[k];
+                                        }
                                     }
-                                    else
-                                    {
-                                        name += classname[k];
-                                    }
+
+                                    ///Debug.Log(name.ToUpper());
                                 }
-                                Debug.Log(name.ToUpper());
                             }
                         }
 
