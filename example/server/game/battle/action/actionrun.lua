@@ -132,7 +132,7 @@ function M:broadcast(velocity)
         velocity ={x= velocity.x,y = velocity.y},
         data = self.agent:get_send_data()
     }
-    copy:broadcast(msgid.BATTLE_ENTITY_RUN,data)
+    copy:broadcast(msgid.BATTLE_ENTITY_RUN_NOTIFY,data)
 end
 
 return M

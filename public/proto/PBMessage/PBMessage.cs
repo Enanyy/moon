@@ -362,10 +362,10 @@ namespace PBMessage
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityIdle")]
-  public partial class BattleEntityIdle : global::ProtoBuf.IExtensible
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityIdleNotify")]
+  public partial class BattleEntityIdleNotify : global::ProtoBuf.IExtensible
   {
-    public BattleEntityIdle() {}
+    public BattleEntityIdleNotify() {}
     
     private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
@@ -394,10 +394,10 @@ namespace PBMessage
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityRun")]
-  public partial class BattleEntityRun : global::ProtoBuf.IExtensible
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityRunNotify")]
+  public partial class BattleEntityRunNotify : global::ProtoBuf.IExtensible
   {
-    public BattleEntityRun() {}
+    public BattleEntityRunNotify() {}
     
     private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
@@ -433,10 +433,10 @@ namespace PBMessage
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityAttack")]
-  public partial class BattleEntityAttack : global::ProtoBuf.IExtensible
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityAttackNotify")]
+  public partial class BattleEntityAttackNotify : global::ProtoBuf.IExtensible
   {
-    public BattleEntityAttack() {}
+    public BattleEntityAttackNotify() {}
     
     private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
@@ -486,10 +486,10 @@ namespace PBMessage
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityDie")]
-  public partial class BattleEntityDie : global::ProtoBuf.IExtensible
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityDieNotify")]
+  public partial class BattleEntityDieNotify : global::ProtoBuf.IExtensible
   {
-    public BattleEntityDie() {}
+    public BattleEntityDieNotify() {}
     
     private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
@@ -510,10 +510,10 @@ namespace PBMessage
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityBlood")]
-  public partial class BattleEntityBlood : global::ProtoBuf.IExtensible
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityBloodNotify")]
+  public partial class BattleEntityBloodNotify : global::ProtoBuf.IExtensible
   {
-    public BattleEntityBlood() {}
+    public BattleEntityBloodNotify() {}
     
     private uint _id;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]

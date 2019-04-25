@@ -49,6 +49,6 @@ function M:broadcast()
         data = self.agent:get_send_data()
     }
 
-    copy:broadcast(msgid.BATTLE_ENTITY_IDLE,data)
+    copy:broadcast(msgid.BATTLE_ENTITY_IDLE_NOTIFY,data)
 end
 return M

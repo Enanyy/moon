@@ -160,9 +160,9 @@ public class Main : MonoBehaviour
                     }
                 }
                 break;
-            case MessageID.BATTLE_ENTITY_IDLE:
+            case MessageID.BATTLE_ENTITY_IDLE_NOTIFY:
                 {
-                    BattleEntityIdle ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityIdle>(packet.data,
+                    BattleEntityIdleNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityIdleNotify>(packet.data,
                         NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
 
                     //Debug.Log(ret.id+" idle");
@@ -184,9 +184,9 @@ public class Main : MonoBehaviour
                     }
                 }
                 break;
-            case MessageID.BATTLE_ENTITY_RUN:
+            case MessageID.BATTLE_ENTITY_RUN_NOTIFY:
                 {
-                    BattleEntityRun ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityRun>(packet.data,
+                    BattleEntityRunNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityRunNotify>(packet.data,
                         NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
 
                     //Debug.Log(ret.id + " run");
@@ -221,9 +221,9 @@ public class Main : MonoBehaviour
                     }
                 }
                 break;
-            case MessageID.BATTLE_ENTITY_ATTACK:
+            case MessageID.BATTLE_ENTITY_ATTACK_NOTIFY:
                 {
-                    BattleEntityAttack ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityAttack>(packet.data,
+                    BattleEntityAttackNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityAttackNotify>(packet.data,
                         NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
                     //Debug.Log(ret.id + " attack");
                     var entity = BattleManager.Instance.GetEntity(ret.id);
@@ -253,9 +253,9 @@ public class Main : MonoBehaviour
                     }
                 }
                 break;
-            case MessageID.BATTLE_ENTITY_DIE:
+            case MessageID.BATTLE_ENTITY_DIE_NOTIFY:
                 {
-                    BattleEntityDie ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityDie>(packet.data,
+                    BattleEntityDieNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityDieNotify>(packet.data,
                         NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
                     Debug.Log(ret.id + " die");
                     var entity = BattleManager.Instance.GetEntity(ret.id);
@@ -266,9 +266,9 @@ public class Main : MonoBehaviour
                     }
                 }
                 break;
-            case MessageID.BATTLE_ENTITY_BLOOD:
+            case MessageID.BATTLE_ENTITY_BLOOD_NOTIFY:
                 {
-                    BattleEntityBlood ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityBlood>(packet.data,
+                    BattleEntityBloodNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEntityBloodNotify>(packet.data,
                         NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
 
                     var entity = BattleManager.Instance.GetEntity(ret.id);

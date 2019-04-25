@@ -55,7 +55,7 @@ function M:broadcast()
         data = self.agent:get_send_data()
     }
 
-    copy:broadcast(msgid.BATTLE_ENTITY_ATTACK,data)
+    copy:broadcast(msgid.BATTLE_ENTITY_ATTACK_NOTIFY,data)
 end
 
 return M

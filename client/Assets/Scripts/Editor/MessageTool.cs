@@ -10,6 +10,7 @@ public class MessageTool
     [MenuItem("Tools/生成协议代码")]
     static void GenMessage()
     {
+        string register = "";
         for (int i = 0; i < 4; i++)
         {
             Assembly assembly = null;
@@ -36,43 +37,47 @@ public class MessageTool
                 assembly = null;
             }
 
-            if (assembly != null)
+            if (assembly == null)
             {
-                Type[] types = assembly.GetTypes();
-                for (int j = 0; j < types.Length; j++)
+                continue;
+            }
+            Type[] types = assembly.GetTypes();
+            for (int j = 0; j < types.Length; j++)
+            {
+                if (types[j].IsAbstract)
                 {
-                    if (!types[j].IsAbstract)
+                    continue;
+                }
+                if (types[j].Namespace == "PBMessage")
+                {
+                    string classname = types[j].ToString().Replace("PBMessage.", "");
+                    if (classname.EndsWith("Request")
+                        || classname.EndsWith("Return")
+                        || classname.EndsWith("Notify"))
                     {
-                        if (types[j].Namespace =="PBMessage")
+                        string filename = "MSG_" + classname;
+                        string file = Application.dataPath + "/Scripts/Message/" + filename + ".cs";
+
+                        if (File.Exists(file) == false)
                         {
-                            string classname = types[j].ToString().Replace("PBMessage.", "");
-                            if (classname.EndsWith("Request")
-                                || classname.EndsWith("Return")
-                                || classname.EndsWith("Notify"))
+
+                            string ID = "";
+                            for (int k = 0; k < classname.Length; k++)
                             {
-                                string filename = "MSG_" + classname;
-                                string file = Application.dataPath + "/Scripts/Message/"+ filename + ".cs";
 
-                                if (File.Exists(file) == false)
+                                if (k > 0 && classname[k] >= 'A' && classname[k] <= 'Z')
                                 {
+                                    ID += "_";
+                                    ID += classname[k];
+                                }
+                                else
+                                {
+                                    ID += classname[k];
+                                }
+                            }
+                            ID = ID.ToUpper();
 
-                                    string ID = "";
-                                    for (int k = 0; k < classname.Length; k++)
-                                    {
-
-                                        if (k > 0 && classname[k] >= 'A' && classname[k] <= 'Z')
-                                        {
-                                            ID += "_";
-                                            ID += classname[k];
-                                        }
-                                        else
-                                        {
-                                            ID += classname[k];
-                                        }
-                                    }
-                                    ID = ID.ToUpper();
-
-                                    string fm = @"
+                            string fm = @"
 using  PBMessage;
 public class {0} : Message<{1}>
 {{
@@ -87,17 +92,35 @@ public class {0} : Message<{1}>
     }}
 }}
 ";
-                                    string code = string.Format(fm, filename, classname, filename, ID);
-                                    File.WriteAllText(file, code);
-                                  
-                                }
-                            }
+                            string code = string.Format(fm, filename, classname, filename, ID);
+                            File.WriteAllText(file, code);
                         }
+                        register += "\t\tRegister(new " + filename + "());\n";
 
                     }
+
+
                 }
+
             }
         }
+
+        string managerFile = Application.dataPath + "/Scripts/Message/MessageManager.cs";
+
+
+        string content = File.ReadAllText(managerFile);
+
+        int startIDIndex = content.IndexOf("//REGISTER_MESSAGE_START");
+        int endIDIndex = content.IndexOf("//REGISTER_MESSAGE_END");
+
+        string part1 = content.Substring(0, startIDIndex + "//REGISTER_MESSAGE_START".Length + 1);
+        string part2 = content.Substring(endIDIndex);
+
+        content = part1 + register + part2;
+        StreamWriter writer = new StreamWriter(managerFile);
+        writer.Write(content);
+        writer.Close();
+        writer.Dispose();
     }
 }
 

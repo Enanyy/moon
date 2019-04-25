@@ -24,10 +24,10 @@ function M.init()
     M.msg_def[msgid.BATTLE_BEGIN_REQUEST]    = {name = "BattleBeginRequest",func = nil}
     M.msg_def[msgid.BATTLE_BEGIN_RETURN]     = {name = "BattleBeginReturn",func = nil}
     M.msg_def[msgid.BATTLE_BEGIN_NOTIFY]     = {name = "BattleBeginNotify",func = nil}
-    M.msg_def[msgid.BATTLE_ENTITY_IDLE]      = {name = "BattleEntityIdle",func = nil}
-    M.msg_def[msgid.BATTLE_ENTITY_RUN]       = {name = "BattleEntityRun",func = nil}
-    M.msg_def[msgid.BATTLE_ENTITY_ATTACK]    = {name = "BattleEntityAttack",func = nil}
-    M.msg_def[msgid.BATTLE_ENTITY_DIE]       = {name = "BattleEntityDie",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_IDLE_NOTIFY]      = {name = "BattleEntityIdleNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_RUN_NOTIFY]       = {name = "BattleEntityRunNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_ATTACK_NOTIFY]    = {name = "BattleEntityAttackNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_DIE_NOTIFY]       = {name = "BattleEntityDieNotify",func = nil}
     M.msg_def[msgid.BATTLE_END_NOTIFY]       = {name = "BattleEndNotify",func = nil}
 
 end

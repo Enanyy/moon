@@ -38,7 +38,7 @@ function M:broadcast()
         copy = self.agent.copyid
     }
     
-    copy:broadcast(msgid.BATTLE_ENTITY_DIE,data)
+    copy:broadcast(msgid.BATTLE_ENTITY_DIE_NOTIFY,data)
 end
 
 return M

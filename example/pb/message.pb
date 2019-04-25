@@ -1,5 +1,6 @@
 
-þ	
+œ
+
 message.proto".
 LoginRequest
 name (	
@@ -51,31 +52,31 @@
 result (">
 BattleBeginNotify
 copy (
-list (2.BattleEntity"M
-BattleEntityIdle
+list (2.BattleEntity"S
+BattleEntityIdleNotify
 
 id (
 copy (
-data (2.BattleEntityData"h
-BattleEntityRun
+data (2.BattleEntityData"n
+BattleEntityRunNotify
 
 id (
 copy (
 velocity (2.Point2D
-data (2.BattleEntityData"ƒ
-BattleEntityAttack
+data (2.BattleEntityData"‰
+BattleEntityAttackNotify
 
 id (
 copy (
 skill (
 attackspeed (
 target (
-data (2.BattleEntityData"+
-BattleEntityDie
+data (2.BattleEntityData"1
+BattleEntityDieNotify
 
 id (
-copy ("H
-BattleEntityBlood
+copy ("N
+BattleEntityBloodNotify
 
 id (
 copy (

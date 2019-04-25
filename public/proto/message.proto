@@ -86,14 +86,14 @@ message BattleBeginNotify
 	repeated BattleEntity list = 2;
 }
 
-message BattleEntityIdle
+message BattleEntityIdleNotify
 {	
 	required uint32 id = 1;
 	required uint32 copy = 2;
 	optional BattleEntityData data =3;
 }
 
-message BattleEntityRun
+message BattleEntityRunNotify
 {
 	required uint32 id = 1;
 	required uint32 copy = 2;
@@ -101,7 +101,7 @@ message BattleEntityRun
 	optional BattleEntityData data = 4;
 }
 
-message BattleEntityAttack
+message BattleEntityAttackNotify
 {
 	required uint32 id = 1;
 	required uint32 copy = 2;
@@ -111,13 +111,13 @@ message BattleEntityAttack
 	optional BattleEntityData data = 6;
 }
 
-message BattleEntityDie
+message BattleEntityDieNotify
 {
 	required uint32 id = 1;
 	required uint32 copy = 2;
 }
 
-message BattleEntityBlood
+message BattleEntityBloodNotify
 {
 	required uint32 id = 1;
 	required uint32 copy = 2;

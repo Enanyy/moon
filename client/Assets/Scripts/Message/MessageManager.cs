@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 public interface IMessage
@@ -55,7 +55,21 @@ public class MessageManager
 
     public void Init()
     {
-        Register(new MSG_LoginRequest());
+//REGISTER_MESSAGE_START		Register(new MSG_LoginRequest());
+		Register(new MSG_LoginReturn());
+		Register(new MSG_LoginGameNotify());
+		Register(new MSG_LoginGameRequest());
+		Register(new MSG_LoginGameReturn());
+		Register(new MSG_BattleBeginRequest());
+		Register(new MSG_BattleBeginReturn());
+		Register(new MSG_BattleBeginNotify());
+		Register(new MSG_BattleEntityIdleNotify());
+		Register(new MSG_BattleEntityRunNotify());
+		Register(new MSG_BattleEntityAttackNotify());
+		Register(new MSG_BattleEntityDieNotify());
+		Register(new MSG_BattleEntityBloodNotify());
+		Register(new MSG_BattleEndNotify());
+//REGISTER_MESSAGE_END
     }
 
     public void Register( IMessage message)

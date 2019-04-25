@@ -187,7 +187,7 @@ function M:hurtby( attacker )
         value = hurtvalue
     }
 
-    copy:broadcast(msgid.BATTLE_ENTITY_BLOOD,data)
+    copy:broadcast(msgid.BATTLE_ENTITY_BLOOD_NOTIFY,data)
 
     if self.hp <= 0 then
         self.isdie = true
