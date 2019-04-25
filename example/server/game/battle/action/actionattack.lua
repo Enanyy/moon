@@ -10,11 +10,20 @@ function M.new()
     o.senddata= {}
     return o
 end
+--
+--overwrite
+--
+function M:isvalid()
+    if self.agent.isdie == true then
+        return false
+    end
+    return self.agent.target ~= nil
+end
 
 function M:enter()
     action.enter(self)
     -- if self.agent.id == 1 then
-    --print(self.agent.id ," enter attack:"..tostring(self.agent.position))
+    --    print(self.agent.id ," enter attack:"..tostring(self.agent.position))
     -- end
     if self.agent.target ~= nil then
 

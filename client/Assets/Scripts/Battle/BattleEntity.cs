@@ -33,10 +33,11 @@ public class BattleEntity:
     public Vector3 position { get; set; }
     public Quaternion rotation { get; set; }
     public float scale { get; set; }
-    public Vector3 syncPosition= Vector3.zero;
 
+    public float attackDistance = 4; // 攻击距离
+    public float searchDistance = 10; //索敌范围
+    public float radius = 1;      //模型半径
 
-    public Vector3 bornPosition; //出生位置
 
     public StateMachine<BattleEntity> machine { get; private set; }
 
@@ -146,8 +147,7 @@ public class BattleEntity:
 
         position = Vector3.zero;
         rotation = Quaternion.identity;
-        bornPosition = Vector3.zero;
-        syncPosition =Vector3.zero;
+
 
         machine.Clear();
         model = null;
@@ -227,6 +227,14 @@ public class BattleEntity:
         }
     }
 
+    public void UpdateEntity(PBMessage.BattleEntityData data)
+    {
+        position = new Vector3(data.position.x,0, data.position.y);
+        rotation = Quaternion.LookRotation(new Vector3(data.direction.x, 0, data.direction.y));
+
+        hp = data.hp;
+    }
+
   
     public void DropBlood(int value)
     {
@@ -250,6 +258,12 @@ public class BattleEntity:
         EntityAction action = ObjectPool.GetInstance<EntityAction>();
         PlayAction(ActionType.Die,action,true);
 
+    }
+
+    public override void Destroy()
+    {
+        Clear();
+        base.Destroy();
     }
 
     

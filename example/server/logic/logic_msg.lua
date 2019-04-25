@@ -89,7 +89,7 @@ function M.battle_begin_request(sessionid, u, msg )
                     camp = 2,
                     type = userdef.MONSTER,
                     heros = {
-                        {config = 1, count = 4},
+                        {config = 1, count = 5},
                         {config = 2, count = 4},
                         {config = 3, count = 5},
                     }

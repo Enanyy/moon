@@ -96,7 +96,11 @@ public class NetworkTest : MonoBehaviour
                             NetworkManager.Instance().Send(ConnectID.Game, MessageID.LOGIN_GAME_REQUEST, request);
                         }
 
-                    }, (c) => { Debug.Log("Connect Game Fail"); });
+                    }, (c) =>
+                    {
+                        Debug.Log("Connect Game Fail");
+                        NetworkManager.Instance().Close(c.ID);
+                    });
 
                 }
                 break;
@@ -134,6 +138,9 @@ public class NetworkTest : MonoBehaviour
                         entity.type = data.type;
 
                         entity.hp = data.data.hp;
+                        entity.searchDistance = data.searchdistance;
+                        entity.attackDistance = data.attackdistance;
+                        entity.radius = data.radius;
 
                         entity.position = new Vector3(data.data.position.x, 0, data.data.position.y);
                         entity.rotation = Quaternion.LookRotation(new Vector3(data.data.direction.x, 0, data.data.direction.y));
@@ -153,17 +160,18 @@ public class NetworkTest : MonoBehaviour
                     var entity = BattleManager.Instance.GetEntity(ret.id);
                     if (entity != null)
                     {
-                        if (entity.machine != null && entity.machine.current != null &&
-                            entity.machine.current.type == (int)ActionType.Run)
-                        {
-                            var action = entity.machine.current as EntityAction;
-                            if (action != null)
-                            {
-                                action.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
-                                action.doneWhenSync = true;
-                                action.sync = true;
-                            }
-                        }
+                        entity.UpdateEntity(ret.data);
+                        //if (entity.machine != null && entity.machine.current != null &&
+                        //    entity.machine.current.type == (int)ActionType.Run)
+                        //{
+                        //    var action = entity.machine.current as EntityAction;
+                        //    if (action != null)
+                        //    {
+                        //        action.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
+                        //        action.doneWhenSync = true;
+                        //        action.sync = true;
+                        //    }
+                        //}
                     }
                 }
                 break;
@@ -178,21 +186,29 @@ public class NetworkTest : MonoBehaviour
                     var entity = BattleManager.Instance.GetEntity(ret.id);
                     if (entity != null)
                     {
-                        EntityAction action = entity.GetFirst(ActionType.Run);
+                        entity.UpdateEntity(ret.data);
+                        //EntityAction action = entity.GetFirst(ActionType.Run);
 
-                        if (action != null)
-                        {
-                            //Vector3 position = new Vector3(ret.data.position.x, 0, ret.data.position.y);
-
+                        //if (action != null)
+                        //{
+                        //    //Vector3 position = new Vector3(ret.data.position.x, 0, ret.data.position.y);
+                        //    //Vector3 direction = position - entity.position;
+                        //    //float angle = Vector3.Angle(velocity, direction);
+                        //    //if (angle > 10)
+                        //    //{
+                        //    //    action.destination = position;
+                        //    //    action.sync = true;
+                        //    //    action.doneWhenSync = false;
+                        //    //}
                            
-                            action.velocity = velocity;
-                        }
-                        else
-                        {
-                            action = ObjectPool.GetInstance<EntityAction>();
-                            action.velocity = velocity;
-                            entity.PlayAction(ActionType.Run, action);
-                        }
+                        //    action.velocity = velocity;
+                        //}
+                        //else
+                        //{
+                        //    action = ObjectPool.GetInstance<EntityAction>();
+                        //    action.velocity = velocity;
+                        //    entity.PlayAction(ActionType.Run, action);
+                        //}
                     }
                 }
                 break;
@@ -204,17 +220,18 @@ public class NetworkTest : MonoBehaviour
                     var entity = BattleManager.Instance.GetEntity(ret.id);
                     if (entity != null)
                     {
-                        if (entity.machine != null && entity.machine.current != null &&
-                            entity.machine.current.type == (int)ActionType.Run)
-                        {
-                            var run = entity.machine.current as EntityAction;
-                            if (run != null )
-                            {
-                                run.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
-                                run.doneWhenSync = true;
-                                run.sync = true;
-                            }
-                        }
+                        //if (entity.machine != null && entity.machine.current != null &&
+                        //    entity.machine.current.type == (int)ActionType.Run)
+                        //{
+                        //    var run = entity.machine.current as EntityAction;
+                        //    if (run != null )
+                        //    {
+                        //        run.destination = new Vector3(ret.data.position.x, 0, ret.data.position.y); ;
+                        //        run.doneWhenSync = true;
+                        //        run.sync = true;
+                        //    }
+                        //}
+                        entity.UpdateEntity(ret.data);
 
                         EntityAction action = ObjectPool.GetInstance<EntityAction>();
                         action.skillid = ret.skill;
@@ -234,6 +251,7 @@ public class NetworkTest : MonoBehaviour
                     var entity = BattleManager.Instance.GetEntity(ret.id);
                     if (entity != null)
                     {
+                        //entity.UpdateEntity(ret.data);
                         entity.Die();
                     }
                 }
@@ -256,6 +274,10 @@ public class NetworkTest : MonoBehaviour
                     BattleEndNotify ret = ProtoTransfer.DeserializeProtoBuf<BattleEndNotify>(packet.data,
                         NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET);
                     Debug.Log("Battle end:" + ret.copy);
+
+                    BattleManager.Instance.Destroy();
+                   
+                    NetworkManager.Instance().Close(ConnectID.Game);
                 }
                 break;
         }

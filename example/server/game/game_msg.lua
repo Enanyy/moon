@@ -31,6 +31,14 @@ function M.login_game_request(sessionid,  msg)
     local userid = msg.id
     print("game_msg:login_game_request->login game service:"..tostring(msg.id))
 
+    if copymgr:userlogin(userid, sessionid) == false then
+        
+        print("game_msg:login_game_request->login copymgr failed:")
+
+        netmgr:send_then_close(sessionid,msgid.LOGIN_GAME_RETURN,{result = errordef.SYSTEM})
+        return
+    end
+
     local copy = copymgr:getcopy_by_userid(userid)
     if copy then
         moon.async(function() 

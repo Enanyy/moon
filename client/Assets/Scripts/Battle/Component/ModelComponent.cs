@@ -119,6 +119,10 @@ public class ModelComponent :
             gameObject.name = agent.id.ToString();
             gameObject.transform.position = agent.position;
             gameObject.transform.rotation = agent.rotation;
+
+#if UNITY_EDITOR
+            ShowShapeRenderer();
+#endif
         }
 
         return result;
@@ -319,6 +323,36 @@ public class ModelComponent :
             }
         }
     }
+
+#if UNITY_EDITOR
+    List<ShapeRenderer> mShapeRenderers=new List<ShapeRenderer>();
+
+    void ShowShapeRenderer()
+    {
+        if (gameObject == null)
+        {
+            return;
+        }
+        ShowRadius(RadiusType.Radius, agent.radius, Color.green);
+        ShowRadius(RadiusType.SearchDistance, agent.searchDistance, Color.yellow);
+        ShowRadius(RadiusType.AttackDistance, agent.attackDistance, Color.red);
+    }
+
+    void ShowRadius(RadiusType type, float radius, Color color)
+    {
+        GameObject go = new GameObject(type.ToString());
+        go.transform.SetParent(gameObject.transform);
+        go.transform.localPosition = Vector3.zero;
+        go.transform.localRotation= Quaternion.identity;
+        var renderer = go.AddComponent<CircularRenderer>();
+        renderer.radius = radius;
+        renderer.color = color;
+        renderer.type = type;
+        mShapeRenderers.Add(renderer);
+    }
+
+
+#endif
 
 }
 

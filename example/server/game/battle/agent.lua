@@ -116,6 +116,8 @@ function M:update(delta)
             self:play(idle)
         end
         self.machine:update(delta)
+
+        self:checksync()
     end
 end
 
@@ -206,6 +208,36 @@ function M:needsync( )
     return false
 end
 
+
+function M:checksync()
+
+    if self.machine  == nil then
+        return
+    end
+    if self:needsync() then
+        local position = rvo2:getAgentPosition(self.sid)
+        local run = nil 
+        if self.machine.current ~= nil and self.machine.current.type == actiondef.run then
+            run = self.machine.current
+        end
+
+        if run == nil then
+            if self.machine.states:count() > 1 and self.machine.states.items[2].type == actiondef.run then
+                run =  self.machine.states.items[2]
+            end
+
+        end
+
+        if run ~= nil then
+            run:setdestination(position)
+        else
+            run = actionrun.new()
+            run:setdestination(position)
+            self:play(run, true)
+        end
+
+    end
+end
 
 function M:get_send_agent()
 

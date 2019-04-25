@@ -23,12 +23,21 @@ function M:setdestination(destination)
     self.destination = destination
 end
 
+--
+--overwrite
+--
+function M:isvalid()
+    if self.agent.isdie == true then
+        return false
+    end
+    return true
+end
 
 function M:enter()
     action.enter(self)
-        -- if self.agent.id == 1 then
-        --    print(self.agent.id.. ' enter run'.." position:"..tostring(self.agent.position).. "destination:"..tostring(self.destination))
-        -- end
+    -- if self.agent.id == 1 then
+    --   print(self.agent.id.. ' enter run'.." position:"..tostring(self.agent.position).. "destination:"..tostring(self.destination))
+    -- end
 
     if self.agent:needsync() then
         self.sync = true
@@ -86,18 +95,7 @@ function M:execute(delta)
     else
         self:done()
     end
---[[ 
-    local direction = self.destination - self.agent.position
-    local distance = direction:magnitude()
-    local displacement = delta * self.agent.movespeed
-    self.agent.direction = direction:normalized() 
-    if distance >= displacement then
-        self.agent.position = self.agent.position + self.agent.direction  * displacement
-    else
-        self.agent.position = self.destination
-        self:done()
-    end
---]]
+
     --if self.agent.type == userdef.USER then
       --  print(self.agent.id.. ' execute run:'..tostring(self.agent.position).." destination:"..tostring(self.destination).." distance:"..tostring((self.destination - self.agent.position):magnitude()))
     --end

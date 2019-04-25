@@ -11,9 +11,19 @@ function M.new()
     return o
 end
 
+--
+--overwrite
+--
+function M:isvalid()
+    if self.agent.isdie == true then
+        return false
+    end
+    return true
+end
+
 function M:enter()
     -- if self.agent.id == 1 then
-    print(self.agent.id ," enter idle:"..tostring(self.agent.position))
+    --print(self.agent.id ," enter idle:"..tostring(self.agent.position))
     --     end
     action.enter(self)
 

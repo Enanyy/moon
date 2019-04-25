@@ -21,6 +21,7 @@ public class ActionRunPlugin : ActionPlugin
 
                 if (action.doneWhenSync)
                 {
+                    action.doneWhenSync = false;
                     action.Done();
                 }
             }

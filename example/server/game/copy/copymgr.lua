@@ -49,9 +49,14 @@ end
 function M:remove(copyid)
     moon.async(function() 
 
+        table.removewhere(self.copies, function (data)
+            local result = copyid == data.id
+            
+            return result 
+        end)
         local ret =  moon.remove_service(copyid,true)
-        table.removewhere(self.copies, function (data) return copyid == data.id end)
-        print("copymgr:remove->",copyid)
+
+        print("copymgr:remove->",copyid," ", ret)
     end)
 
 end
@@ -67,6 +72,18 @@ function M:getcopy_by_userid(userid)
     end
 
     return nil
+end
+function M:userlogin(userid, sessionid)
+    for i,v in ipairs(self.copies) do
+        for j,u in ipairs(v.data.users) do
+            if u.userid == userid then
+                u.sessionid = sessionid
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 

@@ -350,7 +350,7 @@ public class BattleManager
         var it = entities.GetEnumerator();
         while (it.MoveNext())
         {
-            it.Current.Value.Clear();
+            it.Current.Value.Destroy();
         }
         entities.Clear();
         ObjectPool.Clear<BattleEntity>();
