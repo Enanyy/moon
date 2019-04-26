@@ -136,6 +136,7 @@ namespace RVO {
 		{
 			if ((*it)->needDelete_)
 			{
+				isDelete = true;
 				it = agents_.erase(it);
 			}
 			else
