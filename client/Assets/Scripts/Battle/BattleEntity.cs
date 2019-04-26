@@ -13,15 +13,15 @@ using System.Collections.Generic;
 using UnityEngine;
 public enum EntityProperty
 {
-    HP = 1,
-    MAX_HP = 2,
-    ATTACK = 3,
-    DEFENSE = 4,
-    MOVE_SPEED = 5,
-    ATTACK_SPEED = 6,
-    SEARCH_DISTANCE = 7,
-    ATTACK_DISTANCE = 8,
-    RADIUS = 9,
+    PRO_HP = 1,
+    PRO_MAX_HP = 2,
+    PRO_ATTACK = 3,
+    PRO_DEFENSE = 4,
+    PRO_MOVE_SPEED = 5,
+    PRO_ATTACK_SPEED = 6,
+    PRO_SEARCH_DISTANCE = 7,
+    PRO_ATTACK_DISTANCE = 8,
+    PRO_RADIUS = 9,
 }
 
 public class BattleEntity: 
@@ -175,15 +175,15 @@ public class BattleEntity:
 
     public void ResetProperty()
     {
-        SetProperty(EntityProperty.HP, 0);
-        SetProperty(EntityProperty.MAX_HP, 0);
-        SetProperty(EntityProperty.ATTACK, 0);
-        SetProperty(EntityProperty.DEFENSE, 0);
-        SetProperty(EntityProperty.MOVE_SPEED, 6);
-        SetProperty(EntityProperty.ATTACK_SPEED, 2);
-        SetProperty(EntityProperty.SEARCH_DISTANCE, 20);
-        SetProperty(EntityProperty.ATTACK_DISTANCE, 10);
-        SetProperty(EntityProperty.RADIUS, 1);
+        SetProperty(EntityProperty.PRO_HP, 0);
+        SetProperty(EntityProperty.PRO_MAX_HP, 0);
+        SetProperty(EntityProperty.PRO_ATTACK, 0);
+        SetProperty(EntityProperty.PRO_DEFENSE, 0);
+        SetProperty(EntityProperty.PRO_MOVE_SPEED, 6);
+        SetProperty(EntityProperty.PRO_ATTACK_SPEED, 2);
+        SetProperty(EntityProperty.PRO_SEARCH_DISTANCE, 20);
+        SetProperty(EntityProperty.PRO_ATTACK_DISTANCE, 10);
+        SetProperty(EntityProperty.PRO_RADIUS, 1);
     }
 
     public void SetProperty(EntityProperty property,int value)

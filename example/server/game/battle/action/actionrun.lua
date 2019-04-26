@@ -125,6 +125,20 @@ function M:broadcast(velocity)
     if velocity == nil then
         return
     end
+    -- local int, mod = math.modf( velocity.x * 100000 / 1 )
+    -- if mod >= 0.5 then
+    --     int = int + 1
+    -- end
+
+    -- velocity.x = int / 100000
+
+    -- local int, mod = math.modf( velocity.y * 100000 / 1 )
+    -- if mod >= 0.5 then
+    --     int = int + 1
+    -- end
+    -- velocity.y = int / 100000
+
+
     if self.senddata ~= nil and self.senddata.velocity.x == velocity.x and self.senddata.velocity.y == velocity.y then
         return
     end
@@ -134,7 +148,7 @@ function M:broadcast(velocity)
         copy = copy.copyid,
         position = {x = self.agent.position.x, y = self.agent.position.y},
         velocity ={x= velocity.x,y = velocity.y},
-        movespeed = self.agent.movespeed
+        movespeed = self.agent.movespeed * 100
     }
     self.senddata = data
     copy:broadcast(msgid.BATTLE_ENTITY_RUN_NOTIFY,data)

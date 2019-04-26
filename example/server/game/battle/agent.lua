@@ -257,15 +257,15 @@ end
 
 function M:properties()
     local data  = {
-        {key = userpro.HP, value = self.hp},
-        {key = userpro.MAX_HP, value = self.hp},
-        {key = userpro.ATTACK, value = self.attackvalue},
-        {key = userpro.DEFENSE, value = self.defensevalue},
-        {key = userpro.MOVE_SPEED, value = self.movespeed * 100},
-        {key = userpro.ATTACK_SPEED, value = self.attackspeed * 100},
-        {key = userpro.SEARCH_DISTANCE, value = self.searchdistance * 100},
-        {key = userpro.ATTACK_DISTANCE, value = self.attackdistance * 100},
-        {key = userpro.RADIUS, value = self.radius * 100},
+        {key = userpro.PRO_HP, value = self.hp},
+        {key = userpro.PRO_MAX_HP, value = self.hp},
+        {key = userpro.PRO_ATTACK, value = self.attackvalue},
+        {key = userpro.PRO_DEFENSE, value = self.defensevalue},
+        {key = userpro.PRO_MOVE_SPEED, value = self.movespeed * 100},
+        {key = userpro.PRO_ATTACK_SPEED, value = self.attackspeed * 100},
+        {key = userpro.PRO_SEARCH_DISTANCE, value = self.searchdistance * 100},
+        {key = userpro.PRO_ATTACK_DISTANCE, value = self.attackdistance * 100},
+        {key = userpro.PRO_RADIUS, value = self.radius * 100},
     }
     return data
 end
