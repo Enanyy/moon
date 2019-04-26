@@ -460,6 +460,7 @@ MonoBehaviour:
   port: 5000
   username: lwg
   pwd: 1234
+  showType: 3
 --- !u!4 &2126523733
 Transform:
   m_ObjectHideFlags: 0

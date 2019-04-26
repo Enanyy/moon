@@ -12,10 +12,12 @@ public class MSG_BattleEntityIdleNotify : Message<BattleEntityIdleNotify>
     }
     protected override void OnMessage()
     {
+        
         //Debug.Log(ret.id+" idle");
         var entity = BattleManager.Instance.GetEntity(message.id);
         if (entity != null)
         {
+            Vector3 pos = new Vector3(message.data.position.x, 0, message.data.position.y);
             entity.UpdateEntity(message.data);
             if (entity.machine != null && entity.machine.current != null &&
                 entity.machine.current.type == (int)ActionType.Run)
@@ -23,9 +25,8 @@ public class MSG_BattleEntityIdleNotify : Message<BattleEntityIdleNotify>
                 var action = entity.machine.current as EntityAction;
                 if (action != null)
                 {
-                    action.destination = new Vector3(message.data.position.x, 0, message.data.position.y); ;
-                    action.doneWhenSync = true;
-                    action.sync = true;
+                  
+                    action.AddPathPoint(pos, Vector3.zero, true);
                 }
             }
         }

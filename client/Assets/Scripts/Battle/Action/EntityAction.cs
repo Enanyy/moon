@@ -2,19 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct PathPoint
+{
+    public Vector3 destination;
+    public Vector3 velocity;
+    public bool done ;
+    public bool arrive;
+
+    public PathPoint(Vector3 destination, Vector3 velocity, bool done)
+    {
+        this.destination = destination;
+        this.velocity = velocity;
+        this.done = done;
+        this.arrive = false;
+    }
+}
 
 public class EntityAction : State<BattleEntity>,IPoolObject
 {
-    public Vector3 velocity;
+    
     public uint skillid;
     public uint target;
+    public LinkedList<PathPoint> paths { get; private set; }
 
-    public Vector3 destination;
-    public bool sync = false;
-    public bool doneWhenSync = false;
-   
+
+
     public ActionParam param { get; private set; }
     public AnimationParam animation { get; private set; }
+
 
     public new ActionType type
     {
@@ -29,9 +44,22 @@ public class EntityAction : State<BattleEntity>,IPoolObject
 
     public EntityAction()
     {
-       
+       paths = new LinkedList<PathPoint>();
     }
-   
+
+    public void AddPathPoint(Vector3 destination,Vector3 velocity, bool done)
+    {
+        if (paths.Count > 1)
+        {
+            var point = paths.Last.Value;
+            if (Vector3.Distance(point.destination, destination) < 0.1f)
+            {
+                paths.RemoveLast();
+            }
+        }
+        
+        paths.AddLast(new PathPoint(destination, velocity, done));
+    }
 
     public override void SetAgent(BattleEntity entity)
     {
@@ -80,12 +108,13 @@ public class EntityAction : State<BattleEntity>,IPoolObject
         base.Clear();
         param = null;
         animation = null;
-        velocity = Vector3.zero;
+       
         skillid = 0;
         target = 0;
-        destination = Vector3.zero;
-        sync = false;
-        doneWhenSync = false;
+        if (paths != null)
+        {
+            paths.Clear();
+        }
     }
 
     public override bool IsValid()
@@ -111,7 +140,7 @@ public class EntityAction : State<BattleEntity>,IPoolObject
                     {
                         return false;
                     }
-                    return velocity != Vector3.zero || (sync && destination != Vector3.zero);
+                    return paths.Count > 0;
                 }
         }
 

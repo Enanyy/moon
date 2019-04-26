@@ -25,6 +25,7 @@ public class AIComponent : IComponent<BattleEntity>,IStateAgent<BattleEntity>,IP
 
     public void OnExcute(State<BattleEntity> state, float delaTime)
     {
+        /*
         EntityAction action = state as EntityAction;
         switch (action.type)
         {
@@ -116,7 +117,7 @@ public class AIComponent : IComponent<BattleEntity>,IStateAgent<BattleEntity>,IP
             }
             break;
         }
-
+        */
     }
 
     public void OnCancel(State<BattleEntity> state)

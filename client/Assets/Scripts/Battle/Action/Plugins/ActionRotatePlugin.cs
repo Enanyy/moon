@@ -21,14 +21,7 @@ public class ActionRotatePlugin : ActionPlugin
                 agent.rotation = Quaternion.Lerp(agent.rotation, Quaternion.LookRotation(direction), deltaTime * 10);
             }
         }
-        else
-        {
-            if (action.velocity != Vector3.zero)
-            {
-                Quaternion rotation = Quaternion.LookRotation(action.velocity);
-                agent.rotation = Quaternion.Lerp(agent.rotation,rotation, deltaTime * 10);
-            }
-        }
+        
     }
 }
 

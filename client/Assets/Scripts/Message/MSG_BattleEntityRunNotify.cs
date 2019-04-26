@@ -12,31 +12,27 @@ public class MSG_BattleEntityRunNotify : Message<BattleEntityRunNotify>
     }
     protected override void OnMessage()
     {
-        Vector3 velocity = new Vector3(message.velocity.x, 0, message.velocity.y);
         var entity = BattleManager.Instance.GetEntity(message.id);
         if (entity != null)
         {
+            Vector3 pos = new Vector3(message.data.position.x, 0, message.data.position.y);
+            Vector3 velocity = new Vector3(message.velocity.x, 0, message.velocity.y);
+
             entity.UpdateEntity(message.data);
+
+           
             EntityAction action = entity.GetFirst(ActionType.Run);
 
             if (action != null)
-            {
-                //Vector3 position = new Vector3(ret.data.position.x, 0, ret.data.position.y);
-                //Vector3 direction = position - entity.position;
-                //float angle = Vector3.Angle(velocity, direction);
-                //if (angle > 10)
-                //{
-                //    action.destination = position;
-                //    action.sync = true;
-                //    action.doneWhenSync = false;
-                //}
+            {            
 
-                action.velocity = velocity;
+               action.AddPathPoint(pos,velocity, false);
             }
             else
             {
                 action = ObjectPool.GetInstance<EntityAction>();
-                action.velocity = velocity;
+                action.AddPathPoint(pos, velocity, false);
+
                 entity.PlayAction(ActionType.Run, action);
             }
         }

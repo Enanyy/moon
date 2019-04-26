@@ -369,26 +369,26 @@ public class BattleTest : MonoBehaviour
 
             EntityAction action = entity.GetFirst(ActionType.Run);
 
-            if (action != null)
-            {
-                action.velocity = velocity;
-            }
-            else
-            { 
-                action = ObjectPool.GetInstance<EntityAction>();
-                action.velocity = velocity;
-                entity.PlayAction(ActionType.Run, action);
-            }
+            //if (action != null)
+            //{
+            //    action.velocity = velocity;
+            //}
+            //else
+            //{ 
+            //    action = ObjectPool.GetInstance<EntityAction>();
+            //    action.velocity = velocity;
+            //    entity.PlayAction(ActionType.Run, action);
+            //}
         }
         else
         {
             if (entity.machine != null && entity.machine.current != null && entity.machine.current.type == (int)ActionType.Run)
             {
                 var action = entity.machine.current as EntityAction;
-                if (action != null && action.sync==false)
-                {
-                    action.Done();
-                }
+                //if (action != null && action.sync==false)
+                //{
+                //    action.Done();
+                //}
             }
         }
     }

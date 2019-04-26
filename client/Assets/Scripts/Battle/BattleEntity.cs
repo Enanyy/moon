@@ -38,6 +38,8 @@ public class BattleEntity:
     public float searchDistance = 10; //索敌范围
     public float radius = 1;      //模型半径
 
+    public float movespeed;
+    public float attackspeed;
 
     public StateMachine<BattleEntity> machine { get; private set; }
 
@@ -148,6 +150,8 @@ public class BattleEntity:
         position = Vector3.zero;
         rotation = Quaternion.identity;
 
+        movespeed = 0;
+        attackspeed = 0;
 
         machine.Clear();
         model = null;
@@ -229,6 +233,8 @@ public class BattleEntity:
 
     public void UpdateEntity(PBMessage.BattleEntityData data)
     {
+        movespeed = data.movespeed;
+        attackspeed = data.attackspeed;
         //position = new Vector3(data.position.x,0, data.position.y);
         //rotation = Quaternion.LookRotation(new Vector3(data.direction.x, 0, data.direction.y));
 

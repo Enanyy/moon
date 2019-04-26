@@ -12,19 +12,20 @@ public class MSG_BattleEntityAttackNotify : Message<BattleEntityAttackNotify>
     }
     protected override void OnMessage()
     {
+       
         var entity = BattleManager.Instance.GetEntity(message.id);
         if (entity != null)
         {
+            Vector3 pos = new Vector3(message.data.position.x, 0, message.data.position.y);
+
+            
             if (entity.machine != null && entity.machine.current != null &&
                 entity.machine.current.type == (int)ActionType.Run)
             {
                 var run = entity.machine.current as EntityAction;
                 if (run != null)
                 {
-                    run.destination = new Vector3(message.data.position.x, 0, message.data.position.y); ;
-                    run.doneWhenSync = true;
-                    run.sync = true;
-                    run.Done();
+                    run.AddPathPoint(pos, Vector3.zero, true);
                 }
             }
             entity.UpdateEntity(message.data);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 public interface IMessage
 {
@@ -23,18 +24,27 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
 
     public void Send(ConnectID connectid)
     {
-        byte[] buffer = ProtoTransfer.SerializeProtoBuf(message);
+        using (MemoryStream ms = new MemoryStream())
+        {
+            ProtoBuf.Serializer.Serialize<T>(ms, message);
+            byte[] bytes = ms.ToArray();
 
-        NetPacket packet = NetPacket.Create((int)id, buffer);
+            ms.Close();
+            NetPacket packet = NetPacket.Create((int)id, bytes);
 
-        NetworkManager.Instance.Send(connectid, packet);
+            NetworkManager.Instance.Send(connectid, packet);
+           
+        }
+       
     }
 
     public void OnReceive(NetPacket packet)
     {
-        message = ProtoTransfer.DeserializeProtoBuf(packet.data,
-            NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET,message);
-        OnMessage();
+        using (MemoryStream ms = new MemoryStream(packet.data, NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET))
+        {
+            message = (T)ProtoBuf.Meta.RuntimeTypeModel.Default.Deserialize(ms, message, typeof(T));
+            OnMessage();
+        }
     }
 }
 
