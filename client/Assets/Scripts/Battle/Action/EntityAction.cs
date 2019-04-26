@@ -46,19 +46,12 @@ public class EntityAction : State<BattleEntity>,IPoolObject
     {
        paths = new LinkedList<PathPoint>();
     }
-
     public void AddPathPoint(Vector3 destination,Vector3 velocity, bool done)
     {
-        if (paths.Count > 1)
-        {
-            var point = paths.Last.Value;
-            if (Vector3.Distance(point.destination, destination) < 0.1f)
-            {
-                paths.RemoveLast();
-            }
-        }
-        
+       
         paths.AddLast(new PathPoint(destination, velocity, done));
+
+       
     }
 
     public override void SetAgent(BattleEntity entity)

@@ -15,18 +15,29 @@ public class ActionRunPlugin : ActionPlugin
             var path = action.paths.First.Value;
 
             Vector3 direction = path.destination - agent.position;
-            float movespeed = agent.movespeed;
-            if (path.velocity != Vector3.zero)
-            {
-                movespeed = path.velocity.magnitude;
-            }
-            float displacement = deltaTime * movespeed;
+           
+            float displacement = deltaTime * agent.movespeed;
             if (direction.magnitude < displacement)
             {
                 path.arrive = true;
                 agent.position = path.destination;
 
                 action.paths.RemoveFirst();
+                if (action.paths.Count > 1)
+                {
+                    var current = action.paths.First;
+                    while (current.Next != null)
+                    {
+                        var next = current.Next;
+                        float distance = Vector3.Distance(current.Value.destination, next.Value.destination);
+                        var pre = current;
+                        current = next;
+                        if (distance < 1)
+                        {
+                            action.paths.Remove(pre);
+                        }
+                    }
+                }
             }
             else
             {
@@ -39,13 +50,8 @@ public class ActionRunPlugin : ActionPlugin
             var path = action.paths.First.Value;
             if (path.arrive == false)
             {
-                Vector3 direction = path.destination - agent.position;
-                float movespeed = agent.movespeed;
-                if (path.velocity != Vector3.zero)
-                {
-                    movespeed = path.velocity.magnitude;
-                }
-                float displacement = deltaTime * movespeed;
+                Vector3 direction = path.destination - agent.position;            
+                float displacement = deltaTime * agent.movespeed;
                 if (direction.magnitude < displacement)
                 {
                     path.arrive = true;

@@ -125,6 +125,9 @@ function M:broadcast(velocity)
     if velocity == nil then
         return
     end
+    if self.senddata ~= nil and self.senddata.velocity.x == velocity.x and self.senddata.velocity.y == velocity.y then
+        return
+    end
 
     local data ={ 
         id = self.agent.id,
@@ -132,6 +135,7 @@ function M:broadcast(velocity)
         velocity ={x= velocity.x,y = velocity.y},
         data = self.agent:get_send_data()
     }
+    self.senddata = data
     copy:broadcast(msgid.BATTLE_ENTITY_RUN_NOTIFY,data)
 end
 
