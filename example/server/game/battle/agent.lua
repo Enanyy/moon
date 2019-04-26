@@ -191,7 +191,7 @@ function M:hurtby( attacker )
 
     if self.hp <= 0 then
         self.isdie = true
-        rvo2:setAgentRadius(self.sid, 0)
+        rvo2:delAgent(self.sid)
         local die = actiondie.new()
         self:play(die)
     end

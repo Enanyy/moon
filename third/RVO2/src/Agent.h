@@ -103,6 +103,8 @@ namespace RVO {
 
 		size_t id_;
 
+		bool needDelete_;
+
 		friend class KdTree;
 		friend class RVOSimulator;
 	};

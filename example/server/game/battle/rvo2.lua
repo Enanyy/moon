@@ -126,6 +126,15 @@ function M:addObstacle( obstacles )
     return self.simulator:addRVOObstacle(rvoobstacles)
 end
 
+function M:delAgent(sid)
+
+    if self.simulator == nil then
+        return
+    end
+
+    self.simulator:delAgent(sid)
+end
+
 
 function M:clear()
     self.simulator = nil

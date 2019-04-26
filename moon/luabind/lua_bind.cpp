@@ -323,6 +323,7 @@ const lua_bind& lua_bind::bind_rvo2() const
 		, sol::constructors<RVO::RVOSimulator(), RVOSimulator(float, float, size_t,float, float, float,float, const Vector2&)>()
 		, "addDefaultAgent", (&RVO::RVOSimulator::addDefaultAgent)
 		, "addAgent", (&RVO::RVOSimulator::addAgent)
+		, "delAgent", (&RVO::RVOSimulator::delAgent)
 		, "addRVOObstacle", (&RVO::RVOSimulator::addRVOObstacle)
 		, "doStep", (&RVO::RVOSimulator::doStep)
 		, "getAgentAgentNeighbor", (&RVO::RVOSimulator::getAgentAgentNeighbor)
