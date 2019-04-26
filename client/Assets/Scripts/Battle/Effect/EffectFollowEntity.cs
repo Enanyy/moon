@@ -26,21 +26,21 @@ public class EffectFollowEntity : EffectEntity
         {
 #if UNITY_EDITOR
             //测试场景使用
-            if (BattleTest.TEST)
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                Plane plane = new Plane(Vector3.up, Vector3.zero);
-                float distance = 0;
+            //if (BattleTest.TEST)
+            //{
+            //    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            //    Plane plane = new Plane(Vector3.up, Vector3.zero);
+            //    float distance = 0;
 
-                plane.Raycast(ray, out distance);
+            //    plane.Raycast(ray, out distance);
 
-                to = ray.GetPoint(distance);
-            }
-            else
-            {
-                OnEnd();
-                return;
-            }
+            //    to = ray.GetPoint(distance);
+            //}
+            //else
+            //{
+            //    OnEnd();
+            //    return;
+            //}
 #else
             OnEnd();
             return;
