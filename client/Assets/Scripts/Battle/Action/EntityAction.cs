@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct PathPoint
+public class PathPoint
 {
     public Vector3 destination;
     public Vector3 velocity;

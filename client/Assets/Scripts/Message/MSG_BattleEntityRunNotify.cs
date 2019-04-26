@@ -24,8 +24,8 @@ public class MSG_BattleEntityRunNotify : Message<BattleEntityRunNotify>
             EntityAction action = entity.GetFirst(ActionType.Run);
 
             if (action != null)
-            {                          
-                action.AddPathPoint(pos,velocity, false);
+            {
+                action.AddPathPoint(pos, velocity, false);               
             }
             else
             {

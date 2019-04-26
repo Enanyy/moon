@@ -581,10 +581,7 @@ namespace RVO {
 		 * \brief      add RVOObstacle
 		 * \param      RVOObstacle        
 		 */
-		size_t addRVOObstacle(const RVOObstacle& obstacle)
-		{
-			return addObstacle(std::move(obstacle.data()));
-		}
+		size_t addRVOObstacle(const RVOObstacle& obstacle);
 
 	private:
 		std::vector<Agent *> agents_;

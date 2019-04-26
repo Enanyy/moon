@@ -366,4 +366,9 @@ namespace RVO {
 	{
 		timeStep_ = timeStep;
 	}
+
+	size_t RVOSimulator::addRVOObstacle(const RVOObstacle& obstacle)
+	{
+	    return addObstacle(std::move(obstacle.data()));	
+	}
 }

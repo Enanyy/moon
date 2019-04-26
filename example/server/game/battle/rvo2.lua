@@ -126,4 +126,9 @@ function M:addObstacle( obstacles )
     return self.simulator:addRVOObstacle(rvoobstacles)
 end
 
+
+function M:clear()
+    self.simulator = nil
+end
+
 return M
