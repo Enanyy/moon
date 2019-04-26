@@ -11,7 +11,18 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
+public enum EntityProperty
+{
+    HP = 1,
+    MAX_HP = 2,
+    ATTACK = 3,
+    DEFENSE = 4,
+    MOVE_SPEED = 5,
+    ATTACK_SPEED = 6,
+    SEARCH_DISTANCE = 7,
+    ATTACK_DISTANCE = 8,
+    RADIUS = 9,
+}
 
 public class BattleEntity: 
     Components<BattleEntity>, 
@@ -27,19 +38,12 @@ public class BattleEntity:
     public uint type;            //实体类型（1为英雄，2为士兵 枚举:EMObjType)
     public uint configid;        //配置id
 
-    public uint hp;
- 
-
+  
     public Vector3 position { get; set; }
     public Quaternion rotation { get; set; }
     public float scale { get; set; }
 
-    public float attackDistance = 4; // 攻击距离
-    public float searchDistance = 10; //索敌范围
-    public float radius = 1;      //模型半径
-
-    public float movespeed;
-    public float attackspeed;
+    public Dictionary<uint,int> properties { get; private set; }
 
     public StateMachine<BattleEntity> machine { get; private set; }
 
@@ -130,7 +134,7 @@ public class BattleEntity:
     public BattleEntity()
     {
         machine = new StateMachine<BattleEntity>(this);
-
+        properties = new Dictionary<uint, int>();
         Clear();
     }
 
@@ -145,16 +149,14 @@ public class BattleEntity:
 
         scale = 1;
 
-        hp = 0;
 
         position = Vector3.zero;
         rotation = Quaternion.identity;
 
-        movespeed = 0;
-        attackspeed = 0;
-
         machine.Clear();
         model = null;
+
+        ResetProperty();
 
         for (int i = 0; i < components.Count; ++i)
         {
@@ -169,6 +171,42 @@ public class BattleEntity:
 
         base.Clear();
       
+    }
+
+    public void ResetProperty()
+    {
+        SetProperty(EntityProperty.HP, 0);
+        SetProperty(EntityProperty.MAX_HP, 0);
+        SetProperty(EntityProperty.ATTACK, 0);
+        SetProperty(EntityProperty.DEFENSE, 0);
+        SetProperty(EntityProperty.MOVE_SPEED, 6);
+        SetProperty(EntityProperty.ATTACK_SPEED, 2);
+        SetProperty(EntityProperty.SEARCH_DISTANCE, 20);
+        SetProperty(EntityProperty.ATTACK_DISTANCE, 10);
+        SetProperty(EntityProperty.RADIUS, 1);
+    }
+
+    public void SetProperty(EntityProperty property,int value)
+    {
+        uint key = (uint)property;
+        if(properties.ContainsKey(key)==false)
+        {
+            properties.Add(key, value);
+        }
+        else
+        {
+            properties[key] = value;
+        }
+    }
+
+    public int GetProperty(EntityProperty property )
+    {
+        uint key = (uint)property;
+        if(properties.ContainsKey(key))
+        {
+            return properties[key];
+        }
+        return 0;
     }
 
     public bool Init(ModelParam param)
@@ -231,14 +269,17 @@ public class BattleEntity:
         }
     }
 
-    public void UpdateEntity(PBMessage.BattleEntityData data)
+    public void UpdateProperty(PBMessage.BattleEntityProperty property)
     {
-        movespeed = data.movespeed;
-        attackspeed = data.attackspeed;
-        //position = new Vector3(data.position.x,0, data.position.y);
-        //rotation = Quaternion.LookRotation(new Vector3(data.direction.x, 0, data.direction.y));
+        SetProperty((EntityProperty)property.key, property.value);
+    }
 
-        hp = data.hp;
+    public  void UpdateProperty(List<PBMessage.BattleEntityProperty> properties)
+    {
+        for(int i = 0; i < properties.Count; ++i)
+        {
+            UpdateProperty(properties[i]);
+        }
     }
 
   
@@ -253,14 +294,8 @@ public class BattleEntity:
     
     public void Die()
     {
-        int value = (int)hp;
-
-        hp = 0;
-
+      
         isDie = true;
-
-        DropBlood(value);
-
         EntityAction action = ObjectPool.GetInstance<EntityAction>();
         PlayAction(ActionType.Die,action,true);
 

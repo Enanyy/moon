@@ -1,5 +1,5 @@
 
-œ
+ˆ
 
 message.proto".
 LoginRequest
@@ -23,17 +23,10 @@
 result ("
 Point2D	
 x (	
-y ("¯
-BattleEntityData
-
-hp (
-maxhp (
-attack (
-defense (
-	movespeed (
-attackspeed (
-position (2.Point2D
-	direction (2.Point2D"Å
+y ("2
+BattleEntityProperty
+key (
+value ("È
 BattleEntity
 
 id (
@@ -41,37 +34,37 @@
 camp (
 name (	
 type (
-config (
-searchdistance (
-attackdistance (
-radius	 (
-data
- (2.BattleEntityData"
+config (
+position (2.Point2D
+	direction (2.Point2D)
+
+properties	 (2.BattleEntityProperty"
 BattleBeginRequest"#
 BattleBeginReturn
 result (">
 BattleBeginNotify
 copy (
-list (2.BattleEntity"S
+list (2.BattleEntity"N
 BattleEntityIdleNotify
 
 id (
-copy (
-data (2.BattleEntityData"n
+copy (
+position (2.Point2D"|
 BattleEntityRunNotify
 
 id (
 copy (
-velocity (2.Point2D
-data (2.BattleEntityData"‰
+position (2.Point2D
+velocity (2.Point2D
+	movespeed ("„
 BattleEntityAttackNotify
 
 id (
 copy (
 skill (
 attackspeed (
-target (
-data (2.BattleEntityData"1
+target (
+position (2.Point2D"1
 BattleEntityDieNotify
 
 id (
@@ -82,6 +75,12 @@
 copy (
 
 hp (
-value ("
+value ("a
+BattleEntityPropertyNotify
+
+id (
+copy ()
+
+properties (2.BattleEntityProperty"
 BattleEndNotify
 copy (

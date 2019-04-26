@@ -16,7 +16,7 @@ public class MSG_BattleEntityAttackNotify : Message<BattleEntityAttackNotify>
         var entity = BattleManager.Instance.GetEntity(message.id);
         if (entity != null)
         {
-            Vector3 pos = new Vector3(message.data.position.x, 0, message.data.position.y);
+            Vector3 pos = new Vector3(message.position.x, 0, message.position.y);
 
             
             if (entity.machine != null && entity.machine.current != null &&
@@ -28,7 +28,7 @@ public class MSG_BattleEntityAttackNotify : Message<BattleEntityAttackNotify>
                     run.AddPathPoint(pos, Vector3.zero, true);
                 }
             }
-            entity.UpdateEntity(message.data);
+            
 
             EntityAction action = ObjectPool.GetInstance<EntityAction>();
             action.skillid = message.skill;

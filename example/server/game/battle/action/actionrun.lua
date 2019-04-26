@@ -132,8 +132,9 @@ function M:broadcast(velocity)
     local data ={ 
         id = self.agent.id,
         copy = copy.copyid,
+        position = {x = self.agent.position.x, y = self.agent.position.y},
         velocity ={x= velocity.x,y = velocity.y},
-        data = self.agent:get_send_data()
+        movespeed = self.agent.movespeed
     }
     self.senddata = data
     copy:broadcast(msgid.BATTLE_ENTITY_RUN_NOTIFY,data)

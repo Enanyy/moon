@@ -46,7 +46,7 @@ function M:broadcast()
     local data = {
         id = self.agent.id,
         copy = self.agent.copyid,
-        data = self.agent:get_send_data()
+        position = {x = self.agent.position.x, y = self.agent.position.y}
     }
 
     copy:broadcast(msgid.BATTLE_ENTITY_IDLE_NOTIFY,data)

@@ -248,25 +248,26 @@ function M:get_send_agent()
         name = self.name,
         type = 1,
         config = self.config,
-        searchdistance = self.searchdistance,
-        attackdistance = self.attackdistance,
-        radius = self.radius,
-        data = self:get_send_data()
+        position = {x = self.position.x, y = self.position.y},
+        direction = {x = self.direction.x, y = self.direction.y},
+        properties = self:properties()
     }
 
 end
 
-function M:get_send_data()
-    return {
-        hp = self.hp,
-        maxhp = self.maxhp,
-        attack = self.attackvalue,
-        defense = self.defensevalue,
-        movespeed = self.movespeed,
-        attackspeed = self.attackspeed,
-        position = {x = self.position.x, y =self.position.y},
-        direction = {x = self.direction.x, y =self.direction.y}
+function M:properties()
+    local data  = {
+        {key = userpro.HP, value = self.hp},
+        {key = userpro.MAX_HP, value = self.hp},
+        {key = userpro.ATTACK, value = self.attackvalue},
+        {key = userpro.DEFENSE, value = self.defensevalue},
+        {key = userpro.MOVE_SPEED, value = self.movespeed * 100},
+        {key = userpro.ATTACK_SPEED, value = self.attackspeed * 100},
+        {key = userpro.SEARCH_DISTANCE, value = self.searchdistance * 100},
+        {key = userpro.ATTACK_DISTANCE, value = self.attackdistance * 100},
+        {key = userpro.RADIUS, value = self.radius * 100},
     }
+    return data
 end
 
 return M

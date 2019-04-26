@@ -52,7 +52,7 @@ function M:broadcast()
         skill = 1,
         attackspeed = self.agent.attackspeed,
         target = self.agent.target.id,
-        data = self.agent:get_send_data()
+        position = {x = self.agent.position.x, y = self.agent.position.y}
     }
 
     copy:broadcast(msgid.BATTLE_ENTITY_ATTACK_NOTIFY,data)

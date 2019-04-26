@@ -17,8 +17,7 @@ public class MSG_BattleEntityIdleNotify : Message<BattleEntityIdleNotify>
         var entity = BattleManager.Instance.GetEntity(message.id);
         if (entity != null)
         {
-            Vector3 pos = new Vector3(message.data.position.x, 0, message.data.position.y);
-            entity.UpdateEntity(message.data);
+            Vector3 pos = new Vector3(message.position.x, 0, message.position.y);
             if (entity.machine != null && entity.machine.current != null &&
                 entity.machine.current.type == (int)ActionType.Run)
             {

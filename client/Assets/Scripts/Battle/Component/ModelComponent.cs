@@ -341,9 +341,9 @@ public class ModelComponent :
         {
             return;
         }
-        ShowRadius(ShapeType.Radius, agent.radius, Color.green);
-        ShowRadius(ShapeType.SearchDistance, agent.searchDistance, Color.yellow);
-        ShowRadius(ShapeType.AttackDistance, agent.attackDistance, Color.red);
+        ShowRadius(ShapeType.Radius, agent.GetProperty(EntityProperty.RADIUS)*0.01f, Color.green);
+        ShowRadius(ShapeType.SearchDistance, agent.GetProperty(EntityProperty.SEARCH_DISTANCE)*0.01f, Color.yellow);
+        ShowRadius(ShapeType.AttackDistance, agent.GetProperty(EntityProperty.ATTACK_DISTANCE)*0.01f, Color.red);
     }
 
     void ShowRadius(ShapeType type, float radius, Color color)

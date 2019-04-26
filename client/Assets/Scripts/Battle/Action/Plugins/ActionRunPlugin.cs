@@ -23,8 +23,10 @@ public class ActionRunPlugin : ActionPlugin
             var point = action.paths.First.Value;
            
             Vector3 direction = point.destination - agent.position;
-           
-            float displacement = deltaTime * agent.movespeed;
+
+            float movespeed = agent.GetProperty(EntityProperty.MOVE_SPEED) * 0.01f;
+
+            float displacement = deltaTime * movespeed;
             if (direction.magnitude < displacement)
             {
                 point.arrive = true;
@@ -60,8 +62,10 @@ public class ActionRunPlugin : ActionPlugin
             
             if (point.arrive == false)
             {
-                Vector3 direction = point.destination - agent.position;            
-                float displacement = deltaTime * agent.movespeed;
+                Vector3 direction = point.destination - agent.position;  
+                float movespeed = agent.GetProperty(EntityProperty.MOVE_SPEED) * 0.01f;
+
+                float displacement = deltaTime * movespeed;
                 if (direction.magnitude < displacement)
                 {
                     point.arrive = true;

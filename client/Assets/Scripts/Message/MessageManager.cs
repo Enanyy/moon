@@ -82,6 +82,7 @@ public class MessageManager
 		Register(new MSG_BattleEntityAttackNotify());
 		Register(new MSG_BattleEntityDieNotify());
 		Register(new MSG_BattleEntityBloodNotify());
+		Register(new MSG_BattleEntityPropertyNotify());
 		Register(new MSG_BattleEndNotify());
 //REGISTER_MESSAGE_END
     }

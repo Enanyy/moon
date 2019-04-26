@@ -43,18 +43,13 @@ message Point2D
 	required float y = 2;
 }
 
-message BattleEntityData
+message BattleEntityProperty
 {
-	required uint32 hp =1;
-	required uint32 maxhp = 2;
-	required uint32 attack = 3;
-	required uint32 defense = 4;
-	required float movespeed = 5;
-	required float attackspeed = 6;
-
-	required Point2D position = 7;
-	required Point2D direction = 8;
+	required uint32 key = 1;
+	required int32 value = 2;
 }
+
+
 
 message BattleEntity
 {
@@ -64,11 +59,9 @@ message BattleEntity
 	required string name = 4;
 	required uint32 type = 5;
 	required uint32 config = 6;
-	required float searchdistance = 7;
-	required float attackdistance = 8;
-	required float radius = 9;
-	
-	required BattleEntityData data = 10;
+	required Point2D position = 7;
+	required Point2D direction = 8;
+	repeated BattleEntityProperty properties = 9;
 	
 }
 message BattleBeginRequest
@@ -90,15 +83,16 @@ message BattleEntityIdleNotify
 {	
 	required uint32 id = 1;
 	required uint32 copy = 2;
-	optional BattleEntityData data =3;
+	required Point2D position = 3;
 }
 
 message BattleEntityRunNotify
 {
 	required uint32 id = 1;
 	required uint32 copy = 2;
-	required Point2D velocity = 3;
-	optional BattleEntityData data = 4;
+	required Point2D position = 3;
+	required Point2D velocity = 4;
+	required float movespeed = 5;
 }
 
 message BattleEntityAttackNotify
@@ -108,7 +102,7 @@ message BattleEntityAttackNotify
 	required uint32 skill = 3;
 	required uint32 attackspeed = 4;
 	required uint32 target = 5;
-	optional BattleEntityData data = 6;
+    required Point2D position = 6;
 }
 
 message BattleEntityDieNotify
@@ -117,12 +111,21 @@ message BattleEntityDieNotify
 	required uint32 copy = 2;
 }
 
+
+
 message BattleEntityBloodNotify
 {
 	required uint32 id = 1;
 	required uint32 copy = 2;
 	required uint32 hp = 3;
 	required int32 value = 4;
+}
+
+message BattleEntityPropertyNotify
+{
+	required uint32 id = 1;
+	required uint32 copy = 2;
+	repeated BattleEntityProperty properties = 3;
 }
 
 message BattleEndNotify

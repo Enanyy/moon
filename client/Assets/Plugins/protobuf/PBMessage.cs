@@ -165,66 +165,24 @@ namespace PBMessage
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityData")]
-  public partial class BattleEntityData : global::ProtoBuf.IExtensible
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityProperty")]
+  public partial class BattleEntityProperty : global::ProtoBuf.IExtensible
   {
-    public BattleEntityData() {}
+    public BattleEntityProperty() {}
     
-    private uint _hp;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"hp", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint hp
+    private uint _key;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"key", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint key
     {
-      get { return _hp; }
-      set { _hp = value; }
+      get { return _key; }
+      set { _key = value; }
     }
-    private uint _maxhp;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"maxhp", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint maxhp
+    private int _value;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int value
     {
-      get { return _maxhp; }
-      set { _maxhp = value; }
-    }
-    private uint _attack;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"attack", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint attack
-    {
-      get { return _attack; }
-      set { _attack = value; }
-    }
-    private uint _defense;
-    [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"defense", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint defense
-    {
-      get { return _defense; }
-      set { _defense = value; }
-    }
-    private float _movespeed;
-    [global::ProtoBuf.ProtoMember(5, IsRequired = true, Name=@"movespeed", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
-    public float movespeed
-    {
-      get { return _movespeed; }
-      set { _movespeed = value; }
-    }
-    private float _attackspeed;
-    [global::ProtoBuf.ProtoMember(6, IsRequired = true, Name=@"attackspeed", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
-    public float attackspeed
-    {
-      get { return _attackspeed; }
-      set { _attackspeed = value; }
-    }
-    private Point2D _position;
-    [global::ProtoBuf.ProtoMember(7, IsRequired = true, Name=@"position", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public Point2D position
-    {
-      get { return _position; }
-      set { _position = value; }
-    }
-    private Point2D _direction;
-    [global::ProtoBuf.ProtoMember(8, IsRequired = true, Name=@"direction", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public Point2D direction
-    {
-      get { return _direction; }
-      set { _direction = value; }
+      get { return _value; }
+      set { _value = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -278,34 +236,27 @@ namespace PBMessage
       get { return _config; }
       set { _config = value; }
     }
-    private float _searchdistance;
-    [global::ProtoBuf.ProtoMember(7, IsRequired = true, Name=@"searchdistance", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
-    public float searchdistance
+    private Point2D _position;
+    [global::ProtoBuf.ProtoMember(7, IsRequired = true, Name=@"position", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public Point2D position
     {
-      get { return _searchdistance; }
-      set { _searchdistance = value; }
+      get { return _position; }
+      set { _position = value; }
     }
-    private float _attackdistance;
-    [global::ProtoBuf.ProtoMember(8, IsRequired = true, Name=@"attackdistance", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
-    public float attackdistance
+    private Point2D _direction;
+    [global::ProtoBuf.ProtoMember(8, IsRequired = true, Name=@"direction", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public Point2D direction
     {
-      get { return _attackdistance; }
-      set { _attackdistance = value; }
+      get { return _direction; }
+      set { _direction = value; }
     }
-    private float _radius;
-    [global::ProtoBuf.ProtoMember(9, IsRequired = true, Name=@"radius", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
-    public float radius
+    private readonly global::System.Collections.Generic.List<BattleEntityProperty> _properties = new global::System.Collections.Generic.List<BattleEntityProperty>();
+    [global::ProtoBuf.ProtoMember(9, Name=@"properties", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<BattleEntityProperty> properties
     {
-      get { return _radius; }
-      set { _radius = value; }
+      get { return _properties; }
     }
-    private BattleEntityData _data;
-    [global::ProtoBuf.ProtoMember(10, IsRequired = true, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public BattleEntityData data
-    {
-      get { return _data; }
-      set { _data = value; }
-    }
+  
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -381,13 +332,12 @@ namespace PBMessage
       get { return _copy; }
       set { _copy = value; }
     }
-    private BattleEntityData _data = null;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public BattleEntityData data
+    private Point2D _position;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"position", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public Point2D position
     {
-      get { return _data; }
-      set { _data = value; }
+      get { return _position; }
+      set { _position = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -413,20 +363,26 @@ namespace PBMessage
       get { return _copy; }
       set { _copy = value; }
     }
+    private Point2D _position;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"position", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public Point2D position
+    {
+      get { return _position; }
+      set { _position = value; }
+    }
     private Point2D _velocity;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"velocity", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"velocity", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public Point2D velocity
     {
       get { return _velocity; }
       set { _velocity = value; }
     }
-    private BattleEntityData _data = null;
-    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public BattleEntityData data
+    private float _movespeed;
+    [global::ProtoBuf.ProtoMember(5, IsRequired = true, Name=@"movespeed", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    public float movespeed
     {
-      get { return _data; }
-      set { _data = value; }
+      get { return _movespeed; }
+      set { _movespeed = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -473,13 +429,12 @@ namespace PBMessage
       get { return _target; }
       set { _target = value; }
     }
-    private BattleEntityData _data = null;
-    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"data", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public BattleEntityData data
+    private Point2D _position;
+    [global::ProtoBuf.ProtoMember(6, IsRequired = true, Name=@"position", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public Point2D position
     {
-      get { return _data; }
-      set { _data = value; }
+      get { return _position; }
+      set { _position = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -543,6 +498,37 @@ namespace PBMessage
       get { return _value; }
       set { _value = value; }
     }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"BattleEntityPropertyNotify")]
+  public partial class BattleEntityPropertyNotify : global::ProtoBuf.IExtensible
+  {
+    public BattleEntityPropertyNotify() {}
+    
+    private uint _id;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint id
+    {
+      get { return _id; }
+      set { _id = value; }
+    }
+    private uint _copy;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"copy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint copy
+    {
+      get { return _copy; }
+      set { _copy = value; }
+    }
+    private readonly global::System.Collections.Generic.List<BattleEntityProperty> _properties = new global::System.Collections.Generic.List<BattleEntityProperty>();
+    [global::ProtoBuf.ProtoMember(3, Name=@"properties", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<BattleEntityProperty> properties
+    {
+      get { return _properties; }
+    }
+  
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

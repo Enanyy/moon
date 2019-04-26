@@ -15,21 +15,22 @@ M.__index = M
 
 function M.init()
     protoloader.loadall()
-    M.msg_def[msgid.LOGIN_REQUEST]           = {name = "LoginRequest",func = nil}
-    M.msg_def[msgid.LOGIN_RETURN]            = {name = "LoginReturn",func = nil}
-    M.msg_def[msgid.LOGIN_GAME_NOTIFY]       = {name = "LoginGameNotify",func = nil}
-    M.msg_def[msgid.LOGIN_GAME_REQUEST]      = {name = "LoginGameRequest",func = nil}
-    M.msg_def[msgid.LOGIN_GAME_RETURN]       = {name = "LoginGameReturn",func = nil}
+    M.msg_def[msgid.LOGIN_REQUEST]                          = {name = "LoginRequest",func = nil}
+    M.msg_def[msgid.LOGIN_RETURN]                           = {name = "LoginReturn",func = nil}
+    M.msg_def[msgid.LOGIN_GAME_NOTIFY]                      = {name = "LoginGameNotify",func = nil}
+    M.msg_def[msgid.LOGIN_GAME_REQUEST]                     = {name = "LoginGameRequest",func = nil}
+    M.msg_def[msgid.LOGIN_GAME_RETURN]                      = {name = "LoginGameReturn",func = nil}
 
-    M.msg_def[msgid.BATTLE_BEGIN_REQUEST]    = {name = "BattleBeginRequest",func = nil}
-    M.msg_def[msgid.BATTLE_BEGIN_RETURN]     = {name = "BattleBeginReturn",func = nil}
-    M.msg_def[msgid.BATTLE_BEGIN_NOTIFY]     = {name = "BattleBeginNotify",func = nil}
-    M.msg_def[msgid.BATTLE_ENTITY_IDLE_NOTIFY]      = {name = "BattleEntityIdleNotify",func = nil}
-    M.msg_def[msgid.BATTLE_ENTITY_RUN_NOTIFY]       = {name = "BattleEntityRunNotify",func = nil}
-    M.msg_def[msgid.BATTLE_ENTITY_ATTACK_NOTIFY]    = {name = "BattleEntityAttackNotify",func = nil}
-    M.msg_def[msgid.BATTLE_ENTITY_DIE_NOTIFY]       = {name = "BattleEntityDieNotify",func = nil}
-    M.msg_def[msgid.BATTLE_END_NOTIFY]       = {name = "BattleEndNotify",func = nil}
-
+    M.msg_def[msgid.BATTLE_BEGIN_REQUEST]                   = {name = "BattleBeginRequest",func = nil}
+    M.msg_def[msgid.BATTLE_BEGIN_RETURN]                    = {name = "BattleBeginReturn",func = nil}
+    M.msg_def[msgid.BATTLE_BEGIN_NOTIFY]                    = {name = "BattleBeginNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_IDLE_NOTIFY]              = {name = "BattleEntityIdleNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_RUN_NOTIFY]               = {name = "BattleEntityRunNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_ATTACK_NOTIFY]            = {name = "BattleEntityAttackNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_DIE_NOTIFY]               = {name = "BattleEntityDieNotify",func = nil}
+    M.msg_def[msgid.BATTLE_END_NOTIFY]                      = {name = "BattleEndNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_PROPERTY_NOTIFY]          = {name = "BattleEntityPropertyNotify",func = nil}
+    
 end
 
 function M.register(id, func )

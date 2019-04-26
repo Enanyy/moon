@@ -46,3 +46,19 @@ local userdef ={
 }
 
 moon.exports.userdef = userdef
+
+--协议属性类型
+local userpro = {
+
+    HP = 1,
+    MAX_HP = 2,
+    ATTACK = 3,
+    DEFENSE = 4,
+    MOVE_SPEED = 5,
+    ATTACK_SPEED = 6,
+    SEARCH_DISTANCE = 7,
+    ATTACK_DISTANCE = 8,
+    RADIUS = 9,
+}
+
+moon.exports.userpro = userpro

@@ -26,13 +26,10 @@ public class MSG_BattleBeginNotify : Message<BattleBeginNotify>
 
             entity.type = data.type;
 
-            entity.hp = data.data.hp;
-            entity.searchDistance = data.searchdistance;
-            entity.attackDistance = data.attackdistance;
-            entity.radius = data.radius;
+            entity.UpdateProperty(data.properties);
 
-            entity.position = new Vector3(data.data.position.x, 0, data.data.position.y);
-            entity.rotation = Quaternion.LookRotation(new Vector3(data.data.direction.x, 0, data.data.direction.y));
+            entity.position = new Vector3(data.position.x, 0, data.position.y);
+            entity.rotation = Quaternion.LookRotation(new Vector3(data.direction.x, 0, data.direction.y));
             if (BattleManager.Instance.AddEntity(entity))
             {
                 entity.active = true;

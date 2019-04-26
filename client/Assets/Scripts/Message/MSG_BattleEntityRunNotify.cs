@@ -15,12 +15,9 @@ public class MSG_BattleEntityRunNotify : Message<BattleEntityRunNotify>
         var entity = BattleManager.Instance.GetEntity(message.id);
         if (entity != null)
         {
-            Vector3 pos = new Vector3(message.data.position.x, 0, message.data.position.y);
+            Vector3 pos = new Vector3(message.position.x, 0, message.position.y);
             Vector3 velocity = new Vector3(message.velocity.x, 0, message.velocity.y);
-
-            entity.UpdateEntity(message.data);
-
-           
+                      
             EntityAction action = entity.GetFirst(ActionType.Run);
 
             if (action != null)
