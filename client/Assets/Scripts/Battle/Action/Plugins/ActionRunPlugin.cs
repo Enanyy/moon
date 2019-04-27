@@ -21,38 +21,44 @@ public class ActionRunPlugin : ActionPlugin
         if (action.paths.Count > 1)
         {   
             var point = action.paths.First.Value;
-           
-            Vector3 direction = point.destination - agent.position;
-
-            float movespeed = agent.GetProperty(EntityProperty.PRO_MOVE_SPEED) * 0.01f;
-
-            float displacement = deltaTime * movespeed;
-            if (direction.magnitude < displacement)
+            if (point.arrive == false)
             {
-                point.arrive = true;
-                agent.position = point.destination;
+                Vector3 direction = point.destination - agent.position;
 
-                action.paths.RemoveFirst();
-                //if (action.paths.Count > 1)
-                //{
-                //    var current = action.paths.First;
-                //    while (current.Next != null)
-                //    {
-                //        var next = current.Next;
-                //        float distance = Vector3.Distance(current.Value.destination, next.Value.destination);
-                //        var pre = current;
-                //        current = next;
-                //        if (distance < 1)
-                //        {
-                //            action.paths.Remove(pre);
-                //        }
-                //    }
-                //}
+                float movespeed = agent.GetProperty(EntityProperty.PRO_MOVE_SPEED) * 0.01f;
+
+                float displacement = deltaTime * movespeed;
+                if (direction.magnitude < displacement)
+                {
+                    point.arrive = true;
+                    agent.position = point.destination;
+
+                    action.paths.RemoveFirst();
+                    //if (action.paths.Count > 1)
+                    //{
+                    //    var current = action.paths.First;
+                    //    while (current.Next != null)
+                    //    {
+                    //        var next = current.Next;
+                    //        float distance = Vector3.Distance(current.Value.destination, next.Value.destination);
+                    //        var pre = current;
+                    //        current = next;
+                    //        if (distance < 1)
+                    //        {
+                    //            action.paths.Remove(pre);
+                    //        }
+                    //    }
+                    //}
+                }
+                else
+                {
+                    agent.position += direction.normalized * displacement;
+                    agent.rotation = Quaternion.LookRotation(direction);
+                }
             }
             else
             {
-                agent.position += direction.normalized * displacement;
-                agent.rotation = Quaternion.LookRotation(direction);
+                action.paths.RemoveFirst();
             }
         }
         else if (action.paths.Count == 1)

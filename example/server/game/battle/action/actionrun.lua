@@ -13,6 +13,7 @@ function M.new()
     o.destination = vector2.zero()
 
     o.sync = false
+    o.send = false
 
     return o
 end
@@ -41,6 +42,7 @@ function M:enter()
     if self.agent:needsync() then
         self.sync = true
     end
+    self.send = false
     
 end
 
@@ -137,21 +139,27 @@ function M:broadcast(velocity)
     --     int = int + 1
     -- end
     -- velocity.y = int / 100000
+    local i, mod = math.modf( self.time / 1 )
 
+    if self.send == false or mod == 0.5 then
+        
+        self.send = true
 
-    if self.senddata ~= nil and self.senddata.velocity.x == velocity.x and self.senddata.velocity.y == velocity.y then
-        return
+        -- if self.senddata ~= nil and self.senddata.velocity.x == velocity.x and self.senddata.velocity.y == velocity.y then
+        --     return
+        -- end
+
+        local data ={ 
+            id = self.agent.id,
+            copy = copy.copyid,
+            position = {x = self.agent.position.x, y = self.agent.position.y},
+            velocity ={x= velocity.x,y = velocity.y},
+            movespeed = self.agent.movespeed * 100
+        }
+
+        self.senddata = data
+        copy:broadcast(msgid.BATTLE_ENTITY_RUN_NOTIFY,data)
     end
-
-    local data ={ 
-        id = self.agent.id,
-        copy = copy.copyid,
-        position = {x = self.agent.position.x, y = self.agent.position.y},
-        velocity ={x= velocity.x,y = velocity.y},
-        movespeed = self.agent.movespeed * 100
-    }
-    self.senddata = data
-    copy:broadcast(msgid.BATTLE_ENTITY_RUN_NOTIFY,data)
 end
 
 return M
