@@ -128,8 +128,9 @@ function M:broadcast(velocity)
     end
 
     local vel = {}
-    local precision = 100
-    local x, mod = math.modf( velocity.x * 100 / 1 )
+    --速度向量精确到小数点后三位
+    local precision = 1000
+    local x, mod = math.modf( velocity.x * precision / 1 )
     if mod >= 0.5 then
         x = x + 1
     end
