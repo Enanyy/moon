@@ -6,14 +6,6 @@ public class ActionRunPlugin : ActionPlugin
 { 
     private System.Random mRandom = new System.Random();
 
-    public override void OnEnter()
-    {
-        if (agent.id == 100003)
-        {
-            Debug.Log(action.type);
-        }
-    }
-
     public override void OnExcute(float deltaTime)
     {
         base.OnExcute(deltaTime);
@@ -34,21 +26,7 @@ public class ActionRunPlugin : ActionPlugin
                     agent.position = point.destination;
 
                     action.paths.RemoveFirst();
-                    //if (action.paths.Count > 1)
-                    //{
-                    //    var current = action.paths.First;
-                    //    while (current.Next != null)
-                    //    {
-                    //        var next = current.Next;
-                    //        float distance = Vector3.Distance(current.Value.destination, next.Value.destination);
-                    //        var pre = current;
-                    //        current = next;
-                    //        if (distance < 1)
-                    //        {
-                    //            action.paths.Remove(pre);
-                    //        }
-                    //    }
-                    //}
+                 
                 }
                 else
                 {

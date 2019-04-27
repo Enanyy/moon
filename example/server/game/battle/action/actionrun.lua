@@ -13,7 +13,6 @@ function M.new()
     o.destination = vector2.zero()
 
     o.sync = false
-    o.send = false
 
     return o
 end
@@ -127,39 +126,39 @@ function M:broadcast(velocity)
     if velocity == nil then
         return
     end
-    -- local int, mod = math.modf( velocity.x * 100000 / 1 )
-    -- if mod >= 0.5 then
-    --     int = int + 1
-    -- end
 
-    -- velocity.x = int / 100000
-
-    -- local int, mod = math.modf( velocity.y * 100000 / 1 )
-    -- if mod >= 0.5 then
-    --     int = int + 1
-    -- end
-    -- velocity.y = int / 100000
-    local i, mod = math.modf( self.time / 1 )
-
-    if self.send == false or mod == 0.5 then
-        
-        self.send = true
-
-        -- if self.senddata ~= nil and self.senddata.velocity.x == velocity.x and self.senddata.velocity.y == velocity.y then
-        --     return
-        -- end
-
-        local data ={ 
-            id = self.agent.id,
-            copy = copy.copyid,
-            position = {x = self.agent.position.x, y = self.agent.position.y},
-            velocity ={x= velocity.x,y = velocity.y},
-            movespeed = self.agent.movespeed * 100
-        }
-
-        self.senddata = data
-        copy:broadcast(msgid.BATTLE_ENTITY_RUN_NOTIFY,data)
+    local vel = {}
+    local precision = 100
+    local x, mod = math.modf( velocity.x * 100 / 1 )
+    if mod >= 0.5 then
+        x = x + 1
     end
+    vel.x = x / precision
+    local y, mod = math.modf( velocity.y * precision / 1 )
+    if mod >= 0.5 then
+        y = y + 1
+    end
+    vel.y = y / precision
+
+    if self.senddata == nil then
+        self.senddata = {}
+    end
+
+    if self.senddata.velocity ~= nil and self.senddata.velocity.x == vel.x and self.senddata.velocity.y == vel.y then
+        return
+    end
+
+    self.senddata.id = self.agent.id
+    self.senddata.copy = copy.copyid
+    self.senddata.position = {x = self.agent.position.x, y = self.agent.position.y}
+    self.senddata.velocity ={x= velocity.x,y = velocity.y}
+    self.senddata.movespeed = self.agent.movespeed * 100
+    
+    copy:broadcast(msgid.BATTLE_ENTITY_RUN_NOTIFY,self.senddata)
+
+    self.senddata.velocity.x = vel.x
+    self.senddata.velocity.y = vel.y
+  
 end
 
 return M
