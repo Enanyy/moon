@@ -2,19 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PathPoint
+public class PathPoint:IPoolObject
 {
     public Vector3 destination;
     public Vector3 velocity;
     public bool done ;
     public bool arrive;
 
-    public PathPoint(Vector3 destination, Vector3 velocity, bool done)
+    public bool isPool { get; set; }
+
+    public PathPoint()
+    {
+
+    }
+
+    public void Init(Vector3 destination, Vector3 velocity, bool done)
     {
         this.destination = destination;
         this.velocity = velocity;
         this.done = done;
         this.arrive = false;
+    }
+
+    public void OnCreate()
+    {
+
+    }
+    public void OnReturn()
+    {
+        Init(Vector3.zero, Vector3.zero, false);
+    }
+    public void OnDestroy()
+    {
+
     }
 }
 
@@ -48,8 +68,9 @@ public class EntityAction : State<BattleEntity>,IPoolObject
     }
     public void AddPathPoint(Vector3 destination,Vector3 velocity, bool done)
     {
-       
-        paths.AddLast(new PathPoint(destination, velocity, done));
+        var point = ObjectPool.GetInstance<PathPoint>();
+        point.Init(destination, velocity, done);
+        paths.AddLast(point);
 
        
     }

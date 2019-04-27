@@ -24,7 +24,7 @@ public class ActionRunPlugin : ActionPlugin
                 {
                     point.arrive = true;
                     agent.position = point.destination;
-
+                    ObjectPool.ReturnInstance(action.paths.First.Value);
                     action.paths.RemoveFirst();
                  
                 }
@@ -36,6 +36,7 @@ public class ActionRunPlugin : ActionPlugin
             }
             else
             {
+                ObjectPool.ReturnInstance(action.paths.First.Value);
                 action.paths.RemoveFirst();
             }
         }
@@ -67,6 +68,7 @@ public class ActionRunPlugin : ActionPlugin
             {
                 if (point.done)
                 {
+                    ObjectPool.ReturnInstance(action.paths.First.Value);
                     action.paths.RemoveFirst();
                     action.Done();
                 }
