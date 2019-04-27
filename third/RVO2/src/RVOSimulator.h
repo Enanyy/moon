@@ -589,6 +589,13 @@ namespace RVO {
 		 * \param      The number of the agent whose
 		 */
 		void delAgent(size_t agentNo);
+
+		/**
+		 * \brief      get agent index by agentNo
+		 * \param      The number of the agent whose
+		 */
+		size_t getAgentIndex(size_t agentNo) ;
+
 	private:
 
 		/**
@@ -606,8 +613,9 @@ namespace RVO {
 		void onAddAgent();
 
 	private:
-		std::map<size_t, size_t> agentNo2indexDict_;
-		std::map<size_t, size_t> index2agentNoDict_;
+		std::map<size_t,size_t> agentNo2indexDict_;
+		std::vector<size_t> delAgents_;
+	
 		std::vector<Agent *> agents_;
 		Agent *defaultAgent_;
 		float globalTime_;

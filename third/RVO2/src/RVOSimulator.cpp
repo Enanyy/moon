@@ -76,8 +76,8 @@ namespace RVO {
 		}
 
 		delete kdTree_;
+		delAgents_.clear();
 		agentNo2indexDict_.clear();
-		index2agentNoDict_.clear();
 	}
 
 	size_t RVOSimulator::addDefaultAgent(const Vector2 &position)
@@ -125,43 +125,50 @@ namespace RVO {
 	}
 	void  RVOSimulator::delAgent(size_t agentNo) {
 
-		agents_[agentNo2indexDict_[agentNo]]->needDelete_ = true;
+		delAgents_.push_back(agentNo);
 	}
 
 	void  RVOSimulator::updateDeleteAgent()
 	{
-		bool isDelete = false;
-		auto it = agents_.begin();
-		for (; it!= agents_.end();)
+		if (delAgents_.size() > 0)
 		{
-			if ((*it)->needDelete_)
+			bool isDelete = false;
+			for (size_t i = 0; i < delAgents_.size(); i++)
 			{
-				isDelete = true;
-				delete (*it);
-				(*it) = nullptr;
-				it = agents_.erase(it);
+				size_t id = delAgents_[i];
+				for (auto it = agents_.begin(); it != agents_.end();)
+				{
+					if ((*it)->id_ == id)
+					{
+						isDelete = true;
+						delete (*it);
+						(*it) = nullptr;
+						it = agents_.erase(it);
+					}
+					else
+					{
+						it++;
+					}
+				}
 			}
-			else
+			
+			if (isDelete)
 			{
-				it++;
+				onDelAgent();
 			}
 		}
-		if (isDelete)
-		{
-			onDelAgent();
-		}
+		delAgents_.clear();
 	}
 
 	void  RVOSimulator::onDelAgent()
 	{
 		agentNo2indexDict_.clear();
-		index2agentNoDict_.clear();
+		
 
 		for (size_t i = 0; i < agents_.size(); ++i)
 		{
 			size_t agentNo = agents_[i]->id_;
 			agentNo2indexDict_.insert(std::make_pair(agentNo, i));
-			index2agentNoDict_.insert(std::make_pair(i, agentNo));
 		}
 	}
 
@@ -174,7 +181,6 @@ namespace RVO {
 		size_t index = agents_.size() - 1;
 		size_t agentNo = agents_[index]->id_;
 		agentNo2indexDict_.insert(std::make_pair(agentNo, index));
-		index2agentNoDict_.insert(std::make_pair(index, agentNo));
 	}
 	size_t RVOSimulator::addObstacle(const std::vector<Vector2> &vertices)
 	{
@@ -426,5 +432,9 @@ namespace RVO {
 	size_t RVOSimulator::addRVOObstacle(const RVOObstacle& obstacle)
 	{
 	    return addObstacle(std::move(obstacle.data()));	
+	}
+	size_t RVOSimulator::getAgentIndex(size_t agentNo)
+	{
+		return agentNo2indexDict_[agentNo];
 	}
 }

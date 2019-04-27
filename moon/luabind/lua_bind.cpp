@@ -326,6 +326,7 @@ const lua_bind& lua_bind::bind_rvo2() const
 		, "delAgent", (&RVO::RVOSimulator::delAgent)
 		, "addRVOObstacle", (&RVO::RVOSimulator::addRVOObstacle)
 		, "doStep", (&RVO::RVOSimulator::doStep)
+		, "getAgentIndex", (&RVO::RVOSimulator::getAgentIndex)
 		, "getAgentAgentNeighbor", (&RVO::RVOSimulator::getAgentAgentNeighbor)
 		, "getAgentMaxNeighbors", (&RVO::RVOSimulator::getAgentMaxNeighbors)
 		, "getAgentMaxSpeed", (&RVO::RVOSimulator::getAgentMaxSpeed)

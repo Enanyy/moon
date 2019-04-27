@@ -135,6 +135,14 @@ function M:delAgent(sid)
     self.simulator:delAgent(sid)
 end
 
+function  M:getAgentIndex(sid )
+    if self.simulator == nil then
+        return -1
+    end
+
+    return self.simulator:getAgentIndex(sid)
+
+end
 
 function M:clear()
     self.simulator = nil
