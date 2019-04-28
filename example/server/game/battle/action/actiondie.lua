@@ -16,7 +16,7 @@ function M:enter()
     print(self.agent.id ," enter die:"..tostring(self.agent.position))
     action.enter(self)
 
-    self:broadcast()
+   
 end
 
 function M:execute(delta)
@@ -25,7 +25,7 @@ end
 
 function M:exit()
     action.exit(self)
-
+    self:broadcast()
     --print(self.agent.id ," exit die")
 
     agentmgr:removeagent(self.agent.id)
