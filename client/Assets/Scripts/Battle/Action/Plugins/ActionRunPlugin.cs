@@ -76,7 +76,8 @@ public class ActionRunPlugin : ActionPlugin
                 {
                     if (point.velocity != Vector3.zero)
                     {
-                        agent.position += point.velocity * deltaTime;
+                        //比服务器慢一些
+                        agent.position += point.velocity * deltaTime * 0.99f;
                         agent.rotation = Quaternion.LookRotation(point.velocity);
                     }
                     else
