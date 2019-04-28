@@ -31,7 +31,7 @@ public class ActionRunPlugin : ActionPlugin
                 else
                 {
                     agent.position += direction.normalized * displacement;
-                    agent.rotation = Quaternion.LookRotation(direction);
+                    
                 }
             }
             else
@@ -59,7 +59,7 @@ public class ActionRunPlugin : ActionPlugin
                 else
                 {
                     agent.position += direction.normalized * displacement;
-                    agent.rotation = Quaternion.LookRotation(direction);
+                   
                 }
                
             }
@@ -78,7 +78,7 @@ public class ActionRunPlugin : ActionPlugin
                     {
                         //比服务器慢一些
                         agent.position += point.velocity * deltaTime * 0.99f;
-                        agent.rotation = Quaternion.LookRotation(point.velocity);
+                       
                     }
                     else
                     {

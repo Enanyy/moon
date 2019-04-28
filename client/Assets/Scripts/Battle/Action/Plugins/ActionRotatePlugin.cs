@@ -21,6 +21,24 @@ public class ActionRotatePlugin : ActionPlugin
                 agent.rotation = Quaternion.Lerp(agent.rotation, Quaternion.LookRotation(direction), deltaTime * 10);
             }
         }
+        else if(action.type== ActionType.Run)
+        {
+            if (action.paths.Count > 0)
+            {
+                var point = action.paths.First.Value;
+                if (point.arrive == false)
+                {
+                    agent.rotation = Quaternion.LookRotation(point.destination - agent.position);
+                }
+                else
+                {
+                    if (point.velocity != Vector3.zero)
+                    {
+                        agent.rotation = Quaternion.LookRotation(point.velocity);
+                    }
+                }
+            }
+        }
         
     }
 }
