@@ -50,7 +50,8 @@ function M:broadcast()
         id = self.agent.id,
         copy = copy.copyid,
         skill = 1,
-        attackspeed = self.agent.attackspeed * 100,
+        duration = self.agent.attackduration,
+        speed =  1,
         target = self.agent.target.id,
         position = {x = self.agent.position.x, y = self.agent.position.y}
     }

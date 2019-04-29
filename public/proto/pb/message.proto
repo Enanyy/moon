@@ -1,5 +1,5 @@
 
-à
+Ò
 
 message.proto".
 LoginRequest
@@ -56,15 +56,22 @@ properties	 (2.BattleEntityProperty"
 copy (
 position (2.Point2D
 velocity (2.Point2D
-	movespeed ("Ñ
+	movespeed ("ê
 BattleEntityAttackNotify
 
 id (
 copy (
-skill (
-attackspeed (
-target (
-position (2.Point2D"1
+skill (
+duration (
+speed (
+target (
+position (2.Point2D"[
+BattleEntityAttackChangeNotify
+
+id (
+copy (
+duration (
+speed ("1
 BattleEntityDieNotify
 
 id (

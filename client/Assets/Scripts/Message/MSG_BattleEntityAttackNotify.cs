@@ -32,8 +32,9 @@ public class MSG_BattleEntityAttackNotify : Message<BattleEntityAttackNotify>
 
             EntityAction action = ObjectPool.GetInstance<EntityAction>();
             action.skillid = message.skill;
-            action.duration = message.attackspeed * 0.01f;
+            action.duration = message.duration;
             action.target = message.target;
+            action.speed = message.speed;
 
 
             entity.PlayAction(ActionType.Attack, action);

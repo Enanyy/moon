@@ -12,7 +12,7 @@ local M = setmetatable({
     hp = 0,
 
     movespeed = 5,
-    attackspeed = 2,
+    attackduration = 2,
 
     searchdistance = 20,
     attackdistance = 2,
@@ -48,7 +48,7 @@ function M:init()
         self.name = cfg.name
         self.hp = cfg.hp
         self.movespeed = cfg.movespeed
-        self.attackspeed = cfg.attackspeed
+        self.attackduration = cfg.attackduration
         self.searchdistance = cfg.searchdistance
         self.attackdistance = cfg.attackdistance
         self.radius = cfg.radius
@@ -231,6 +231,22 @@ function M:checksync()
         if run ~= nil then
             run:setdestination(position)
         else
+            -- if self.machine.current ~= nil and self.machine.current.type == actiondef.attack then
+            --     local attack = self.machine.current
+            --     if attack ~= nil then
+            --         attack.duration = 0
+
+            --         local data = 
+            --         {
+            --             id = self.id,
+            --             copy = copy.copyid,
+            --             duration = attack.duration,
+            --             speed = attack.speed,
+            --         }
+            --         copy:broadcast(msgid.BATTLE_ENTITY_ATTACK_CHANGE_NOTIFY,data)
+            --     end
+            -- end
+
             run = actionrun.new()
             run:setdestination(position)
             self:play(run, true)
@@ -262,7 +278,7 @@ function M:properties()
         {key = userpro.PRO_ATTACK, value = self.attackvalue},
         {key = userpro.PRO_DEFENSE, value = self.defensevalue},
         {key = userpro.PRO_MOVE_SPEED, value = self.movespeed * 100},
-        {key = userpro.PRO_ATTACK_SPEED, value = self.attackspeed * 100},
+        {key = userpro.PRO_ATTACK_DURATION, value = self.attackduration * 100},
         {key = userpro.PRO_SEARCH_DISTANCE, value = self.searchdistance * 100},
         {key = userpro.PRO_ATTACK_DISTANCE, value = self.attackdistance * 100},
         {key = userpro.PRO_RADIUS, value = self.radius * 100},

@@ -100,10 +100,20 @@ message BattleEntityAttackNotify
 	required uint32 id = 1;
 	required uint32 copy = 2;
 	required uint32 skill = 3;
-	required uint32 attackspeed = 4;
-	required uint32 target = 5;
-    required Point2D position = 6;
+	required float duration = 4;
+	required float  speed = 5;
+	required uint32 target = 6;
+    required Point2D position = 7;
 }
+
+message BattleEntityAttackChangeNotify
+{
+	required uint32 id = 1;
+	required uint32 copy = 2;
+	required float duration = 3;
+	required float speed = 4;
+}
+
 
 message BattleEntityDieNotify
 {

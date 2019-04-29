@@ -18,7 +18,7 @@ public enum EntityProperty
     PRO_ATTACK = 3,
     PRO_DEFENSE = 4,
     PRO_MOVE_SPEED = 5,
-    PRO_ATTACK_SPEED = 6,
+    PRO_ATTACK_DURATION = 6,
     PRO_SEARCH_DISTANCE = 7,
     PRO_ATTACK_DISTANCE = 8,
     PRO_RADIUS = 9,
@@ -180,7 +180,7 @@ public class BattleEntity:
         SetProperty(EntityProperty.PRO_ATTACK, 0);
         SetProperty(EntityProperty.PRO_DEFENSE, 0);
         SetProperty(EntityProperty.PRO_MOVE_SPEED, 6);
-        SetProperty(EntityProperty.PRO_ATTACK_SPEED, 2);
+        SetProperty(EntityProperty.PRO_ATTACK_DURATION, 2);
         SetProperty(EntityProperty.PRO_SEARCH_DISTANCE, 20);
         SetProperty(EntityProperty.PRO_ATTACK_DISTANCE, 10);
         SetProperty(EntityProperty.PRO_RADIUS, 1);

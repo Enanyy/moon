@@ -80,6 +80,7 @@ public class MessageManager
 		Register(new MSG_BattleEntityIdleNotify());
 		Register(new MSG_BattleEntityRunNotify());
 		Register(new MSG_BattleEntityAttackNotify());
+		Register(new MSG_BattleEntityAttackChangeNotify());
 		Register(new MSG_BattleEntityDieNotify());
 		Register(new MSG_BattleEntityBloodNotify());
 		Register(new MSG_BattleEntityPropertyNotify());

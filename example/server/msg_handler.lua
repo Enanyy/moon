@@ -30,6 +30,7 @@ function M.init()
     M.msg_def[msgid.BATTLE_ENTITY_DIE_NOTIFY]               = {name = "BattleEntityDieNotify",func = nil}
     M.msg_def[msgid.BATTLE_END_NOTIFY]                      = {name = "BattleEndNotify",func = nil}
     M.msg_def[msgid.BATTLE_ENTITY_PROPERTY_NOTIFY]          = {name = "BattleEntityPropertyNotify",func = nil}
+    M.msg_def[msgid.BATTLE_ENTITY_ATTACK_CHANGE_NOTIFY]     = {name = "BattleEntityAttackChangeNotify",func = nil}
     
 end
 
