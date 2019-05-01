@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class ActionRunPlugin : ActionPlugin
 { 
-    private System.Random mRandom = new System.Random();
-
+   
     public override void OnExcute(float deltaTime)
     {
         base.OnExcute(deltaTime);

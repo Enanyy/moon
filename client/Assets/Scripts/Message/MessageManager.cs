@@ -33,14 +33,14 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
             packet.Length = length;
 
             Array.Copy(BitConverter.GetBytes((int)id), 0, packet.Buffer, 0, 4);
-            Array.Copy(ms.GetBuffer(), 0, packet.Buffer, 4, ms.Position);
-            
+            ms.Seek(0, SeekOrigin.Begin);
+            ms.Read(packet.Buffer, 4, length - 4);
+           
             ms.Close();
             
             NetworkManager.Instance.Send(connectid, packet);
 
             NetPacket.Recycle(packet);
-
         }
 
     }
