@@ -9,13 +9,13 @@ public class NetPacket
     /// <summary>
     /// 整个包的字节长度，可能并没有填充满数据，根据length来读取有效数据
     /// </summary>
-    public byte[] data { get; private set; }
+    private byte[] mBuffer;
+    public byte[] Buffer { get { return mBuffer; } }
 
  
     //数据的实际长度
-    public int length { get; set; }
+    public int Length { get; set; }
 
-    public bool isPool { get ; private set; }
 
     private static Queue<NetPacket> mPacketQueue = new Queue<NetPacket>();
     public static NetPacket Create(int size)
@@ -31,7 +31,6 @@ public class NetPacket
             packet = new NetPacket(size);
         }
         packet.Clear();
-        packet.isPool = false;
 
         return packet;
     }
@@ -40,7 +39,6 @@ public class NetPacket
     {
         if(packet!=null)
         {
-            packet.isPool = true;
             mPacketQueue.Enqueue(packet);
         }
     }
@@ -49,23 +47,22 @@ public class NetPacket
     private NetPacket(int size)
     {
         Resize(size);
-        length = 0;
+        Length = 0;
     }
 
-    public void Clear() { length = 0; }
+    public void Clear() { Length = 0; }
 
     public void Resize(int size)
     { 
-        if (data == null)
+        if (mBuffer == null)
         {
-            data = new byte[size];
+            mBuffer = new byte[size];
         }
         else
         {
-            if (data.Length < size)
+            if (mBuffer.Length < size)
             {
-                var buffer = data;
-                Array.Resize(ref buffer, size);
+                Array.Resize(ref mBuffer, size);
             }
         }
 

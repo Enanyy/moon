@@ -34,6 +34,10 @@ public class MSG_BattleBeginNotify : Message<BattleBeginNotify>
             {
                 entity.active = true;
             }
+            else
+            {
+                ObjectPool.ReturnInstance(entity);
+            }
         }
     }
 }

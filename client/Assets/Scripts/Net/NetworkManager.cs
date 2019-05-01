@@ -9,7 +9,7 @@ public enum ConnectID
     Game,
 }
 
-public delegate void MessageHandler(byte[] data);
+public delegate void NetPacketHandler(NetPacket packet);
 
 public class NetworkManager 
 {
@@ -35,12 +35,12 @@ public class NetworkManager
     private Dictionary<int, Connection> mConnectionDic = new Dictionary<int, Connection>();
 
     
-    private Queue<byte[]> mPacketList = new Queue<byte[]>();
+    private Queue<NetPacket> mPacketList = new Queue<NetPacket>();
     private Queue<Connection> mConnectResults = new Queue<Connection>();
     private Dictionary<int, OnConnectionHandler> mConnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
     private Dictionary<int, OnConnectionHandler> mDisconnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
     private object mLock = new object();
-    public event MessageHandler onReceive;
+    public event NetPacketHandler onReceive;
     private DateTime D1970 = new DateTime(1970, 1, 1, 0, 0, 0);
 
 
@@ -139,9 +139,9 @@ public class NetworkManager
     /// <param name="clientID"></param>
     /// <param name="id"></param>
     /// <param name="packet"></param>
-    public void Send(ConnectID connectid, byte[] data)
+    public void Send(ConnectID connectid, NetPacket packet)
     {
-        if (data == null)
+        if (packet == null)
         {
             return;
         }
@@ -153,7 +153,8 @@ public class NetworkManager
             return;
         }
        
-        client.Send(data, (ushort)data.Length);
+        client.Send(packet.Buffer, (ushort)packet.Length);
+
     }
 
     /// <summary>
@@ -181,16 +182,16 @@ public class NetworkManager
         mConnectionDic.Clear();
     }
 
-    private void OnMessage(byte[] data)
+    private void OnMessage(NetPacket packet)
     {
-        if (data == null)
+        if (packet == null)
         {
             return;
         }
 
         lock (mLock)
         {
-            mPacketList.Enqueue(data);
+            mPacketList.Enqueue(packet);
         }
 
     }

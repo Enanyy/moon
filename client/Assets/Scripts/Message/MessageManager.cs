@@ -27,18 +27,22 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
         using (MemoryStream ms = new MemoryStream())
         {
             ProtoBuf.Serializer.Serialize<T>(ms, message);
-            byte[] bytes = ms.ToArray();
-            byte[] data = new byte[bytes.Length + 4];
-            Array.Copy(BitConverter.GetBytes((int)id), 0, data, 0, 4);
-            Array.Copy(bytes, 0, data, 4, bytes.Length);
 
+            int length = 4 + (int)ms.Position;
+            NetPacket packet = NetPacket.Create(length);
+            packet.Length = length;
+
+            Array.Copy(BitConverter.GetBytes((int)id), 0, packet.Buffer, 0, 4);
+            Array.Copy(ms.GetBuffer(), 0, packet.Buffer, 4, ms.Position);
+            
             ms.Close();
             
+            NetworkManager.Instance.Send(connectid, packet);
 
-            NetworkManager.Instance.Send(connectid, data);
-           
+            NetPacket.Recycle(packet);
+
         }
-       
+
     }
 
     public void OnReceive(byte[] data, int index, int length)
@@ -111,21 +115,26 @@ public class MessageManager
         return message as T;
     }
 
-    public void OnReceive(byte[] data)
+    public void OnReceive(NetPacket packet)
     {
-        if(data == null || data.Length < 4)
+        if(packet == null)
         {
             return;
         }
-        int id = BitConverter.ToInt32(data, 0);
-        if (mMessageDic.ContainsKey(id))
-        {
-            mMessageDic[id].OnReceive(data, 4, data.Length - 4);
+
+        if (packet.Length >= 4)
+        { 
+            int id = BitConverter.ToInt32(packet.Buffer, 0);
+            if (mMessageDic.ContainsKey(id))
+            {
+                mMessageDic[id].OnReceive(packet.Buffer, 4, packet.Length - 4);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError("消息ID:" + (MessageID)id + "未注册");
+            }
         }
-        else
-        {
-            UnityEngine.Debug.LogError("消息ID:" + (MessageID)id+"未注册");
-        }
+        NetPacket.Recycle(packet);
     }
 
 
