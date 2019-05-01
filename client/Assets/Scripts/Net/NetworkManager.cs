@@ -106,7 +106,8 @@ public class NetworkManager
                     {
                         onReceive(data);
                     }
-                   
+                    NetPacket.Recycle(data);
+
                 }
             }
         }
@@ -154,6 +155,8 @@ public class NetworkManager
         }
        
         client.Send(packet.Buffer, (ushort)packet.Length);
+
+        NetPacket.Recycle(packet);
 
     }
 

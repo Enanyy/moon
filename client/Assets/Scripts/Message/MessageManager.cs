@@ -40,7 +40,6 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
             
             NetworkManager.Instance.Send(connectid, packet);
 
-            NetPacket.Recycle(packet);
         }
 
     }
@@ -133,10 +132,7 @@ public class MessageManager
             {
                 UnityEngine.Debug.LogError("消息ID:" + (MessageID)id + "未注册");
             }
-        }
-        NetPacket.Recycle(packet);
+        } 
     }
-
-
 }
 
