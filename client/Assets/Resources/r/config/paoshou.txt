@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ModelParam model="paoshou" assetID="20004" maxhp="100" movespeed="10" attackspeed="2" attackDistance="20" searchDistance="100" radius="1" scale="1" hitPosition="(0.0, 1.0, 0.0)" name="Model" rect="(20,20,240,20)">
+<ModelParam model="paoshou" assetID="20004" scale="1" hitPosition="(0.0, 1.0, 0.0)" name="Model" rect="(20,20,240,20)">
   <ActionParam state="2" weight="2" duration="1.133333" useAnimationLength="1" name="Action" rect="(279,161,240,20)">
     <AnimationParam animationClip="attack01" length="1.133333" mode="0" triggerAt="0" default="1" name="Animation" rect="(609,154,240,20)">
       <EffectFollowParam speed="50" effectType="3" arise="0" on="0" assetID="30008" delay="0.27" offset="(0.3, 1.6, 1.0)" name="FollowEffect" rect="(912,135,240,20)">

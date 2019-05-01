@@ -285,13 +285,7 @@ public partial class ModelParam : BattleParam
 {
     public string model;
     public uint assetID;
-    public uint maxhp;
-    public float movespeed = 10;
-    public float attackspeed = 2; //攻击速度
-
-    public float attackDistance = 4; // 攻击距离
-    public float searchDistance = 10; //索敌范围
-    public float radius = 1;      //模型半径
+    
     public float scale = 1;
     public Vector3 hitPosition = Vector3.zero;
 
@@ -306,18 +300,7 @@ public partial class ModelParam : BattleParam
         r.height += 20;
         assetID = (uint)Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("AssetID", (int)assetID),0,uint.MaxValue);
         r.height += 20;
-        maxhp = (uint)Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("MaxHP", (int)maxhp), 0, uint.MaxValue);
-        r.height += 20;
-        movespeed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("MoveSpeed", movespeed), 0, float.MaxValue);
-        r.height += 20;
-        attackspeed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("AttackSpeed", attackspeed), 0, float.MaxValue);
-        r.height += 20;
-        attackDistance = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("AttackDistance", attackDistance), 0, float.MaxValue);
-        r.height += 20;
-        searchDistance = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("SearchDistance", searchDistance), 0, float.MaxValue);
-        r.height += 20;
-        radius = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Radius", radius), 0, float.MaxValue);
-        r.height += 20;
+      
         scale = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Scale", scale), 0, float.MaxValue);
         r.height += 20;
         hitPosition = UnityEditor.EditorGUILayout.Vector3Field("HitPosition", hitPosition);
@@ -354,12 +337,7 @@ public partial class ModelParam : BattleParam
         }
         param.model = this.model;
         param.assetID = this.assetID;
-        param.maxhp = this.maxhp;
-        param.movespeed = this.movespeed;
-        param.attackspeed = this.attackspeed;
-        param.attackDistance = this.attackDistance;
-        param.searchDistance = this.searchDistance;
-        param.radius = this.radius;
+     
         param.scale = this.scale;
         return base.Clone(param);
     }
@@ -373,12 +351,7 @@ public partial class ModelParam : BattleParam
         }
         attributes.Add("model", model);
         attributes.Add("assetID", assetID.ToString());
-        attributes.Add("maxhp", maxhp.ToString());
-        attributes.Add("movespeed", movespeed.ToString());
-        attributes.Add("attackspeed", attackspeed.ToString());
-        attributes.Add("attackDistance", attackDistance.ToString());
-        attributes.Add("searchDistance", searchDistance.ToString());
-        attributes.Add("radius", radius.ToString());
+        
         attributes.Add("scale", scale.ToString());
         attributes.Add("hitPosition", hitPosition.ToString());
 
@@ -388,13 +361,6 @@ public partial class ModelParam : BattleParam
     {
         model = node.GetAttribute("model");
         assetID = node.GetAttribute("assetID").ToUInt32Ex();
-        maxhp = node.GetAttribute("maxhp").ToUInt32Ex();
-        movespeed = node.GetAttribute("movespeed").ToFloatEx();
-        attackspeed = node.GetAttribute("attackspeed").ToFloatEx();
-        attackspeed = node.GetAttribute("attackspeed").ToFloatEx();
-        attackDistance = node.GetAttribute("attackDistance").ToFloatEx();
-        searchDistance = node.GetAttribute("searchDistance").ToFloatEx();
-        radius = node.GetAttribute("radius").ToFloatEx();
         scale = node.GetAttribute("scale").ToFloatEx();
         hitPosition = node.GetAttribute("hitPosition").ToVector3Ex();
         base.ParseXml(node);

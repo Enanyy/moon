@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ModelParam model="nvjiangjun" assetID="20003" maxhp="1000" movespeed="10" attackspeed="2.16" attackDistance="6" searchDistance="100" radius="1" scale="2" hitPosition="(0.0, 2.7, 0.0)" name="Model" rect="(-1,101,240,20)">
+<ModelParam model="nvjiangjun" assetID="20003" scale="2" hitPosition="(0.0, 2.7, 0.0)" name="Model" rect="(-1,101,240,20)">
   <ActionParam state="0" weight="0" duration="86400" useAnimationLength="1" name="Action" rect="(276,49,240,20)">
     <AnimationParam animationClip="bufu" length="5" mode="0" triggerAt="0" default="0" name="Animation" rect="(1098,22,240,20)" />
     <AnimationParam animationClip="idle" length="1.666667" mode="2" triggerAt="0" default="1" name="Animation" rect="(569,25,240,20)" />

@@ -176,6 +176,13 @@ function M:hurtby( attacker )
     end
 
     local hurtvalue = (attacker.attackvalue - self.defensevalue)
+
+    hurtvalue = math.random(hurtvalue - 5, hurtvalue + 5)
+
+    if hurtvalue < 1 then
+        hurtvalue = 1
+    end
+
     self.hp = self.hp - hurtvalue
 
     --print(attacker.id, " attack ",self.id, " hurt:",hurtvalue," hp:",self.hp)
@@ -198,10 +205,11 @@ function M:hurtby( attacker )
 end
 
 function M:needsync( )
-    if self.sid >= 0 then
+    if self.sid >= 0 and self.isdie == false then
         local position = rvo2:getAgentPosition(self.sid)
-        
-        local result = (position-self.position):sqrmagnitude() > 0.25
+        local distance = vector2.distance (position,self.position)
+      
+        local result = distance > 0.5
         return result
     end
 
@@ -231,7 +239,7 @@ function M:checksync()
         if run ~= nil then
             run:setdestination(position)
         else
-            -- if self.machine.current ~= nil and self.machine.current.type == actiondef.attack then
+            -- if self.machine.current ~= nil and self.machine.c 3f urrent.type == actiondef.attack then
             --     local attack = self.machine.current
             --     if attack ~= nil then
             --         attack.duration = 0

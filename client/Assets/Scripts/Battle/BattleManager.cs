@@ -151,6 +151,8 @@ public class BattleManager
         }
         BattleEntity target = null;
 
+        float searchDistance = entity.GetProperty(EntityProperty.PRO_SEARCH_DISTANCE) * 0.01f;
+
         float minDistance = 0;
         var it = entities.GetEnumerator();
         while (it.MoveNext())
@@ -158,7 +160,7 @@ public class BattleManager
             if (it.Current.Value.id != entity.id && it.Current.Value.campflag != entity.campflag)
             {
                 float distance = Vector3.Distance(it.Current.Value.position, entity.position);
-                if (distance < entity.param.searchDistance)
+                if (distance < searchDistance)
                 {
                     if (target == null || distance < minDistance)
                     {
@@ -204,7 +206,7 @@ public class BattleManager
         Vector3 vertical = Vector3.Cross(direction.normalized, Vector3.up);
         vertical.y = 0;
 
-        float radius = entity.param.radius + block.param.radius;
+        float radius = entity.GetProperty(EntityProperty.PRO_RADIUS) * 0.01f + block.GetProperty(EntityProperty.PRO_RADIUS) * 0.01f;
 
         Vector3 point = block.position + vertical * radius;
         bool isValid = block.rectangle.Contains(point);
@@ -252,7 +254,7 @@ public class BattleManager
         var it = entities.GetEnumerator();
         while (it.MoveNext())
         {
-            if (Vector3.Distance(it.Current.Value.position, point) < it.Current.Value.param.radius)
+            if (Vector3.Distance(it.Current.Value.position, point) < it.Current.Value.GetProperty(EntityProperty.PRO_RADIUS)*0.01f)
             {
                 contains = true;
                 break;

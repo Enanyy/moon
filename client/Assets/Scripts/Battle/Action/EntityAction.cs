@@ -142,7 +142,7 @@ public class EntityAction : State<BattleEntity>,IPoolObject
                         return false;
                     }
                     var entity = BattleManager.Instance.GetEntity(target);
-                    if (entity == null || Vector3.Distance(entity.position,agent.position)>= agent.param.attackDistance)
+                    if (entity == null || entity.isDie)
                     {
                         return false;
                     }

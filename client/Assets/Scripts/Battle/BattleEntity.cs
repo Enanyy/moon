@@ -111,7 +111,7 @@ public class BattleEntity:
     {
         get
         {
-            float radius = param.radius;
+            float radius = GetProperty(EntityProperty.PRO_RADIUS) * 0.01f;
 
             Vector3 forward = rotation * Vector3.forward;
             Vector3 right = rotation * Vector3.right;

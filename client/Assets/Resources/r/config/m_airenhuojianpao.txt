@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ModelParam model="m_airenhuojianpao" assetID="20002" maxhp="100" movespeed="10" attackspeed="2" attackDistance="50" searchDistance="100" radius="1" scale="1" hitPosition="(0.0, 1.5, 0.0)" name="Model" rect="(15,140,240,20)">
+<ModelParam model="m_airenhuojianpao" assetID="20002" scale="1" hitPosition="(0.0, 1.5, 0.0)" name="Model" rect="(15,140,240,20)">
   <ActionParam state="2" weight="1" duration="1.566667" useAnimationLength="1" name="Action" rect="(299,369,240,20)">
     <AnimationParam animationClip="attack01" length="1.566667" mode="0" triggerAt="0" default="1" name="Animation" rect="(613,415,240,20)">
       <EffectParabolaParam speed="20" gravity="9.8" heightOffset="0" heightLimit="20" effectType="4" arise="0" on="0" assetID="30010" delay="0.61" offset="(0.3, 1.4, 0.6)" name="ParabolaEffect" rect="(968,372,240,20)">
