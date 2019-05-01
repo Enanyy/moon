@@ -5,7 +5,7 @@ using System.IO;
 public interface IMessage
 {
     MessageID id { get; set; }
-    void OnReceive(NetPacket packet);
+    void OnReceive(byte[] data, int index, int length);
 }
 
 public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensible, new()
@@ -28,19 +28,22 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
         {
             ProtoBuf.Serializer.Serialize<T>(ms, message);
             byte[] bytes = ms.ToArray();
+            byte[] data = new byte[bytes.Length + 4];
+            Array.Copy(BitConverter.GetBytes((int)id), 0, data, 0, 4);
+            Array.Copy(bytes, 0, data, 4, bytes.Length);
 
             ms.Close();
-            NetPacket packet = NetPacket.Create((int)id, bytes);
+            
 
-            NetworkManager.Instance.Send(connectid, packet);
+            NetworkManager.Instance.Send(connectid, data);
            
         }
        
     }
 
-    public void OnReceive(NetPacket packet)
+    public void OnReceive(byte[] data, int index, int length)
     {
-        using (MemoryStream ms = new MemoryStream(packet.data, NetPacket.PACKET_BUFFER_OFFSET, packet.Position - NetPacket.PACKET_BUFFER_OFFSET))
+        using (MemoryStream ms = new MemoryStream(data,index, length))
         {
             message = (T)ProtoBuf.Meta.RuntimeTypeModel.Default.Deserialize(ms, message, typeof(T));
             OnMessage();
@@ -108,12 +111,16 @@ public class MessageManager
         return message as T;
     }
 
-    public void OnReceive(NetPacket packet)
+    public void OnReceive(byte[] data)
     {
-        int id = packet.ID;
+        if(data == null || data.Length < 4)
+        {
+            return;
+        }
+        int id = BitConverter.ToInt32(data, 0);
         if (mMessageDic.ContainsKey(id))
         {
-            mMessageDic[id].OnReceive(packet);
+            mMessageDic[id].OnReceive(data, 4, data.Length - 4);
         }
         else
         {

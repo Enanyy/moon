@@ -9,7 +9,7 @@ public enum ConnectID
     Game,
 }
 
-public delegate void NetPacketHandler(NetPacket packet);
+public delegate void MessageHandler(byte[] data);
 
 public class NetworkManager 
 {
@@ -35,12 +35,12 @@ public class NetworkManager
     private Dictionary<int, Connection> mConnectionDic = new Dictionary<int, Connection>();
 
     
-    private Queue<NetPacket> mPacketList = new Queue<NetPacket>();
+    private Queue<byte[]> mPacketList = new Queue<byte[]>();
     private Queue<Connection> mConnectResults = new Queue<Connection>();
     private Dictionary<int, OnConnectionHandler> mConnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
     private Dictionary<int, OnConnectionHandler> mDisconnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
     private object mLock = new object();
-    public event NetPacketHandler onReceive;
+    public event MessageHandler onReceive;
     private DateTime D1970 = new DateTime(1970, 1, 1, 0, 0, 0);
 
 
@@ -100,13 +100,13 @@ public class NetworkManager
             {
                 while (mPacketList.Count > 0)
                 {
-                    NetPacket packet = mPacketList.Dequeue();
+                    var data = mPacketList.Dequeue();
                     //这里分发网络包
                     if (onReceive != null)
                     {
-                        onReceive(packet);
+                        onReceive(data);
                     }
-                    NetPacket.Recycle(packet);
+                   
                 }
             }
         }
@@ -139,9 +139,9 @@ public class NetworkManager
     /// <param name="clientID"></param>
     /// <param name="id"></param>
     /// <param name="packet"></param>
-    public void Send(ConnectID connectid, NetPacket packet)
+    public void Send(ConnectID connectid, byte[] data)
     {
-        if (packet == null)
+        if (data == null)
         {
             return;
         }
@@ -153,9 +153,7 @@ public class NetworkManager
             return;
         }
        
-        client.Send(packet.data, (ushort)packet.Position);
-        NetPacket.Recycle(packet);
-        Debug.Log("NetworkManager.Send,id=" + packet.ID);
+        client.Send(data, (ushort)data.Length);
     }
 
     /// <summary>
@@ -190,10 +188,9 @@ public class NetworkManager
             return;
         }
 
-        NetPacket packet = NetPacket.Create(data);
         lock (mLock)
         {
-            mPacketList.Enqueue(packet);
+            mPacketList.Enqueue(data);
         }
 
     }
