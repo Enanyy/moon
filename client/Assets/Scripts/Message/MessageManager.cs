@@ -29,12 +29,11 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
             ProtoBuf.Serializer.Serialize<T>(ms, message);
 
             int length = 4 + (int)ms.Position;
-            NetPacket packet = NetPacket.Create(length);
-            packet.Length = length;
+            byte[] packet = new byte[length];
 
-            Array.Copy(BitConverter.GetBytes((int)id), 0, packet.Buffer, 0, 4);
+            Array.Copy(BitConverter.GetBytes((int)id), 0, packet, 0, 4);
             ms.Seek(0, SeekOrigin.Begin);
-            ms.Read(packet.Buffer, 4, length - 4);
+            ms.Read(packet, 4, length - 4);
            
             ms.Close();
             
@@ -114,7 +113,7 @@ public class MessageManager
         return message as T;
     }
 
-    public void OnReceive(NetPacket packet)
+    public void OnReceive(byte[] packet)
     {
         if(packet == null)
         {
@@ -123,10 +122,10 @@ public class MessageManager
 
         if (packet.Length >= 4)
         { 
-            int id = BitConverter.ToInt32(packet.Buffer, 0);
+            int id = BitConverter.ToInt32(packet, 0);
             if (mMessageDic.ContainsKey(id))
             {
-                mMessageDic[id].OnReceive(packet.Buffer, 4, packet.Length - 4);
+                mMessageDic[id].OnReceive(packet, 4, packet.Length - 4);
             }
             else
             {

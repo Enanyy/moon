@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.IO;
 
 public delegate void OnConnectionHandler(Connection c);
-public delegate void OnReceiveHandler(NetPacket packet);
+public delegate void OnReceiveHandler( byte[] data);
 public delegate void OnDebugHandler(string msg);
 
 public class Connection
@@ -395,10 +395,9 @@ public class Connection
         {
             if (null != onReceive)
             {
-                NetPacket packet = NetPacket.Create(nPackageLen);
-                packet.Length = nPackageLen;
+                byte[] packet = new byte[nPackageLen];
 
-                Array.Copy(mRecvData, sizeof(ushort), packet.Buffer, 0, nPackageLen);
+                Array.Copy(mRecvData, sizeof(ushort), packet, 0, nPackageLen);
                 //TRACE.Log(string.Format("m_InfoList.Push(packetData) 1 nPackageLen={0}", nPackageLen));
                 onReceive(packet);
             }
@@ -415,9 +414,9 @@ public class Connection
                 // 先拷贝一个数据包，提交到列表中
                 if (null != onReceive)
                 {
-                    NetPacket packet = NetPacket.Create(nPackageLen);
-                    packet.Length = nPackageLen;
-                    Array.Copy(mCopyData, nReadPos + sizeof(ushort), packet.Buffer, 0, nPackageLen);
+                    byte[] packet = new byte[nPackageLen];
+
+                    Array.Copy(mCopyData, nReadPos + sizeof(ushort), packet, 0, nPackageLen);
 
                     onReceive(packet);
                 }
