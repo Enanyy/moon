@@ -28,7 +28,11 @@ public class ActionRotatePlugin : ActionPlugin
                 var point = action.paths.First.Value;
                 if (point.arrive == false)
                 {
-                    agent.rotation = Quaternion.LookRotation(point.destination - agent.position);
+                    Vector3 direction = point.destination - agent.position;
+                    if (direction != Vector3.zero)
+                    {
+                        agent.rotation = Quaternion.LookRotation(direction);
+                    }
                 }
                 else
                 {
