@@ -9,7 +9,12 @@ public abstract class EffectEntity :AssetEntity,IGameObject
 
     public EffectEntity parent { get; private set; }
     public BattleEntity agent { get; private set; }
-    public BattleEntity target { get; private set; }
+
+    private uint mTarget;
+    public BattleEntity target
+    {
+        get { return BattleManager.Instance.GetEntity(mTarget); }
+    }
 
 
     public EffectParam param { get; private set; }
@@ -20,12 +25,12 @@ public abstract class EffectEntity :AssetEntity,IGameObject
     private Animator[] mAnimators;
 
 
-    public virtual bool Init(EffectParam param, BattleEntity agent, BattleEntity target, EffectEntity parent)
+    public virtual bool Init(EffectParam param, BattleEntity agent, uint target, EffectEntity parent)
     {
         this.param = param;
         this.agent = agent;
         this.parent = parent;
-        this.target = target;
+        this.mTarget = target;
         this.scale = agent.scale;
         
         IGameObject go = GetOnAgent();
@@ -169,19 +174,22 @@ public abstract class EffectEntity :AssetEntity,IGameObject
             if (child.delay > 0)
             {
                 model.AddDelayTask(child.delay, delegate ()
-                {
-                    
-
+                {                  
                     EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
-
-                    effect.Init(child, agent, target, this);
+                    if (effect.Init(child, agent, mTarget, this) == false)
+                    {
+                        BattleManager.Instance.RemoveEffect(effect);
+                    }
                 });
             }
             else
             {
                 EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
 
-                effect.Init(child, agent, target, this);
+                if (effect.Init(child, agent, mTarget, this) == false)
+                {
+                    BattleManager.Instance.RemoveEffect(effect);
+                }
             }
         }
         return childCount;
@@ -200,7 +208,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
         mEffectSpeed = 1;
         parent = null;
         agent = null;
-        target = null;
+        mTarget = 0;
     }
 
     public override void OnDestroy()

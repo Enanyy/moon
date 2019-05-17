@@ -313,21 +313,24 @@ public class ModelComponent :
             if (child.delay > 0)
             {
                 AddDelayTask(child.delay, delegate ()
-                {
-                    var entity = BattleManager.Instance.GetEntity(target);
-
+                {                 
                     EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
 
-                    effect.Init(child, agent, entity, null);
+                    if (effect.Init(child, agent, target, null)==false)
+                    {
+                        BattleManager.Instance.RemoveEffect(effect);
+                    }
                 });
             }
             else
             {
-                var entity = BattleManager.Instance.GetEntity(target);
-
+                
                 EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
 
-                effect.Init(child, agent, entity, null);
+                if (effect.Init(child, agent, target, null) == false)
+                {
+                    BattleManager.Instance.RemoveEffect(effect);
+                }
             }
         }
     }
