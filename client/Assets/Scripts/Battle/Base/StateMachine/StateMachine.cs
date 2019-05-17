@@ -69,6 +69,75 @@ public class StateMachine<T> where T: IStateAgent<T>
         return true;
     }
 
+    public bool AddBefore(State<T> node, State<T> state)
+    {
+        if (state == null)
+        {
+            return false;
+        }
+        state.SetStateMachine(this);
+        var last = mStateList.Last;
+        var result = false;
+        while (last!= null)
+        {
+            if (last.Value == node)
+            {
+                mStateList.AddBefore(last, state);
+                result = true;
+                break;
+            }
+            else
+            {
+                last = last.Previous;
+            }
+        }
+
+        if (result == false)
+        {
+            if (mStateList.Count == 0)
+            {
+                mStateList.AddLast(state);
+            }
+            else
+            {
+                mStateList.AddAfter(mStateList.First, state);
+            }
+        }
+
+        return true;
+    }
+
+    public bool AddAfter(State<T> node, State<T> state)
+    {
+        if (state == null)
+        {
+            return false;
+        }
+        state.SetStateMachine(this);
+      
+        var first = mStateList.First;
+        var result = false;
+        while (first!= null)
+        {
+            if (first.Value == node)
+            {
+                mStateList.AddAfter(first, state);
+                result = true;
+                break;
+            }
+            else
+            {
+                first = first.Next;
+            }
+        }
+
+        if (result == false)
+        {
+            mStateList.AddLast(state);
+        }
+        return true;
+    }
+
     public State<T> GetFirst(int type)
     {
         var it = mStateList.First;
@@ -128,14 +197,25 @@ public class StateMachine<T> where T: IStateAgent<T>
 
         while (mStateList.Count > 0)
         {
-            if(mStateList.First.Value.IsValid()==false)
+            var state = mStateList.First.Value;
+            if (state.IsValid()==false)
             {
-                mStateList.First.Value.OnDestroy();
+                state.OnDestroy();
                 mStateList.RemoveFirst();
             }
             else
             {
-                break;
+                if (state.duration <= 0)
+                {
+                    state.OnEnter();
+                    state.OnExit();
+                    state.OnDestroy();
+                    mStateList.RemoveFirst();
+                }
+                else
+                {
+                    break;
+                }
             }
         }
 
