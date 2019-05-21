@@ -137,7 +137,18 @@ public class ModelComponent :
     }
     public void OnUpdate(float deltaTime)
     {
-        if(gameObject!= null)
+        for (int i = mDelayTasks.Count - 1; i >= 0; --i)
+        {
+            if (mDelayTasks[i] == null || mDelayTasks[i].DoTask(deltaTime * animationSpeed))
+            {
+                if (mDelayTasks[i] != null)
+                {
+                    ObjectPool.ReturnInstance(mDelayTasks[i]);
+                }
+                mDelayTasks.RemoveAt(i);
+            }
+        }
+        if (gameObject!= null)
         {
             gameObject.transform.position = agent.position;// Vector3.Lerp(gameObject.transform.position, agent.position, deltaTime * 10);
             gameObject.transform.rotation = Quaternion.Lerp(gameObject.transform.rotation, agent.rotation, deltaTime * 10* animationSpeed);
@@ -167,17 +178,7 @@ public class ModelComponent :
 
     public void OnExcute(State<BattleEntity> state,float deltaTime)
     {
-        for (int i = mDelayTasks.Count - 1; i >= 0; --i)
-        {
-            if (mDelayTasks[i] == null || mDelayTasks[i].DoTask(deltaTime * animationSpeed))
-            {
-                if (mDelayTasks[i] != null)
-                {
-                    ObjectPool.ReturnInstance(mDelayTasks[i]);
-                }
-                mDelayTasks.RemoveAt(i);
-            }
-        }
+      
         EntityAction action = state as EntityAction;
         if(action.animation!=null)
         {
