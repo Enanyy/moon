@@ -127,6 +127,29 @@ public class Chess : MonoBehaviour
         return covers;
     }
 
+    public int Distance(Vector3 from, Vector3 to)
+    {
+        var fromNode = IndexOf(from);
+        var toNode = IndexOf(to);
+        if (fromNode != null && toNode != null)
+        {
+            return Distance(fromNode.index, toNode.index);
+        }
+
+        return -1;
+    }
+
+    public int Distance(int from, int to)
+    {
+        int fromLine = from / columns;
+        int fromIndex = from % columns;
+
+        int toLine = to / columns;
+        int toIndex = to % columns;
+
+        return Math.Max(Math.Abs(toLine - fromLine), Math.Abs(toIndex - fromIndex));
+    }
+
 
     private GameObject mClick;
 
