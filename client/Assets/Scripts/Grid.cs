@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node
+public class Tile
 {
     public int index;
     public Vector3 position;
@@ -17,18 +17,20 @@ public class Node
     }
 }
 
-public class Chess : MonoBehaviour
+
+
+public class Grid : MonoBehaviour
 {
 
     public int lines = 16;
 
     public int columns = 12;
 
-    public float nodeSize = 2.5f;
+    public float tileSize = 2.5f;
 
-    public Dictionary<int,Node> nodes = new Dictionary<int, Node>();
+    public Dictionary<int,Tile> tiles = new Dictionary<int, Tile>();
 
-    public Vector3 startPoint=Vector3.zero;
+    public Vector3 original=Vector3.zero;
 
     private  Plane mPlane = new Plane(Vector3.up, Vector3.zero);
 	// Use this for initialization
@@ -39,74 +41,74 @@ public class Chess : MonoBehaviour
             for (int i = 0; i < columns; i++)
             {
                 int index = j * columns + i ;
-                Node node = new Node();
-                node.index = index;
+                Tile tile = new Tile();
+                tile.index = index;
 
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 Vector3 center = transform.position;
                 Vector3 position = Vector3.zero;
-                position.x = startPoint.x+(i +0.5f) * nodeSize;
-                position.z = startPoint.y+(j +0.5f) * nodeSize;
+                position.x = original.x+(i +0.5f) * tileSize;
+                position.z = original.y+(j +0.5f) * tileSize;
                 go.name = index.ToString();
 
                 go.transform.position = position;
               
-                node.gameObject = go;
+                tile.gameObject = go;
 
-                nodes.Add(index,node);
+                tiles.Add(index,tile);
             }
         }
     }
 
-    public Node IndexOf(Vector3 position)
+    public Tile IndexOf(Vector3 position)
     {      
-        if (position.x > startPoint.x + nodeSize * columns
-            || position.x < startPoint.x
-            || position.z > startPoint.z + nodeSize * lines
-            || position.z < startPoint.z)
+        if (position.x > original.x + tileSize * columns
+            || position.x < original.x
+            || position.z > original.z + tileSize * lines
+            || position.z < original.z)
 
         {
             return null;
         }
        
-        float x = position.x - startPoint.x;
-        float z = position.z - startPoint.z;
+        float x = position.x - original.x;
+        float z = position.z - original.z;
 
-        int i = (int)(x / nodeSize);
+        int i = (int)(x / tileSize);
 
-        int j = (int)(z / nodeSize);
+        int j = (int)(z / tileSize);
 
         int index = j * columns + i;
 
         return IndexOf(index);
     }
 
-    public Node IndexOf(int index)
+    public Tile IndexOf(int index)
     {
-        Node node = null;
-        nodes.TryGetValue(index, out node);
+        Tile node = null;
+        tiles.TryGetValue(index, out node);
         return node;
     }
 
-    public List<Node> GetCover(Vector3 position,int r)
+    public List<Tile> TilesInRange(Vector3 position,int r)
     {
-        Node node = IndexOf(position);
-        if (node != null)
+        Tile tile = IndexOf(position);
+        if (tile != null)
         {
-            return GetCover(node.index,r);
+            return TilesInRange(tile.index,r);
         }
-        return new List<Node>();
+        return new List<Tile>();
     }
 
-    public List<Node> GetCover(int index,int r)
+    public List<Tile> TilesInRange(int index,int r)
     {
-        List<Node> covers = new List<Node>();
+        List<Tile> list = new List<Tile>();
 
         ////上下左右
         for (int i = -r; i <= r; ++i)
         {
             int middle = (index / columns + i) * columns + index % columns;
-            if (nodes.ContainsKey(middle))
+            if (tiles.ContainsKey(middle))
             {
                 int line = middle / columns;
                 for (int j = -r; j <= r; ++j)
@@ -114,9 +116,9 @@ public class Chess : MonoBehaviour
                     int n = middle + j;
                     if (n / columns == line)
                     {
-                        if (nodes.ContainsKey(n))
+                        if (tiles.ContainsKey(n))
                         {
-                            covers.Add(nodes[n]);
+                            list.Add(tiles[n]);
                         }
                     }
                 }
@@ -124,7 +126,45 @@ public class Chess : MonoBehaviour
         }
 
 
-        return covers;
+        return list;
+    }
+    public List<Tile> TilesInDistance(Vector3 position, int r)
+    {
+        Tile tile = IndexOf(position);
+        if (tile != null)
+        {
+            return TilesInDistance(tile.index, r);
+        }
+        return new List<Tile>();
+    }
+
+    public List<Tile> TilesInDistance(int index, int r)
+    {
+        List<Tile> list = new List<Tile>();
+        ////上下左右
+        for (int i = -r; i <= r; ++i)
+        {
+            int middle = (index / columns + i) * columns + index % columns;
+            if (tiles.ContainsKey(middle))
+            {
+                int line = middle / columns;
+                for (int j = -r; j <= r; )
+                {
+                    int n = middle + j;
+                    if (n / columns == line)
+                    {
+                        if (tiles.ContainsKey(n))
+                        {
+                            list.Add(tiles[n]);
+                        }
+                    }
+
+                    j = (i == -r || i == r) ? j + 1 : j + r * 2;
+                }
+            }
+        }
+
+        return list;
     }
 
     public int Distance(Vector3 from, Vector3 to)
@@ -153,9 +193,9 @@ public class Chess : MonoBehaviour
 
     private GameObject mClick;
 
-    private Node mNode;
+    private Tile mTile;
 
-    private List<Node> mCovers;
+    private List<Tile> mCovers;
 	// Update is called once per frame
 	void Update () {
         if (Input.GetMouseButtonDown(0))
@@ -176,16 +216,16 @@ public class Chess : MonoBehaviour
             mClick.transform.position = point;
 
 
-            var node = IndexOf(point);
-            if (node!= null)
+            var tile = IndexOf(point);
+            if (tile!= null)
             {
-                if (mNode != null)
+                if (mTile != null)
                 {
-                    mNode.Select(false);
+                    mTile.Select(false);
                 }
 
-                mNode = node;
-                mNode.Select(true);
+                mTile = tile;
+                mTile.Select(true);
 
                 if (mCovers != null)
                 {
@@ -195,7 +235,7 @@ public class Chess : MonoBehaviour
                     }
                 }
 
-                mCovers = GetCover(mNode.index, 2);
+                mCovers =TilesInDistance (mTile.index, 2);
                 for (int i = 0; i < mCovers.Count; i++)
                 {
                     mCovers[i].Select(true);
