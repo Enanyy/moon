@@ -366,14 +366,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2126523731}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afa5b34eca9559a44bec28dce0a4c3a4, type: 3}
+  m_Script: {fileID: 11500000, guid: 56a142129f5d0744bad5fe2304f55071, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   lines: 16
   columns: 12
   tileSize: 2.5
-  original: {x: 0, y: 0, z: 0}
-  material: {fileID: 2100000, guid: 7ce26db94f9180648864035c1615f2f3, type: 2}
+  showGrid: 1
+  original: {x: 0, y: 0, z: 2}
 --- !u!4 &2126523733
 Transform:
   m_ObjectHideFlags: 0
