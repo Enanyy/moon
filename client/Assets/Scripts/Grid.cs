@@ -10,10 +10,17 @@ public class Tile
 
     public GameObject gameObject;
 
+    public Color defaultColor;
+
     public void Select(bool value)
     {
+        int j = index;
+        SetColor(value ? Color.green : defaultColor);
+    }
+    public void SetColor(Color color)
+    {
         MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
-        renderer.material.SetColor("_Color", value? Color.green:Color.white);
+        renderer.material.SetColor("_Color", color);
     }
 }
 
@@ -32,32 +39,55 @@ public class Grid : MonoBehaviour
 
     public Vector3 original=Vector3.zero;
 
+    public Material material;
+
     private  Plane mPlane = new Plane(Vector3.up, Vector3.zero);
 	// Use this for initialization
 	void Start () {
+
+        transform.position = original;
 
         for (int j = 0; j < lines; j++)
         {
             for (int i = 0; i < columns; i++)
             {
-                int index = j * columns + i ;
+                int index = j * columns + i;
                 Tile tile = new Tile();
                 tile.index = index;
 
-                GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Vector3 center = transform.position;
+                GameObject go = new GameObject();
+                go.transform.SetParent(transform);
+                MeshFilter filter = go.AddComponent<MeshFilter>();
+                MeshRenderer renderer = go.AddComponent<MeshRenderer>();
+                filter.mesh = GenerateMesh(tileSize);
+                renderer.material = material;
+
+
                 Vector3 position = Vector3.zero;
-                position.x = original.x+(i +0.5f) * tileSize;
-                position.z = original.y+(j +0.5f) * tileSize;
+                position.x = original.x + i * tileSize;
+                position.z = original.y + j * tileSize;
                 go.name = index.ToString();
 
                 go.transform.position = position;
-              
-                tile.gameObject = go;
 
-                tiles.Add(index,tile);
+                tile.gameObject = go;
+                tile.position = position;
+
+                if (j % 2 == 0)
+                {
+                    tile.defaultColor = i % 2 == 0 ? new Color(180 / 255f, 180 / 255f, 180 / 255f, 1) : new Color(90 / 255f, 90 / 255f, 90 / 255f, 1);
+                }
+                else
+                {
+                    tile.defaultColor = i % 2 == 1 ? new Color(180 / 255f, 180 / 255f, 180 / 255f, 1) : new Color(90 / 255f, 90 / 255f, 90 / 255f, 1);
+                }
+                tile.SetColor(tile.defaultColor);
+                tiles.Add(index, tile);
             }
         }
+
+     
+        
     }
 
     public Tile IndexOf(Vector3 position)
@@ -190,6 +220,44 @@ public class Grid : MonoBehaviour
         return Math.Max(Math.Abs(toLine - fromLine), Math.Abs(toIndex - fromIndex));
     }
 
+    public static Mesh GenerateMesh(float size)
+    {
+        Mesh mesh = new Mesh();
+        List<Vector3> verts = new List<Vector3>();
+        List<int> tris = new List<int>();
+        List<Vector2> uvs = new List<Vector2>();
+
+        verts.Add(new Vector3(0, 0, 0));
+        verts.Add(new Vector3(0, 0, size));
+        verts.Add(new Vector3(size, 0, size));
+        verts.Add(new Vector3(size, 0, 0));
+
+        tris.Add(0);
+        tris.Add(1);
+        tris.Add(3);
+
+        tris.Add(3);
+        tris.Add(1);
+        tris.Add(2);
+
+
+        uvs.Add(new Vector2(0, 0f));
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
+      
+
+        mesh.vertices = verts.ToArray();
+        mesh.triangles = tris.ToArray();
+        mesh.uv = uvs.ToArray();
+
+        mesh.name = "Hexagonal Plane";
+
+        mesh.RecalculateNormals();
+
+        return mesh;
+    }
+
 
     private GameObject mClick;
 
@@ -227,19 +295,19 @@ public class Grid : MonoBehaviour
                 mTile = tile;
                 mTile.Select(true);
 
-                if (mCovers != null)
-                {
-                    for (int i = 0; i < mCovers.Count; i++)
-                    {
-                        mCovers[i].Select(false);
-                    }
-                }
+                //if (mCovers != null)
+                //{
+                //    for (int i = 0; i < mCovers.Count; i++)
+                //    {
+                //        mCovers[i].Select(false);
+                //    }
+                //}
 
-                mCovers =TilesInDistance (mTile.index, 2);
-                for (int i = 0; i < mCovers.Count; i++)
-                {
-                    mCovers[i].Select(true);
-                }
+                //mCovers =TilesInDistance (mTile.index, 2);
+                //for (int i = 0; i < mCovers.Count; i++)
+                //{
+                //    mCovers[i].Select(true);
+                //}
             }
         }
 	}
