@@ -56,6 +56,7 @@ public enum ActionType
     Die,
     Victory,
     Retreat,
+    Jump,
 }
 public abstract partial class BattleParam
 #if UNITY_EDITOR    
@@ -695,6 +696,21 @@ public partial class RotatePluginParam : PluginParam
     public override INode Clone(INode node)
     {
         return new RotatePluginParam();
+    }
+#endif
+}
+
+public partial class JumpPluginParam : PluginParam
+{
+    public JumpPluginParam()
+    {
+        name = "JumpPlugin";
+        plugin = typeof(ActionJumpPlugin);
+    }
+#if UNITY_EDITOR
+    public override INode Clone(INode node)
+    {
+        return new JumpPluginParam();
     }
 #endif
 }

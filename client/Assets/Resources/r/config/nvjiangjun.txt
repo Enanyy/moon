@@ -2,10 +2,15 @@
 <ModelParam model="nvjiangjun" assetID="20003" scale="2" hitPosition="(0.0, 2.7, 0.0)" name="Model" rect="(-1,101,240,20)">
   <ActionParam state="0" weight="0" duration="86400" useAnimationLength="1" name="Action" rect="(276,49,240,20)">
     <AnimationParam animationClip="bufu" length="5" mode="0" triggerAt="0" default="0" name="Animation" rect="(1098,22,240,20)" />
-    <AnimationParam animationClip="idle" length="1.666667" mode="2" triggerAt="0" default="1" name="Animation" rect="(569,25,240,20)" />
+    <AnimationParam animationClip="idle" length="1.666667" mode="2" triggerAt="0" default="1" name="Animation" rect="(641,248,240,20)" />
     <AnimationParam animationClip="standby" length="14.16667" mode="2" triggerAt="0" default="0" name="Animation" rect="(860,20,240,20)" />
     <AnimationParam animationClip="xiuxi" length="1.666667" mode="2" triggerAt="0" default="0" name="Animation" rect="(914,132,240,20)" />
     <RotatePluginParam name="RotatePlugin" rect="(1428,100,240,20)" />
+  </ActionParam>
+  <ActionParam state="1" weight="1" duration="86400" useAnimationLength="1" name="Action" rect="(269,170,240,20)">
+    <AnimationParam animationClip="run" length="0.9333334" mode="2" triggerAt="0" default="1" name="Animation" rect="(589,131,240,20)" />
+    <RunPluginParam name="RunPlugin" rect="(576,258,240,20)" />
+    <RotatePluginParam name="RotatePlugin" rect="(655,301,240,20)" />
   </ActionParam>
   <ActionParam state="2" weight="1" duration="2.033334" useAnimationLength="1" name="Action" rect="(271,287,240,20)">
     <AnimationParam animationClip="attack01" length="2.033334" mode="0" triggerAt="0" default="1" name="Animation" rect="(889,267,240,20)">
@@ -19,21 +24,21 @@
     </AnimationParam>
     <RotatePluginParam name="RotatePlugin" rect="(643,386,240,20)" />
   </ActionParam>
-  <ActionParam state="1" weight="1" duration="86400" useAnimationLength="1" name="Action" rect="(269,170,240,20)">
-    <AnimationParam animationClip="run" length="0.9333334" mode="2" triggerAt="0" default="1" name="Animation" rect="(589,131,240,20)" />
-    <RunPluginParam name="RunPlugin" rect="(576,258,240,20)" />
-    <RotatePluginParam name="RotatePlugin" rect="(655,301,240,20)" />
-  </ActionParam>
   <ActionParam state="3" weight="10" duration="2.266667" useAnimationLength="1" name="Action" rect="(263,409,240,20)">
     <AnimationParam animationClip="die" length="2.266667" mode="8" triggerAt="0" default="1" name="Animation" rect="(543,427,240,20)" />
     <RemovePluginParam name="RunPlugin" rect="(544,562,240,20)" />
+  </ActionParam>
+  <ActionParam state="4" weight="10" duration="86400" useAnimationLength="1" name="Action" rect="(2,606,240,20)">
+    <AnimationParam animationClip="victory" length="1.9" mode="2" triggerAt="0" default="1" name="Animation" rect="(136,761,240,20)" />
   </ActionParam>
   <ActionParam state="5" weight="10" duration="86400" useAnimationLength="1" name="Action" rect="(278,550,240,20)">
     <AnimationParam animationClip="run_away" length="0.5666667" mode="2" triggerAt="0" default="1" name="Animation" rect="(575,616,240,20)" />
     <RemovePluginParam name="RunPlugin" rect="(879,717,240,20)" />
     <RotatePluginParam name="RotatePlugin" rect="(866,788,240,20)" />
   </ActionParam>
-  <ActionParam state="4" weight="10" duration="86400" useAnimationLength="1" name="Action" rect="(2,606,240,20)">
-    <AnimationParam animationClip="victory" length="1.9" mode="2" triggerAt="0" default="1" name="Animation" rect="(136,761,240,20)" />
+  <ActionParam state="6" weight="1" duration="86400" useAnimationLength="1" name="Action" rect="(284,666,240,20)">
+    <RotatePluginParam name="RotatePlugin" rect="(592,933,240,20)" />
+    <AnimationParam animationClip="idle" length="1.666667" mode="2" triggerAt="0" default="1" name="Animation" rect="(556,737,240,20)" />
+    <JumpPluginParam name="JumpPlugin" rect="(651,881,240,20)" />
   </ActionParam>
 </ModelParam>

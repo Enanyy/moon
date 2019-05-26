@@ -7,6 +7,7 @@ public class BattleTile : ITile
 
     public int line { get; set; }
     public int column { get; set; }
+
     public Vector3 position { get; set; }
 
     public GameObject gameObject { get; private set; }
@@ -29,16 +30,16 @@ public class BattleTile : ITile
             renderer.material = material;
             collider.sharedMesh = mesh;
 
-            GameObject go = new GameObject("Text");
-            go.transform.SetParent(gameObject.transform);
-            go.transform.localPosition = Vector3.zero;
-            go.transform.localEulerAngles = new Vector3(90, 0, 0);
-            TextMesh text = go.AddComponent<TextMesh>();
-            text.anchor = TextAnchor.MiddleCenter;
-            text.alignment = TextAlignment.Center;
-            text.text = name;
-            text.color = Color.black;
-            text.fontSize = 7;
+            //GameObject go = new GameObject("Text");
+            //go.transform.SetParent(gameObject.transform);
+            //go.transform.localPosition = Vector3.zero;
+            //go.transform.localEulerAngles = new Vector3(90, 0, 0);
+            //TextMesh text = go.AddComponent<TextMesh>();
+            //text.anchor = TextAnchor.MiddleCenter;
+            //text.alignment = TextAlignment.Center;
+            //text.text = name;
+            //text.color = Color.black;
+            //text.fontSize = 7;
 
             SetColor(defaultColor);
         }
@@ -58,7 +59,7 @@ public class BattleTile : ITile
     }
 }
 
-public class BattleGrid :Grid<BattleTile>
+public class BattleGrid :RectGrid<BattleTile>
 {
     private BattleGrid() { }
     private static BattleGrid _instance;
@@ -98,7 +99,7 @@ public class BattleGrid :Grid<BattleTile>
                 {
                     if (mTileMesh == null)
                     {
-                        mTileMesh = GenerateTileMesh(tileSize);
+                        mTileMesh = GenerateTileMesh(tileWidth,tileHeight);
                     }
                     if (mMaterial == null)
                     {
@@ -128,6 +129,24 @@ public class BattleGrid :Grid<BattleTile>
         }
     }
 
+    public override void Init(Vector3 original, int lines, int columns, float tileWidth, float tileHeight)
+    {
+        base.Init(original, lines, columns, tileWidth, tileHeight);
+
+        BattleEntity entity = ObjectPool.GetInstance<BattleEntity>();
+        entity.id = 1;
+        entity.configid = 10003;
+        entity.campflag = 1;
+        entity.type = 1;
+
+        BattleTile tile = TileAt(0, 0);
+        entity.position = tile.position;
+
+        BattleManager.Instance.AddEntity(entity);
+        entity.active = true;
+
+        
+    }
 
     protected override void OnCreateTile(BattleTile t)
     {
@@ -146,7 +165,7 @@ public class BattleGrid :Grid<BattleTile>
         {
             if(mTileMesh == null)
             {
-                mTileMesh = GenerateTileMesh(tileSize);
+                mTileMesh = GenerateTileMesh(tileWidth,tileHeight);
             }
             if(mMaterial == null)
             {
@@ -160,6 +179,8 @@ public class BattleGrid :Grid<BattleTile>
     // Update is called once per frame
     public void Update()
     {
+        BattleManager.Instance.Update(Time.deltaTime);
+
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -178,7 +199,7 @@ public class BattleGrid :Grid<BattleTile>
             mClick.transform.position = point;
 
 
-            var tile = IndexOf(point);
+            var tile = TileAt(point);
             if (tile != null)
             {
                 if (mTile != null)
@@ -188,6 +209,15 @@ public class BattleGrid :Grid<BattleTile>
 
                 mTile = tile;
                 mTile.Select(true);
+
+                BattleEntity entity = BattleManager.Instance.GetEntity(1);
+                if(entity!= null)
+                {
+                    EntityAction jump = ObjectPool.GetInstance<EntityAction>();
+                    jump.AddPathPoint(mTile.position, Vector3.zero, true);
+
+                    entity.PlayAction(ActionType.Jump, jump);
+                }
 
                 //if (mCovers != null)
                 //{

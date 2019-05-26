@@ -5,7 +5,8 @@ public class Chess : MonoBehaviour
 {
     public int lines = 12;
     public int columns = 16;
-    public float tileSize = 2.5f;
+    public float tileWidth = 2.5f;
+    public float tileHeight = 2.5f;
 
     public bool showGrid = true;
 
@@ -13,7 +14,7 @@ public class Chess : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        BattleGrid.Instance.Init(original, lines, columns, tileSize);
+        BattleGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
     }
 
     // Update is called once per frame

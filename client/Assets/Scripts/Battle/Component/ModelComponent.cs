@@ -157,10 +157,13 @@ public class ModelComponent :
         }
 
 #if UNITY_EDITOR
-        var type = Main.Instance.showType;
-        for (int i = 0; i < mShapeRenderers.Count; i++)
+        if (Main.Instance)
         {
-            mShapeRenderers[i].gameObject.SetActive(mShapeRenderers[i].type == type || type == ShapeType.All);
+            var type = Main.Instance.showType;
+            for (int i = 0; i < mShapeRenderers.Count; i++)
+            {
+                mShapeRenderers[i].gameObject.SetActive(mShapeRenderers[i].type == type || type == ShapeType.All);
+            }
         }
 #endif
     }
