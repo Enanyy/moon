@@ -183,14 +183,38 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
         }
         return t; 
     }
+    
+    private List<Vector3> mPathPoints = new List<Vector3>();
 
+    private bool mShowPath = false;
+
+    private BattleEntity mEntity;
+
+    private LineRenderer mPathRenderer;
     // Update is called once per frame
     public void Update()
     {
         BattleManager.Instance.Update(Time.deltaTime);
 
+        if (mEntity == null)
+        {
+            mEntity = BattleManager.Instance.GetEntity(1);
+        }
+
+        if (mEntity == null)
+        {
+            return;
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
+            mShowPath = true;
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            mShowPath = false;
+
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             float distance;
             mPlane.Raycast(ray, out distance);
@@ -218,13 +242,13 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                 mTile = tile;
                 mTile.Select(true);
 
-                BattleEntity entity = BattleManager.Instance.GetEntity(1);
-                if(entity!= null)
+                
+                if(mEntity!= null)
                 {
                     EntityAction jump = ObjectPool.GetInstance<EntityAction>();
                     jump.AddPathPoint(mTile.position, Vector3.zero, true);
 
-                    entity.PlayAction(ActionType.Jump, jump);
+                    mEntity.PlayAction(ActionType.Jump, jump);
                 }
 
                 //if (mCovers != null)
@@ -240,6 +264,48 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                 //{
                 //    mCovers[i].Select(true);
                 //}
+            }
+        }
+
+        if (mShowPath)
+        {
+            if (mPathRenderer == null)
+            {
+                if (root)
+                {
+                    mPathRenderer = root.GetComponent<LineRenderer>();
+                    if (mPathRenderer == null)
+                    {
+                        mPathRenderer = root.AddComponent<LineRenderer>();
+
+                    }
+
+                    mPathRenderer.startWidth = 1;
+                    mPathRenderer.endWidth = 1;
+                    mPathRenderer.startColor = Color.yellow;
+                    mPathRenderer.endColor = Color.yellow;
+                }
+            }
+
+            if (mPathRenderer != null)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                float distance;
+                mPlane.Raycast(ray, out distance);
+                Vector3 point = ray.GetPoint(distance);
+
+                ActionJumpPlugin.GetPath(mEntity.position, point, 0.01f, ref mPathPoints);
+
+                mPathRenderer.positionCount = mPathPoints.Count;
+                mPathRenderer.SetPositions(mPathPoints.ToArray());
+
+            }
+        }
+        else
+        {
+            if (mPathRenderer != null)
+            {
+                mPathRenderer.positionCount = 0;
             }
         }
     }

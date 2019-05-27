@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Chess : MonoBehaviour
 {
+    public bool rectGrid = true;
     public int lines = 12;
     public int columns = 16;
     public float tileWidth = 2.5f;
@@ -18,19 +19,33 @@ public class Chess : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        //BattleRectGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
-       BattleHexGrid.Instance.Init(original, shape, lines, columns, Mathf.Max(tileWidth, tileHeight),orientation);
+        if (rectGrid)
+        {
+            BattleRectGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
+        }
+        else
+        {
+            BattleHexGrid.Instance.Init(original, shape, lines, columns, Mathf.Max(tileWidth, tileHeight), orientation);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-         //BattleRectGrid.Instance.Update();
+        if (rectGrid)
+        {
+            BattleRectGrid.Instance.Update();
 
-         //BattleRectGrid.Instance.showGrid = showGrid;
+            BattleRectGrid.Instance.showGrid = showGrid;
 
-        BattleHexGrid.Instance.Update();
+        }
+        else
+        {
+            BattleHexGrid.Instance.Update();
 
-        BattleHexGrid.Instance.showGrid = showGrid;
+            BattleHexGrid.Instance.showGrid = showGrid;
+        }
+        
+     
     }
 }
