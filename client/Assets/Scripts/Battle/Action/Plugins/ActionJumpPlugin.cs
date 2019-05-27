@@ -6,11 +6,11 @@ public class ActionJumpPlugin :ActionPlugin
 {
     private Vector3 mVelocity;          // 初速度向量
 
-    private float mGravity = -50f;        // 重力加速度9.8
+    private float mGravity = -100f;        // 重力加速度9.8
 
     private PathPoint mTargetPoint;
 
-    private float mHeightLimit = 20;
+    private float mHeightLimit = 10;
     private float mSpeed = 20;
 
     public override void OnEnter()
@@ -64,12 +64,13 @@ public class ActionJumpPlugin :ActionPlugin
                 // 这一帧移动位移
                 Vector3 displacement = (mVelocity) * deltaTime;
                 //剩余距离
-                float distance = Vector3.Distance(mTargetPoint.destination, agent.position);
-
-                if (distance >= displacement.magnitude)
+               
+                Vector3 direction = mTargetPoint.destination - agent.position;
+                if (direction.magnitude >= displacement.magnitude)
                 {
                     agent.position += displacement;
-                   
+                    direction.y = 0;
+                    agent.rotation = Quaternion.LookRotation(direction);
                 }
                 else
                 {

@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class BattleTile : IRectTile
+public class BattleRectTile : ITile
 {
-    public int index { get; set; }
-
-    public int line { get; set; }
-    public int column { get; set; }
+    public TileIndex index { get; set; }
 
     public Vector3 position { get; set; }
 
@@ -18,7 +15,7 @@ public class BattleTile : IRectTile
     {
         if(gameObject== null)
         {
-            string name = string.Format("{0}-({1},{2})", index, line, column);
+            string name = index.ToString();
             gameObject = new GameObject(name);
             gameObject.transform.SetParent(parent);
             gameObject.transform.position = position;
@@ -60,28 +57,33 @@ public class BattleTile : IRectTile
 
     public void Clear()
     {
-        
+        if (gameObject)
+        {
+            Object.DestroyImmediate(gameObject);
+        }
+
+        gameObject = null;
     }
 }
 
-public class BattleGrid :RectGrid<BattleTile>
+public class BattleRectGrid :RectGrid<BattleRectTile>
 {
-    private BattleGrid() { }
-    private static BattleGrid _instance;
-    public static BattleGrid Instance
+    private BattleRectGrid() { }
+    private static BattleRectGrid _instance;
+    public static BattleRectGrid Instance
     {
         get
         {
-            if (_instance == null) _instance = new BattleGrid();
+            if (_instance == null) _instance = new BattleRectGrid();
             return _instance;
         }
     }
 
     private GameObject mClick;
 
-    private BattleTile mTile;
+    private BattleRectTile mTile;
 
-    private List<BattleTile> mCovers;
+    private List<BattleRectTile> mCovers;
 
     private Material mMaterial;
 
@@ -140,11 +142,11 @@ public class BattleGrid :RectGrid<BattleTile>
 
         BattleEntity entity = ObjectPool.GetInstance<BattleEntity>();
         entity.id = 1;
-        entity.configid = 10003;
+        entity.configid = 10002;
         entity.campflag = 1;
         entity.type = 1;
 
-        BattleTile tile = TileAt(0, 0);
+        BattleRectTile tile = TileAt(0, 0);
         entity.position = tile.position;
 
         BattleManager.Instance.AddEntity(entity);
@@ -153,17 +155,17 @@ public class BattleGrid :RectGrid<BattleTile>
         
     }
 
-    protected override BattleTile CreateTile(int index, int line, int column, Vector3 position)
+    protected override BattleRectTile CreateTile(TileIndex index, Vector3 position)
     {
-        var t = base.CreateTile(index,line,column,position);
+        var t = base.CreateTile(index,position);
   
-        if(line % 2== 0)
+        if(index.x % 2== 0)
         {
-            t.defaultColor = column % 2 == 0 ? Color.white:Color.gray;
+            t.defaultColor = index.z % 2 == 0 ? Color.white:Color.gray;
         }
         else
         {
-            t.defaultColor = column % 2 == 1 ? Color.white : Color.gray;
+            t.defaultColor = index.z % 2 == 1 ? Color.white : Color.gray;
         }
 
         if (mShowGrid)

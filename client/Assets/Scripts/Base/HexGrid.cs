@@ -1,95 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
-
-public interface IHexTile
-{
-    TileIndex index { get; set; }
-    Vector3 position { get; set; }
-    void Clear();
-}
+using System.Security.Cryptography.X509Certificates;
 
 
-[System.Serializable]
-public struct TileIndex
-{
-    public int x;
-    public int y;
-    public int z;
-
-    public TileIndex(int x, int y, int z)
-    {
-        this.x = x; this.y = y; this.z = z;
-    }
-
-    public TileIndex(int x, int z)
-    {
-        this.x = x; this.z = z; this.y = -x - z;
-    }
-
-    public static TileIndex operator +(TileIndex a, TileIndex b)
-    {
-        return new TileIndex(a.x + b.x, a.y + b.y, a.z + b.z);
-    }
-    public static TileIndex operator *(TileIndex a, int distance)
-    {
-        a.x *= distance;
-        a.z *= distance;
-        a.y = -a.x - a.z;
-        return a;
-    }
-
-    public static bool operator ==(TileIndex a, TileIndex b)
-    {
-        return a.Equals(b);
-    }
-    public static bool operator !=(TileIndex a, TileIndex b)
-    {
-        return !a.Equals(b);
-    }
-
-    public override bool Equals(object obj)
-    {
-        if (obj == null)
-            return false;
-        TileIndex o = (TileIndex)obj;
-        if ((object)o == null)
-            return false;
-        return ((x == o.x) && (y == o.y) && (z == o.z));
-    }
-
-    public bool Equals(TileIndex o)
-    {
-        return ((x == o.x) && (y == o.y) && (z == o.z));
-    }
-
-    public override int GetHashCode()
-    {
-        return (x.GetHashCode() ^ (y.GetHashCode() + (int)(Mathf.Pow(2, 32) / (1 + Mathf.Sqrt(5)) / 2) + (x.GetHashCode() << 6) + (x.GetHashCode() >> 2)));
-    }
-
-    public override string ToString()
-    {
-        return string.Format("[{0},{1},{2}]", x, y, z);
-    }
-}
-public class HexGrid<T> where T : class, IHexTile, new()
+public class HexGrid<T>:Grid<T> where T : class, ITile, new()
 {
     //Map settings
 
-
-    public GridShape gridShape = GridShape.Rectangle;
-    public int gridWidth;
-    public int gridHeight;
-    /// <summary>
-    /// GridShape.Rectangle的起始位置或GridShape.Hexagon的中心点
-    /// </summary>
-
-    public Vector3 center = Vector3.zero;
+    public HexGridShape shape { get; private set; }
 
     //Hex Settings
-    public HexOrientation hexOrientation = HexOrientation.Flat;
-    public float hexRadius = 1;
+    public HexOrientation orientation { get; private set; }
+    public float radius { get; private set; }
   
 
     private static TileIndex[] directions =
@@ -103,49 +26,33 @@ public class HexGrid<T> where T : class, IHexTile, new()
             new TileIndex(0, -1, 1)
         };
 
-
-
-    #region Getters and Setters
-
-    public Dictionary<TileIndex, T> Tiles { get; } = new Dictionary<TileIndex, T>();
-
-    #endregion
-
     #region Public Methods
 
-    public void GenerateGrid()
+    public virtual void Init(Vector3 original, HexGridShape shape, int lines, int columns, float radius,
+        HexOrientation orientation)
     {
+        this.original = original;
+        this.shape = shape;
+        this.lines = lines;
+        this.columns = columns;
+        this.radius = radius;
+        this.orientation = orientation;
         //Generating a new grid, clear any remants and initialise values
         Clear();
 
         //Generate the grid shape
-        switch (gridShape)
+        switch (shape)
         {
-            case GridShape.Hexagon:
+            case HexGridShape.Hexagon:
                 GenerateHexShape();
                 break;
 
-            case GridShape.Rectangle:
+            case HexGridShape.Rectangle:
                 GenerateRectShape();
                 break;
             default:
                 break;
         }
-    }
-    public virtual void Clear()
-    {
-        foreach (var v in Tiles)
-        {
-            v.Value.Clear();
-        }
-        Tiles.Clear();
-    }
-
-    public T TileAt(TileIndex index)
-    {
-        if (Tiles.ContainsKey(index))
-            return Tiles[index];
-        return null;
     }
 
     public T TileAt(int x, int y, int z)
@@ -155,7 +62,7 @@ public class HexGrid<T> where T : class, IHexTile, new()
 
     public T TileAt(int x, int z)
     {
-        return TileAt(new TileIndex(x, z));
+        return TileAt(new TileIndex(x, -x - z, z));
     }
 
     /// <summary>
@@ -170,23 +77,23 @@ public class HexGrid<T> where T : class, IHexTile, new()
 
     public T TileAt(float x, float z)
     {
-        x -= center.x;
-        z -= center.z;
+        x -= original.x;
+        z -= original.z;
 
-        switch (hexOrientation)
+        switch (orientation)
         {
             case HexOrientation.Flat:
             {
-                int q = (int) Math.Round(x / hexRadius / 1.5f, MidpointRounding.AwayFromZero);
-                int r = (int) Math.Round(z / hexRadius / Mathf.Sqrt(3.0f) - q * 0.5f, MidpointRounding.AwayFromZero);
+                int q = (int) Math.Round(x / radius / 1.5f, MidpointRounding.AwayFromZero);
+                int r = (int) Math.Round(z / radius / Mathf.Sqrt(3.0f) - q * 0.5f, MidpointRounding.AwayFromZero);
 
                 var index = new TileIndex(q, r, -q - r);
                 return TileAt(index);
             }
             case HexOrientation.Pointy:
             {
-                int r = (int) Math.Round(z / hexRadius / 1.5f, MidpointRounding.AwayFromZero);
-                int q = (int) Math.Round(x / hexRadius / Mathf.Sqrt(3.0f) - r * 0.5f, MidpointRounding.AwayFromZero);
+                int r = (int) Math.Round(z / radius / 1.5f, MidpointRounding.AwayFromZero);
+                int q = (int) Math.Round(x / radius / Mathf.Sqrt(3.0f) - r * 0.5f, MidpointRounding.AwayFromZero);
 
                 var index = new TileIndex(q, r, -q - r);
                 return TileAt(index);
@@ -205,9 +112,12 @@ public class HexGrid<T> where T : class, IHexTile, new()
 
         for (int i = 0; i < 6; i++)
         {
-            o = tile.index + directions[i];
-            if (Tiles.ContainsKey(o))
-                ret.Add(Tiles[o]);
+            o = tile.index;
+            o.x += directions[i].x;
+            o.y += directions[i].y;
+            o.z += directions[i].z;
+            if (tiles.ContainsKey(o))
+                ret.Add(tiles[o]);
         }
 
         return ret;
@@ -248,9 +158,13 @@ public class HexGrid<T> where T : class, IHexTile, new()
         {
             for (int dy = Mathf.Max(-range, -dx - range); dy <= Mathf.Min(range, -dx + range); dy++)
             {
-                o = new TileIndex(dx, dy, -dx - dy) + center.index;
-                if (Tiles.ContainsKey(o))
-                    ret.Add(Tiles[o]);
+                o = new TileIndex(dx, dy, -dx - dy);
+                o.x += center.index.x;
+                o.y += center.index.y;
+                o.z += center.index.y;
+
+                if (tiles.ContainsKey(o))
+                    ret.Add(tiles[o]);
             }
         }
 
@@ -325,22 +239,22 @@ public class HexGrid<T> where T : class, IHexTile, new()
     {
         Vector3 pos = Vector3.zero;
 
-        for (int q = -gridWidth; q <= gridWidth; q++)
+        for (int q = -lines; q <= lines; q++)
         {
-            int r1 = Mathf.Max(-gridHeight, -q - gridHeight);
-            int r2 = Mathf.Min(gridHeight, -q + gridHeight);
+            int r1 = Mathf.Max(-columns, -q - columns);
+            int r2 = Mathf.Min(columns, -q + columns);
             for (int r = r1; r <= r2; r++)
             {
-                switch (hexOrientation)
+                switch (orientation)
                 {
                     case HexOrientation.Flat:
-                        pos.x = hexRadius * 3.0f / 2.0f * q;
-                        pos.z = hexRadius * Mathf.Sqrt(3.0f) * (r + q / 2.0f);
+                        pos.x = radius * 3.0f / 2.0f * q;
+                        pos.z = radius * Mathf.Sqrt(3.0f) * (r + q / 2.0f);
                         break;
 
                     case HexOrientation.Pointy:
-                        pos.x = hexRadius * Mathf.Sqrt(3.0f) * (q + r / 2.0f);
-                        pos.z = hexRadius * 3.0f / 2.0f * r;
+                        pos.x = radius * Mathf.Sqrt(3.0f) * (q + r / 2.0f);
+                        pos.z = radius * 3.0f / 2.0f * r;
                         break;
                 }
 
@@ -355,16 +269,16 @@ public class HexGrid<T> where T : class, IHexTile, new()
     {
         Vector3 pos = Vector3.zero;
 
-        switch (hexOrientation)
+        switch (orientation)
         {
             case HexOrientation.Flat:
-                for (int q = 0; q < gridWidth; q++)
+                for (int q = 0; q < lines; q++)
                 {
                     int qOff = q >> 1;
-                    for (int r = -qOff; r < gridHeight - qOff; r++)
+                    for (int r = -qOff; r < columns - qOff; r++)
                     {
-                        pos.x = hexRadius * 3.0f / 2.0f * q;
-                        pos.z = hexRadius * Mathf.Sqrt(3.0f) * (r + q / 2.0f);
+                        pos.x = radius * 3.0f / 2.0f * q;
+                        pos.z = radius * Mathf.Sqrt(3.0f) * (r + q / 2.0f);
 
                         var index = new TileIndex(q, r, -q - r);
                         CreateTile(index, pos);
@@ -374,13 +288,13 @@ public class HexGrid<T> where T : class, IHexTile, new()
                 break;
 
             case HexOrientation.Pointy:
-                for (int r = 0; r < gridHeight; r++)
+                for (int r = 0; r < columns; r++)
                 {
                     int rOff = r >> 1;
-                    for (int q = -rOff; q < gridWidth - rOff; q++)
+                    for (int q = -rOff; q < lines - rOff; q++)
                     {
-                        pos.x = hexRadius * Mathf.Sqrt(3.0f) * (q + r / 2.0f);
-                        pos.z = hexRadius * 3.0f / 2.0f * r;
+                        pos.x = radius * Mathf.Sqrt(3.0f) * (q + r / 2.0f);
+                        pos.z = radius * 3.0f / 2.0f * r;
 
                         var index = new TileIndex(q, r, -q - r);
                         CreateTile( index, pos);
@@ -391,13 +305,7 @@ public class HexGrid<T> where T : class, IHexTile, new()
         }
     }
 
-    protected virtual T CreateTile(TileIndex index, Vector3 position)
-    {
-        T tile = new T();
-
-        Tiles.Add(tile.index, tile);
-        return tile;
-    }
+   
 
     #endregion
 
@@ -412,9 +320,9 @@ public class HexGrid<T> where T : class, IHexTile, new()
         return new Vector3(origin.x + radius * Mathf.Cos(angle), 0.0f, origin.z + radius * Mathf.Sin(angle));
     }
 
-    public static void GenerateHexMesh(float radius, HexOrientation orientation, ref Mesh mesh)
+    public static Mesh GenerateHexMesh(float radius, HexOrientation orientation)
     {
-        mesh = new Mesh();
+        Mesh mesh = new Mesh();
 
         List<Vector3> verts = new List<Vector3>();
         List<int> tris = new List<int>();
@@ -454,6 +362,8 @@ public class HexGrid<T> where T : class, IHexTile, new()
         mesh.name = "Hexagonal Plane";
 
         mesh.RecalculateNormals();
+
+        return mesh;
     }
 
 
@@ -461,7 +371,7 @@ public class HexGrid<T> where T : class, IHexTile, new()
 }
 
 [System.Serializable]
-public enum GridShape {
+public enum HexGridShape {
 	Rectangle,
 	Hexagon,
 }

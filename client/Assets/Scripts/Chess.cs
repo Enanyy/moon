@@ -11,17 +11,26 @@ public class Chess : MonoBehaviour
     public bool showGrid = true;
 
     public Vector3 original = new Vector3(0, 0, 0);
+
+    public HexGridShape shape = HexGridShape.Hexagon;
+
+    public HexOrientation orientation = HexOrientation.Pointy;
     // Use this for initialization
     void Start()
     {
-        BattleGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
+        //BattleRectGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
+       BattleHexGrid.Instance.Init(original, shape, lines, columns, Mathf.Max(tileWidth, tileHeight),orientation);
     }
 
     // Update is called once per frame
     void Update()
     {
-        BattleGrid.Instance.Update();
+         //BattleRectGrid.Instance.Update();
 
-        BattleGrid.Instance.showGrid = showGrid;
+         //BattleRectGrid.Instance.showGrid = showGrid;
+
+        BattleHexGrid.Instance.Update();
+
+        BattleHexGrid.Instance.showGrid = showGrid;
     }
 }

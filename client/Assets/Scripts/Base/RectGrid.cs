@@ -3,30 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IRectTile
+public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 {
-    int index { get; set; }
-    int line { get; set; }
-    int column { get; set; }
-    Vector3 position { get; set; }
-    void Clear();
-}
-
-
-
-public class RectGrid <T> where T:class, IRectTile, new ()
-{
-    public int lines { get; private set; }
-
-    public int columns { get; private set; }
-
     public float tileWidth { get; private set; }
     public float tileHeight { get; private set; }
-
-    public Dictionary<int, T> tiles { get; } = new Dictionary<int, T>();
-
-    public Vector3 original { get; private set; }
-
+ 
 	// Use this for initialization
 	public virtual void Init (Vector3 original, int lines, int columns,float tileWidth,float tileHeight)
     {
@@ -42,28 +23,14 @@ public class RectGrid <T> where T:class, IRectTile, new ()
             {
                 int index = j * columns + i;
                
-
                 Vector3 position = Vector3.zero;
                 position.x = original.x + i * tileWidth;
                 position.z = original.z + j * tileHeight;
-
-                CreateTile(index,j, i, position);
+               
+                CreateTile(new TileIndex(j, j * columns + i, i), position);
             }
         }      
     }
-
-    protected virtual T CreateTile(int index, int line, int column,Vector3 position)
-    {
-        T tile = new T();
-        tile.index = index;
-        tile.line = line;
-        tile.column = column;
-        tile.position = position;
-
-        tiles.Add(index, tile);
-        return tile;
-    }
-
     public T TileAt(Vector3 position)
     {
         if (position.x > original.x + tileWidth * (columns - 0.5f)
@@ -87,19 +54,36 @@ public class RectGrid <T> where T:class, IRectTile, new ()
         return TileAt(index);
     }
 
-    public T TileAt(int index)
+    public TileIndex IndexOf(int index)
     {
-        T tile = null;
-        tiles.TryGetValue(index, out tile);
-        return tile;
+        return new TileIndex(index / columns, index, index % columns);
+    }
+
+    public TileIndex IndexOf(int line, int column)
+    {
+        return  new TileIndex(line, line * columns + column,column);
+    }
+
+    public T TileAt(int index)
+    {     
+        return TileAt(IndexOf(index));
     }
 
     public T TileAt(int line, int column)
     {
-        int index = line * columns + column;
-        return TileAt(index);
+        return TileAt(IndexOf(line,column));
     }
 
+    public List<T> TilesInRange(int index, int r)
+    {
+        return TilesInRange(IndexOf(index), r);
+    }
+
+    public List<T> TilesInRange(int line, int column, int r)
+    {
+        return TilesInRange(IndexOf(line, column),r);
+    }
+    
     public List<T> TilesInRange(Vector3 position,int r)
     {
         T tile = TileAt(position);
@@ -110,15 +94,15 @@ public class RectGrid <T> where T:class, IRectTile, new ()
         return new List<T>();
     }
 
-    public List<T> TilesInRange(int index,int r)
+    public List<T> TilesInRange(TileIndex index,int r)
     {
         List<T> list = new List<T>();
 
         ////上下左右
         for (int i = -r; i <= r; ++i)
         {
-            int middle = (index / columns + i) * columns + index % columns;
-            if (tiles.ContainsKey(middle))
+            int middle = (index.x + i) * columns + index.z;
+            if (tiles.ContainsKey(IndexOf(middle)))
             {
                 int line = middle / columns;
                 for (int j = -r; j <= r; ++j)
@@ -126,9 +110,9 @@ public class RectGrid <T> where T:class, IRectTile, new ()
                     int n = middle + j;
                     if (n / columns == line)
                     {
-                        if (tiles.ContainsKey(n))
+                        if (tiles.ContainsKey(IndexOf(n)))
                         {
-                            list.Add(tiles[n]);
+                            list.Add(tiles[IndexOf(n)]);
                         }
                     }
                 }
@@ -150,12 +134,17 @@ public class RectGrid <T> where T:class, IRectTile, new ()
 
     public List<T> TilesInDistance(int index, int r)
     {
+        return TilesInDistance(IndexOf(index), r);
+    }
+
+    public List<T> TilesInDistance(TileIndex index, int r)
+    {
         List<T> list = new List<T>();
         ////上下左右
         for (int i = -r; i <= r; ++i)
         {
-            int middle = (index / columns + i) * columns + index % columns;
-            if (tiles.ContainsKey(middle))
+            int middle = (index.x + i) * columns + index.z;
+            if (tiles.ContainsKey(IndexOf(middle)))
             {
                 int line = middle / columns;
                 for (int j = -r; j <= r; )
@@ -163,9 +152,9 @@ public class RectGrid <T> where T:class, IRectTile, new ()
                     int n = middle + j;
                     if (n / columns == line)
                     {
-                        if (tiles.ContainsKey(n))
+                        if (tiles.ContainsKey(IndexOf(n)))
                         {
-                            list.Add(tiles[n]);
+                            list.Add(tiles[IndexOf(n)]);
                         }
                     }
 
@@ -196,22 +185,12 @@ public class RectGrid <T> where T:class, IRectTile, new ()
 
     public int Distance(int from, int to)
     {
-        int fromLine = from / columns;
-        int fromIndex = from % columns;
-
-        int toLine = to / columns;
-        int toIndex = to % columns;
-
-        return Math.Max(Math.Abs(toLine - fromLine), Math.Abs(toIndex - fromIndex));
+        return Distance(IndexOf(from), IndexOf(from));
     }
 
-    public virtual void Clear()
+    public int Distance(TileIndex from, TileIndex to)
     {
-        foreach (var v in tiles)
-        {
-            v.Value.Clear();
-        }
-        tiles.Clear();
+        return Math.Max(Math.Abs(to.x - to.x), Math.Abs(to.z - to.z));
     }
 
     public static Mesh GenerateTileMesh(float tileWidth,float tileHeight)
