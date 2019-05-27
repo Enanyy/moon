@@ -3,17 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ITile
+public interface IRectTile
 {
     int index { get; set; }
     int line { get; set; }
     int column { get; set; }
     Vector3 position { get; set; }
+    void Clear();
 }
 
 
 
-public class RectGrid <T> where T:class, ITile, new ()
+public class RectGrid <T> where T:class, IRectTile, new ()
 {
     public int lines { get; private set; }
 
@@ -52,7 +53,6 @@ public class RectGrid <T> where T:class, ITile, new ()
                 tile.position = position;
 
                 tiles.Add(index, tile);
-
                 OnCreateTile(tile);
             }
         }      
@@ -202,6 +202,15 @@ public class RectGrid <T> where T:class, ITile, new ()
         int toIndex = to % columns;
 
         return Math.Max(Math.Abs(toLine - fromLine), Math.Abs(toIndex - fromIndex));
+    }
+
+    public virtual void Clear()
+    {
+        foreach (var v in tiles)
+        {
+            v.Value.Clear();
+        }
+        tiles.Clear();
     }
 
     public static Mesh GenerateTileMesh(float tileWidth,float tileHeight)

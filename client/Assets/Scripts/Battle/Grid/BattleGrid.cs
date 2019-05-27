@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class BattleTile : ITile
+public class BattleTile : IRectTile
 {
     public int index { get; set; }
 
@@ -56,6 +56,11 @@ public class BattleTile : ITile
             MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
             renderer.material.SetColor("_Color", color);
         }
+    }
+
+    public void Clear()
+    {
+        
     }
 }
 
