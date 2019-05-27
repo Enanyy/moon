@@ -41,26 +41,27 @@ public class RectGrid <T> where T:class, IRectTile, new ()
             for (int i = 0; i < columns; i++)
             {
                 int index = j * columns + i;
-                T tile = new T();
-                tile.index = index;
-                tile.line = j;
-                tile.column = i;
+               
 
                 Vector3 position = Vector3.zero;
                 position.x = original.x + i * tileWidth;
                 position.z = original.z + j * tileHeight;
 
-                tile.position = position;
-
-                tiles.Add(index, tile);
-                OnCreateTile(tile);
+                CreateTile(index,j, i, position);
             }
         }      
     }
 
-    protected virtual void OnCreateTile(T t)
+    protected virtual T CreateTile(int index, int line, int column,Vector3 position)
     {
+        T tile = new T();
+        tile.index = index;
+        tile.line = line;
+        tile.column = column;
+        tile.position = position;
 
+        tiles.Add(index, tile);
+        return tile;
     }
 
     public T TileAt(Vector3 position)

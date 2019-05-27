@@ -153,17 +153,17 @@ public class BattleGrid :RectGrid<BattleTile>
         
     }
 
-    protected override void OnCreateTile(BattleTile t)
+    protected override BattleTile CreateTile(int index, int line, int column, Vector3 position)
     {
-        base.OnCreateTile(t);
+        var t = base.CreateTile(index,line,column,position);
   
-        if(t.line % 2== 0)
+        if(line % 2== 0)
         {
-            t.defaultColor = t.column % 2 == 0 ? Color.white:Color.gray;
+            t.defaultColor = column % 2 == 0 ? Color.white:Color.gray;
         }
         else
         {
-            t.defaultColor = t.column % 2 == 1 ? Color.white : Color.gray;
+            t.defaultColor = column % 2 == 1 ? Color.white : Color.gray;
         }
 
         if (mShowGrid)
@@ -179,6 +179,7 @@ public class BattleGrid :RectGrid<BattleTile>
 
             t.Show(root.transform,mTileMesh,mMaterial);
         }
+        return t; 
     }
 
     // Update is called once per frame
