@@ -325,12 +325,10 @@ public class HexGrid<T> where T : class, IHexTile, new()
     {
         Vector3 pos = Vector3.zero;
 
-        int mapSize = Mathf.Max(gridWidth, gridHeight);
-
-        for (int q = -mapSize; q <= mapSize; q++)
+        for (int q = -gridWidth; q <= gridWidth; q++)
         {
-            int r1 = Mathf.Max(-mapSize, -q - mapSize);
-            int r2 = Mathf.Min(mapSize, -q + mapSize);
+            int r1 = Mathf.Max(-gridHeight, -q - gridHeight);
+            int r2 = Mathf.Min(gridHeight, -q + gridHeight);
             for (int r = r1; r <= r2; r++)
             {
                 switch (hexOrientation)
