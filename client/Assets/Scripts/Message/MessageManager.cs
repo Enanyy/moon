@@ -2,6 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+public enum ConnectID
+{
+    Logic,
+    Game,
+}
+
 public interface IMessage
 {
     MessageID id { get; set; }
@@ -37,7 +43,7 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
            
             ms.Close();
             
-            NetworkManager.Instance.Send(connectid, packet);
+            NetworkManager.Instance.Send((int)connectid, packet);
 
         }
 
@@ -113,7 +119,7 @@ public class MessageManager
         return message as T;
     }
 
-    public void OnReceive(byte[] packet)
+    public void OnReceive(Connection connection, byte[] packet)
     {
         if(packet == null)
         {

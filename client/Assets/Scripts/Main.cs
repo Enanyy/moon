@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using PBMessage;
 
+
+
 public class Main : MonoBehaviour
 {
     public string ip = "127.0.0.1";
@@ -43,7 +45,7 @@ public class Main : MonoBehaviour
     {
         if (GUI.Button(new Rect(20, 20, 100, 40), "Connect"))
         {
-            NetworkManager.Instance.Connect(ConnectID.Logic, ip, port,
+            NetworkManager.Instance.Connect((int)ConnectID.Logic, ip, port,
                 delegate(Connection connection)
                 {
                     Debug.Log("Connect");

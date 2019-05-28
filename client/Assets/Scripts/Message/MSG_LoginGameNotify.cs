@@ -15,7 +15,7 @@ public class MSG_LoginGameNotify : Message<LoginGameNotify>
        
         Debug.Log(message.ip + ":" + message.port);
 
-        NetworkManager.Instance.Connect(ConnectID.Game, message.ip, message.port, (c) =>
+        NetworkManager.Instance.Connect((int)ConnectID.Game, message.ip, message.port, (c) =>
         {
             Debug.Log("Connect Game Success");
 

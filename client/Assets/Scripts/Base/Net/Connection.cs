@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.IO;
 
 public delegate void OnConnectionHandler(Connection c);
-public delegate void OnReceiveHandler( byte[] data);
+public delegate void OnReceiveHandler(Connection c, byte[] data);
 public delegate void OnDebugHandler(string msg);
 
 public class Connection
@@ -40,7 +40,7 @@ public class Connection
 
     private MemoryStream mStream;
 
-    public ConnectID ID { get; private set; }
+    public int ID { get; private set; }
     public string IP { get; private set; }
     public int Port { get; private set; }
 
@@ -54,7 +54,7 @@ public class Connection
     /// </summary>
     public static bool IsLittleEndian = false;
 
-    public Connection(ConnectID id)
+    public Connection(int id)
     {
         ID = id;
         IsConnecting = false;
@@ -399,7 +399,7 @@ public class Connection
 
                 Array.Copy(mRecvData, sizeof(ushort), packet, 0, nPackageLen);
                 //TRACE.Log(string.Format("m_InfoList.Push(packetData) 1 nPackageLen={0}", nPackageLen));
-                onReceive(packet);
+                onReceive(this, packet);
             }
 
             mDataNowLength = 0;
@@ -418,7 +418,7 @@ public class Connection
 
                     Array.Copy(mCopyData, nReadPos + sizeof(ushort), packet, 0, nPackageLen);
 
-                    onReceive(packet);
+                    onReceive(this,packet);
                 }
 
                 nReadPos += nPackageLen + sizeof(ushort);

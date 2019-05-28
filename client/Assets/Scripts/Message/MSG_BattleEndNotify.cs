@@ -16,6 +16,6 @@ public class MSG_BattleEndNotify : Message<BattleEndNotify>
 
         BattleManager.Instance.Destroy();
 
-        NetworkManager.Instance.Close(ConnectID.Game);
+        NetworkManager.Instance.Close((int)ConnectID.Game);
     }
 }

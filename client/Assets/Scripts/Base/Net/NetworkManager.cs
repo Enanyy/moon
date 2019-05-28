@@ -2,14 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public enum ConnectID
-{
-    Logic,
-    Game,
-}
-
-public delegate void MessageHandler(byte[] packet);
+public delegate void MessageHandler(Connection c, byte[] packet);
 
 public class NetworkManager 
 {
@@ -35,7 +28,7 @@ public class NetworkManager
     private Dictionary<int, Connection> mConnectionDic = new Dictionary<int, Connection>();
 
     
-    private Queue<byte[]> mPacketList = new Queue<byte[]>();
+    private Queue<KeyValuePair<Connection, byte[]> > mPacketList = new Queue<KeyValuePair<Connection, byte[]>>();
     private Queue<Connection> mConnectResults = new Queue<Connection>();
     private Dictionary<int, OnConnectionHandler> mConnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
     private Dictionary<int, OnConnectionHandler> mDisconnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
@@ -44,10 +37,9 @@ public class NetworkManager
     private DateTime D1970 = new DateTime(1970, 1, 1, 0, 0, 0);
 
 
-    public void Connect(ConnectID varConnectID, string ip, int port, OnConnectionHandler connectCallback, OnConnectionHandler disconnectCallback)
+    public void Connect(int id, string ip, int port, OnConnectionHandler connectCallback, OnConnectionHandler disconnectCallback)
     {
-        int id = (int)varConnectID;
-
+        
         if (mConnectionDic.ContainsKey(id))
         {
             Connection client = mConnectionDic[id];
@@ -64,7 +56,7 @@ public class NetworkManager
             mDisconnectHandlerDic.Remove(id);
         }
 
-        Connection c = new Connection(varConnectID);
+        Connection c = new Connection(id);
 
         c.onConnect += OnConnect;
         c.onDisconnect += OnDisconnect;
@@ -79,9 +71,8 @@ public class NetworkManager
         c.Connect(ip, port);
     }
 
-    public Connection GetConnection(ConnectID clientID)
+    public Connection GetConnection(int id)
     {
-        int id = (int)clientID;
         if (mConnectionDic.ContainsKey(id))
         {
             return mConnectionDic[id];
@@ -104,7 +95,7 @@ public class NetworkManager
                     //这里分发网络包
                     if (onReceive != null)
                     {
-                        onReceive(data);
+                        onReceive(data.Key, data.Value);
                     }
                 }
             }
@@ -138,7 +129,7 @@ public class NetworkManager
     /// <param name="clientID"></param>
     /// <param name="id"></param>
     /// <param name="packet"></param>
-    public void Send(ConnectID connectid, byte[] packet)
+    public void Send(int connectid, byte[] packet)
     {
         if (packet == null)
         {
@@ -159,12 +150,12 @@ public class NetworkManager
     /// <summary>
     /// 断开连接
     /// </summary>
-    public void Close(ConnectID connectid)
+    public void Close(int connectid)
     {
-        if (mConnectionDic.ContainsKey((int)connectid))
+        if (mConnectionDic.ContainsKey(connectid))
         {
-            var c = mConnectionDic[(int)connectid];
-            mConnectionDic.Remove((int)connectid);
+            var c = mConnectionDic[connectid];
+            mConnectionDic.Remove(connectid);
             c.Close(true);
         }
     }
@@ -181,7 +172,7 @@ public class NetworkManager
         mConnectionDic.Clear();
     }
 
-    private void OnMessage(byte[] packet)
+    private void OnMessage(Connection connection, byte[] packet)
     {
         if (packet == null)
         {
@@ -190,7 +181,7 @@ public class NetworkManager
 
         lock (mLock)
         {
-            mPacketList.Enqueue(packet);
+            mPacketList.Enqueue(new KeyValuePair<Connection, byte[]>(connection,packet));
         }
 
     }
