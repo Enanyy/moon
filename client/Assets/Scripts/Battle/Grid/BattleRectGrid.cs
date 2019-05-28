@@ -280,6 +280,8 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
                     }
 
+                    mPathRenderer.material = Resources.Load<Material>("r/material/arrow");
+
                     mPathRenderer.startWidth = 1;
                     mPathRenderer.endWidth = 1;
                     mPathRenderer.startColor = Color.yellow;
@@ -293,16 +295,42 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                 float distance;
                 mPlane.Raycast(ray, out distance);
                 Vector3 point = ray.GetPoint(distance);
+                var tile = TileAt(point);
+                if (tile != null)
+                {
+                    if (mTile == null || tile.index != mTile.index)
+                    {
+                        if (mTile != null)
+                        {
+                            mTile.Select(false);
+                        }
 
-                ActionJumpPlugin.GetPath(mEntity.position, point, 0.01f, ref mPathPoints);
+                        mTile = tile;
+                        mTile.Select(true);
 
-                mPathRenderer.positionCount = mPathPoints.Count;
-                mPathRenderer.SetPositions(mPathPoints.ToArray());
+                        ActionJumpPlugin.GetPath(mEntity.position, mTile.position, 0.05f, ref mPathPoints);
+
+                        mPathRenderer.positionCount = mPathPoints.Count;
+                        mPathRenderer.SetPositions(mPathPoints.ToArray());
+                    }
+                }
+                else
+                {
+                    if (mTile != null)
+                    {
+                        mTile.Select(false);
+                    }
+                    mPathRenderer.positionCount = 0;
+                }
 
             }
         }
         else
         {
+            if (mTile != null)
+            {
+                mTile.Select(false);
+            }
             if (mPathRenderer != null)
             {
                 mPathRenderer.positionCount = 0;
