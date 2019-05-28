@@ -300,51 +300,62 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                 var tile = TileAt(point);
                 if (tile != null)
                 {
-                    if (mTile == null || tile.index != mTile.index)
+                    if (mTile == null || (tile.index != mTile.index))
                     {
-                        if (mTile != null)
+                        ITile t = TileAt(mEntity.position);
+
+                        if (t != null && t.index == tile.index)
                         {
-                            mTile.Select(false);
+                            ClearPath();
                         }
+                        else
+                        {
+                            if (mTile != null)
+                            {
+                                mTile.Select(false);
+                            }
 
-                        mTile = tile;
-                        mTile.Select(true);
+                            mTile = tile;
+                            mTile.Select(true);
 
-                        BattleBezierPath.GetPath(mEntity.position,
-                            mTile.position,
-                            0.5f, 
-                            ActionJumpPlugin.SPEED,
-                            ActionJumpPlugin.MINHEIGHT,
-                            ActionJumpPlugin.MAXHEIGHT,
-                            ActionJumpPlugin.GRAVITY,
-                            ref mPathPoints);
+                            BattleBezierPath.GetPath(mEntity.position,
+                                mTile.position,
+                                0.5f,
+                                ActionJumpPlugin.SPEED,
+                                ActionJumpPlugin.MINHEIGHT,
+                                ActionJumpPlugin.MAXHEIGHT,
+                                ActionJumpPlugin.GRAVITY,
+                                ref mPathPoints);
 
-                       
-                        mPathRenderer.positionCount = mPathPoints.Count;
-                        mPathRenderer.SetPositions(mPathPoints.ToArray());
+
+                            mPathRenderer.positionCount = mPathPoints.Count;
+                            mPathRenderer.SetPositions(mPathPoints.ToArray());
+                        }
                     }
+
                 }
                 else
                 {
-                    if (mTile != null)
-                    {
-                        mTile.Select(false);
-                    }
-                    mPathRenderer.positionCount = 0;
+                    ClearPath();
                 }
 
             }
         }
         else
         {
-            if (mTile != null)
-            {
-                mTile.Select(false);
-            }
-            if (mPathRenderer != null)
-            {
-                mPathRenderer.positionCount = 0;
-            }
+           ClearPath();
+        }
+    }
+    private void ClearPath()
+    {
+        if (mTile != null)
+        {
+            mTile.Select(false);
+        }
+        mTile = null;
+        if (mPathRenderer != null)
+        {
+            mPathRenderer.positionCount = 0;
         }
     }
 }

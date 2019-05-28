@@ -8,7 +8,7 @@ public class ActionJumpPlugin :ActionPlugin
 {
     private PathPoint mTargetPoint;
 
-    public const float MAXHEIGHT = 20;
+    public const float MAXHEIGHT = 15;
     public const float MINHEIGHT = 5;
     public const float SPEED = 100;
     public const float GRAVITY = -1000;
@@ -67,11 +67,10 @@ public class ActionJumpPlugin :ActionPlugin
 
             if (mTargetPoint != null)
             {
-                Vector3 position = agent.position;
+                Vector3 direction = mTargetPoint.destination - agent.position;
 
                 agent.position = mVertexPath.GetPointAtDistance(mDistance, EndOfPathInstruction.Stop);
 
-                Vector3 direction = agent.position - position;
                 direction.y = 0;
                 if (direction != Vector3.zero)
                 {
@@ -81,6 +80,8 @@ public class ActionJumpPlugin :ActionPlugin
                 mDistance += SPEED * deltaTime;
                 if (mDistance > mVertexPath.length)
                 {
+                    agent.position = mTargetPoint.destination;
+
                     mDistance = 0;
                     mTargetPoint = null;
                     action.paths.RemoveFirst();
