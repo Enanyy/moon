@@ -2,26 +2,29 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using PathCreation;
 
 public class ActionJumpPlugin :ActionPlugin
 {
-    private Vector3 mVelocity;          // 初速度向量
-
-
-    private float mGravity = GRAVITY;        // 重力加速度9.8
-
     private PathPoint mTargetPoint;
 
-    private const float HEIGHTLIMIT = 10;
-    private const float SPEED = 50;
-    private const float GRAVITY = -100;
+    public const float MAXHEIGHT = 20;
+    public const float MINHEIGHT = 5;
+    public const float SPEED = 100;
+    public const float GRAVITY = -1000;
 
-    private float mHeight = 0;
 
+    private BezierPath mBezierPath;
+    private VertexPath mVertexPath;
+
+    private float mDistance = 0;
+  
     public override void OnEnter()
     {
         base.OnEnter();
-        mGravity = GRAVITY;
+
+        mTargetPoint = null;
+        mDistance = 0;
     }
 
     public override void OnExcute(float deltaTime)
@@ -30,29 +33,29 @@ public class ActionJumpPlugin :ActionPlugin
        
         if (action.paths.Count > 0)
         {
-            if(mTargetPoint == null)
+            if (mTargetPoint == null)
             {
                 mTargetPoint = action.paths.First.Value;
-
-
+                mDistance = 0;
                 //水平移动需要多久
-                float duration = Vector3.Distance(agent.position, mTargetPoint.destination) / SPEED;
-                float halfTime = duration * 0.5f;
-                mHeight = Math.Abs(mGravity) * halfTime * halfTime / 2;
-                //限制垂直高度
-                if (mHeight > HEIGHTLIMIT)
-                {
-                    mGravity = -Math.Abs(2 * HEIGHTLIMIT / (halfTime * halfTime));
-                    mHeight = HEIGHTLIMIT;
-                }
-
+                float duration = Vector3.Distance(agent.position , mTargetPoint.destination) / SPEED;
                 if (duration > 0)
                 {
-                    // 通过一个式子计算初速度
-                    mVelocity = new Vector3(
-                        (mTargetPoint.destination.x - agent.position.x) / duration,
-                        (mTargetPoint.destination.y - agent.position.y) / duration - 0.5f * mGravity * duration,
-                        (mTargetPoint.destination.z - agent.position.z) / duration);
+                    float halfTime = duration * 0.5f;
+                    float height = Math.Abs(GRAVITY) * halfTime * halfTime / 2;
+                    //限制垂直高度
+                    height = Mathf.Clamp(height, MINHEIGHT, MAXHEIGHT);
+
+                    Vector3 center = (agent.position + mTargetPoint.destination) / 2f;
+                    center.y = height;
+
+                    List<Vector3> points = new List<Vector3>();
+                    points.Add(agent.position);
+                    points.Add(center);
+                    points.Add(mTargetPoint.destination);
+
+                    mBezierPath = new BezierPath(points,false,PathSpace.xyz);
+                    mVertexPath = new VertexPath(mBezierPath,0.3f, 0.01f);
 
                 }
                 else
@@ -64,25 +67,23 @@ public class ActionJumpPlugin :ActionPlugin
 
             if (mTargetPoint != null)
             {
-                // 重力模拟
-                mVelocity.y += mGravity * deltaTime;//v=gt
+                Vector3 position = agent.position;
 
-                // 这一帧移动位移
-                Vector3 displacement = (mVelocity) * deltaTime;
-                //剩余距离
-               
-                Vector3 direction = mTargetPoint.destination - agent.position;
-                if (direction.magnitude >= displacement.magnitude)
+                agent.position = mVertexPath.GetPointAtDistance(mDistance, EndOfPathInstruction.Stop);
+
+                Vector3 direction = agent.position - position;
+                direction.y = 0;
+                if (direction != Vector3.zero)
                 {
-                    agent.position += displacement;
-                    direction.y = 0;
                     agent.rotation = Quaternion.LookRotation(direction);
                 }
-                else
+
+                mDistance += SPEED * deltaTime;
+                if (mDistance > mVertexPath.length)
                 {
-                    agent.position = mTargetPoint.destination;
-                    action.paths.RemoveFirst();
+                    mDistance = 0;
                     mTargetPoint = null;
+                    action.paths.RemoveFirst();
                 }
             }
 
@@ -97,57 +98,5 @@ public class ActionJumpPlugin :ActionPlugin
     {
         base.OnExit();
         mTargetPoint = null;
-    }
-
-    public static void GetPath(Vector3 from, Vector3 to, float d, ref List<Vector3> list)
-    {
-        list.Clear();
-        float gravity = GRAVITY;
-        Vector3 velocity = Vector3.zero;
-        
-        //水平移动需要多久
-        float duration = Vector3.Distance(from, to) / SPEED;
-        float halfTime = duration * 0.5f;
-        float height = Math.Abs(gravity) * halfTime * halfTime / 2;
-        //限制垂直高度
-        if (height > HEIGHTLIMIT)
-        {
-            gravity = -Math.Abs(2 * HEIGHTLIMIT / (halfTime * halfTime));
-        }
-
-        if (duration > 0)
-        {
-            // 通过一个式子计算初速度
-            velocity = new Vector3(
-                (to.x - from.x) / duration,
-                (to.y - from.y) / duration - 0.5f * gravity * duration,
-                (to.z - from.z) / duration);
-
-            Vector3 position = from;
-            list.Add(position);
-
-            while (true)
-            {
-                // 重力模拟
-                velocity.y += gravity * d; //v=gt
-
-                // 这一帧移动位移
-                Vector3 displacement = velocity * d;
-                //剩余距离
-
-                Vector3 direction = to - position;
-                if (direction.magnitude >= displacement.magnitude)
-                {
-                    position += displacement;   
-                    list.Add(position);
-                }
-                else
-                {
-                    list.Add(to);
-                    break;
-                }
-            }
-           
-        }
     }
 }

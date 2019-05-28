@@ -301,8 +301,8 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
 
                     }
                     mPathRenderer.material = Resources.Load<Material>("r/material/arrow");
-                    mPathRenderer.startWidth = 0.1f;
-                    mPathRenderer.endWidth = 0.1f;
+                    mPathRenderer.startWidth = 1f;
+                    mPathRenderer.endWidth = 1f;
                     mPathRenderer.startColor = Color.yellow;
                     mPathRenderer.endColor = Color.yellow;
                 }
@@ -327,8 +327,14 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                         mTile = tile;
                         mTile.Select(true);
 
-                        ActionJumpPlugin.GetPath(mEntity.position, mTile.position, 0.01f, ref mPathPoints);
-
+                        BattleBezierPath.GetPath(mEntity.position,
+                            mTile.position,
+                            0.5f,
+                            ActionJumpPlugin.SPEED,
+                            ActionJumpPlugin.MINHEIGHT,
+                            ActionJumpPlugin.MAXHEIGHT,
+                            ActionJumpPlugin.GRAVITY,
+                            ref mPathPoints);
                         mPathRenderer.positionCount = mPathPoints.Count;
                         mPathRenderer.SetPositions(mPathPoints.ToArray());
                     }

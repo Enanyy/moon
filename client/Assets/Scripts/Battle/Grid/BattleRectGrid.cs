@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using PathCreation;
 using UnityEngine;
 
 public class BattleRectTile : ITile
@@ -191,6 +192,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
     private BattleEntity mEntity;
 
     private LineRenderer mPathRenderer;
+
     // Update is called once per frame
     public void Update()
     {
@@ -308,8 +310,16 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                         mTile = tile;
                         mTile.Select(true);
 
-                        ActionJumpPlugin.GetPath(mEntity.position, mTile.position, 0.01f, ref mPathPoints);
+                        BattleBezierPath.GetPath(mEntity.position,
+                            mTile.position,
+                            0.5f, 
+                            ActionJumpPlugin.SPEED,
+                            ActionJumpPlugin.MINHEIGHT,
+                            ActionJumpPlugin.MAXHEIGHT,
+                            ActionJumpPlugin.GRAVITY,
+                            ref mPathPoints);
 
+                       
                         mPathRenderer.positionCount = mPathPoints.Count;
                         mPathRenderer.SetPositions(mPathPoints.ToArray());
                     }

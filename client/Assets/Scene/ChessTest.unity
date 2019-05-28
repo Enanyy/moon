@@ -369,7 +369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56a142129f5d0744bad5fe2304f55071, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectGrid: 0
+  rectGrid: 1
   lines: 16
   columns: 12
   tileWidth: 3
