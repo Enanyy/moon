@@ -53,15 +53,58 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
         }
     }
 
+    public TileIndex IndexOf(int x, int y, int z)
+    {
+        return new TileIndex(x,y,z);
+    }
+
+    public TileIndex IndexOf(int x, int z)
+    {
+        return new TileIndex(x, -x - z, z);
+    }
+
+    public TileIndex IndexOf(Vector3 position)
+    {
+        return IndexOf(position.x, position.z);
+    }
+
+    public TileIndex IndexOf(float x, float z)
+    {
+        x -= original.x;
+        z -= original.z;
+
+        switch (orientation)
+        {
+            case HexOrientation.Flat:
+                {
+                    int q = (int)Math.Round(x / radius / 1.5f, MidpointRounding.AwayFromZero);
+                    int r = (int)Math.Round(z / radius / Mathf.Sqrt(3.0f) - q * 0.5f, MidpointRounding.AwayFromZero);
+
+                    return new TileIndex(q, r, -q - r);
+                   
+                }
+            case HexOrientation.Pointy:
+            default:
+                {
+                    int r = (int)Math.Round(z / radius / 1.5f, MidpointRounding.AwayFromZero);
+                    int q = (int)Math.Round(x / radius / Mathf.Sqrt(3.0f) - r * 0.5f, MidpointRounding.AwayFromZero);
+
+                    return new TileIndex(q, r, -q - r);
+                    
+                }
+        }
+    }
+
     public T TileAt(int x, int y, int z)
     {
-        return TileAt(new TileIndex(x, y, z));
+        return TileAt(IndexOf(x,y,z));
     }
 
     public T TileAt(int x, int z)
     {
-        return TileAt(new TileIndex(x, -x - z, z));
+        return TileAt(IndexOf(x,z));
     }
+
 
     /// <summary>
     /// 世界坐标
@@ -75,33 +118,9 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
 
     public T TileAt(float x, float z)
     {
-        x -= original.x;
-        z -= original.z;
+        return TileAt(IndexOf(x, z));
 
-        switch (orientation)
-        {
-            case HexOrientation.Flat:
-            {
-                int q = (int) Math.Round(x / radius / 1.5f, MidpointRounding.AwayFromZero);
-                int r = (int) Math.Round(z / radius / Mathf.Sqrt(3.0f) - q * 0.5f, MidpointRounding.AwayFromZero);
-
-                var index = new TileIndex(q, r, -q - r);
-                return TileAt(index);
-            }
-            case HexOrientation.Pointy:
-            {
-                int r = (int) Math.Round(z / radius / 1.5f, MidpointRounding.AwayFromZero);
-                int q = (int) Math.Round(x / radius / Mathf.Sqrt(3.0f) - r * 0.5f, MidpointRounding.AwayFromZero);
-
-                var index = new TileIndex(q, r, -q - r);
-                return TileAt(index);
-            }
-        }
-
-        return null;
     }
-
-
 
     public List<T> Neighbours(T tile)
     {
@@ -227,6 +246,10 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
         return Distance(a.index, b.index);
     }
 
+    public int Distance(Vector3 from, Vector3 to)
+    {
+        return Distance(IndexOf(from), IndexOf(to));
+    }
 
 
     #endregion

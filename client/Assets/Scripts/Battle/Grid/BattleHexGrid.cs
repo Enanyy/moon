@@ -213,6 +213,8 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
     private BattleEntity mEntity;
 
     private LineRenderer mPathRenderer;
+
+    private BattleHexTile mSelectTile;
     // Update is called once per frame
     public void Update()
     {
@@ -236,32 +238,15 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
         if (Input.GetMouseButtonUp(0))
         {
             mShowPath = false;
-
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            float distance;
-            mPlane.Raycast(ray, out distance);
-            Vector3 point = ray.GetPoint(distance);
-
-            if (mClick == null)
-            {
-                mClick = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                mClick.transform.localScale = Vector3.one * 0.1f;
-                MeshRenderer renderer = mClick.GetComponent<MeshRenderer>();
-                renderer.material.SetColor("_Color", Color.red);
-            }
-
-            mClick.transform.position = point;
-
-
-            var tile = TileAt(point);
-            if (tile != null)
+         
+            if (mSelectTile != null)
             {
                 if (mTile != null)
                 {
                     mTile.Select(false);
                 }
 
-                mTile = tile;
+                mTile = mSelectTile;
                 mTile.Select(true);
 
 
@@ -272,21 +257,9 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
 
                     mEntity.PlayAction(ActionType.Jump, jump);
                 }
-
-                //if (mCovers != null)
-                //{
-                //    for (int i = 0; i < mCovers.Count; i++)
-                //    {
-                //        mCovers[i].Select(false);
-                //    }
-                //}
-
-                //mCovers =TilesInDistance (mTile.index, 2);
-                //for (int i = 0; i < mCovers.Count; i++)
-                //{
-                //    mCovers[i].Select(true);
-                //}
             }
+
+            mSelectTile = null;
         }
 
         if (mShowPath)
@@ -318,6 +291,20 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                 mPlane.Raycast(ray, out distance);
                 Vector3 point = ray.GetPoint(distance);
                 var tile = TileAt(point);
+                if (tile == null)
+                {
+                    int minDistance = -1;
+                    var it = tiles.GetEnumerator();
+                    while (it.MoveNext())
+                    {
+                        int d = Distance(point, it.Current.Value.position);
+                        if (minDistance == -1 || d < minDistance)
+                        {
+                            tile = it.Current.Value;
+                            minDistance = d;
+                        }
+                    }
+                }
                 if (tile != null)
                 {
                     if (mTile == null || (tile.index != mTile.index))
@@ -346,7 +333,10 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                             }
 
                             mTile = tile;
+
                             mTile.Select(true);
+
+                            mSelectTile = mTile;
 
                             BattleBezierPath.GetPath(position,
                                 mTile.position,

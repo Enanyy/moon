@@ -173,7 +173,7 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 
     public int Distance(TileIndex from, TileIndex to)
     {
-        return Math.Max(Math.Abs(to.x - to.x), Math.Abs(to.z - to.z));
+        return Math.Max(Math.Abs(to.x - from.x), Math.Abs(to.z - from.z));
     }
 
     public static Mesh GenerateTileMesh(float tileWidth,float tileHeight)
