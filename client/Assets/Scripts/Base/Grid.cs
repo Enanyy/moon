@@ -57,7 +57,7 @@ public struct TileIndex
     }
 }
 
-public class Grid<T> where T: class, ITile,new()
+public abstract class Grid<T> where T: class, ITile,new()
 {
     public int lines { get; protected set; }
     public int columns { get; protected set; }

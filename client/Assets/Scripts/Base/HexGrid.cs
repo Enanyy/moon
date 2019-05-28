@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
-using System.Security.Cryptography.X509Certificates;
 
-
-public class HexGrid<T>:Grid<T> where T : class, ITile, new()
+public class HexGrid<T> : Grid<T> where T : class, ITile, new()
 {
     //Map settings
 
@@ -13,7 +11,7 @@ public class HexGrid<T>:Grid<T> where T : class, ITile, new()
     //Hex Settings
     public HexOrientation orientation { get; private set; }
     public float radius { get; private set; }
-  
+
 
     private static TileIndex[] directions =
         new TileIndex[]
@@ -297,7 +295,7 @@ public class HexGrid<T>:Grid<T> where T : class, ITile, new()
                         pos.z = radius * 3.0f / 2.0f * r;
 
                         var index = new TileIndex(q, r, -q - r);
-                        CreateTile( index, pos);
+                        CreateTile(index, pos);
                     }
                 }
 
@@ -305,7 +303,7 @@ public class HexGrid<T>:Grid<T> where T : class, ITile, new()
         }
     }
 
-   
+
 
     #endregion
 

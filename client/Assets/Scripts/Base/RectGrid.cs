@@ -31,18 +31,11 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
             }
         }      
     }
-    public T TileAt(Vector3 position)
-    {
-        if (position.x > original.x + tileWidth * (columns - 0.5f)
-            || position.x < original.x - tileWidth * 0.5f
-            || position.z > original.z + tileHeight * (lines - 0.5f)
-            || position.z < original.z - tileHeight * 0.5f)
+  
 
-        {
-            return null;
-        }
-       
-        float x = position.x - original.x + tileWidth *0.5f;
+    public TileIndex IndexOf(Vector3 position)
+    {
+        float x = position.x - original.x + tileWidth * 0.5f;
         float z = position.z - original.z + tileHeight * 0.5f;
 
         int i = (int)(x / tileWidth);
@@ -51,7 +44,7 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 
         int index = j * columns + i;
 
-        return TileAt(index);
+        return new TileIndex(j,index,i);
     }
 
     public TileIndex IndexOf(int index)
@@ -64,6 +57,10 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
         return  new TileIndex(line, line * columns + column,column);
     }
 
+    public T TileAt(Vector3 position)
+    {
+        return TileAt(IndexOf(position));
+    }
     public T TileAt(int index)
     {     
         return TileAt(IndexOf(index));
@@ -86,12 +83,7 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
     
     public List<T> TilesInRange(Vector3 position,int r)
     {
-        T tile = TileAt(position);
-        if (tile != null)
-        {
-            return TilesInRange(tile.index,r);
-        }
-        return new List<T>();
+        return TilesInRange(IndexOf(position), r);
     }
 
     public List<T> TilesInRange(TileIndex index,int r)
@@ -122,14 +114,10 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 
         return list;
     }
+
     public List<T> TilesInDistance(Vector3 position, int r)
     {
-        T tile = TileAt(position);
-        if (tile != null)
-        {
-            return TilesInDistance(tile.index, r);
-        }
-        return new List<T>();
+        return TilesInDistance(IndexOf(position), r);
     }
 
     public List<T> TilesInDistance(int index, int r)
@@ -168,14 +156,9 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 
     public int Distance(Vector3 from, Vector3 to)
     {
-        var fromNode = TileAt(from);
-        var toNode = TileAt(to);
-        if (fromNode != null && toNode != null)
-        {
-            return Distance(fromNode.index, toNode.index);
-        }
-
-        return -1;
+        var indexFrom = IndexOf(from);
+        var indexTo = IndexOf(to);
+        return Distance(indexFrom, indexTo);
     }
 
     public int Distance(T from, T to)
