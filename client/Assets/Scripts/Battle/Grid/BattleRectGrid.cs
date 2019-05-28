@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using PathCreation;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class BattleRectTile : ITile
 {
@@ -288,6 +289,8 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                     mPathRenderer.endWidth = 1;
                     mPathRenderer.startColor = Color.yellow;
                     mPathRenderer.endColor = Color.yellow;
+                    mPathRenderer.receiveShadows = false;
+                    mPathRenderer.shadowCastingMode = ShadowCastingMode.Off;
                 }
             }
 
@@ -302,7 +305,17 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                 {
                     if (mTile == null || (tile.index != mTile.index))
                     {
-                        ITile t = TileAt(mEntity.position);
+                        Vector3 position = mEntity.position;
+                        var run = mEntity.GetLast(ActionType.Jump);
+                        if (run != null)
+                        {
+                            if (run.paths.Count > 0)
+                            {
+                                position = run.paths.Last.Value.destination;
+                            }
+                        }
+
+                        ITile t = TileAt(position);
 
                         if (t != null && t.index == tile.index)
                         {
@@ -318,7 +331,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                             mTile = tile;
                             mTile.Select(true);
 
-                            BattleBezierPath.GetPath(mEntity.position,
+                            BattleBezierPath.GetPath(position,
                                 mTile.position,
                                 0.5f,
                                 ActionJumpPlugin.SPEED,

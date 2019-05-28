@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class BattleHexTile : ITile
 {
@@ -305,6 +306,8 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                     mPathRenderer.endWidth = 1f;
                     mPathRenderer.startColor = Color.yellow;
                     mPathRenderer.endColor = Color.yellow;
+                    mPathRenderer.receiveShadows = false;
+                    mPathRenderer.shadowCastingMode = ShadowCastingMode.Off;
                 }
             }
 
@@ -319,7 +322,16 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                 {
                     if (mTile == null || (tile.index != mTile.index))
                     {
-                        ITile t = TileAt(mEntity.position);
+                        Vector3 position = mEntity.position;
+                        var run = mEntity.GetLast(ActionType.Jump);
+                        if (run != null)
+                        {
+                            if (run.paths.Count > 0)
+                            {
+                                position = run.paths.Last.Value.destination;
+                            }
+                        }
+                        ITile t = TileAt(position);
 
                         if (t != null && t.index == tile.index)
                         {
@@ -336,7 +348,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                             mTile = tile;
                             mTile.Select(true);
 
-                            BattleBezierPath.GetPath(mEntity.position,
+                            BattleBezierPath.GetPath(position,
                                 mTile.position,
                                 0.5f,
                                 ActionJumpPlugin.SPEED,
