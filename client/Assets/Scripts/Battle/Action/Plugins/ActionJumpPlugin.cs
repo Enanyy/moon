@@ -17,23 +17,11 @@ public class ActionJumpPlugin :ActionPlugin
     private const float GRAVITY = -100;
 
     private float mHeight = 0;
-    private float mDuration = 0;
-    private float mTime = 0;
-    private float mVelocityY = 0;
 
     public override void OnEnter()
     {
         base.OnEnter();
-        Reset();
-    }
-
-    private void Reset()
-    {
         mGravity = GRAVITY;
-        mHeight = 0;
-        mDuration = 0;
-        mTime = 0;
-        mVelocityY = 0;
     }
 
     public override void OnExcute(float deltaTime)
@@ -44,13 +32,12 @@ public class ActionJumpPlugin :ActionPlugin
         {
             if(mTargetPoint == null)
             {
-                Reset();
-
                 mTargetPoint = action.paths.First.Value;
-            
+
+
                 //水平移动需要多久
-                mDuration = Vector3.Distance(agent.position, mTargetPoint.destination) / SPEED;
-                float halfTime = mDuration * 0.5f;
+                float duration = Vector3.Distance(agent.position, mTargetPoint.destination) / SPEED;
+                float halfTime = duration * 0.5f;
                 mHeight = Math.Abs(mGravity) * halfTime * halfTime / 2;
                 //限制垂直高度
                 if (mHeight > HEIGHTLIMIT)
@@ -59,16 +46,14 @@ public class ActionJumpPlugin :ActionPlugin
                     mHeight = HEIGHTLIMIT;
                 }
 
-                if (mDuration > 0)
+                if (duration > 0)
                 {
-
                     // 通过一个式子计算初速度
                     mVelocity = new Vector3(
-                        (mTargetPoint.destination.x - agent.position.x) / mDuration,
-                        (mTargetPoint.destination.y - agent.position.y) / mDuration - 0.5f * mGravity * mDuration,
-                        (mTargetPoint.destination.z - agent.position.z) / mDuration);
+                        (mTargetPoint.destination.x - agent.position.x) / duration,
+                        (mTargetPoint.destination.y - agent.position.y) / duration - 0.5f * mGravity * duration,
+                        (mTargetPoint.destination.z - agent.position.z) / duration);
 
-                    mVelocityY = mVelocity.y;
                 }
                 else
                 {
@@ -79,21 +64,8 @@ public class ActionJumpPlugin :ActionPlugin
 
             if (mTargetPoint != null)
             {
-                mTime += deltaTime;
-                float factor = mTime / mDuration;
-                if (factor <= 0.5f)
-                {
-                    factor = mTime / (mDuration * 0.5f);
-                    mVelocity.y = Mathf.Lerp(mVelocityY,0, factor);
-                }
-                else
-                {
-                    factor = (mTime - mDuration * 0.5f) / (mDuration * 0.5f);
-                    mVelocity.y = Mathf.Lerp(0, -mVelocityY, factor);
-
-                }
                 // 重力模拟
-                //mVelocity.y += mGravity * deltaTime;//v=gt
+                mVelocity.y += mGravity * deltaTime;//v=gt
 
                 // 这一帧移动位移
                 Vector3 displacement = (mVelocity) * deltaTime;

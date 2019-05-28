@@ -327,7 +327,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                         mTile = tile;
                         mTile.Select(true);
 
-                        ActionJumpPlugin.GetPath(mEntity.position, mTile.position, 0.05f, ref mPathPoints);
+                        ActionJumpPlugin.GetPath(mEntity.position, mTile.position, 0.01f, ref mPathPoints);
 
                         mPathRenderer.positionCount = mPathPoints.Count;
                         mPathRenderer.SetPositions(mPathPoints.ToArray());
