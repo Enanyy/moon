@@ -192,7 +192,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
     private LineRenderer mPathRenderer;
 
-    private BattleRectTile mSelectTile;
+ 
 
     // Update is called once per frame
     public void Update()
@@ -219,16 +219,12 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
             mShowPath = false;
 
 
-            if (mSelectTile != null)
+            if (mTile != null)
             {
-                if (mTile != null)
-                {
-                    mTile.Select(false);
-                }
+                
+                mTile.Select(false);
+                
 
-                mTile = mSelectTile;
-                mTile.Select(true);
-        
                 if(mEntity!= null)
                 {
                     EntityAction jump = ObjectPool.GetInstance<EntityAction>();
@@ -238,7 +234,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                 } 
             }
 
-            mSelectTile = null;
+            mTile = null;
         }
 
         if (mShowPath)
@@ -316,8 +312,6 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
                             mTile = tile;
                             mTile.Select(true);
-
-                            mSelectTile = mTile;
 
                             BattleBezierPath.GetPath(position,
                                 mTile.position,

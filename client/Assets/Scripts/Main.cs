@@ -19,6 +19,7 @@ public class Main : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        CameraManager.Instance.Init();
     }
 
     void Start()
@@ -36,9 +37,6 @@ public class Main : MonoBehaviour
     void Update()
     {
         BattleManager.Instance.Update(Time.deltaTime);
-
-        Drag();
-        Scroll();
     }
 
     void OnGUI()
@@ -82,74 +80,7 @@ public class Main : MonoBehaviour
         NetworkManager.Instance.Close();
     }
 
-    Vector3 oldMousePosition;
-    Plane mPlane = new Plane(Vector3.up, Vector3.zero);
-    void Drag()
-    {
-        if (Input.GetMouseButton(1))
-        {
-            float xDelta = Input.GetAxis("Mouse X");
-            float yDelta = Input.GetAxis("Mouse Y");
-            if (xDelta != 0.0f || yDelta != 0.0f)
-            {
-                if (oldMousePosition != Vector3.zero)
-                {
-                    Ray rayDest = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                    float distance = 0;
-                    mPlane.Raycast(rayDest, out distance);
-
-                    Vector3 dest = rayDest.GetPoint(distance);
-                    distance = 0;
-                    Ray rayOld = Camera.main.ScreenPointToRay(oldMousePosition);
-                    mPlane.Raycast(rayOld, out distance);
-
-
-                    Vector3 pos = Camera.main.transform.localPosition + rayOld.GetPoint(distance) - dest;
-
-                    Camera.main.transform.localPosition = pos;
-                }
-
-                oldMousePosition = Input.mousePosition;
-            }
-
-        }
-        if (Input.GetMouseButtonUp(1))
-        {
-            oldMousePosition = Vector3.zero;
-        }
-
-    }
-    //缩放距离限制   
-
-    private float minScrollDistance = 1;
-    private float maxScrollDistance = 100;
-    private float scrollSpeed = 20;
-    void Scroll()
-    {
-        // 鼠标滚轮触发缩放
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-
-        if (scroll < -0.001 || scroll > 0.001)
-        {
-            float displacement = scrollSpeed * scroll;
-
-            Camera.main.transform.position += Camera.main.transform.forward * displacement;
-            Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
-            float distance = 0;
-            mPlane.Raycast(ray, out distance);
-
-            if (distance < minScrollDistance)
-            {
-                Camera.main.transform.position = ray.GetPoint(distance - minScrollDistance);
-            }
-            else if (distance > maxScrollDistance)
-            {
-                Camera.main.transform.position = ray.GetPoint(distance - maxScrollDistance);
-            }
-        }
-
-    }
+    
 }
 
 

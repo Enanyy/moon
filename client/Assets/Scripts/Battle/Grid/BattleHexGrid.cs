@@ -214,7 +214,6 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
 
     private LineRenderer mPathRenderer;
 
-    private BattleHexTile mSelectTile;
     // Update is called once per frame
     public void Update()
     {
@@ -239,15 +238,10 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
         {
             mShowPath = false;
          
-            if (mSelectTile != null)
+            if (mTile != null)
             {
-                if (mTile != null)
-                {
-                    mTile.Select(false);
-                }
-
-                mTile = mSelectTile;
-                mTile.Select(true);
+               
+                mTile.Select(false);
 
 
                 if (mEntity != null)
@@ -259,7 +253,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                 }
             }
 
-            mSelectTile = null;
+            mTile = null;
         }
 
         if (mShowPath)
@@ -335,8 +329,6 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                             mTile = tile;
 
                             mTile.Select(true);
-
-                            mSelectTile = mTile;
 
                             BattleBezierPath.GetPath(position,
                                 mTile.position,

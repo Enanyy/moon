@@ -202,41 +202,5 @@ public class NetworkManager
             Debug.Log(message);
         }
     }
-
-    private ulong m_nLoaclTime;
-    private ulong m_nServerMillTime;
-
-    public void UpdateServerTime(ulong nClientTime, ulong nServerTime)
-    {
-        m_nLoaclTime = (ulong)(DateTime.UtcNow - D1970).TotalMilliseconds;
-
-        ulong rtt = m_nLoaclTime - nClientTime;
-
-        m_nServerMillTime = nServerTime + rtt / 2;
-    }
-
-    /// <summary>
-    /// 返回当前服务器毫秒数
-    /// </summary>
-    public ulong mCurServerMillTime
-    {
-        get
-        {
-            ulong nCurTime = (ulong)(DateTime.UtcNow - D1970).TotalMilliseconds;
-            return m_nServerMillTime + (nCurTime - m_nLoaclTime);
-        }
-
-    }
-
-    /// <summary>
-    /// 当前服务器时间，秒
-    /// </summary>
-    public uint mCurServerTime
-    {
-        get
-        {
-            return (uint)(mCurServerMillTime / 1000);
-        }
-    }
 }
 

@@ -19,6 +19,8 @@ public class Chess : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        CameraManager.Instance.Init();
+
         if (rectGrid)
         {
             BattleRectGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);

@@ -3,6 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
 using System.IO;
+#if UNITY_EDITOR
+public interface INode
+{
+    string name { get; set; }
+    Rect rect { get; set; }
+    void Draw(ref Rect rect);
+    bool LinkAble(INode node);
+    void OnLink(INode node);
+    void OnUnLink(INode node);
+    INode Clone(INode node);
+    Color GetColor();
+}
+#endif
+
 
 public enum EffectArise
 {
