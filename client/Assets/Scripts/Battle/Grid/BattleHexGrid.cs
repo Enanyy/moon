@@ -245,10 +245,17 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
      
                 if (mEntity != null)
                 {
-                    EntityAction jump = ObjectPool.GetInstance<EntityAction>();
-                    jump.AddPathPoint(mTile.position, Vector3.zero, true);
-
-                    mEntity.PlayAction(ActionType.Jump, jump);
+                    EntityAction jump = mEntity.GetFirst(ActionType.Jump);
+                    if (jump == null)
+                    {
+                        jump = ObjectPool.GetInstance<EntityAction>();
+                        jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                        mEntity.PlayAction(ActionType.Jump, jump);
+                    }
+                    else
+                    {
+                        jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                    }
                 }
             }
 

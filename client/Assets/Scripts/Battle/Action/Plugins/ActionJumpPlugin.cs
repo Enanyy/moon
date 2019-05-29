@@ -60,8 +60,10 @@ public class ActionJumpPlugin :ActionPlugin
                 }
                 else
                 {
+                    ObjectPool.ReturnInstance(mTargetPoint);
                     mTargetPoint = null;
                     action.paths.RemoveFirst();
+
                 }
             }
 
@@ -83,6 +85,8 @@ public class ActionJumpPlugin :ActionPlugin
                     agent.position = mTargetPoint.destination;
 
                     mDistance = 0;
+                    ObjectPool.ReturnInstance(mTargetPoint);
+
                     mTargetPoint = null;
                     action.paths.RemoveFirst();
                 }

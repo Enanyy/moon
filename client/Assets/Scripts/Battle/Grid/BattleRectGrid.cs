@@ -224,13 +224,20 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                 
                 mTile.Select(false);
 
-                if(mEntity!= null)
+                if (mEntity != null)
                 {
-                    EntityAction jump = ObjectPool.GetInstance<EntityAction>();
-                    jump.AddPathPoint(mTile.position, Vector3.zero, true);
-
-                    mEntity.PlayAction(ActionType.Jump, jump);
-                } 
+                    EntityAction jump = mEntity.GetFirst(ActionType.Jump);
+                    if (jump == null)
+                    {
+                        jump = ObjectPool.GetInstance<EntityAction>();
+                        jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                        mEntity.PlayAction(ActionType.Jump, jump);
+                    }
+                    else
+                    {
+                        jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                    }
+                }
             }
 
             mTile = null;
