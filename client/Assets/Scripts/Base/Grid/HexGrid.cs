@@ -13,7 +13,7 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
     public float radius { get; private set; }
 
 
-    private static TileIndex[] directions =
+    private static readonly TileIndex[] directions =
         new TileIndex[]
         {
             new TileIndex(1, -1, 0),
@@ -173,12 +173,14 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
 
         for (int dx = -range; dx <= range; dx++)
         {
-            for (int dy = Mathf.Max(-range, -dx - range); dy <= Mathf.Min(range, -dx + range); dy++)
+            int i = Mathf.Max(-range, -dx - range);
+            int j = Mathf.Min(range, -dx + range);
+            for (int dy = i; dy <= j; dy++)
             {
                 o = new TileIndex(dx, dy, -dx - dy);
                 o.x += center.index.x;
                 o.y += center.index.y;
-                o.z += center.index.y;
+                o.z += center.index.z;
 
                 if (tiles.ContainsKey(o))
                     ret.Add(tiles[o]);
@@ -207,14 +209,24 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
 
     public List<T> TilesInDistance(T center, int range)
     {
-        List<T> ret = TilesInRange(center, range);
-        ret.Remove(center);
-        if (range > 1)
+        List<T> ret = new List<T>();
+        TileIndex o;
+
+        for (int dx = -range; dx <= range; dx++)
         {
-            List<T> insides = TilesInRange(center, range - 1);
-            for (int i = 0; i < insides.Count; ++i)
+            int i = Mathf.Max(-range, -dx - range);
+            int j = Mathf.Min(range, -dx + range);
+            for (int dy = i; dy <= j;)
             {
-                ret.Remove(insides[i]);
+                o = new TileIndex(dx, dy, -dx - dy);
+                o.x += center.index.x;
+                o.y += center.index.y;
+                o.z += center.index.z;
+
+                if (tiles.ContainsKey(o))
+                    ret.Add(tiles[o]);
+
+                dy = (dx == -range || dx == range) ? dy + 1 : dy + (j - i);
             }
         }
 

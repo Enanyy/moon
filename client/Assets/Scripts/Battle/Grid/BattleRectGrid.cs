@@ -29,16 +29,16 @@ public class BattleRectTile : ITile
             renderer.material = material;
             collider.sharedMesh = mesh;
 
-            //GameObject go = new GameObject("Text");
-            //go.transform.SetParent(gameObject.transform);
-            //go.transform.localPosition = Vector3.zero;
-            //go.transform.localEulerAngles = new Vector3(90, 0, 0);
-            //TextMesh text = go.AddComponent<TextMesh>();
-            //text.anchor = TextAnchor.MiddleCenter;
-            //text.alignment = TextAlignment.Center;
-            //text.text = name;
-            //text.color = Color.black;
-            //text.fontSize = 7;
+            GameObject go = new GameObject("Text");
+            go.transform.SetParent(gameObject.transform);
+            go.transform.localPosition = Vector3.zero;
+            go.transform.localEulerAngles = new Vector3(90, 0, 0);
+            TextMesh text = go.AddComponent<TextMesh>();
+            text.anchor = TextAnchor.MiddleCenter;
+            text.alignment = TextAlignment.Center;
+            text.text = name;
+            text.color = Color.black;
+            text.fontSize = 7;
 
             SetColor(defaultColor);
         }
@@ -223,7 +223,6 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
             {
                 
                 mTile.Select(false);
-                
 
                 if(mEntity!= null)
                 {

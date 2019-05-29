@@ -242,8 +242,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
             {
                
                 mTile.Select(false);
-
-
+     
                 if (mEntity != null)
                 {
                     EntityAction jump = ObjectPool.GetInstance<EntityAction>();
@@ -328,7 +327,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
 
                             mTile = tile;
 
-                            mTile.Select(true);
+                            mTile.Select(true);                          
 
                             BattleBezierPath.GetPath(position,
                                 mTile.position,

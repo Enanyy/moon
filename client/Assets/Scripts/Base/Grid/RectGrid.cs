@@ -1,12 +1,38 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
+public enum RectDirection
+{
+    Left = 0,
+    Right,
+    Top,
+    Bottom,
+    LeftTop,
+    RightTop,
+    LeftBottom,
+    RightBottom,
+}
 public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 {
     public float tileWidth { get; private set; }
     public float tileHeight { get; private set; }
+
+   
+
+    public static readonly TileIndex[] Directions = new TileIndex[]
+    {
+        new TileIndex(0,0,-1), //Left
+        new TileIndex(0,0,1),  //Right
+        new TileIndex(1,0,0),  //Top
+        new TileIndex(-1,0,0), //Bottom
+        new TileIndex(1,0,-1), //LeftTop
+        new TileIndex(1,0,1),  //RightTop
+        new TileIndex(-1,0,-1),//LeftBottom
+        new TileIndex(-1,0,1), //RightBottom
+    };
  
 	// Use this for initialization
 	public virtual void Init (Vector3 original, int lines, int columns,float tileWidth,float tileHeight)
@@ -71,6 +97,67 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
         return TileAt(IndexOf(line,column));
     }
 
+    public List<T> Neighbours(int index)
+    {
+        return Neighbours(IndexOf(index));
+    }
+
+    public List<T> Neighbours(int line, int column)
+    {
+        return Neighbours(IndexOf(line,column));
+    }
+    public List<T> Neighbours(Vector3 position)
+    {
+        return Neighbours(IndexOf(position));
+    }
+
+    public List<T> Neighbours(T tile)
+    {
+        return Neighbours(tile.index);
+    }
+
+    public List<T> Neighbours(TileIndex index)
+    {
+        List<T> ret = new List<T>();
+        for (int i = 0; i < Directions.Length; i++)
+        {
+            var tile = DirectionTo(index,(RectDirection)i, 1);
+            if (tile != null)
+            {
+                ret.Add(tile);
+            }
+        }
+
+        return ret;
+    }
+    public T DirectionTo(int index, RectDirection direction, int distance)
+    {
+        return DirectionTo(IndexOf(index), direction,distance);
+    }
+    public T DirectionTo(int line, int column, RectDirection direction, int distance)
+    {
+        return DirectionTo(IndexOf(line,column), direction,distance);
+    }
+    public T DirectionTo(Vector3 position, RectDirection direction,int distance)
+    {
+        return DirectionTo(IndexOf(position), direction, distance);
+    }
+
+    public T DirectionTo(T tile, RectDirection direction, int distance)
+    {
+        return DirectionTo(tile.index, direction, distance);
+    }
+
+    public T DirectionTo(TileIndex index, RectDirection direction,int distance)
+    {
+        int i = (int) direction;
+ 
+        TileIndex o = new TileIndex(index.x + Directions[i].x * distance,
+            (index.x + Directions[i].x * distance) * columns + index.z + Directions[i].z* distance,
+            index.z + Directions[i].z* distance);
+        return TileAt(o);
+    }
+
     public List<T> TilesInRange(int index, int r)
     {
         return TilesInRange(IndexOf(index), r);
@@ -90,7 +177,7 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
     {
         List<T> list = new List<T>();
 
-        ////上下左右
+        //////上下左右
         for (int i = -r; i <= r; ++i)
         {
             int middle = (index.x + i) * columns + index.z;
@@ -110,8 +197,6 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
                 }
             }
         }
-
-
         return list;
     }
 
