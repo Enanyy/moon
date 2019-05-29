@@ -2,6 +2,16 @@
 using System.Collections.Generic;
 using System;
 
+public enum HexDirection
+{
+    HD1,
+    HD2,
+    HD3,
+    HD4,
+    HD5,
+    HD6,
+}
+
 public class HexGrid<T> : Grid<T> where T : class, ITile, new()
 {
     //Map settings
@@ -120,6 +130,28 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
     {
         return TileAt(IndexOf(x, z));
 
+    }
+
+    public T DirectionTo(Vector3 position, HexDirection direction, int distance)
+    {
+        return DirectionTo(IndexOf(position), direction, distance);
+    }
+    public T DirectionTo(float x, float z, HexDirection direction, int distance)
+    {
+        return DirectionTo(IndexOf(x,z), direction, distance);
+    }
+    public T DirectionTo(T tile, HexDirection direction, int distance)
+    {
+        return DirectionTo(tile.index,direction,distance);
+    }
+    public T DirectionTo(TileIndex index, HexDirection direction, int distance)
+    {
+        int i = (int) direction;
+        TileIndex o;
+        o.x = index.x + directions[i].x * distance;
+        o.y = index.y + directions[i].y * distance;
+        o.z = index.z + directions[i].z * distance;
+        return TileAt(o);
     }
 
     public List<T> Neighbours(T tile)

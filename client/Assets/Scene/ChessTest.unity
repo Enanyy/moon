@@ -369,7 +369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56a142129f5d0744bad5fe2304f55071, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectGrid: 1
+  rectGrid: 0
   lines: 16
   columns: 12
   tileWidth: 3
@@ -377,7 +377,7 @@ MonoBehaviour:
   showGrid: 1
   original: {x: 0, y: 0, z: 2}
   shape: 1
-  orientation: 0
+  orientation: 1
 --- !u!4 &2126523733
 Transform:
   m_ObjectHideFlags: 0
