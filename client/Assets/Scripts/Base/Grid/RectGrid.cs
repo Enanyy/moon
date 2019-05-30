@@ -350,4 +350,19 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 
         return mesh;
     }
+
+    public static int GetCostValue(T a, T b)
+    {
+        int cntX = Mathf.Abs(a.index.x - b.index.x);
+        int cntY = Mathf.Abs(a.index.y - b.index.y);
+        // 判断到底是那个轴相差的距离更远
+        if (cntX > cntY)
+        {
+            return 14 * cntY + 10 * (cntX - cntY);
+        }
+        else
+        {
+            return 14 * cntX + 10 * (cntY - cntX);
+        }
+    }
 }

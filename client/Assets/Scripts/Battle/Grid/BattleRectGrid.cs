@@ -237,9 +237,6 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
             if (mTile != null)
             {
-                
-                mTile.Select(false);
-              
                 if (mEntity != null)
                 {
                     EntityAction jump = mEntity.GetFirst(ActionType.Jump);
@@ -272,12 +269,18 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
                         if (jump == null)
                         {
-
                             jump = ObjectPool.GetInstance<EntityAction>();
                             while (result.Count > 0)
                             {
                                 var path = result.Pop();
-                                jump.AddPathPoint(path.position, Vector3.zero, true);
+                                jump.AddPathPoint(path.position, Vector3.zero, false, (entity, destination) =>
+                                {
+                                    var p = TileAt(destination);
+                                    if (p != null)
+                                    {
+                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    }
+                                });
                             }
 
                             mEntity.PlayAction(ActionType.Jump, jump);
@@ -287,7 +290,14 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                             while (result.Count > 0)
                             {
                                 var path = result.Pop();
-                                jump.AddPathPoint(path.position, Vector3.zero, true);
+                                jump.AddPathPoint(path.position, Vector3.zero, false, (entity, destination) =>
+                                {
+                                    var p = TileAt(destination);
+                                    if (p != null)
+                                    {
+                                        p.SetColor(p.isValid?p.defaultColor:Color.black);
+                                    }
+                                });
                             }
                         }
                     }
@@ -435,18 +445,5 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
         }
     }
 
-    private int GetCostValue(BattleRectTile a, BattleRectTile b)
-    {
-        int cntX = Mathf.Abs(a.index.x - b.index.x);
-        int cntY = Mathf.Abs(a.index.y - b.index.y);
-        // 判断到底是那个轴相差的距离更远
-        if (cntX > cntY)
-        {
-            return 14 * cntY + 10 * (cntX - cntY);
-        }
-        else
-        {
-            return 14 * cntX + 10 * (cntY - cntX);
-        }
-    }
+    
 }

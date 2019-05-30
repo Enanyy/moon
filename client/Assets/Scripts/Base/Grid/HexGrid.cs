@@ -425,8 +425,23 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
         return mesh;
     }
 
-
+    public static int GetCostValue(T a, T b)
+    {
+        int cntX = Mathf.Abs(a.index.x - b.index.x);
+        int cntZ = Mathf.Abs(a.index.z - b.index.z);
+        // 判断到底是那个轴相差的距离更远
+        if (cntX > cntZ)
+        {
+            return 14 * cntZ + 10 * (cntX - cntZ);
+        }
+        else
+        {
+            return 14 * cntX + 10 * (cntZ - cntX);
+        }
+    }
     #endregion
+
+
 }
 
 [System.Serializable]

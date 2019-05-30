@@ -92,7 +92,8 @@ public abstract class Grid<T> where T: class, ITile,new()
         tiles.Clear();
     }
 
-   
+    #region FindPath
+
     private class PathNode
     {
         public T tile;
@@ -109,11 +110,12 @@ public abstract class Grid<T> where T: class, ITile,new()
     private List<T> mCloseList = new List<T>();
     private Dictionary<T, PathNode> mNodeDic = new Dictionary<T, PathNode>();
 
-    public Stack<T> FindPath(T from, T to, Func<T, bool> isValid,Func<T,List<T>> getNeihbors, Func<T, T, int> getCostValue)
+    public Stack<T> FindPath(T from, T to, Func<T, bool> isValid, Func<T, List<T>> getNeihbors,
+        Func<T, T, int> getCostValue)
     {
         Stack<T> result = new Stack<T>();
 
-        if (isValid == null || getNeihbors == null || getCostValue == null)
+        if (from == null || to == null || isValid == null || getNeihbors == null || getCostValue == null)
         {
             Debug.LogError("参数不能为空");
             return result;
@@ -237,5 +239,6 @@ public abstract class Grid<T> where T: class, ITile,new()
 
         return result;
     }
+    #endregion
 }
 

@@ -22,6 +22,7 @@ public class ActionRunPlugin : ActionPlugin
                 if (direction.magnitude < displacement)
                 {
                     point.arrive = true;
+                    point.Arrive(agent);
                     agent.position = point.destination;
                     ObjectPool.ReturnInstance(action.paths.First.Value);
                     action.paths.RemoveFirst();
@@ -53,6 +54,7 @@ public class ActionRunPlugin : ActionPlugin
                 if (direction.magnitude < displacement)
                 {
                     point.arrive = true;
+                    point.Arrive(agent);
                     agent.position = point.destination;
                 }
                 else

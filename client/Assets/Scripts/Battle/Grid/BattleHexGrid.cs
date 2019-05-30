@@ -12,6 +12,8 @@ public class BattleHexTile : ITile
 
     public Color defaultColor = Color.white;
 
+    public bool isValid = true;
+
     public void Show(Transform parent,Mesh mesh, Material material,float radius, HexOrientation hexOrientation)
     {
         if(gameObject== null)
@@ -228,6 +230,19 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
         {
             return;
         }
+        if (Input.GetMouseButtonDown(1))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            float distance;
+            mPlane.Raycast(ray, out distance);
+            Vector3 point = ray.GetPoint(distance);
+            var tile = TileAt(point);
+            if (tile != null)
+            {
+                tile.isValid = false;
+                tile.SetColor(Color.black);
+            }
+        }
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -241,20 +256,84 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
             if (mTile != null)
             {
                
-                mTile.Select(false);
-     
                 if (mEntity != null)
                 {
                     EntityAction jump = mEntity.GetFirst(ActionType.Jump);
-                    if (jump == null)
+
+                    if (Chess.Instance.jump)
                     {
-                        jump = ObjectPool.GetInstance<EntityAction>();
-                        jump.AddPathPoint(mTile.position, Vector3.zero, true);
-                        mEntity.PlayAction(ActionType.Jump, jump);
+                        if (jump == null)
+                        {
+                            jump = ObjectPool.GetInstance<EntityAction>();
+                            jump.AddPathPoint(mTile.position, Vector3.zero, false, (entity, destination) =>
+                            {
+                                var p = TileAt(destination);
+                                if (p != null)
+                                {
+                                    p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                }
+                            });
+                            mEntity.PlayAction(ActionType.Jump, jump);
+                        }
+                        else
+                        {
+                            jump.AddPathPoint(mTile.position, Vector3.zero, false, (entity, destination) =>
+                            {
+                                var p = TileAt(destination);
+                                if (p != null)
+                                {
+                                    p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                }
+                            });
+                        }
                     }
                     else
                     {
-                        jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                        var position = mEntity.position;
+                        if (jump != null && jump.paths.Count > 0)
+                        {
+                            position = jump.paths.Last.Value.destination;
+                        }
+
+                        var result = FindPath(TileAt(position), mTile,
+                            (tile) => { return tile.isValid; },
+                            (tile) => { return Neighbours(tile); },
+                            GetCostValue);
+
+                        if (jump == null)
+                        {
+
+                            jump = ObjectPool.GetInstance<EntityAction>();
+                            while (result.Count > 0)
+                            {
+                                var path = result.Pop();
+                                jump.AddPathPoint(path.position, Vector3.zero, false, (entity, destination) =>
+                                {
+                                    var p = TileAt(destination);
+                                    if (p != null)
+                                    {
+                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    }
+                                });
+                            }
+
+                            mEntity.PlayAction(ActionType.Jump, jump);
+                        }
+                        else
+                        {
+                            while (result.Count > 0)
+                            {
+                                var path = result.Pop();
+                                jump.AddPathPoint(path.position, Vector3.zero, false, (entity, destination) =>
+                                {
+                                    var p = TileAt(destination);
+                                    if (p != null)
+                                    {
+                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    }
+                                });
+                            }
+                        }
                     }
                 }
             }
@@ -318,7 +397,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                 position = run.paths.Last.Value.destination;
                             }
                         }
-                        ITile t = TileAt(position);
+                        BattleHexTile t = TileAt(position);
 
                         if (t != null && t.index == tile.index)
                         {
@@ -334,8 +413,26 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
 
                             mTile = tile;
 
-                            mTile.Select(true);                          
+                            mTile.Select(true);
+                            if (Chess.Instance.jump == false)
+                            {
+                                var result = FindPath(t, mTile,
+                                    (o) => { return o.isValid; },
+                                    (o) => { return Neighbours(o); },
+                                    GetCostValue
+                                );
+                                var it = tiles.GetEnumerator();
+                                while (it.MoveNext())
+                                {
+                                    it.Current.Value.SetColor(it.Current.Value.isValid ? it.Current.Value.defaultColor : Color.black);
+                                }
 
+                                var r = result.GetEnumerator();
+                                while (r.MoveNext())
+                                {
+                                    r.Current.SetColor(Color.green);
+                                }
+                            }
                             BattleBezierPath.GetPath(position,
                                 mTile.position,
                                 0.5f,
@@ -377,4 +474,6 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
             mPathRenderer.positionCount = 0;
         }
     }
+
+   
 }
