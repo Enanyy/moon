@@ -172,6 +172,38 @@ public class StateMachine<T> where T: IStateAgent<T>
         return null;
     }
 
+    public List<State<T>> Get(int type)
+    {
+        List<State<T>> states = new List<State<T>>();
+        var it = mStateList.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if (it.Current.type == type)
+            {
+                states.Add(it.Current);
+            }
+        }
+
+        return states;
+    }
+
+    public void Remove(State<T> state)
+    {
+        if (state == null)
+        {
+            return;
+        }
+        var it = mStateList.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if (it.Current== state)
+            {
+                mStateList.Remove(it.Current);
+                break;
+            }
+        }
+    }
+
     /*状态改变*/
     private bool DoNext()
     {

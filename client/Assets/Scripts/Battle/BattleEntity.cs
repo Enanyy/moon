@@ -246,6 +246,17 @@ public class BattleEntity:
         return machine.GetLast((int)type) as EntityAction;
     }
 
+    public List<State<BattleEntity>> Get(ActionType type)
+    {
+        return  machine.Get((int)type);
+    }
+
+    public void Remove(EntityAction action)
+    {
+        machine.Remove(action);
+    }
+
+
     public override void OnUpdate(float deltaTime)
     {
         if (isPause)

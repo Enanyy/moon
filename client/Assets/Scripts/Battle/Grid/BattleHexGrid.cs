@@ -446,18 +446,23 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                         : Color.black);
                                 }
 
-                                var jump = mEntity.GetFirst(ActionType.Jump);
-                                if (jump != null)
+                                var jumps = mEntity.Get(ActionType.Jump);
+                                if (jumps != null)
                                 {
-                                    var d = jump.paths.GetEnumerator();
-                                    while (d.MoveNext())
+                                    var j = jumps.GetEnumerator();
+                                    while (j.MoveNext())
                                     {
-                                        var dest = TileAt(d.Current.destination);
-                                        if (dest != null)
+                                        var jump = j.Current as EntityAction;
+                                        var d = jump.paths.GetEnumerator();
+                                        while (d.MoveNext())
                                         {
-                                            dest.SetColor(Color.green);
+                                            var dest = TileAt(d.Current.destination);
+                                            if (dest != null)
+                                            {
+                                                dest.SetColor(Color.green);
+                                            }
                                         }
-                                    }
+                                    }          
                                 }
                                
 
