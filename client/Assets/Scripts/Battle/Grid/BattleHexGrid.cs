@@ -239,8 +239,8 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
             var tile = TileAt(point);
             if (tile != null)
             {
-                tile.isValid = false;
-                tile.SetColor(Color.black);
+                tile.isValid = !tile.isValid;
+                tile.SetColor(!tile.isValid? Color.black:tile.defaultColor);
             }
         }
 
@@ -308,13 +308,21 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                             {
                                 var path = result.Pop();
                                 jump.AddPathPoint(path.position, Vector3.zero, false, (entity, destination) =>
-                                {
-                                    var p = TileAt(destination);
-                                    if (p != null)
                                     {
-                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
-                                    }
-                                });
+                                        var p = TileAt(destination);
+                                        if (p != null)
+                                        {
+                                            p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                        }
+                                    },
+                                    (entity, destination) =>
+                                    {
+                                        var p = TileAt(destination);
+                                        if (p != null)
+                                        {
+                                            p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                        }
+                                    });
                             }
 
                             mEntity.PlayAction(ActionType.Jump, jump);
@@ -325,6 +333,14 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                             {
                                 var path = result.Pop();
                                 jump.AddPathPoint(path.position, Vector3.zero, false, (entity, destination) =>
+                                {
+                                    var p = TileAt(destination);
+                                    if (p != null)
+                                    {
+                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    }
+                                },
+                                (entity, destination) =>
                                 {
                                     var p = TileAt(destination);
                                     if (p != null)
@@ -421,11 +437,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                     (o) => { return Neighbours(o); },
                                     GetCostValue
                                 );
-                                var it = tiles.GetEnumerator();
-                                while (it.MoveNext())
-                                {
-                                    it.Current.Value.SetColor(it.Current.Value.isValid ? it.Current.Value.defaultColor : Color.black);
-                                }
+                               
 
                                 var r = result.GetEnumerator();
                                 while (r.MoveNext())

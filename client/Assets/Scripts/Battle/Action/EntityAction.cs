@@ -12,19 +12,21 @@ public class PathPoint:IPoolObject
     public bool isPool { get; set; }
 
     private Action<BattleEntity, Vector3> mArriveAction;
+    private Action<BattleEntity, Vector3> mFailedAction;
 
     public PathPoint()
     {
 
     }
 
-    public void Init(Vector3 destination, Vector3 velocity, bool done,Action<BattleEntity, Vector3> onArrive = null)
+    public void Init(Vector3 destination, Vector3 velocity, bool done,Action<BattleEntity, Vector3> onArrive = null, Action<BattleEntity, Vector3> failedAction= null)
     {
         this.destination = destination;
         this.velocity = velocity;
         this.done = done;
         this.arrive = false;
         this.mArriveAction = onArrive;
+        this.mFailedAction = failedAction;
     }
 
     public void Arrive(BattleEntity entity)
@@ -32,6 +34,14 @@ public class PathPoint:IPoolObject
         if (mArriveAction != null)
         {
             mArriveAction(entity, destination);
+        }
+    }
+
+    public void Failed(BattleEntity entity)
+    {
+        if (mFailedAction != null)
+        {
+            mFailedAction(entity, destination);
         }
     }
 
@@ -77,10 +87,10 @@ public class EntityAction : State<BattleEntity>,IPoolObject
     {
        paths = new LinkedList<PathPoint>();
     }
-    public void AddPathPoint(Vector3 destination,Vector3 velocity, bool done, Action<BattleEntity, Vector3> onArrive= null)
+    public void AddPathPoint(Vector3 destination,Vector3 velocity, bool done, Action<BattleEntity, Vector3> onArrive= null, Action<BattleEntity, Vector3> failedAction = null)
     {
         var point = ObjectPool.GetInstance<PathPoint>();
-        point.Init(destination, velocity, done,onArrive);
+        point.Init(destination, velocity, done,onArrive,failedAction);
         paths.AddLast(point);
 
        

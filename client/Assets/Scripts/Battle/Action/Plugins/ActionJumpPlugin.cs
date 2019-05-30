@@ -37,6 +37,44 @@ public class ActionJumpPlugin :ActionPlugin
             {
                 mTargetPoint = action.paths.First.Value;
                 mDistance = 0;
+
+                if (Chess.Instance.rectGrid)
+                {
+                    var tile = BattleRectGrid.Instance.TileAt(mTargetPoint.destination);
+                    if (tile == null || tile.isValid == false)
+                    {
+                        action.Done();
+
+                        var point = action.paths.First;
+                        while (point!= null)
+                        {
+                            point.Value.Failed(agent);
+                            ObjectPool.ReturnInstance(point.Value);
+                            point = point.Next;
+
+                        }
+                        action.paths.Clear();
+                    }
+                }
+                else
+                {
+                    var tile = BattleHexGrid.Instance.TileAt(mTargetPoint.destination);
+                    if (tile == null || tile.isValid == false)
+                    {
+                        action.Done();
+                        var point = action.paths.First;
+                        while (point != null)
+                        {
+                            point.Value.Failed(agent);
+                            ObjectPool.ReturnInstance(point.Value);
+                            point = point.Next;
+
+                        }
+                        action.paths.Clear();
+                        action.paths.Clear();
+                    }
+                }
+
                 //水平移动需要多久
                 float duration = Vector3.Distance(agent.position , mTargetPoint.destination) / SPEED;
                 if (duration > 0)
