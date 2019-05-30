@@ -406,7 +406,28 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                     (o) => { return Neighbours(o, RectNeighbors.Edge);},
                                     GetCostValue
                                 );
-                              
+
+                                var it = tiles.GetEnumerator();
+                                while (it.MoveNext())
+                                {
+                                    it.Current.Value.SetColor(it.Current.Value.isValid
+                                        ? it.Current.Value.defaultColor
+                                        : Color.black);
+                                }
+
+                                var jump = mEntity.GetFirst(ActionType.Jump);
+                                if (jump != null)
+                                {
+                                    var d = jump.paths.GetEnumerator();
+                                    while (d.MoveNext())
+                                    {
+                                        var dest = TileAt(d.Current.destination);
+                                        if (dest != null)
+                                        {
+                                            dest.SetColor(Color.green);
+                                        }
+                                    }
+                                }
 
                                 var r = result.GetEnumerator();
                                 while (r.MoveNext())

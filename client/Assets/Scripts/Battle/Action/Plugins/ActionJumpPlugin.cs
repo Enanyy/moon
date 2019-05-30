@@ -71,7 +71,6 @@ public class ActionJumpPlugin :ActionPlugin
 
                         }
                         action.paths.Clear();
-                        action.paths.Clear();
                     }
                 }
 
