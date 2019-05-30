@@ -15,12 +15,18 @@ public enum RectDirection
     LeftBottom,
     RightBottom,
 }
+
+public enum RectNeighbors
+{
+    All,
+    Edge,
+    Corner
+}
+
 public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 {
     public float tileWidth { get; private set; }
     public float tileHeight { get; private set; }
-
-   
 
     public static readonly TileIndex[] Directions = new TileIndex[]
     {
@@ -116,6 +122,8 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
         return Neighbours(tile.index);
     }
 
+  
+
     public List<T> Neighbours(TileIndex index)
     {
         List<T> ret = new List<T>();
@@ -130,6 +138,50 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 
         return ret;
     }
+    public List<T> Neighbours(int index, RectNeighbors neighbor)
+    {
+        return Neighbours(IndexOf(index), neighbor);
+    }
+
+    public List<T> Neighbours(int line, int column, RectNeighbors neighbor)
+    {
+        return Neighbours(IndexOf(line, column), neighbor);
+    }
+    public List<T> Neighbours(Vector3 position, RectNeighbors neighbor)
+    {
+        return Neighbours(IndexOf(position), neighbor);
+    }
+
+    public List<T> Neighbours(T tile, RectNeighbors neighbor)
+    {
+        return Neighbours(tile.index, neighbor);
+    }
+    public List<T> Neighbours(TileIndex index,RectNeighbors neighbor)
+    {
+        List<T> ret = new List<T>();
+        int i = 0;
+        int count = Directions.Length;
+        if (neighbor == RectNeighbors.Edge)
+        {
+            count = 4;
+        }
+        else if(neighbor == RectNeighbors.Corner)
+        {
+            i = 4;
+        }
+
+        for (i = 0; i < count ; i++)
+        {
+            var tile = DirectionTo(index, (RectDirection)i, 1);
+            if (tile != null)
+            {
+                ret.Add(tile);
+            }
+        }
+
+        return ret;
+    }
+
     public T DirectionTo(int index, RectDirection direction, int distance)
     {
         return DirectionTo(IndexOf(index), direction,distance);

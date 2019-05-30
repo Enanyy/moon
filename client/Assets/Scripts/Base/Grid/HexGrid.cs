@@ -4,12 +4,7 @@ using System;
 
 public enum HexDirection
 {
-    HD1,
-    HD2,
-    HD3,
-    HD4,
-    HD5,
-    HD6,
+    NE, E, SE, SW, W, NW
 }
 
 public class HexGrid<T> : Grid<T> where T : class, ITile, new()
@@ -154,7 +149,7 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
         return TileAt(o);
     }
 
-    public List<T> Neighbours(T tile)
+    public  List<T> Neighbours(T tile)
     {
         List<T> ret = new List<T>();
         TileIndex o;
@@ -294,7 +289,6 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
     {
         return Distance(IndexOf(from), IndexOf(to));
     }
-
 
     #endregion
 

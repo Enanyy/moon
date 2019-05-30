@@ -13,6 +13,8 @@ public class BattleRectTile : ITile
 
     public Color defaultColor = Color.white;
 
+    public bool isValid = true;
+
     public void Show(Transform parent,Mesh mesh, Material material)
     {
         if(gameObject== null)
@@ -209,6 +211,20 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
             return;
         }
 
+        if (Input.GetMouseButtonDown(1))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            float distance;
+            mPlane.Raycast(ray, out distance);
+            Vector3 point = ray.GetPoint(distance);
+            var tile = TileAt(point);
+            if (tile != null)
+            {
+                tile.isValid = false;
+                tile.SetColor(Color.black);
+            }
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             mShowPath = true;
@@ -223,19 +239,57 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
             {
                 
                 mTile.Select(false);
-
+              
                 if (mEntity != null)
                 {
                     EntityAction jump = mEntity.GetFirst(ActionType.Jump);
-                    if (jump == null)
+
+                    if (Chess.Instance.jump)
                     {
-                        jump = ObjectPool.GetInstance<EntityAction>();
-                        jump.AddPathPoint(mTile.position, Vector3.zero, true);
-                        mEntity.PlayAction(ActionType.Jump, jump);
+                        if (jump == null)
+                        {
+                            jump = ObjectPool.GetInstance<EntityAction>();
+                            jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                            mEntity.PlayAction(ActionType.Jump, jump);
+                        }
+                        else
+                        {
+                            jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                        }
                     }
                     else
                     {
-                        jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                        var position = mEntity.position;
+                        if (jump != null && jump.paths.Count > 0)
+                        {
+                            position = jump.paths.Last.Value.destination;
+                        }
+
+                        var result = FindPath(TileAt(position), mTile,
+                            (tile) => { return tile.isValid; },
+                            (tile) => { return Neighbours(tile, RectNeighbors.Edge); },
+                            GetCostValue);
+
+                        if (jump == null)
+                        {
+
+                            jump = ObjectPool.GetInstance<EntityAction>();
+                            while (result.Count > 0)
+                            {
+                                var path = result.Pop();
+                                jump.AddPathPoint(path.position, Vector3.zero, true);
+                            }
+
+                            mEntity.PlayAction(ActionType.Jump, jump);
+                        }
+                        else
+                        {
+                            while (result.Count > 0)
+                            {
+                                var path = result.Pop();
+                                jump.AddPathPoint(path.position, Vector3.zero, true);
+                            }
+                        }
                     }
                 }
             }
@@ -302,7 +356,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                             }
                         }
 
-                        ITile t = TileAt(position);
+                        BattleRectTile t = TileAt(position);
 
 
                         if (t != null && t.index == tile.index)
@@ -318,6 +372,27 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
                             mTile = tile;
                             mTile.Select(true);
+
+                            if (Chess.Instance.jump == false)
+                            {
+                                var result = FindPath(t,mTile, 
+                                    (o) => { return o.isValid;},
+                                    (o) => { return Neighbours(o, RectNeighbors.Edge);},
+                                    GetCostValue
+                                );
+                                var it = tiles.GetEnumerator();
+                                while (it.MoveNext())
+                                {
+                                    it.Current.Value.SetColor(it.Current.Value.isValid? it.Current.Value.defaultColor:Color.black);
+                                }
+
+                                var r = result.GetEnumerator();
+                                while (r.MoveNext())
+                                {
+                                    r.Current.SetColor(Color.green);
+                                }
+                            }
+
 
                             BattleBezierPath.GetPath(position,
                                 mTile.position,
@@ -357,6 +432,21 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
         if (mPathRenderer != null)
         {
             mPathRenderer.positionCount = 0;
+        }
+    }
+
+    private int GetCostValue(BattleRectTile a, BattleRectTile b)
+    {
+        int cntX = Mathf.Abs(a.index.x - b.index.x);
+        int cntY = Mathf.Abs(a.index.y - b.index.y);
+        // 判断到底是那个轴相差的距离更远
+        if (cntX > cntY)
+        {
+            return 14 * cntY + 10 * (cntX - cntY);
+        }
+        else
+        {
+            return 14 * cntX + 10 * (cntY - cntX);
         }
     }
 }

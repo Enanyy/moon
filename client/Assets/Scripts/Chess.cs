@@ -16,9 +16,15 @@ public class Chess : MonoBehaviour
     public HexGridShape shape = HexGridShape.Hexagon;
 
     public HexOrientation orientation = HexOrientation.Pointy;
+
+    public bool jump = true;
+
+    public static Chess Instance { get; private set; }
     // Use this for initialization
     void Start()
     {
+        Instance = this;
+
         CameraManager.Instance.Init();
 
         if (rectGrid)
