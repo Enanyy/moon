@@ -172,7 +172,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         return null;
     }
 
-    public List<State<T>> Get(int type)
+    public List<State<T>> GetStates(int type)
     {
         List<State<T>> states = new List<State<T>>();
         var it = mStateList.GetEnumerator();

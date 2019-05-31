@@ -246,9 +246,9 @@ public class BattleEntity:
         return machine.GetLast((int)type) as EntityAction;
     }
 
-    public List<State<BattleEntity>> Get(ActionType type)
+    public List<State<BattleEntity>> GetActions(ActionType type)
     {
-        return  machine.Get((int)type);
+        return  machine.GetStates((int)type);
     }
 
     public void Remove(EntityAction action)

@@ -246,12 +246,42 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                         if (jump == null)
                         {
                             jump = ObjectPool.GetInstance<EntityAction>();
-                            jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                            jump.AddPathPoint(mTile.position, Vector3.zero, true, (entity, destination) =>
+                                {
+                                    var p = TileAt(destination);
+                                    if (p != null)
+                                    {
+                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    }
+                                },
+                                (entity, destination) =>
+                                {
+                                    var p = TileAt(destination);
+                                    if (p != null)
+                                    {
+                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    }
+                                });
                             mEntity.PlayAction(ActionType.Jump, jump);
                         }
                         else
                         {
-                            jump.AddPathPoint(mTile.position, Vector3.zero, true);
+                            jump.AddPathPoint(mTile.position, Vector3.zero, true, (entity, destination) =>
+                                {
+                                    var p = TileAt(destination);
+                                    if (p != null)
+                                    {
+                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    }
+                                },
+                                (entity, destination) =>
+                                {
+                                    var p = TileAt(destination);
+                                    if (p != null)
+                                    {
+                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    }
+                                });
                         }
                     }
                     else
@@ -415,7 +445,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                         : Color.black);
                                 }
 
-                                var jumps = mEntity.Get(ActionType.Jump);
+                                var jumps = mEntity.GetActions(ActionType.Jump);
                                 if (jumps != null)
                                 {
                                     var j = jumps.GetEnumerator();

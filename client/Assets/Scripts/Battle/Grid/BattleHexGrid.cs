@@ -446,7 +446,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                         : Color.black);
                                 }
 
-                                var jumps = mEntity.Get(ActionType.Jump);
+                                var jumps = mEntity.GetActions(ActionType.Jump);
                                 if (jumps != null)
                                 {
                                     var j = jumps.GetEnumerator();
