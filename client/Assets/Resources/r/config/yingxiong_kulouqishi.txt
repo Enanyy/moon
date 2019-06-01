@@ -20,7 +20,10 @@
     <AnimationParam animationClip="die" length="2.633333" mode="8" triggerAt="0" default="1" name="Animation" rect="(579,272,240,20)" />
     <RemovePluginParam name="RunPlugin" rect="(570,393,240,20)" />
   </ActionParam>
-  <ActionParam state="6" weight="1" duration="86400" useAnimationLength="1" name="Action" rect="(237,523,240,20)">
+  <ActionParam state="5" weight="10" duration="1.666667" useAnimationLength="1" name="Action" rect="(259,581,240,20)">
+    <AnimationParam animationClip="idle" length="1.666667" mode="1" triggerAt="0" default="1" name="Animation" rect="(724,680,240,20)" />
+  </ActionParam>
+  <ActionParam state="6" weight="1" duration="86400" useAnimationLength="1" name="Action" rect="(233,446,240,20)">
     <AnimationParam animationClip="idle" length="1.666667" mode="2" triggerAt="0" default="1" name="Animation" rect="(493,707,240,20)" />
     <JumpPluginParam name="JumpPlugin" rect="(499,850,240,20)" />
   </ActionParam>

@@ -10,10 +10,12 @@ public static class AssetID
 	public const uint R_CONFIG_YINGXIONG_KULOUQISHI = 10002;
 	public const uint R_CONFIG_NVJIANGJUN = 10003;
 	public const uint R_CONFIG_PAOSHOU = 10004;
+	public const uint R_CONFIG_TROLLGIANT = 10006;
 	public const uint R_MODEL_YINGXIONG_KULOUQISHI = 20001;
 	public const uint R_MODEL_M_AIRENHUOJIANPAO = 20002;
 	public const uint R_MODEL_NVJIANGJUN = 20003;
 	public const uint R_MODEL_PAOSHOU = 20004;
+	public const uint R_MODEL_TROLLGIANT = 20006;
 	public const uint R_SPELL_FX_FX_KULOUFASHI_ATTACK_HIT = 30001;
 	public const uint R_SPELL_FX_FX_KULOUFASHI_ATTACK_XULI = 30002;
 	public const uint R_SPELL_FX_FX_NVJIANGJUN_ATTACK_01 = 30003;
@@ -27,6 +29,10 @@ public static class AssetID
 	public const uint R_SPELL_FX_FX_SIWANG = 30011;
 	public const uint R_MATERIAL_DIBAN = 40001;
 	public const uint R_MATERIAL_LINE = 40002;
+	public const uint R_MATERIAL_ARROW = 40003;
+	public const uint R_MATERIAL_TILE = 40004;
+	public const uint R_SHADER_DIMAIN = 50001;
+	public const uint R_TEXTURE_FLOOR = 60001;
 //ASSET_ID_REPLACE_END
 }
 
@@ -38,10 +44,12 @@ public static class AssetPath
 	{ AssetID.R_CONFIG_YINGXIONG_KULOUQISHI,"r/config/yingxiong_kulouqishi.txt" },
 	{ AssetID.R_CONFIG_NVJIANGJUN,"r/config/nvjiangjun.txt" },
 	{ AssetID.R_CONFIG_PAOSHOU,"r/config/paoshou.txt" },
+	{ AssetID.R_CONFIG_TROLLGIANT,"r/config/trollgiant.txt" },
 	{ AssetID.R_MODEL_YINGXIONG_KULOUQISHI,"r/model/yingxiong_kulouqishi.prefab" },
 	{ AssetID.R_MODEL_M_AIRENHUOJIANPAO,"r/model/m_airenhuojianpao.prefab" },
 	{ AssetID.R_MODEL_NVJIANGJUN,"r/model/nvjiangjun.prefab" },
 	{ AssetID.R_MODEL_PAOSHOU,"r/model/paoshou.prefab" },
+	{ AssetID.R_MODEL_TROLLGIANT,"r/model/trollgiant.prefab" },
 	{ AssetID.R_SPELL_FX_FX_KULOUFASHI_ATTACK_HIT,"r/spell_fx/fx_kuloufashi_attack_hit.prefab" },
 	{ AssetID.R_SPELL_FX_FX_KULOUFASHI_ATTACK_XULI,"r/spell_fx/fx_kuloufashi_attack_xuli.prefab" },
 	{ AssetID.R_SPELL_FX_FX_NVJIANGJUN_ATTACK_01,"r/spell_fx/fx_nvjiangjun_attack_01.prefab" },
@@ -55,6 +63,10 @@ public static class AssetPath
 	{ AssetID.R_SPELL_FX_FX_SIWANG,"r/spell_fx/fx_siwang.prefab" },
 	{ AssetID.R_MATERIAL_DIBAN,"r/material/diban.mat" },
 	{ AssetID.R_MATERIAL_LINE,"r/material/line.mat" },
+	{ AssetID.R_MATERIAL_ARROW,"r/material/arrow.mat" },
+	{ AssetID.R_MATERIAL_TILE,"r/material/tile.mat" },
+	{ AssetID.R_SHADER_DIMAIN,"r/shader/dimain.shader" },
+	{ AssetID.R_TEXTURE_FLOOR,"r/texture/floor.png" },
 //ASSET_PATH_REPLACE_END
     };
 

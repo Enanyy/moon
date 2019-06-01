@@ -69,7 +69,7 @@ public enum ActionType
     Attack,
     Die,
     Victory,
-    Retreat,
+    Hit,
     Jump,
 }
 public abstract partial class BattleParam
@@ -402,7 +402,7 @@ public partial class ActionParam :BattleParam
         {ActionType.Run,1 },
         {ActionType.Attack,1 },
         {ActionType.Die,10 },
-        {ActionType.Retreat,10 },
+        {ActionType.Hit,10 },
         {ActionType.Victory,10 },
     };
 

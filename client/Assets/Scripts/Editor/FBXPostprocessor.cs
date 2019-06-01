@@ -297,11 +297,11 @@ public class SUFBXPostprocessor : AssetPostprocessor
         {
             return ActionType.Idle;
         }
-        else if (animName.Contains("run_away")
-           || animName.Contains("retreat"))
-        {
-            return ActionType.Retreat;
-        }
+        //else if (animName.Contains("run_away")
+        //   || animName.Contains("retreat"))
+        //{
+        //    return ActionType.Hit;
+        //}
         else if (animName.Contains("run")        
             || animName.Contains("walk"))
         {
@@ -322,6 +322,11 @@ public class SUFBXPostprocessor : AssetPostprocessor
         else if (animName.Contains("victory"))
         {
             return ActionType.Victory;
+        }
+        else if (animName.Contains("hit")
+            || animName.Contains("damage"))
+        {
+            return ActionType.Hit;
         }
         return ActionType.Idle;
     }
