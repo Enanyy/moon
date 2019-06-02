@@ -64,43 +64,50 @@ public class BattleManager
             return false;
         }
 
-        if (mParams.ContainsKey(entity.configid) == false)
-        {
-            string path = AssetPath.Get(entity.configid);
-
-            var xml = Resources.Load<TextAsset>(path);
-            if (xml)
-            {
-                var param = BattleParam.Create(xml.text) as ModelParam;
-                if (param != null)
-                {
-                    mParams.Add(entity.configid, param);
-                }
-            }
-        }
-        if (mParams.ContainsKey(entity.configid) == false)
-        {
-            return false;
-        }
-
-        if(entity.Init(mParams[entity.configid]) == false)
-        {
-            return false;
-        }
-
         entities.Add(entity.id, entity);
-
+        entity.Init();
 
         return true;
     }
 
-    public ModelParam GetParam(uint configid)
+    public void GetParam(uint configid,Action<ModelParam> callback)
     {
         if(mParams.ContainsKey(configid))
         {
-            return mParams[configid];
+            if(callback!= null)
+            {
+                callback(mParams[configid]);
+            }
+             
         }
-        return null;
+        else
+        {
+            string path = AssetPath.Get(configid);
+
+            AssetManager.Instance.Load(configid, (id, obj) => {
+
+                if (obj)
+                { 
+                    var xml = obj as TextAsset;
+                    if (xml)
+                    {
+                        var param = BattleParam.Create(xml.text) as ModelParam;
+                        if (param != null)
+                        {
+                            mParams.Add(configid, param);
+                        }
+                    }
+                    
+                }
+                if (callback != null)
+                {
+                    callback(mParams[configid]);
+                }
+
+            });
+
+            
+        }
     }
 
     public void Show()

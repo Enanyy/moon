@@ -300,7 +300,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
                         var result = FindPath(TileAt(position), mTile,
                             (tile) => { return tile.isValid; },
-                            (tile) => { return Neighbours(tile, RectNeighbors.Edge); },
+                            (tile) => { return Neighbours(tile, RectNeighbors.All); },
                             GetCostValue);
 
                         if (jump == null)
@@ -443,7 +443,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                             {
                                 var result = FindPath(t,mTile, 
                                     (o) => { return o.isValid;},
-                                    (o) => { return Neighbours(o, RectNeighbors.Edge);},
+                                    (o) => { return Neighbours(o, RectNeighbors.All);},
                                     GetCostValue
                                 );
 

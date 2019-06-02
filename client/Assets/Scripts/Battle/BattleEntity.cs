@@ -138,6 +138,13 @@ public class BattleEntity:
         Clear();
     }
 
+    public void Init()
+    {
+        BattleManager.Instance.GetParam(configid, (param) => {
+            this.param = param;
+        });
+    }
+
     public override void Clear()
     {
         id = 0;
@@ -207,14 +214,6 @@ public class BattleEntity:
             return properties[key];
         }
         return 0;
-    }
-
-    public bool Init(ModelParam param)
-    {
-        this.param = param;
-
-        
-        return true;
     }
 
     public void PlayAction(ActionType actionType, EntityAction action = null,bool first = false)
