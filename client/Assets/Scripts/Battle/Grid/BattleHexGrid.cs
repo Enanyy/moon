@@ -11,7 +11,7 @@ public class BattleHexTile : BattleTile
     public override void Show(Transform parent,Mesh mesh, Material material)
     {
         base.Show(parent, mesh, material);
-        if(gameObject== null)
+        if(gameObject!= null)
         {
 
             LineRenderer lines = gameObject.AddComponent<LineRenderer>();

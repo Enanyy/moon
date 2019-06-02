@@ -7,6 +7,9 @@ public enum BattleGrid
     Hex,
 }
 
+
+
+
 public class BattleGridEntity : BattleEntity
 {
     public BattleTile tile { get; private set; }
