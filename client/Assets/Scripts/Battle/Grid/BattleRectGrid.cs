@@ -145,9 +145,9 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
     {
         base.Init(original, lines, columns, tileWidth, tileHeight);
 
-        BattleEntity entity = ObjectPool.GetInstance<BattleEntity>();
+        BattleGridEntity entity = ObjectPool.GetInstance<BattleGridEntity>();
         entity.id = 1;
-        entity.configid = 10002;
+        entity.heroid = 1;
         entity.campflag = 1;
         entity.type = 1;
 

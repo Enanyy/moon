@@ -138,10 +138,11 @@ public class BattleEntity:
         Clear();
     }
 
-    public void Init()
+    public virtual void Init()
     {
         BattleManager.Instance.GetParam(configid, (param) => {
             this.param = param;
+            scale = param.scale;
         });
     }
 
@@ -265,7 +266,7 @@ public class BattleEntity:
 
         base.OnUpdate(deltaTime);
 
-        scale = param.scale;
+        
 
         if (machine != null)
         {

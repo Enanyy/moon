@@ -101,7 +101,7 @@ public class BattleManager
                 }
                 if (callback != null)
                 {
-                    callback(mParams[configid]);
+                    callback(mParams.ContainsKey(configid)?mParams[configid]:null);
                 }
 
             });

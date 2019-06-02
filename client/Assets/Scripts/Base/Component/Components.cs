@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 public abstract class Components<C> where C : Components<C>
 {
-    private List<IComponent<C>> mComponentList = new List<IComponent<C>>();
-    public List<IComponent<C>> components { get { return mComponentList; } }
+    public List<IComponent<C>> components { get; } = new List<IComponent<C>>();
 
     public T AddComponent<T>() where T : class, IComponent<C>, new()
     {
@@ -19,7 +18,7 @@ public abstract class Components<C> where C : Components<C>
         if (component != null)
         {
             component.agent = this as C;
-            mComponentList.Add(component);
+            components.Add(component);
             component.OnStart();
         }
         return component;
@@ -34,11 +33,11 @@ public abstract class Components<C> where C : Components<C>
 
     public IComponent<C> GetComponent(Type type)
     {
-        for (int i = 0; i < mComponentList.Count; ++i)
+        for (int i = 0; i < components.Count; ++i)
         {
-            if (mComponentList[i].GetType() == type)
+            if (components[i].GetType() == type)
             {
-                return mComponentList[i];
+                return components[i];
             }
         }
         return null;
@@ -50,46 +49,46 @@ public abstract class Components<C> where C : Components<C>
     }
     public void RemoveComponent(Type type)
     {
-        for (int i = mComponentList.Count - 1; i >= 0; --i)
+        for (int i = components.Count - 1; i >= 0; --i)
         {
-            if (mComponentList[i].GetType() == type)
+            if (components[i].GetType() == type)
             {
-                mComponentList[i].OnDestroy();
-                mComponentList.RemoveAt(i);
+                components[i].OnDestroy();
+                components.RemoveAt(i);
             }
         }
     }
 
     public void RemoveComponent(IComponent<C> component)
     {
-        for (int i = mComponentList.Count - 1; i >= 0; --i)
+        for (int i = components.Count - 1; i >= 0; --i)
         {
-            if (mComponentList[i] == component)
+            if (components[i] == component)
             {
-                mComponentList.RemoveAt(i);
+                components.RemoveAt(i);
             }
         }
     }
 
     public virtual void OnUpdate(float deltaTime)
     {
-        for (int i = 0; i < mComponentList.Count; ++i)
+        for (int i = 0; i < components.Count; ++i)
         {
-            mComponentList[i].OnUpdate(deltaTime);
+            components[i].OnUpdate(deltaTime);
         }
     }
     public virtual void Destroy()
     {
-        for(int i = 0; i < mComponentList.Count;++i)
+        for(int i = 0; i < components.Count;++i)
         {
-            mComponentList[i].OnDestroy();
+            components[i].OnDestroy();
         }
-        mComponentList.Clear();
+        components.Clear();
     }
 
     public virtual void Clear()
     {
-        mComponentList.Clear();
+        components.Clear();
     }
 }
 
