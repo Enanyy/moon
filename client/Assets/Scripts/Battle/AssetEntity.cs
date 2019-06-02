@@ -27,14 +27,11 @@ public class AssetEntity : IPoolObject
     {
         this.assetID = assetID;
 
-        gameObject = AssetPool.GetInstance(assetID);
-        if (gameObject == null)
-        {
-            string assetPath = AssetPath.Get(assetID);
-            UnityEngine.Object obj = Resources.Load<UnityEngine.Object>(assetPath);
-            gameObject = UnityEngine.Object.Instantiate(obj) as GameObject;
-        }
-        OnAssetLoad();
+        AssetManager.Instance.Instantiate(assetID, (id, go) => {
+            gameObject = go;
+            OnAssetLoad();
+
+        });
     }
 
     protected virtual bool OnAssetLoad()

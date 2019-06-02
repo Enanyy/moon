@@ -20,6 +20,11 @@ public class Main : MonoBehaviour
     {
         Instance = this;
         CameraManager.Instance.Init();
+        TextAsset data = Resources.Load<TextAsset>("r/database/data");
+        if(data!= null)
+        {
+            DataTableManager.Instance.Init(data.bytes);
+        }
     }
 
     void Start()

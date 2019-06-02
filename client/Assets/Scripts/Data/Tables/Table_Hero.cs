@@ -8,8 +8,8 @@ public class TB_Hero {
 	public int hp;
 	public int attack;
 	public int defense;
-	public int movespeed;
-	public int direction;
+	public int movedistance;
+	public int movedirection;
 	public int attackdistance;
 	public int searchdistance;
 	public float radius;
@@ -37,8 +37,8 @@ public class Table_Hero : IDataTable
 			o.hp = table.GetByColumnName("hp",0);
 			o.attack = table.GetByColumnName("attack",0);
 			o.defense = table.GetByColumnName("defense",0);
-			o.movespeed = table.GetByColumnName("movespeed",0);
-			o.direction = table.GetByColumnName("direction",0);
+			o.movedistance = table.GetByColumnName("movedistance", 0);
+			o.movedirection = table.GetByColumnName("movedirection",0);
 			o.attackdistance = table.GetByColumnName("attackdistance",0);
 			o.searchdistance = table.GetByColumnName("searchdistance",0);
 			o.radius = table.GetByColumnName("radius",0);

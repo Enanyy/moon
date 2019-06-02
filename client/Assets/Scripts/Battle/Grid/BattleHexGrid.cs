@@ -129,7 +129,11 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                     }
                     if (mMaterial == null)
                     {
-                        mMaterial = Resources.Load<UnityEngine.Material>("r/material/tile");
+                        AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (id, obj) => {
+
+                            mMaterial = obj as Material;
+                        });
+
                     }
 
                     root = new GameObject("Grid");
@@ -200,7 +204,10 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
             }
             if(mMaterial == null)
             {
-                mMaterial = Resources.Load<UnityEngine.Material>("r/material/tile");
+                AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (id, obj) => {
+
+                    mMaterial = obj as Material;
+                });
             }
 
             t.Show(root.transform, mTileMesh, mMaterial, radius, orientation);
@@ -369,7 +376,10 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                         mPathRenderer = root.AddComponent<LineRenderer>();
 
                     }
-                    mPathRenderer.material = Resources.Load<Material>("r/material/arrow");
+                    AssetManager.Instance.Load(AssetID.R_MATERIAL_ARROW, (id, obj) => {
+
+                        mPathRenderer.material = obj as Material;
+                    });
                     mPathRenderer.startWidth = 1f;
                     mPathRenderer.endWidth = 1f;
                     mPathRenderer.startColor = Color.yellow;

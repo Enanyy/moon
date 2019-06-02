@@ -26,7 +26,11 @@ public class Chess : MonoBehaviour
         Instance = this;
 
         CameraManager.Instance.Init();
-
+        TextAsset data = Resources.Load<TextAsset>("r/database/data");
+        if (data != null)
+        {
+            DataTableManager.Instance.Init(data.bytes);
+        }
         if (rectGrid)
         {
             BattleRectGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
