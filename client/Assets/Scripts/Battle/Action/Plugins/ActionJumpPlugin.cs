@@ -54,6 +54,8 @@ public class ActionJumpPlugin :ActionPlugin
 
                         }
                         action.paths.Clear();
+                        mTargetPoint = null;
+
                     }
                 }
                 else
@@ -71,36 +73,41 @@ public class ActionJumpPlugin :ActionPlugin
 
                         }
                         action.paths.Clear();
+                        mTargetPoint = null;
+
                     }
-                }
-
-                //水平移动需要多久
-                float duration = Vector3.Distance(agent.position , mTargetPoint.destination) / SPEED;
-                if (duration > 0)
-                {
-                    float halfTime = duration * 0.5f;
-                    float height = Math.Abs(GRAVITY) * halfTime * halfTime / 2;
-                    //限制垂直高度
-                    height = Mathf.Clamp(height, MINHEIGHT, MAXHEIGHT);
-
-                    Vector3 center = (agent.position + mTargetPoint.destination) / 2f;
-                    center.y = height;
-
-                    List<Vector3> points = new List<Vector3>();
-                    points.Add(agent.position);
-                    points.Add(center);
-                    points.Add(mTargetPoint.destination);
-
-                    mBezierPath = new BezierPath(points,false,PathSpace.xyz);
-                    mVertexPath = new VertexPath(mBezierPath,0.3f, 0.01f);
 
                 }
-                else
+                if (mTargetPoint != null)
                 {
-                    mTargetPoint.Arrive(agent);
-                    ObjectPool.ReturnInstance(mTargetPoint);
-                    mTargetPoint = null;
-                    action.paths.RemoveFirst();
+                    //水平移动需要多久
+                    float duration = Vector3.Distance(agent.position, mTargetPoint.destination) / SPEED;
+                    if (duration > 0)
+                    {
+                        float halfTime = duration * 0.5f;
+                        float height = Math.Abs(GRAVITY) * halfTime * halfTime / 2;
+                        //限制垂直高度
+                        height = Mathf.Clamp(height, MINHEIGHT, MAXHEIGHT);
+
+                        Vector3 center = (agent.position + mTargetPoint.destination) / 2f;
+                        center.y = height;
+
+                        List<Vector3> points = new List<Vector3>();
+                        points.Add(agent.position);
+                        points.Add(center);
+                        points.Add(mTargetPoint.destination);
+
+                        mBezierPath = new BezierPath(points, false, PathSpace.xyz);
+                        mVertexPath = new VertexPath(mBezierPath, 0.3f, 0.01f);
+
+                    }
+                    else
+                    {
+                        mTargetPoint.Arrive(agent);
+                        ObjectPool.ReturnInstance(mTargetPoint);
+                        mTargetPoint = null;
+                        action.paths.RemoveFirst();
+                    }
                 }
             }
 
