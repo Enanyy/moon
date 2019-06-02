@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Chess : MonoBehaviour
 {
-    public bool rectGrid = true;
+    public BattleGrid grid;
     public int lines = 12;
     public int columns = 16;
     public float tileWidth = 2.5f;
@@ -31,7 +31,7 @@ public class Chess : MonoBehaviour
         {
             DataTableManager.Instance.Init(data.bytes);
         }
-        if (rectGrid)
+        if (grid == BattleGrid.Rect)
         {
             BattleRectGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
         }
@@ -44,7 +44,7 @@ public class Chess : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (rectGrid)
+        if (grid == BattleGrid.Rect)
         {
             BattleRectGrid.Instance.Update();
 

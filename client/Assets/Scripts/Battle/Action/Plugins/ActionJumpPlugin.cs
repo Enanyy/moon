@@ -38,7 +38,7 @@ public class ActionJumpPlugin :ActionPlugin
                 mTargetPoint = action.paths.First.Value;
                 mDistance = 0;
 
-                if (Chess.Instance.rectGrid)
+                if (Chess.Instance.grid == BattleGrid.Rect)
                 {
                     var tile = BattleRectGrid.Instance.TileAt(mTargetPoint.destination);
                     if (tile == null || tile.isValid == false)

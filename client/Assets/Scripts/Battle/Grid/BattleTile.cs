@@ -12,6 +12,8 @@ public class BattleTile : ITile
     public Color defaultColor = Color.white;
 
     public bool isValid = true;
+
+    public BattleGridEntity entity;
     public virtual void Show(Transform parent, Mesh mesh, Material material)
     {
         if (gameObject == null)

@@ -93,7 +93,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
         entity.heroid = 1;
         entity.campflag = 1;
         entity.type = 1;
-
+        entity.grid = BattleGrid.Rect;
         BattleRectTile tile = TileAt(0, 0);
         entity.position = tile.position;
 

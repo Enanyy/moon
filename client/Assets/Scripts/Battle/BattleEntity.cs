@@ -39,8 +39,9 @@ public class BattleEntity:
     public uint configid;        //配置id
 
   
-    public Vector3 position { get; set; }
-    public Quaternion rotation { get; set; }
+
+    public virtual Vector3 position { get; set; }
+    public virtual Quaternion rotation { get; set; }
     public float scale { get; set; }
 
     public Dictionary<uint,int> properties { get; private set; }

@@ -117,11 +117,12 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
     {
         base.Init(original, shape, lines, columns, radius, orientation);
 
-        BattleEntity entity = ObjectPool.GetInstance<BattleEntity>();
+        BattleGridEntity entity = ObjectPool.GetInstance<BattleGridEntity>();
         entity.id = 1;
-        entity.configid = 10002;
+        entity.heroid = 1;
         entity.campflag = 1;
         entity.type = 1;
+        entity.grid = BattleGrid.Hex;
 
         BattleHexTile tile = TileAt(0, 0);
         entity.position = tile.position;
