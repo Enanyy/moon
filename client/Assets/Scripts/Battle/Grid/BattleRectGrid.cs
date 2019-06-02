@@ -3,71 +3,14 @@ using PathCreation;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class BattleRectTile : ITile
+public class BattleRectTile : BattleTile
 {
-    public TileIndex index { get; set; }
-
-    public Vector3 position { get; set; }
-
-    public GameObject gameObject { get; private set; }
-
-    public Color defaultColor = Color.white;
-
-    public bool isValid = true;
-
-    public void Show(Transform parent,Mesh mesh, Material material)
+    public override void Show(Transform parent,Mesh mesh, Material material)
     {
-        if(gameObject== null)
-        {
-            string name = index.ToString();
-            gameObject = new GameObject(name);
-            gameObject.transform.SetParent(parent);
-            gameObject.transform.position = position;
-
-            MeshFilter filter = gameObject.AddComponent<MeshFilter>();
-            MeshRenderer renderer = gameObject.AddComponent<MeshRenderer>();
-            MeshCollider collider = gameObject.AddComponent<MeshCollider>();
-            filter.mesh = mesh;
-            renderer.material = material;
-            collider.sharedMesh = mesh;
-
-            GameObject go = new GameObject("Text");
-            go.transform.SetParent(gameObject.transform);
-            go.transform.localPosition = Vector3.zero;
-            go.transform.localEulerAngles = new Vector3(90, 0, 0);
-            TextMesh text = go.AddComponent<TextMesh>();
-            text.anchor = TextAnchor.MiddleCenter;
-            text.alignment = TextAlignment.Center;
-            text.text = name;
-            text.color = Color.black;
-            text.fontSize = 7;
-
-            SetColor(defaultColor);
-        }
+        base.Show(parent, mesh, material);
+        
     }
-
-    public void Select(bool value)
-    {
-        SetColor(value ? Color.green : defaultColor);
-    }
-    public void SetColor(Color color)
-    {
-        if (gameObject)
-        {
-            MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
-            renderer.material.SetColor("_Color", color);
-        }
-    }
-
-    public void Clear()
-    {
-        if (gameObject)
-        {
-            Object.DestroyImmediate(gameObject);
-        }
-
-        gameObject = null;
-    }
+ 
 }
 
 public class BattleRectGrid :RectGrid<BattleRectTile>

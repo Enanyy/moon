@@ -2,33 +2,17 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class BattleHexTile : ITile
+public class BattleHexTile : BattleTile
 {
-    public TileIndex index { get; set; }
 
-    public Vector3 position { get; set; }
+    public float radius;
 
-    public GameObject gameObject { get; private set; }
-
-    public Color defaultColor = Color.white;
-
-    public bool isValid = true;
-
-    public void Show(Transform parent,Mesh mesh, Material material,float radius, HexOrientation hexOrientation)
+    public HexOrientation hexOrientation;
+    public override void Show(Transform parent,Mesh mesh, Material material)
     {
+        base.Show(parent, mesh, material);
         if(gameObject== null)
         {
-            string name = string.Format("{0}", index.ToString());
-            gameObject = new GameObject(name);
-            gameObject.transform.SetParent(parent);
-            gameObject.transform.position = position;
-
-            MeshFilter filter = gameObject.AddComponent<MeshFilter>();
-            MeshRenderer renderer = gameObject.AddComponent<MeshRenderer>();
-            MeshCollider collider = gameObject.AddComponent<MeshCollider>();
-            filter.mesh = mesh;
-            renderer.material = material;
-            collider.sharedMesh = mesh;
 
             LineRenderer lines = gameObject.AddComponent<LineRenderer>();
             lines.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
@@ -45,44 +29,11 @@ public class BattleHexTile : ITile
 
             for (int vert = 0; vert <= 6; vert++)
                 lines.SetPosition(vert, HexGrid<BattleHexTile>.Corner(gameObject.transform.position, radius, vert, hexOrientation));
-
-            GameObject go = new GameObject("Text");
-            go.transform.SetParent(gameObject.transform);
-            go.transform.localPosition = Vector3.zero;
-            go.transform.localEulerAngles = new Vector3(90, 0, 0);
-            TextMesh text = go.AddComponent<TextMesh>();
-            text.anchor = TextAnchor.MiddleCenter;
-            text.alignment = TextAlignment.Center;
-            text.text = name;
-            text.color = Color.black;
-            text.fontSize = 7;
-
-            SetColor(defaultColor);
+         
         }
     }
 
-    public void Select(bool value)
-    {
-        SetColor(value ? Color.green : defaultColor);
-    }
-    public void SetColor(Color color)
-    {
-        if (gameObject)
-        {
-            MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
-            renderer.material.SetColor("_Color", color);
-        }
-    }
-
-    public void Clear()
-    {
-        if (gameObject)
-        {
-            Object.DestroyImmediate(gameObject);
-        }
-
-        gameObject = null;
-    }
+    
 }
 
 public class BattleHexGrid :HexGrid<BattleHexTile>
@@ -141,7 +92,9 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                     var it = tiles.GetEnumerator();
                     while(it.MoveNext())
                     {
-                        it.Current.Value.Show(root.transform, mTileMesh, mMaterial, radius,orientation);
+                        it.Current.Value.radius = radius;
+                        it.Current.Value.hexOrientation = orientation;
+                        it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
                     }
                 }
                 else
@@ -209,8 +162,9 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                     mMaterial = obj as Material;
                 });
             }
-
-            t.Show(root.transform, mTileMesh, mMaterial, radius, orientation);
+            t.radius = radius;
+            t.hexOrientation = orientation;
+            t.Show(root.transform, mTileMesh, mMaterial);
         }
         return t; 
     }

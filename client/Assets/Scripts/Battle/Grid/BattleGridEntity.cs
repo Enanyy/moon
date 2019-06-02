@@ -3,7 +3,7 @@
 
 public class BattleGridEntity : BattleEntity
 {
-    public ITile tile { get; private set; }
+    public BattleTile tile { get; private set; }
 
     public TB_Hero hero { get; private set; }
 
