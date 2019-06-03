@@ -76,7 +76,7 @@ public class AssetEntity :IPoolObject
         if (gameObject != null)
         {
             gameObject.SetActive(false);
-            AssetPool.ReturnInstance(asset);
+            AssetManager.Instance.ReturnInstance(asset);
         }
 
         asset = null;
@@ -87,7 +87,7 @@ public class AssetEntity :IPoolObject
         if (gameObject != null)
         { 
             gameObject.SetActive(false);
-            AssetPool.ReturnInstance(asset);
+            AssetManager.Instance.ReturnInstance(asset);
         }
         asset = null;
     }
