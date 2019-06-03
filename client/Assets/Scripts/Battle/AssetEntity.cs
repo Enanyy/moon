@@ -11,13 +11,13 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-public class AssetEntity : IPoolObject
+public class AssetEntity :IPoolObject
 {
     public bool isPool { get ; set ; }
 
     public GameObject gameObject { get; private set; }
-    
-    public uint assetID { get; private set; }
+
+    public AssetObject asset { get; private set; }
     public AssetEntity()
     {
         
@@ -25,10 +25,10 @@ public class AssetEntity : IPoolObject
 
     protected void LoadAsset(uint assetID)
     {
-        this.assetID = assetID;
-
-        AssetManager.Instance.Instantiate(assetID, (id, go) => {
-            gameObject = go;
+       
+        AssetManager.Instance.Instantiate(assetID, (asset) => {
+            this.gameObject = asset.gameObject;
+            this.asset = asset;
             OnAssetLoad();
 
         });
@@ -76,9 +76,10 @@ public class AssetEntity : IPoolObject
         if (gameObject != null)
         {
             gameObject.SetActive(false);
-            AssetPool.ReturnInstance(assetID, gameObject);
+            AssetPool.ReturnInstance(asset);
         }
-        assetID = 0;
+
+        asset = null;
     }
 
     public virtual void OnReturn()
@@ -86,9 +87,9 @@ public class AssetEntity : IPoolObject
         if (gameObject != null)
         { 
             gameObject.SetActive(false);
-            AssetPool.ReturnInstance(assetID, gameObject);
+            AssetPool.ReturnInstance(asset);
         }
-        assetID = 0;
+        asset = null;
     }
     public virtual void Recycle()
     {

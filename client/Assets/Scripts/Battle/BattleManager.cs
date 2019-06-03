@@ -84,11 +84,11 @@ public class BattleManager
         {
             string path = AssetPath.Get(configid);
 
-            AssetManager.Instance.Load(configid, (id, obj) => {
+            AssetManager.Instance.Load(configid, (asset) => {
 
-                if (obj)
+                if (asset!= null)
                 { 
-                    var xml = obj as TextAsset;
+                    var xml = asset.obj as TextAsset;
                     if (xml)
                     {
                         var param = BattleParam.Create(xml.text) as ModelParam;

@@ -55,19 +55,29 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                     }
                     if (mMaterial == null)
                     {
-                        AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (id, obj) => {
+                        AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (asset) => {
 
-                            mMaterial = obj as Material;
+                            mMaterial = asset.obj as Material;
+                            root = new GameObject("Grid");
+                            root.transform.position = original;
+                            var it = tiles.GetEnumerator();
+                            while (it.MoveNext())
+                            {
+                                it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                            }
                         });
                     }
-
-                    root = new GameObject("Grid");
-                    root.transform.position = original;
-                    var it = tiles.GetEnumerator();
-                    while(it.MoveNext())
+                    else
                     {
-                        it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                        root = new GameObject("Grid");
+                        root.transform.position = original;
+                        var it = tiles.GetEnumerator();
+                        while (it.MoveNext())
+                        {
+                            it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                        }
                     }
+                   
                 }
                 else
                 {
@@ -124,13 +134,18 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
             }
             if(mMaterial == null)
             {
-                AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (id, obj) => {
+                AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (asset) => {
 
-                    mMaterial = obj as Material;
+                    mMaterial = asset.obj as Material;
+                    t.Show(root.transform, mTileMesh, mMaterial);
+
                 });
             }
+            else
+            {
+                t.Show(root.transform, mTileMesh, mMaterial);
+            }
 
-            t.Show(root.transform,mTileMesh,mMaterial);
         }
         return t; 
     }
@@ -200,7 +215,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                     var p = TileAt(destination);
                                     if (p != null)
                                     {
-                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                        p.SetColor();
                                     }
                                 },
                                 (entity, destination) =>
@@ -208,7 +223,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                     var p = TileAt(destination);
                                     if (p != null)
                                     {
-                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                        p.SetColor();
                                     }
                                 });
                             mEntity.PlayAction(ActionType.Jump, jump);
@@ -220,7 +235,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                     var p = TileAt(destination);
                                     if (p != null)
                                     {
-                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                        p.SetColor();
                                     }
                                 },
                                 (entity, destination) =>
@@ -228,7 +243,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                     var p = TileAt(destination);
                                     if (p != null)
                                     {
-                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                        p.SetColor();
                                     }
                                 });
                         }
@@ -257,7 +272,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                         var p = TileAt(destination);
                                         if (p != null)
                                         {
-                                            p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                            p.SetColor();
                                         }
                                     },
                                     (entity, destination) =>
@@ -265,7 +280,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                         var p = TileAt(destination);
                                         if (p != null)
                                         {
-                                            p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                            p.SetColor();
                                         }
                                     });
                             }
@@ -282,7 +297,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                     var p = TileAt(destination);
                                     if (p != null)
                                     {
-                                        p.SetColor(p.isValid?p.defaultColor:Color.black);
+                                        p.SetColor();
                                     }
                                 },
                                 (entity, destination) =>
@@ -290,7 +305,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                     var p = TileAt(destination);
                                     if (p != null)
                                     {
-                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                        p.SetColor();
                                     }
                                 });
                             }
@@ -315,9 +330,9 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
                     }
 
-                    AssetManager.Instance.Load(AssetID.R_MATERIAL_ARROW, (id, obj) => {
+                    AssetManager.Instance.Load(AssetID.R_MATERIAL_ARROW, (asset) => {
 
-                        mPathRenderer.material = obj as Material;
+                        mPathRenderer.material = asset.obj as Material;
                     });
 
                     
@@ -393,9 +408,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                                 var it = tiles.GetEnumerator();
                                 while (it.MoveNext())
                                 {
-                                    it.Current.Value.SetColor(it.Current.Value.isValid
-                                        ? it.Current.Value.defaultColor
-                                        : Color.black);
+                                    it.Current.Value.SetColor();
                                 }
 
                                 var jumps = mEntity.GetActions(ActionType.Jump);

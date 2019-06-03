@@ -19,8 +19,11 @@ public static class DataTableTool
                     string registerString = "";
                     while(table.Read())
                     {
-                        string tableName = table.GetByColumnName("name","");
-                        string fileName = tableName.Replace("TB", "Table");
+                        string tableName = table.GetByColumnName("name", "");
+                        
+                        string className = tableName.Replace("TB_","TB");
+                        
+                        string fileName = tableName.Replace("TB_", "DT");
 
                         IDString += "\t" + tableName + ",\n";
 
@@ -44,7 +47,9 @@ public static class DataTableTool
     {{
         while (table.Read())
         {{
+//READ_START
            {4}
+//READ_END
         }}          
     }}
     /*
@@ -62,8 +67,8 @@ public static class DataTableTool
 
                             if (info != null)
                             {
-                                string tb = "using System.Collections.Generic;\n\npublic class " + tableName + " { \n";
-                                string read = "/*\t"+tableName+ " o = new "+tableName+"();\n";
+                                string tb = "using System.Collections.Generic;\n\npublic class " + className + "\n{\n//DEFINITION_START\n";
+                                string read = "/*\t"+className+ " o = new "+className+"();\n";
                                 
                                 while (info.Read())
                                 {
@@ -73,16 +78,18 @@ public static class DataTableTool
                                     tb += "\tpublic " + columnType + " " + columnName + ";\n";
                                     read += "\t\t\to." + columnName + " = table.GetByColumnName(\"" + columnName + "\","+(columnType=="string"?"\"\"":"0")+");\n";
                                 }
-                                read += "\t\t\tdata.Add(o.id,o);*/\n";
+
+                                tb += "//DEFINITION_END\n";
+                                read += "\t\t\tdata.Add(o.id,o);*/";
                                 tb += "}";
 
                                 code = string.Format(code, 
                                     fileName,
                                     tableName,
-                                    tableName,
-                                    tableName,
+                                    className,
+                                    className,
                                     read,
-                                    tableName,
+                                    className,
                                     fileName,
                                     tableName
                                     );

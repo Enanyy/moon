@@ -58,6 +58,11 @@ public class BattleTile : ITile
         }
     }
 
+    public virtual void SetColor()
+    {
+        SetColor(isValid?defaultColor:Color.black);
+    }
+
     public virtual void Clear()
     {
         if (gameObject)

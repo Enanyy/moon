@@ -40,7 +40,7 @@ public class DataTableManager
 
         if(SQLite.Instance.Open(bytes))
         {
-//DATATABLE_REGISTER_START			Register(new Table_Hero());
+//DATATABLE_REGISTER_START			Register(new DTHero());
 //DATATABLE_REGISTER_END
             SQLite.Instance.Close();
 

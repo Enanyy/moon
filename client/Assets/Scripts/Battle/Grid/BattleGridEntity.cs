@@ -14,7 +14,7 @@ public class BattleGridEntity : BattleEntity
 {
     public BattleTile tile { get; private set; }
 
-    public TB_Hero hero { get; private set; }
+    public TBHero hero { get; private set; }
 
     public int heroid;
 
@@ -56,7 +56,7 @@ public class BattleGridEntity : BattleEntity
     public override void Init()
     {
 
-        hero = Table_Hero.Get(heroid);
+        hero = DTHero.Get(heroid);
 
         if (hero != null)
         {

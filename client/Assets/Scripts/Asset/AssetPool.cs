@@ -4,27 +4,32 @@ using UnityEngine;
 
 public static class AssetPool
 {
-    static private Dictionary<uint, Queue<GameObject>> _pool = new Dictionary<uint, Queue<GameObject>>();
+    static private Dictionary<uint, Queue<AssetObject>> _pool = new Dictionary<uint, Queue<AssetObject>>();
 
     /// <summary>
     /// 归还对象到对象池
     /// </summary>
     /// <param name="o">对象</param>
-    static public void ReturnInstance(uint id, GameObject go) 
+    static public void ReturnInstance(AssetObject asset) 
     {
-        if(go == null)
+        if(asset == null)
         {
             return;
         }
-        go.SetActive(false);
-        if(_pool.ContainsKey(id)==false)
+
+        if (asset.gameObject != null)
         {
-            _pool.Add(id, new Queue<GameObject>());
+            asset.gameObject.SetActive(false);
         }
-        _pool[id].Enqueue(go);
+       
+        if(_pool.ContainsKey(asset.id)==false)
+        {
+            _pool.Add(asset.id, new Queue<AssetObject>());
+        }
+        _pool[asset.id].Enqueue(asset);
     }
 
-    static public GameObject GetInstance(uint id)
+    static public AssetObject GetInstance(uint id)
     {
         if(_pool.ContainsKey(id))
         {
@@ -46,8 +51,12 @@ public static class AssetPool
         {
             while (_pool[id].Count > 0)
             {
-                GameObject go = _pool[id].Dequeue();
-                UnityEngine.Object.Destroy(go);
+                var asset = _pool[id].Dequeue();
+                if (asset.gameObject != null)
+                {
+                    UnityEngine.Object.Destroy(asset.gameObject);
+
+                }
             }
             _pool[id].Clear();
         }
@@ -60,8 +69,12 @@ public static class AssetPool
         {
             while (it.Current.Value.Count > 0)
             {
-                GameObject go = it.Current.Value.Dequeue();
-                UnityEngine.Object.Destroy(go);
+                var asset = it.Current.Value.Dequeue();
+                if (asset.gameObject != null)
+                {
+                    UnityEngine.Object.Destroy(asset.gameObject);
+
+                }
             }
         }
         _pool.Clear();

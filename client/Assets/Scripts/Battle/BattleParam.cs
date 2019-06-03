@@ -204,7 +204,7 @@ public abstract partial class BattleParam
         }
         catch (Exception e)
         {
-            Debug.LogError(e.Message);
+            //Debug.LogError(e.Message);
         }
         return null;
     }

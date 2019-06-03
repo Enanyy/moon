@@ -16,36 +16,48 @@ public class AssetManager
         }
     }
 
-    public void Instantiate(uint id,Action<uint,GameObject> callback)
+    public void Instantiate(uint id,Action<AssetObject> callback)
     {
-        GameObject gameObject = AssetPool.GetInstance(id);
-        if (gameObject == null)
+        Load(id, (asset) =>
+        {
+            if (asset != null)
+            {
+                if (asset.gameObject == null)
+                {
+                    asset.gameObject = UnityEngine.Object.Instantiate(asset.obj) as GameObject;
+                }
+            }
+            if (callback != null)
+            {
+                callback(asset);
+            }
+        });
+    }
+
+    public void Load(uint id, Action<AssetObject> callback)
+    {
+        var asset = AssetPool.GetInstance(id);
+        if (asset == null)
         {
             string assetPath = AssetPath.Get(id);
-            UnityEngine.Object obj = Resources.Load<UnityEngine.Object>(assetPath);
-            gameObject = UnityEngine.Object.Instantiate(obj) as GameObject;
 
-            if(callback!= null)
+            asset = new AssetObject
             {
-                callback(id, gameObject);
+                id = id,
+                obj = Resources.Load<UnityEngine.Object>(assetPath),
+            };
+
+            if (callback != null)
+            {
+                callback(asset);
             }
         }
         else
         {
             if (callback != null)
             {
-                callback(id, gameObject);
+                callback(asset);
             }
-        }
-    }
-
-    public void Load(uint id, Action<uint, UnityEngine.Object> callback)
-    {
-        string assetPath = AssetPath.Get(id);
-        UnityEngine.Object obj = Resources.Load<UnityEngine.Object>(assetPath);
-        if(callback!= null)
-        {
-            callback(id, obj);
         }
     }
 }

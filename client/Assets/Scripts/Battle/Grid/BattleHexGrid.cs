@@ -80,22 +80,34 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                     }
                     if (mMaterial == null)
                     {
-                        AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (id, obj) => {
+                        AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (asset) => {
 
-                            mMaterial = obj as Material;
+                            mMaterial = asset.obj as Material;
+                            root = new GameObject("Grid");
+                            root.transform.position = original;
+                            var it = tiles.GetEnumerator();
+                            while (it.MoveNext())
+                            {
+                                it.Current.Value.radius = radius;
+                                it.Current.Value.hexOrientation = orientation;
+                                it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                            }
                         });
-
                     }
-
-                    root = new GameObject("Grid");
-                    root.transform.position = original;
-                    var it = tiles.GetEnumerator();
-                    while(it.MoveNext())
+                    else
                     {
-                        it.Current.Value.radius = radius;
-                        it.Current.Value.hexOrientation = orientation;
-                        it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                        root = new GameObject("Grid");
+                        root.transform.position = original;
+                        var it = tiles.GetEnumerator();
+                        while (it.MoveNext())
+                        {
+                            it.Current.Value.radius = radius;
+                            it.Current.Value.hexOrientation = orientation;
+                            it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                        }
                     }
+
+                    
                 }
                 else
                 {
@@ -158,14 +170,21 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
             }
             if(mMaterial == null)
             {
-                AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (id, obj) => {
+                AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (asset) => {
 
-                    mMaterial = obj as Material;
+                    mMaterial = asset.obj as Material;
+                    t.radius = radius;
+                    t.hexOrientation = orientation;
+                    t.Show(root.transform, mTileMesh, mMaterial);
                 });
             }
-            t.radius = radius;
-            t.hexOrientation = orientation;
-            t.Show(root.transform, mTileMesh, mMaterial);
+            else
+            {
+                t.radius = radius;
+                t.hexOrientation = orientation;
+                t.Show(root.transform, mTileMesh, mMaterial);
+            }
+          
         }
         return t; 
     }
@@ -202,7 +221,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
             if (tile != null)
             {
                 tile.isValid = !tile.isValid;
-                tile.SetColor(!tile.isValid? Color.black:tile.defaultColor);
+                tile.SetColor();
             }
         }
 
@@ -232,7 +251,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                 var p = TileAt(destination);
                                 if (p != null)
                                 {
-                                    p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    p.SetColor();
                                 }
                             });
                             mEntity.PlayAction(ActionType.Jump, jump);
@@ -244,7 +263,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                 var p = TileAt(destination);
                                 if (p != null)
                                 {
-                                    p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                    p.SetColor();
                                 }
                             });
                         }
@@ -274,7 +293,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                         var p = TileAt(destination);
                                         if (p != null)
                                         {
-                                            p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                            p.SetColor();
                                         }
                                     },
                                     (entity, destination) =>
@@ -282,7 +301,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                         var p = TileAt(destination);
                                         if (p != null)
                                         {
-                                            p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                            p.SetColor();
                                         }
                                     });
                             }
@@ -299,7 +318,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                     var p = TileAt(destination);
                                     if (p != null)
                                     {
-                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                        p.SetColor();
                                     }
                                 },
                                 (entity, destination) =>
@@ -307,7 +326,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                     var p = TileAt(destination);
                                     if (p != null)
                                     {
-                                        p.SetColor(p.isValid ? p.defaultColor : Color.black);
+                                        p.SetColor();
                                     }
                                 });
                             }
@@ -331,9 +350,9 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                         mPathRenderer = root.AddComponent<LineRenderer>();
 
                     }
-                    AssetManager.Instance.Load(AssetID.R_MATERIAL_ARROW, (id, obj) => {
+                    AssetManager.Instance.Load(AssetID.R_MATERIAL_ARROW, (asset) => {
 
-                        mPathRenderer.material = obj as Material;
+                        mPathRenderer.material = asset.obj as Material;
                     });
                     mPathRenderer.startWidth = 1f;
                     mPathRenderer.endWidth = 1f;
@@ -406,9 +425,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                                 var it = tiles.GetEnumerator();
                                 while (it.MoveNext())
                                 {
-                                    it.Current.Value.SetColor(it.Current.Value.isValid
-                                        ? it.Current.Value.defaultColor
-                                        : Color.black);
+                                    it.Current.Value.SetColor();
                                 }
 
                                 var jumps = mEntity.GetActions(ActionType.Jump);
