@@ -309,6 +309,7 @@ public class StateMachine<T> where T: IStateAgent<T>
                 current.OnCancel();
             }
             current.OnExit();
+            current.OnDestroy();
         }
        
         if(previous!=null)
@@ -319,6 +320,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         var it = mStateList.GetEnumerator();
         while(it.MoveNext())
         {
+            it.Current.OnCancel();
             it.Current.OnDestroy();
         }
         mStateList.Clear();

@@ -193,6 +193,8 @@ public class EntityAction : State<BattleEntity>,IPoolObject
         {
             var plugin = mSubStateList[i] as ActionPlugin;
 
+            plugin.agent = null;
+
             ObjectPool.ReturnInstance(plugin, plugin.GetType());
         }
         Clear();

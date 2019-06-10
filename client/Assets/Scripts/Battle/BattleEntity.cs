@@ -11,7 +11,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-public enum EntityProperty
+public enum PropertyID
 {
     PRO_HP = 1,
     PRO_MAX_HP = 2,
@@ -44,7 +44,7 @@ public class BattleEntity:
     public virtual Quaternion rotation { get; set; }
     public float scale { get; set; }
 
-    public Dictionary<uint,int> properties { get; private set; }
+    public Dictionary<uint,IEntityProperty> properties { get; private set; }
 
     public StateMachine<BattleEntity> machine { get; private set; }
 
@@ -112,7 +112,7 @@ public class BattleEntity:
     {
         get
         {
-            float radius = GetProperty(EntityProperty.PRO_RADIUS) * 0.01f;
+            float radius = GetProperty<float>(PropertyID.PRO_RADIUS);
 
             Vector3 forward = rotation * Vector3.forward;
             Vector3 right = rotation * Vector3.right;
@@ -135,7 +135,7 @@ public class BattleEntity:
     public BattleEntity()
     {
         machine = new StateMachine<BattleEntity>(this);
-        properties = new Dictionary<uint, int>();
+        properties = new Dictionary<uint, IEntityProperty>();
         Clear();
     }
 
@@ -184,38 +184,45 @@ public class BattleEntity:
 
     public void ResetProperty()
     {
-        SetProperty(EntityProperty.PRO_HP, 0);
-        SetProperty(EntityProperty.PRO_MAX_HP, 0);
-        SetProperty(EntityProperty.PRO_ATTACK, 0);
-        SetProperty(EntityProperty.PRO_DEFENSE, 0);
-        SetProperty(EntityProperty.PRO_MOVE_SPEED, 6);
-        SetProperty(EntityProperty.PRO_ATTACK_DURATION, 2);
-        SetProperty(EntityProperty.PRO_SEARCH_DISTANCE, 20);
-        SetProperty(EntityProperty.PRO_ATTACK_DISTANCE, 10);
-        SetProperty(EntityProperty.PRO_RADIUS, 1);
+        SetProperty(PropertyID.PRO_HP, 0);
+        SetProperty(PropertyID.PRO_MAX_HP, 0);
+        SetProperty(PropertyID.PRO_ATTACK, 0);
+        SetProperty(PropertyID.PRO_DEFENSE, 0);
+        SetProperty(PropertyID.PRO_MOVE_SPEED, 6f);
+        SetProperty(PropertyID.PRO_ATTACK_DURATION, 2f);
+        SetProperty(PropertyID.PRO_SEARCH_DISTANCE, 20f);
+        SetProperty(PropertyID.PRO_ATTACK_DISTANCE, 10f);
+        SetProperty(PropertyID.PRO_RADIUS, 1f);
     }
 
-    public void SetProperty(EntityProperty property,int value)
+    public void SetProperty<T>(PropertyID id,T value)
     {
-        uint key = (uint)property;
+        uint key = (uint)id;
         if(properties.ContainsKey(key)==false)
         {
-            properties.Add(key, value);
+            properties.Add(key, new EntityProperty<T>
+            {
+                value = value,
+                defaultValue = value,
+            });
         }
         else
         {
-            properties[key] = value;
+            var property = properties[key] as EntityProperty<T>;
+            property.value = value;
         }
     }
 
-    public int GetProperty(EntityProperty property )
+    public T GetProperty<T>(PropertyID id, T defaultValue = default(T))
     {
-        uint key = (uint)property;
-        if(properties.ContainsKey(key))
+        uint key = (uint) id;
+        if (properties.ContainsKey(key))
         {
-            return properties[key];
+            var property = properties[key] as EntityProperty<T>;
+            return property.value;
         }
-        return 0;
+
+        return defaultValue;
     }
 
     public void PlayAction(ActionType actionType, EntityAction action = null,bool first = false)
@@ -283,7 +290,7 @@ public class BattleEntity:
 
     public void UpdateProperty(PBMessage.BattleEntityProperty property)
     {
-        SetProperty((EntityProperty)property.key, property.value);
+        SetProperty((PropertyID)property.key, property.value);
     }
 
     public  void UpdateProperty(List<PBMessage.BattleEntityProperty> properties)

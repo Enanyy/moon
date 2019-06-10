@@ -104,11 +104,34 @@ public abstract class Grid<T> where T: class, ITile,new()
             get { return h + g; }
         }
         public T parent = null;
+
+        public void Clear()
+        {
+            h = 0;
+            g = 0;
+            parent = null;
+        }
     }
 
     private List<T> mOpenList = new List<T>();
     private List<T> mCloseList = new List<T>();
     private Dictionary<T, PathNode> mNodeDic = new Dictionary<T, PathNode>();
+
+    private PathNode GetNode(T t)
+    {
+        if (mNodeDic.ContainsKey(t) == false)
+        {
+            mNodeDic.Add(t, new PathNode
+            {
+                h = 0,
+                g = 0,
+                tile = t,
+                parent = null,
+            });
+        }
+
+        return mNodeDic[t];
+    }
 
     public Stack<T> FindPath(T from, T to, Func<T, bool> isValid, Func<T, List<T>> getNeihbors,
         Func<T, T, int> getCostValue)
@@ -123,7 +146,12 @@ public abstract class Grid<T> where T: class, ITile,new()
 
         mOpenList.Clear();
         mCloseList.Clear();
-        mNodeDic.Clear();
+
+        var it = mNodeDic.GetEnumerator();
+        while (it.MoveNext())
+        {
+            it.Current.Value.Clear();
+        }
 
 
         //将起点作为待处理的点放入开启列表，
@@ -135,34 +163,15 @@ public abstract class Grid<T> where T: class, ITile,new()
             //遍历开启列表，找到消费最小的点作为检查点
             T cur = mOpenList[0];
 
-            if (mNodeDic.ContainsKey(cur) == false)
-            {
-                mNodeDic.Add(cur, new PathNode
-                {
-                    h = 0,
-                    g = 0,
-                    tile = cur,
-                    parent = null,
-                });
-            }
+           
 
-            var curNode = mNodeDic[cur];
+            var curNode = GetNode(cur);
 
             for (int i = 0; i < mOpenList.Count; i++)
             {
                 var t = mOpenList[i];
-                if (mNodeDic.ContainsKey(t) == false)
-                {
-                    mNodeDic.Add(t, new PathNode
-                    {
-                        h = 0,
-                        g = 0,
-                        tile = t,
-                        parent = null,
-                    });
-                }
 
-                var node = mNodeDic[t];
+                var node = GetNode(t);
 
                 if (node.f < curNode.f && node.h < curNode.h)
                 {
@@ -183,9 +192,10 @@ public abstract class Grid<T> where T: class, ITile,new()
                 while (tile != null)
                 {
                     result.Push(tile);
-                    if (mNodeDic.ContainsKey(tile))
+                    var node = GetNode(tile);
+                    if (node!= null)
                     {
-                        tile = mNodeDic[tile].parent;
+                        tile = node.parent;
                     }
                     else
                     {
@@ -210,18 +220,7 @@ public abstract class Grid<T> where T: class, ITile,new()
 
                 int cost = curNode.g + getCostValue(neighbour, cur);
 
-                if (mNodeDic.ContainsKey(neighbour) == false)
-                {
-                    mNodeDic.Add(neighbour, new PathNode
-                    {
-                        tile = neighbour,
-                        g = 0,
-                        h = 0,
-                        parent = null,
-                    });
-                }
-
-                var neighborNode = mNodeDic[neighbour];
+                var neighborNode = GetNode(neighbour);
 
                 if (cost < neighborNode.g || !mOpenList.Contains(neighbour))
                 {
