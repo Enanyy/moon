@@ -125,5 +125,15 @@ public class CameraManager : MonoBehaviour
         }
 
     }
+
+    public Vector3 GetWorldMousePosition()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+        float distance;
+        mPlane.Raycast(ray, out distance);
+
+        return ray.GetPoint(distance);
+    }
 }
 

@@ -166,13 +166,12 @@ public class SUFBXPostprocessor : AssetPostprocessor
                     animationParam = new AnimationParam();
                     animationParam.rect = new Rect(600, 20, TreeNode.WIDTH, TreeNode.HEIGHT);
 
-                    actionParam.children.Add(animationParam);
+                    modelParam.children.Add(animationParam);
                 }
                 animationParam.animationClip = animName;
                 animationParam.length = clip.length;
                 animationParam.mode = GetWrapMode(animName);
-                animationParam.isDefault = IsDefalutAnimationClip(animName);
-
+                
             }
         }
         var empty = sm.AddState("empty", new Vector3(180, 25 + 50 * rightIndex, 0));
@@ -391,19 +390,6 @@ public class SUFBXPostprocessor : AssetPostprocessor
         return WrapMode.Default;
     }
 
-    static bool IsDefalutAnimationClip(string clipName)
-    {
-        if (clipName == "idle"
-         || clipName == "run"
-         || clipName == "die"
-         || clipName == "victory"
-         || clipName == "attack01"
-         || clipName == "retreat"
-         )
-        {
-            return true;
-        }
-        return false;
-    }
+   
 }
 

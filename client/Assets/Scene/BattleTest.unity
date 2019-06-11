@@ -453,37 +453,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2126523731}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5221a09e7850c84e94909b2425ca69c, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f41973830f2d6d4e868029e34971566, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 100
-  CreateList:
-  - type: 0
-    id: 10003
-    AI: 0
-    count: 1
-    camp: 0
-  - type: 0
-    id: 10001
-    AI: 1
-    count: 1
-    camp: 1
-  - type: 0
-    id: 10002
-    AI: 1
-    count: 1
-    camp: 1
-  - type: 0
-    id: 10003
-    AI: 1
-    count: 1
-    camp: 1
-  - type: 0
-    id: 10004
-    AI: 1
-    count: 1
-    camp: 1
-  radiusType: 4
+  ip: 127.0.0.1
+  port: 5000
+  username: lwg
+  pwd: 1234
+  showType: 5
 --- !u!4 &2126523733
 Transform:
   m_ObjectHideFlags: 0

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
 using System.IO;
+using System.Linq;
+
 #if UNITY_EDITOR
 public interface INode
 {
@@ -82,6 +84,22 @@ public abstract partial class BattleParam
     public Rect rect { get; set; }
     public List<BattleParam> children = new List<BattleParam>();
 
+    public BattleParam parent { get; set; }
+
+    public BattleParam root
+    {
+        get
+        {
+            var param = this;
+            while (param.parent!= null)
+            {
+                param = param.parent;
+            }
+
+            return param;
+        }
+    }
+
     public BattleParam()
     {
         name = type.ToString();
@@ -155,6 +173,7 @@ public abstract partial class BattleParam
                         if (param != null)
                         {
                             param.ParseXml(child);
+                            param.parent = this;
                             children.Add(param);
                         }
                     }
@@ -163,7 +182,20 @@ public abstract partial class BattleParam
         }
     }
 
+    public List<T> GetParams<T>() where T : BattleParam
+    {
+        List<T> list = new List<T>();
+        for (int i = 0; i < children.Count; i++)
+        {
+            var param = children[i] as T;
+            if (param != null)
+            {
+                list.Add(param);
+            }
+        }
 
+        return list;
+    }
 
     public static bool IsTypeOrSubClass(string tag, Type subClass)
     {
@@ -265,6 +297,7 @@ public abstract partial class BattleParam
         BattleParam param = node as BattleParam;
         if(param!= null)
         {
+            param.parent = this;
             children.Add(param);
         }
     }
@@ -306,6 +339,8 @@ public partial class ModelParam : BattleParam
 
     public ModelParam() { type = BattleParamType.Model; name = "Model"; }
 
+    
+
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
     {
@@ -323,6 +358,11 @@ public partial class ModelParam : BattleParam
     }
     public override bool LinkAble(INode node)
     {
+        if (node.GetType() == typeof(AnimationParam))
+        {
+            return true;
+        }
+
         if(node.GetType() == typeof(ActionParam))
         {
             bool linkable = true;
@@ -392,6 +432,8 @@ public partial class ModelParam : BattleParam
         }
         return null;
     }
+
+    
 }
 
 public partial class ActionParam :BattleParam
@@ -410,11 +452,8 @@ public partial class ActionParam :BattleParam
     public int weight;
     public float duration;
 
-    public bool useAnimationLength = true;
-
-    private List<AnimationParam> mAnimations = new List<AnimationParam>();
-    private List<PluginParam> mPlugins = new List<PluginParam>();
-
+    
+   
     public ActionParam() { type = BattleParamType.Action; name = type.ToString(); }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
@@ -425,34 +464,20 @@ public partial class ActionParam :BattleParam
         r.height += 20;
         weight = UnityEditor.EditorGUILayout.IntField("Weight", weight);
         r.height += 20;
-        GUILayout.BeginHorizontal(new GUILayoutOption[0]);
+        UnityEditor.EditorGUILayout.BeginHorizontal();
         duration = Mathf.Clamp( UnityEditor.EditorGUILayout.FloatField("Duration", duration), 0, float.MaxValue);
-        useAnimationLength = UnityEditor.EditorGUILayout.Toggle("", useAnimationLength);
-        if(useAnimationLength)
+        bool loop = duration == 86400;
+        loop = UnityEditor.EditorGUILayout.Toggle("", loop);
+        if (loop)
         {
-            for(int i = 0; i < children.Count;++i)
-            {
-                var child = children[i] as AnimationParam;
-                if(child!= null && child.isDefault)
-                {
-                    if (child.mode == WrapMode.Loop)
-                    {
-                        duration = 86400;
-                    }
-                    else
-                    {
-                        duration = child.length;
-                    }
-                    break;
-                }
-            }
+            duration = 86400;
         }
-        GUILayout.EndHorizontal();
+        UnityEditor.EditorGUILayout.EndHorizontal();
         r.height += 20;
     }
     public override bool LinkAble(INode node)
     {
-        return node.GetType() == typeof(AnimationParam) || node.GetType().IsSubclassOf(typeof(PluginParam));
+        return node.GetType().IsSubclassOf(typeof(PluginParam));
     }
 
     public override Color GetColor()
@@ -470,7 +495,7 @@ public partial class ActionParam :BattleParam
         param.action = this.action;
         param.weight = this.weight;
         param.duration = this.duration;
-        param.useAnimationLength = this.useAnimationLength;
+       
         return base.Clone(param);
     }
 #endif
@@ -483,82 +508,18 @@ public partial class ActionParam :BattleParam
         attributes.Add("state", ((int)action).ToString());
         attributes.Add("weight", weight.ToString());
         attributes.Add("duration", duration.ToString());
-        attributes.Add("useAnimationLength", useAnimationLength?"1":"0");
-
+        
         return base.ToXml(parent, attributes);
 
     }
 
     public override void ParseXml(XmlElement node)
     {
-        action = (ActionType)node.GetAttribute("state").ToInt32Ex();
+        action = (ActionType) node.GetAttribute("state").ToInt32Ex();
         weight = node.GetAttribute("weight").ToInt32Ex();
         duration = node.GetAttribute("duration").ToFloatEx();
-        useAnimationLength = node.GetAttribute("useAnimationLength").ToInt32Ex() == 1;
-      
+
         base.ParseXml(node);
-    }
-    public AnimationParam GetAnimation(string animationClip)
-    {
-        if (children.Count > 0)
-        {
-            for (int j = 0; j < children.Count; ++j)
-            {
-                var animation = children[j] as AnimationParam;
-                if (animation != null && animation.animationClip == animationClip)
-                {
-                    return animation;
-                }
-            }
-        }
-        return null;
-    }
-
-    public AnimationParam GetDefaultAnimation()
-    {
-        if (children.Count > 0)
-        {
-            for (int j = 0; j < children.Count; ++j)
-            {
-                var animation = children[j] as AnimationParam;
-                if (animation != null && animation.isDefault)
-                {
-                    return animation;
-                }
-            }
-        }
-        return null;
-    }
-
-    public List<AnimationParam> GetAnimations()
-    {
-        if(mAnimations.Count <= 0)
-        {
-            for (int j = 0; j < children.Count; ++j)
-            {
-                var animation = children[j] as AnimationParam;
-                if (animation != null )
-                {
-                    mAnimations.Add(animation);
-                }
-            }
-        }
-        return mAnimations;
-    }
-    public List<PluginParam> GetPlugins()
-    {
-        if (mPlugins.Count <= 0)
-        {
-            for (int j = 0; j < children.Count; ++j)
-            {
-                var plugin = children[j] as PluginParam;
-                if (plugin != null)
-                {
-                    mPlugins.Add(plugin);
-                }
-            }
-        }
-        return mPlugins;
     }
 }
 
@@ -566,9 +527,8 @@ public partial class AnimationParam : BattleParam
 {
     public string animationClip;
     public float length;
-    public float triggerAt;
     public WrapMode mode;
-    public bool isDefault;
+ 
     
     public AnimationParam() { type = BattleParamType.Animation; name = type.ToString(); }
 #if UNITY_EDITOR
@@ -585,11 +545,7 @@ public partial class AnimationParam : BattleParam
         mode = (WrapMode)UnityEditor.EditorGUILayout.EnumPopup("Mode", mode);
         r.height += 20;
 
-        triggerAt = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Trigger At", triggerAt), 0, length);
-        r.height += 20;
-
-        isDefault = UnityEditor.EditorGUILayout.Toggle("defalut", isDefault);
-        r.height += 20;
+      
 
     }
     public override bool LinkAble(INode node)
@@ -607,8 +563,7 @@ public partial class AnimationParam : BattleParam
         param.animationClip = this.animationClip;
         param.length = this.length;
         param.mode = this.mode;
-        param.triggerAt = this.triggerAt;
-
+     
         return base.Clone(param);
     }
 
@@ -622,8 +577,8 @@ public partial class AnimationParam : BattleParam
         attributes.Add("animationClip", animationClip);
         attributes.Add("length", length.ToString());
         attributes.Add("mode", ((int)mode).ToString());
-        attributes.Add("triggerAt", triggerAt.ToString());
-        attributes.Add("default", isDefault?"1":"0");
+      
+        
         return base.ToXml(parent, attributes);
     }
 
@@ -632,9 +587,8 @@ public partial class AnimationParam : BattleParam
         animationClip = node.GetAttribute("animationClip");
         length = node.GetAttribute("length").ToFloatEx();
         mode = (WrapMode)node.GetAttribute("mode").ToInt32Ex();
-        triggerAt = node.GetAttribute("triggerAt").ToFloatEx();
-        isDefault = node.GetAttribute("default") == "1";
-
+      
+      
         base.ParseXml(node);
     }
 }
@@ -729,6 +683,131 @@ public partial class JumpPluginParam : PluginParam
 #endif
 }
 
+
+public partial class AnimationPluginParam : PluginParam
+{
+    public class AnimationData
+    {
+        public string animationClip;
+        public float length;
+    }
+
+    public List<AnimationData> animations =new  List<AnimationData>();
+
+    public AnimationPluginParam()
+    {
+        name = "AnimationPlugin";
+        plugin = typeof(ActionAnimationPlugin);
+    }
+#if UNITY_EDITOR
+    public override void Draw(ref Rect r)
+    {
+        base.Draw(ref r);
+      
+        int size = UnityEditor.EditorGUILayout.IntField("Size", animations.Count);
+      
+        r.height += 20;
+
+        if (size > animations.Count)
+        {
+            for (int i = animations.Count; i < size; i++)
+            {
+                animations.Add(new AnimationData());
+            }
+        }
+        else if(size < animations.Count)
+        {
+            for (int i = animations.Count - 1; i >= size; i--)
+            {
+                animations.RemoveAt(i);
+            }
+        }
+
+        if (root != null)
+        {
+            var anims = root.GetParams<AnimationParam>();
+            var names = anims.Select(a => { return a.animationClip; }).ToList();
+
+            for (int i = 0; i < animations.Count; i++)
+            {
+                UnityEditor.EditorGUILayout.LabelField("  Element "+ i);
+                r.height += 20;
+
+                if (string.IsNullOrEmpty(animations[i].animationClip) && parent != null)
+                {
+                    var action = parent as ActionParam;
+                    if (action != null)
+                    {
+                        animations[i].animationClip = action.action.ToString();
+                    }
+                }
+
+                int index = names.IndexOf(animations[i].animationClip);
+                if (index < 0) index = 0;
+
+                index = UnityEditor.EditorGUILayout.Popup("    AnimationClip", index, names.ToArray());
+                r.height += 20;
+
+                if (index >= 0 && index < anims.Count)
+                {
+                    animations[i].animationClip = anims[index].animationClip;
+                    animations[i].length = anims[index].length;
+                }
+
+                animations[i].length = UnityEditor.EditorGUILayout.FloatField("    Length", animations[i].length);
+
+                r.height += 20;
+            }
+        }
+    }
+
+    public override INode Clone(INode node)
+    {
+        var param = new AnimationPluginParam();
+
+        param.animations.AddRange(animations);
+
+        return param;
+    }
+#endif
+
+    public override XmlElement ToXml(XmlNode parent, Dictionary<string, string> attributes = null)
+    {
+        if (attributes == null)
+        {
+            attributes = new Dictionary<string, string>();
+        }
+
+        var node = base.ToXml(parent, attributes);
+
+        for (int i = 0; i < animations.Count; i++)
+        {
+            var animation = new Dictionary<string, string>();
+            animation.Add("animationClip", animations[i].animationClip);
+            animation.Add("length", animations[i].length.ToString());
+            CreateXmlNode(node, "AnimationData", animation);
+        }
+
+        return node;
+    }
+    public override void ParseXml(XmlElement node)
+    {
+        if (node != null)
+        {
+            for (int i = 0; i < node.ChildNodes.Count; i++)
+            {
+                var child = node.ChildNodes[i] as XmlElement;
+                var animation = new AnimationData();
+                animation.animationClip = child.GetAttribute("animationClip");
+                animation.length = child.GetAttribute("length").ToFloatEx();
+                animations.Add(animation);
+            }
+        }
+        base.ParseXml(node);
+    }
+}
+
+
 public abstract partial class EffectParam:BattleParam
 {
     public EffectType effectType { get; protected set; }
@@ -767,7 +846,7 @@ public abstract partial class EffectParam:BattleParam
     }
     public override bool LinkAble(INode node)
     {
-        return node.GetType().IsSubclassOf(typeof(EffectParam));
+        return node.GetType().IsSubclassOf(typeof(EffectParam)) && node != this;
     }
     public override INode Clone(INode node)
     {

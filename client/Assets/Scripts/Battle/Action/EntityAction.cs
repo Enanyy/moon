@@ -66,12 +66,8 @@ public class EntityAction : State<BattleEntity>,IPoolObject
     public uint target;
     public LinkedList<PathPoint> paths { get; private set; }
 
-
-
     public ActionParam param { get; private set; }
-    public AnimationParam animation { get; private set; }
-
-
+   
     public new ActionType type
     {
         get { return (ActionType)base.type; }
@@ -109,23 +105,16 @@ public class EntityAction : State<BattleEntity>,IPoolObject
         {
             weight = action.weight;
             duration = duration == 0 ? action.duration : duration;
-            animation = action.GetDefaultAnimation();
-            if (animation == null)
-            {
-                var animations = action.GetAnimations();
-                if (animations.Count > 0)
-                {
-                    animation = animations[0];
-                }
-            }
-            var plugins = action.GetPlugins();
+
+            var plugins = action.GetParams<PluginParam>();
             for (int i = 0; i < plugins.Count; ++i)
             {
                 try
                 {
-                    IState<BattleEntity> plugin = ObjectPool.GetInstance<ActionPlugin>(plugins[i].plugin);
+                    ActionPlugin plugin = ObjectPool.GetInstance<ActionPlugin>(plugins[i].plugin);
                     if (plugin != null)
                     {
+                        plugin.Init(plugins[i]);
                         AddSubState(plugin);
                     }
                 }
@@ -142,7 +131,7 @@ public class EntityAction : State<BattleEntity>,IPoolObject
     {
         base.Clear();
         param = null;
-        animation = null;
+
        
         skillid = 0;
         target = 0;

@@ -40,7 +40,7 @@ public static class AssetPath
 {
     static readonly Dictionary<uint, string> mAssetPath = new Dictionary<uint, string> {
 //ASSET_PATH_REPLACE_START
-	{ AssetID.R_CONFIG_M_AIRENHUOJIANPAO,"r/config/m_airenhuojianpao.txt" },
+	{ AssetID.R_CONFIG_M_AIRENHUOJIANPAO,"r/config/m_airenhuojianpao1.txt" },
 	{ AssetID.R_CONFIG_YINGXIONG_KULOUQISHI,"r/config/yingxiong_kulouqishi.txt" },
 	{ AssetID.R_CONFIG_NVJIANGJUN,"r/config/nvjiangjun.txt" },
 	{ AssetID.R_CONFIG_PAOSHOU,"r/config/paoshou.txt" },

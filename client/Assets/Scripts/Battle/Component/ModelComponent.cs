@@ -72,7 +72,7 @@ public class ModelComponent :
     private AnimationClip mCurrentAnimationClip;
     public float animationSpeed { get; private set; }
 
-    private float mActionTime;
+
 
     private Animator mAnimator;
     public Animator animator
@@ -109,11 +109,6 @@ public class ModelComponent :
     {
         bool result= base.OnAssetLoad();
        
-
-        if(result && agent!= null && agent.machine != null)
-        {
-            Play(agent.machine.current);
-        }
         if(gameObject!= null)
         {
             gameObject.name = agent.id.ToString();
@@ -174,29 +169,20 @@ public class ModelComponent :
 
     public void OnEnter(State<BattleEntity> state)
     {
-        mActionTime = 0;
-        Play(state);
-        ShowEffect(state, EffectArise.ParentBegin);
+        
+        //Play(state);
+        //ShowEffect(state, EffectArise.ParentBegin);
     }
 
     public void OnExcute(State<BattleEntity> state,float deltaTime)
     {
       
-        EntityAction action = state as EntityAction;
-        if(action.animation!=null)
-        {
-            float triggerAt = action.animation.triggerAt / animationSpeed;
-            if (mActionTime < triggerAt && action.time >= triggerAt)
-            {
-                ShowEffect(state, EffectArise.ParentTrigger);
-            }
-            mActionTime = action.time;
-        }
+       
     }
 
     public void OnExit(State<BattleEntity> state)
     {
-        ShowEffect(state, EffectArise.ParentEnd);
+        //ShowEffect(state, EffectArise.ParentEnd);
     }
 
     public void OnPause(State<BattleEntity> state)
@@ -219,22 +205,11 @@ public class ModelComponent :
 
     }
 
-    private void Play(State<BattleEntity> state)
+
+    public void PlayAnimation(EntityAction action, string name)
     {
-        if(animator == null)
-        {
-            return;
-        }
-
-        EntityAction action = state as EntityAction;
-        if(action == null || action.animation == null)
-        {
-            return;
-        }
-
-       
-        var animationClip = GetAnimationClip(action.animation.animationClip);
-        if(animationClip== null)
+        var animationClip = GetAnimationClip(name);
+        if (animationClip == null)
         {
             return;
         }
@@ -245,7 +220,7 @@ public class ModelComponent :
         }
         else
         {
-            animationSpeed = (action.animation.length / action.duration)* action.speed;
+            animationSpeed = (animationClip.length / action.duration) * action.speed;
         }
 
         if (mCurrentAnimationClip == null
@@ -254,7 +229,7 @@ public class ModelComponent :
         {
             animator.Play("empty", 0);
             animator.Update(0);
-            animator.Play(action.animation.animationClip, 0);
+            animator.Play(name, 0);
             animator.speed = animationSpeed;
             mCurrentAnimationClip = animationClip;
         }
@@ -289,13 +264,13 @@ public class ModelComponent :
     }
     private void ShowEffect(State<BattleEntity> state, EffectArise arise)
     {
-        EntityAction action = state as EntityAction;
-        if (action == null || action.animation == null)
-        {
-            return;
-        }
+        //EntityAction action = state as EntityAction;
+        //if (action == null || action.animation == null)
+        //{
+        //    return;
+        //}
 
-        ShowEffect(action.animation, action.target, arise);
+        //ShowEffect(action.animation, action.target, arise);
     }
 
     private void ShowEffect(AnimationParam param,uint target, EffectArise arise)

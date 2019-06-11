@@ -8,9 +8,17 @@ public class ActionPlugin : IState<BattleEntity>,IPoolObject
 
     public EntityAction action { get { return parent as EntityAction; } }
 
+    public PluginParam param { get; private set; }
+
+
     public bool isPool
     {
         get;set;
+    }
+
+    public virtual void Init(PluginParam param)
+    {
+        this.param = param;
     }
 
     public virtual void OnCancel()
