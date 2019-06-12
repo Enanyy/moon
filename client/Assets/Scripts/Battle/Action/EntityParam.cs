@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
 using System.IO;
-using System.Linq;
 
 #if UNITY_EDITOR
+using System.Linq;
 public interface INode
 {
     string name { get; set; }
@@ -86,6 +86,7 @@ public abstract partial class EntityParam
 
     public EntityParam parent { get; set; }
 
+    public const float DEFAULT_DURATION = 86400;
     public EntityParam root
     {
         get
@@ -241,7 +242,7 @@ public abstract partial class EntityParam
         return null;
     }
 
-    public static int SortParam(EntityParam a, EntityParam b)
+    private static int Sort(EntityParam a, EntityParam b)
     {
         if (a.type == BattleParamType.Action)
         {
@@ -266,7 +267,7 @@ public abstract partial class EntityParam
 
     public static string ToXml(EntityParam root)
     {
-        root.children.Sort(SortParam);
+        root.children.Sort(Sort);
 
         XmlDocument doc = new XmlDocument();
         XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "utf-8", "yes");
@@ -466,11 +467,11 @@ public partial class ActionParam :EntityParam
         r.height += 20;
         UnityEditor.EditorGUILayout.BeginHorizontal();
         duration = Mathf.Clamp( UnityEditor.EditorGUILayout.FloatField("Duration", duration), 0, float.MaxValue);
-        bool loop = duration == 86400;
+        bool loop = duration == DEFAULT_DURATION;
         loop = UnityEditor.EditorGUILayout.Toggle("", loop);
         if (loop)
         {
-            duration = 86400;
+            duration = DEFAULT_DURATION;
         }
         UnityEditor.EditorGUILayout.EndHorizontal();
         r.height += 20;
@@ -528,7 +529,8 @@ public partial class AnimationParam : EntityParam
     public string animationClip;
     public float length;
     public WrapMode mode;
- 
+
+    private AnimationClip mAnimationClip;
     
     public AnimationParam() { type = BattleParamType.Animation; name = type.ToString(); }
 #if UNITY_EDITOR
@@ -545,8 +547,15 @@ public partial class AnimationParam : EntityParam
         mode = (WrapMode)UnityEditor.EditorGUILayout.EnumPopup("Mode", mode);
         r.height += 20;
 
-      
-
+        AnimationClip clip = (AnimationClip)UnityEditor.EditorGUILayout.ObjectField(mAnimationClip, typeof(AnimationClip), false, new GUILayoutOption[0]);
+        if(clip!= null && mAnimationClip!= clip)
+        {
+            mAnimationClip = clip;
+            animationClip = mAnimationClip.name;
+            length = mAnimationClip.length;
+            mode = mAnimationClip.wrapMode;
+        }
+        r.height += 20;
     }
     public override bool LinkAble(INode node)
     {
@@ -703,8 +712,8 @@ public partial class AnimationPluginParam : PluginParam
     public override void Draw(ref Rect r)
     {
         base.Draw(ref r);
-      
-        int size = UnityEditor.EditorGUILayout.IntField("Size", animations.Count);
+
+        int size = Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("Size", animations.Count), 0, 10);
       
         r.height += 20;
 
@@ -725,17 +734,19 @@ public partial class AnimationPluginParam : PluginParam
 
         if (root != null)
         {
+            var action = parent as ActionParam;
+
+
             var anims = root.GetParams<AnimationParam>();
             var names = anims.Select(a => { return a.animationClip; }).ToList();
-
+            float length = 0;
             for (int i = 0; i < animations.Count; i++)
             {
                 UnityEditor.EditorGUILayout.LabelField("  Element "+ i);
-                r.height += 20;
+                r.height += 18;
 
-                if (string.IsNullOrEmpty(animations[i].animationClip) && parent != null)
+                if (string.IsNullOrEmpty(animations[i].animationClip))
                 {
-                    var action = parent as ActionParam;
                     if (action != null)
                     {
                         animations[i].animationClip = action.action.ToString();
@@ -743,21 +754,27 @@ public partial class AnimationPluginParam : PluginParam
                 }
 
                 int index = names.IndexOf(animations[i].animationClip);
-                if (index < 0) index = 0;
 
-                index = UnityEditor.EditorGUILayout.Popup("    AnimationClip", index, names.ToArray());
-                r.height += 20;
+                int j = UnityEditor.EditorGUILayout.Popup("    AnimationClip", index, names.ToArray());
+                r.height += 18;
 
-                if (index >= 0 && index < anims.Count)
+                if (j >= 0 && j < anims.Count && j != index )
                 {
-                    animations[i].animationClip = anims[index].animationClip;
-                    animations[i].length = anims[index].length;
+                    animations[i].animationClip = anims[j].animationClip;
+                    animations[i].length = anims[j].length;
                 }
 
                 animations[i].length = UnityEditor.EditorGUILayout.FloatField("    Length", animations[i].length);
+                r.height += 18;
 
-                r.height += 20;
+                length += animations[i].length;
+
             }
+            if(action!= null && action.duration != DEFAULT_DURATION)
+            {
+                action.duration = length;
+            }
+
         }
     }
 
