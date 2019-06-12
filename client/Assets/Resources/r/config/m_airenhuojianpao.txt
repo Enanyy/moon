@@ -1,31 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ModelParam model="m_airenhuojianpao" assetID="20002" scale="1" hitPosition="(0.0, 1.5, 0.0)" name="Model" rect="(15,140,240,20)">
-  <ActionParam state="0" weight="0" duration="86400" useAnimationLength="1" name="Action" rect="(292,53,240,20)">
-    <AnimationParam animationClip="idle" length="1" mode="2" triggerAt="0" default="1" name="Animation" rect="(642,16,240,20)" />
-    <RotatePluginParam name="RotatePlugin" rect="(913,54,240,20)" />
-  </ActionParam>
-  <ActionParam state="1" weight="1" duration="86400" useAnimationLength="1" name="Action" rect="(301,260,240,20)">
-    <AnimationParam animationClip="run" length="0.9333334" mode="2" triggerAt="0" default="1" name="Animation" rect="(634,233,240,20)" />
-    <RunPluginParam name="RunPlugin" rect="(1087,180,240,20)" />
-    <RotatePluginParam name="RotatePlugin" rect="(1049,291,240,20)" />
-  </ActionParam>
-  <ActionParam state="2" weight="1" duration="1.566667" useAnimationLength="1" name="Action" rect="(299,369,240,20)">
-    <AnimationParam animationClip="attack01" length="1.566667" mode="0" triggerAt="0" default="1" name="Animation" rect="(613,415,240,20)">
-      <EffectParabolaParam speed="20" gravity="9.8" heightOffset="0" heightLimit="20" effectType="4" arise="0" on="0" assetID="30010" delay="0.61" offset="(0.3, 1.4, 0.6)" name="ParabolaEffect" rect="(968,372,240,20)">
-        <EffectTimeParam duration="2" triggerAt="0" bone="0" bind="0" syncAnimationSpeed="0" effectType="1" arise="1" on="2" assetID="30009" delay="0" offset="(0.0, 0.0, 0.0)" name="TimeEffect" rect="(1296,411,240,20)" />
-      </EffectParabolaParam>
-    </AnimationParam>
-    <RotatePluginParam name="RotatePlugin" rect="(611,365,240,20)" />
-  </ActionParam>
-  <ActionParam state="3" weight="10" duration="4.733334" useAnimationLength="1" name="Action" rect="(204,539,240,20)">
-    <AnimationParam animationClip="die" length="4.733334" mode="8" triggerAt="0" default="1" name="Animation" rect="(589,538,240,20)" />
-    <RemovePluginParam name="RunPlugin" rect="(637,718,240,20)" />
-  </ActionParam>
-  <ActionParam state="5" weight="10" duration="1" useAnimationLength="1" name="Action" rect="(329,806,240,20)">
-    <AnimationParam animationClip="idle" length="1" mode="1" triggerAt="0" default="1" name="Animation" rect="(801,814,240,20)" />
-  </ActionParam>
-  <ActionParam state="6" weight="1" duration="86400" useAnimationLength="1" name="Action" rect="(186,668,240,20)">
-    <AnimationParam animationClip="idle" length="1" mode="2" triggerAt="0" default="1" name="Animation" rect="(462,714,240,20)" />
-    <JumpPluginParam name="JumpPlugin" rect="(514,895,240,20)" />
-  </ActionParam>
-</ModelParam>
+<EntityParamModel model="m_airenhuojianpao" assetID="0" scale="1" hitPosition="(0.0, 0.0, 0.0)" name="Model" rect="(20,20,240,20)">
+  <EntityParamAction action="Idle" weight="0" duration="86400" name="Action" rect="(292,34,240,20)">
+    <EntityParamPluginAnimation name="AnimationPlugin" rect="(575,17,240,20)">
+      <AnimationData animationClip="idle" length="1" />
+    </EntityParamPluginAnimation>
+  </EntityParamAction>
+  <EntityParamAction action="Run" weight="1" duration="86400" name="Action" rect="(282,139,240,20)">
+    <EntityParamPluginAnimation name="AnimationPlugin" rect="(570,146,240,20)">
+      <AnimationData animationClip="run" length="0.9333334" />
+    </EntityParamPluginAnimation>
+  </EntityParamAction>
+  <EntityParamAction action="Attack" weight="1" duration="1.566667" name="Action" rect="(286,233,240,20)">
+    <EntityParamPluginAnimation name="AnimationPlugin" rect="(574,272,240,20)">
+      <AnimationData animationClip="attack01" length="1.566667" />
+    </EntityParamPluginAnimation>
+  </EntityParamAction>
+  <EntityParamAction action="Die" weight="10" duration="4.733334" name="Action" rect="(294,334,240,20)">
+    <EntityParamPluginAnimation name="AnimationPlugin" rect="(572,405,240,20)">
+      <AnimationData animationClip="die" length="4.733334" />
+    </EntityParamPluginAnimation>
+  </EntityParamAction>
+  <EntityParamAnimation animationClip="attack01" length="1.566667" mode="Default" name="Animation" rect="(19,388,240,20)" />
+  <EntityParamAnimation animationClip="die" length="4.733334" mode="ClampForever" name="Animation" rect="(25,493,240,20)" />
+  <EntityParamAnimation animationClip="idle" length="1" mode="Loop" name="Animation" rect="(12,155,240,20)" />
+  <EntityParamAnimation animationClip="run" length="0.9333334" mode="Loop" name="Animation" rect="(15,272,240,20)" />
+</EntityParamModel>

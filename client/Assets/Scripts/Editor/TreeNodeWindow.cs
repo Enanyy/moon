@@ -43,10 +43,10 @@ public class TreeNodeWindow : EditorWindow
     {
         hideFlags = HideFlags.HideAndDontSave;
 
-        onLoad = BattleParamTool.OnLoad;
-        onSave = BattleParamTool.OnSave;
-        onInitMenu = BattleParamTool.OnInitMenu;
-        onDataChange = BattleParamTool.onDataChange;
+        onLoad = EntityParamTool.OnLoad;
+        onSave = EntityParamTool.OnSave;
+        onInitMenu = EntityParamTool.OnInitMenu;
+        onDataChange = EntityParamTool.onDataChange;
 
         if (onInitMenu != null)
         {
@@ -298,6 +298,11 @@ public class TreeNodeWindow : EditorWindow
     /// <param name="id"></param>
     private void DrawNode(int i)
     {
+        if(data == null)
+        {
+            return;
+        }
+
         if (i >= 0 && i < data.nodes.Count)
         {
             data.nodes[i].DrawWindow();

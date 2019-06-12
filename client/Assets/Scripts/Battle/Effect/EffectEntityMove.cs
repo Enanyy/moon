@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public  class EffectMoveEntity:EffectEntity
+public  class EffectEntityMove:EffectEntity
 {
     private Vector3 mFrom;
     private Vector3 mTo;
@@ -10,7 +10,7 @@ public  class EffectMoveEntity:EffectEntity
     protected override void OnInit(IGameObject on)
     {
         base.OnInit(on);
-        var move = param as EffectMoveParam;
+        var move = param as EntityParamEffectMove;
    
         if (on!=null)
         {

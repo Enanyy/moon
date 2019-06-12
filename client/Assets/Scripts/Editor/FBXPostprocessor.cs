@@ -79,18 +79,18 @@ public class SUFBXPostprocessor : AssetPostprocessor
         DirectoryInfo dir = new DirectoryInfo(dirName);
         FileInfo[] files = dir.GetFiles("*.fbx");
 
-        ModelParam modelParam = null;
+        EntityParamModel modelParam = null;
         string configFullPath = string.Format("{0}/Resources/r/config/{1}.txt", Application.dataPath, obj.name.ToLower());
 
         Debug.Log(configFullPath);
         if(File.Exists(configFullPath)==false)
         {
-            modelParam = new ModelParam();
+            modelParam = new EntityParamModel();
             modelParam.rect = new Rect(20, 20, TreeNode.WIDTH, TreeNode.HEIGHT);
         }
         else
         {
-            modelParam = EntityParam.Create(File.ReadAllText(configFullPath)) as ModelParam;
+            modelParam = EntityParam.Create(File.ReadAllText(configFullPath)) as EntityParamModel;
         }
 
         modelParam.model = obj.name.ToLower();
@@ -134,10 +134,10 @@ public class SUFBXPostprocessor : AssetPostprocessor
             if (modelParam != null)
             {
                 ActionType type = GetActionType(animName);
-                ActionParam actionParam = null;
+                EntityParamAction actionParam = null;
                 for(int j = 0; j < modelParam.children.Count; ++j)
                 {
-                    var child = modelParam.children[j] as ActionParam;
+                    var child = modelParam.children[j] as EntityParamAction;
                     if(child!=null && type == child.action)
                     {
                         actionParam = child;break;
@@ -145,17 +145,17 @@ public class SUFBXPostprocessor : AssetPostprocessor
                 }
                 if(actionParam== null)
                 {
-                    actionParam = new ActionParam();
+                    actionParam = new EntityParamAction();
                     actionParam.rect = new Rect(300, 20, TreeNode.WIDTH, TreeNode.HEIGHT);
                     modelParam.children.Add(actionParam);
                 }
                 actionParam.action = type;
-                actionParam.weight = ActionParam.ActionWeights[type];
+                actionParam.weight = EntityParamAction.ActionWeights[type];
 
-                AnimationParam animationParam = null;
+                EntityParamAnimation animationParam = null;
                 for(int j = 0; j < actionParam.children.Count; ++j)
                 {
-                    var child = actionParam.children[j] as AnimationParam;
+                    var child = actionParam.children[j] as EntityParamAnimation;
                     if (child != null && child.animationClip == animationClip)
                     {
                         animationParam = child; break;
@@ -163,7 +163,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
                 }
                 if(animationParam == null)
                 {
-                    animationParam = new AnimationParam();
+                    animationParam = new EntityParamAnimation();
                     animationParam.rect = new Rect(600, 20, TreeNode.WIDTH, TreeNode.HEIGHT);
 
                     modelParam.children.Add(animationParam);
@@ -182,7 +182,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
         {
             File.Delete(configFullPath);
         }
-        BattleParamTool.Save(modelParam, configFullPath);
+        EntityParamTool.Save(modelParam, configFullPath);
        
         // 如果目录下预制体不存在，则创建预制体
         string prefabPath = string.Format("Assets/Resources/r/model/{0}.prefab", obj.name.ToLower());

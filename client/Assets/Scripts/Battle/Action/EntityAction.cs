@@ -66,7 +66,7 @@ public class EntityAction : State<BattleEntity>,IPoolObject
     public uint target;
     public LinkedList<PathPoint> paths { get; private set; }
 
-    public ActionParam param { get; private set; }
+    public EntityParamAction param { get; private set; }
    
     public new ActionType type
     {
@@ -100,13 +100,13 @@ public class EntityAction : State<BattleEntity>,IPoolObject
             return;
         }
 
-        ActionParam action = agent.param.GetAction(type);
+        EntityParamAction action = agent.param.GetAction(type);
         if (action != null)
         {
             weight = action.weight;
             duration = duration == 0 ? action.duration : duration;
 
-            var plugins = action.GetParams<PluginParam>();
+            var plugins = action.GetParams<EntityParamPlugin>();
             for (int i = 0; i < plugins.Count; ++i)
             {
                 try

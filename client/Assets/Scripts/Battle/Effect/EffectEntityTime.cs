@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectTimeEntity : EffectEntity
+public class EffectEntityTime : EffectEntity
 {
     private float mEffectTime;
     protected override void OnInit(IGameObject on)
     {
         base.OnInit(on);
         mEffectTime = 0;
-        EffectTimeParam timeParam = param as EffectTimeParam;
+        EntityParamEffectTime  timeParam = param as EntityParamEffectTime ;
         if (mEffectTime >= timeParam.duration)
         {
             OnEnd();
@@ -21,7 +21,7 @@ public class EffectTimeEntity : EffectEntity
 
         if (gameObject)
         {
-            var time = param as EffectTimeParam;
+            var time = param as EntityParamEffectTime ;
             var bone = false;
             var on = GetOnAgent();
             var entity = on as BattleEntity;
@@ -72,7 +72,7 @@ public class EffectTimeEntity : EffectEntity
     public override void OnUpdate(float deltaTime)
     {
         base.OnUpdate(deltaTime);
-        var time = param as EffectTimeParam;
+        var time = param as EntityParamEffectTime ;
 
         if (mEffectTime < time.duration)
         {

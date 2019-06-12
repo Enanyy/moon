@@ -7,7 +7,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEditor.Callbacks;
 
-public static class BattleParamTool
+public static class EntityParamTool
 {
     public static List<TreeNodeMenu> OnInitMenu()
     {
@@ -75,7 +75,7 @@ public static class BattleParamTool
         var root = graph.GetRoot();
         if (root != null)
         {
-            var param = root.data as ModelParam;
+            var param = root.data as EntityParamModel;
             
             string path = EditorUtility.SaveFilePanel("导出特效配置文件", Application.dataPath + "/Resources/r/config/", param.model, "txt");
             path = path.ToLower();
@@ -90,7 +90,7 @@ public static class BattleParamTool
         }
     }
 
-    public static void Save(ModelParam param, string path)
+    public static void Save(EntityParamModel param, string path)
     {
         string xml = EntityParam.ToXml(param);
         if (!string.IsNullOrEmpty(path))

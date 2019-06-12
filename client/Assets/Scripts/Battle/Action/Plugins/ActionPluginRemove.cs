@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class ActionRemovePlugin : ActionPlugin
+public class ActionPluginRemove : ActionPlugin
 {
     public override void OnExit()
     {

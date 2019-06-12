@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectFollowEntity : EffectEntity
+public class EffectEntityFollow : EffectEntity
 {
     public override void OnUpdate(float deltaTime)
     {
@@ -19,7 +19,7 @@ public class EffectFollowEntity : EffectEntity
             return;
         }
        
-        var follow = param as EffectFollowParam;
+        var follow = param as EntityParamEffectFollow ;
         Vector3 from = position;
         Vector3 to = Vector3.zero;
         if (target == null)

@@ -8,7 +8,7 @@ public class ActionPlugin : IState<BattleEntity>,IPoolObject
 
     public EntityAction action { get { return parent as EntityAction; } }
 
-    public PluginParam param { get; private set; }
+    public EntityParamPlugin param { get; private set; }
 
 
     public bool isPool
@@ -16,7 +16,7 @@ public class ActionPlugin : IState<BattleEntity>,IPoolObject
         get;set;
     }
 
-    public virtual void Init(PluginParam param)
+    public virtual void Init(EntityParamPlugin param)
     {
         this.param = param;
     }

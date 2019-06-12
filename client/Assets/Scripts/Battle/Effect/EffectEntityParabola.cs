@@ -17,7 +17,7 @@ public class EffectParabolaEntity : EffectEntity
     protected override void OnInit(IGameObject on)
     {
         base.OnInit(on);
-        var parabola = param as EffectParabolaParam;
+        var parabola = param as EntityParamEffectParabola ;
         mGravity = -Math.Abs(parabola.gravity);
         mHeightLimit = parabola.heightLimit;
         if (target != null)

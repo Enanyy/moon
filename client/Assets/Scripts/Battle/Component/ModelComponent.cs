@@ -98,7 +98,7 @@ public class ModelComponent :
     public void OnStart()
     {
         animationSpeed = 1;
-        ModelParam param = agent.param;
+        EntityParamModel param = agent.param;
         if (param!=null)
         {
             LoadAsset(param.assetID);
@@ -273,7 +273,7 @@ public class ModelComponent :
         //ShowEffect(action.animation, action.target, arise);
     }
 
-    private void ShowEffect(AnimationParam param,uint target, EffectArise arise)
+    private void ShowEffect(EntityParamAnimation param,uint target, EffectArise arise)
     {
         if (param == null)
         {
@@ -282,7 +282,7 @@ public class ModelComponent :
 
         for (int i = 0; i < param.children.Count; ++i)
         {
-            var child = param.children[i] as EffectParam;
+            var child = param.children[i] as EntityParamEffect ;
             if (child== null || child.assetID == 0 || child.arise != arise)
             {
                 continue;

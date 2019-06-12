@@ -49,7 +49,7 @@ public class BattleEntity:
     public StateMachine<BattleEntity> machine { get; private set; }
 
 
-    public ModelParam param { get;private set; }
+    public EntityParamModel param { get;private set; }
 
     private bool mPause;
     public bool isPause

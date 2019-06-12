@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ActionAnimationPlugin : ActionPlugin
+public class ActionPluginAnimation : ActionPlugin
 {
     public override void OnEnter()
     {
@@ -28,7 +28,7 @@ public class ActionAnimationPlugin : ActionPlugin
             return;
         }
        
-        AnimationPluginParam animationPluginParam = param as AnimationPluginParam;
+        EntityParamPluginAnimation animationPluginParam = param as EntityParamPluginAnimation;
         if (animationPluginParam == null)
         {
             return;

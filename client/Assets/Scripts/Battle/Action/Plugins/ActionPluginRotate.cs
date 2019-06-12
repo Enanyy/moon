@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class ActionRotatePlugin : ActionPlugin
+public class ActionPluginRotate : ActionPlugin
 {
     private BattleEntity mTargetEntity;
     public override void OnExcute(float deltaTime)

@@ -17,7 +17,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
     }
 
 
-    public EffectParam param { get; private set; }
+    public EntityParamEffect  param { get; private set; }
 
 
     private float mEffectSpeed = 1;
@@ -25,7 +25,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
     private Animator[] mAnimators;
 
 
-    public virtual bool Init(EffectParam param, BattleEntity agent, uint target, EffectEntity parent)
+    public virtual bool Init(EntityParamEffect  param, BattleEntity agent, uint target, EffectEntity parent)
     {
         this.param = param;
         this.agent = agent;
@@ -164,7 +164,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
         }
         for(int i = 0; i < param.children.Count; ++i)
         {
-            var child = param.children[i] as EffectParam;
+            var child = param.children[i] as EntityParamEffect ;
             if (child == null || child.assetID == 0 || child.arise != arise)
             {
                 continue;

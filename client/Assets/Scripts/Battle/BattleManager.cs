@@ -27,7 +27,7 @@ public class BattleManager
         }
     }
 
-    private Dictionary<uint, ModelParam> mParams = new Dictionary<uint, ModelParam>();
+    private Dictionary<uint, EntityParamModel> mParams = new Dictionary<uint, EntityParamModel>();
 
     /// <summary>
     /// <nodeid,list>
@@ -70,7 +70,7 @@ public class BattleManager
         return true;
     }
 
-    public void GetParam(uint configid,Action<ModelParam> callback)
+    public void GetParam(uint configid,Action<EntityParamModel> callback)
     {
         if(mParams.ContainsKey(configid))
         {
@@ -91,7 +91,7 @@ public class BattleManager
                     var xml = asset.obj as TextAsset;
                     if (xml)
                     {
-                        var param = EntityParam.Create(xml.text) as ModelParam;
+                        var param = EntityParam.Create(xml.text) as EntityParamModel;
                         if (param != null)
                         {
                             mParams.Add(configid, param);
@@ -197,11 +197,11 @@ public class BattleManager
         switch (type)
         {
             case EffectType.Time:
-                entity = ObjectPool.GetInstance<EffectTimeEntity>(); break;
+                entity = ObjectPool.GetInstance<EffectEntityTime>(); break;
             case EffectType.Move:
-                entity = ObjectPool.GetInstance<EffectMoveEntity>(); break;
+                entity = ObjectPool.GetInstance<EffectEntityMove>(); break;
             case EffectType.Follow:
-                entity = ObjectPool.GetInstance<EffectFollowEntity>(); break;
+                entity = ObjectPool.GetInstance<EffectEntityFollow>(); break;
             case EffectType.Parabola:
                 entity = ObjectPool.GetInstance<EffectParabolaEntity>(); break;
            

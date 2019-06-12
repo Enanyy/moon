@@ -55,7 +55,7 @@ public enum BoneType
     Weapon3,   // Bip001 Prop3 （武器点3）
 }
 
-public enum BattleParamType
+public enum EntityParamType
 {
     Model,
     Action,
@@ -79,7 +79,7 @@ public abstract partial class EntityParam
     :INode
 #endif
 {
-    public BattleParamType type { get; protected set; }
+    public EntityParamType type { get; protected set; }
     public string name { get; set; }
     public Rect rect { get; set; }
     public List<EntityParam> children = new List<EntityParam>();
@@ -244,10 +244,10 @@ public abstract partial class EntityParam
 
     private static int Sort(EntityParam a, EntityParam b)
     {
-        if (a.type == BattleParamType.Action)
+        if (a.type == EntityParamType.Action)
         {
-            var commandParamA = a as ActionParam;
-            var commandParamB = b as ActionParam;
+            var commandParamA = a as EntityParamAction;
+            var commandParamB = b as EntityParamAction;
             if (commandParamB != null)
             {
                 if (commandParamA.action > commandParamB.action)
@@ -257,7 +257,7 @@ public abstract partial class EntityParam
             }
             return -1;
         }
-        else if (a.type == BattleParamType.Animation)
+        else if (a.type == EntityParamType.Animation)
         {
             return 1;
         }
@@ -330,7 +330,7 @@ public abstract partial class EntityParam
 #endif
 }
 
-public partial class ModelParam : EntityParam
+public partial class EntityParamModel : EntityParam
 {
     public string model;
     public uint assetID;
@@ -338,7 +338,7 @@ public partial class ModelParam : EntityParam
     public float scale = 1;
     public Vector3 hitPosition = Vector3.zero;
 
-    public ModelParam() { type = BattleParamType.Model; name = "Model"; }
+    public EntityParamModel() { type = EntityParamType.Model; name = "Model"; }
 
     
 
@@ -359,20 +359,20 @@ public partial class ModelParam : EntityParam
     }
     public override bool LinkAble(INode node)
     {
-        if (node.GetType() == typeof(AnimationParam))
+        if (node.GetType() == typeof(EntityParamAnimation))
         {
             return true;
         }
 
-        if(node.GetType() == typeof(ActionParam))
+        if(node.GetType() == typeof(EntityParamAction))
         {
             bool linkable = true;
-            var state = node as ActionParam;
+            var state = node as EntityParamAction;
             for(int i = 0; i < children.Count;++i)
             {
-                if(children[i].GetType() == typeof(ActionParam))
+                if(children[i].GetType() == typeof(EntityParamAction))
                 {
-                    var child = children[i] as ActionParam;
+                    var child = children[i] as EntityParamAction;
                     if(child.action == state.action)
                     {
                         linkable = false;break;
@@ -386,10 +386,10 @@ public partial class ModelParam : EntityParam
 
     public override INode Clone(INode node)
     {
-        ModelParam param = node as ModelParam;
+        EntityParamModel param = node as EntityParamModel;
         if (param == null)
         {
-            param =  new ModelParam();
+            param =  new EntityParamModel();
         }
         param.model = this.model;
         param.assetID = this.assetID;
@@ -421,11 +421,11 @@ public partial class ModelParam : EntityParam
         hitPosition = node.GetAttribute("hitPosition").ToVector3Ex();
         base.ParseXml(node);
     }
-    public ActionParam GetAction(ActionType action)
+    public EntityParamAction GetAction(ActionType action)
     {
         for (int i = 0; i < children.Count; ++i)
         {
-            var child =children[i] as ActionParam;
+            var child =children[i] as EntityParamAction;
             if (child != null && child.action == action)
             {
                 return child;
@@ -437,7 +437,7 @@ public partial class ModelParam : EntityParam
     
 }
 
-public partial class ActionParam :EntityParam
+public partial class EntityParamAction :EntityParam
 {
     public static readonly Dictionary<ActionType, int> ActionWeights = new Dictionary<ActionType, int>
     {
@@ -455,7 +455,7 @@ public partial class ActionParam :EntityParam
 
     
    
-    public ActionParam() { type = BattleParamType.Action; name = type.ToString(); }
+    public EntityParamAction() { base.type = EntityParamType.Action; name = base.type.ToString(); }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
     {
@@ -478,7 +478,7 @@ public partial class ActionParam :EntityParam
     }
     public override bool LinkAble(INode node)
     {
-        return node.GetType().IsSubclassOf(typeof(PluginParam));
+        return node.GetType().IsSubclassOf(typeof(EntityParamPlugin));
     }
 
     public override Color GetColor()
@@ -488,10 +488,10 @@ public partial class ActionParam :EntityParam
 
     public override INode Clone(INode node )
     {
-        ActionParam param = node as ActionParam;
+        EntityParamAction param = node as EntityParamAction;
         if (param == null)
         {
-            param =   new ActionParam();
+            param =   new EntityParamAction();
         }
         param.action = this.action;
         param.weight = this.weight;
@@ -506,7 +506,7 @@ public partial class ActionParam :EntityParam
         {
             attributes = new Dictionary<string, string>();
         }
-        attributes.Add("state", ((int)action).ToString());
+        attributes.Add("action", action.ToString());
         attributes.Add("weight", weight.ToString());
         attributes.Add("duration", duration.ToString());
         
@@ -516,7 +516,7 @@ public partial class ActionParam :EntityParam
 
     public override void ParseXml(XmlElement node)
     {
-        action = (ActionType) node.GetAttribute("state").ToInt32Ex();
+        action = node.GetAttribute("action").ToEnumEx<ActionType>();
         weight = node.GetAttribute("weight").ToInt32Ex();
         duration = node.GetAttribute("duration").ToFloatEx();
 
@@ -524,7 +524,7 @@ public partial class ActionParam :EntityParam
     }
 }
 
-public partial class AnimationParam : EntityParam
+public partial class EntityParamAnimation : EntityParam
 {
     public string animationClip;
     public float length;
@@ -532,7 +532,7 @@ public partial class AnimationParam : EntityParam
 
     private AnimationClip mAnimationClip;
     
-    public AnimationParam() { type = BattleParamType.Animation; name = type.ToString(); }
+    public EntityParamAnimation() { type = EntityParamType.Animation; name = type.ToString(); }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
     {
@@ -559,15 +559,15 @@ public partial class AnimationParam : EntityParam
     }
     public override bool LinkAble(INode node)
     {
-        return node.GetType().IsSubclassOf(typeof(EffectParam));
+        return node.GetType().IsSubclassOf(typeof(EntityParamEffect ));
     }
 
     public override INode Clone(INode node)
     {
-        AnimationParam param = node as AnimationParam;
+        EntityParamAnimation param = node as EntityParamAnimation;
         if(param == null)
         {
-            param = new AnimationParam();
+            param = new EntityParamAnimation();
         }
         param.animationClip = this.animationClip;
         param.length = this.length;
@@ -585,7 +585,7 @@ public partial class AnimationParam : EntityParam
         }
         attributes.Add("animationClip", animationClip);
         attributes.Add("length", length.ToString());
-        attributes.Add("mode", ((int)mode).ToString());
+        attributes.Add("mode", mode.ToString());
       
         
         return base.ToXml(parent, attributes);
@@ -595,7 +595,7 @@ public partial class AnimationParam : EntityParam
     {
         animationClip = node.GetAttribute("animationClip");
         length = node.GetAttribute("length").ToFloatEx();
-        mode = (WrapMode)node.GetAttribute("mode").ToInt32Ex();
+        mode = node.GetAttribute("mode").ToEnumEx<WrapMode>();
       
       
         base.ParseXml(node);
@@ -605,12 +605,12 @@ public partial class AnimationParam : EntityParam
 /// <summary>
 /// 插件参数
 /// </summary>
-public abstract partial class PluginParam:EntityParam
+public abstract partial class EntityParamPlugin:EntityParam
 {
     public Type plugin;
-    public PluginParam()
+    public EntityParamPlugin()
     {
-        type = BattleParamType.Plugin;
+        type = EntityParamType.Plugin;
         name = type.ToString();
     }
 #if UNITY_EDITOR
@@ -633,53 +633,53 @@ public abstract partial class PluginParam:EntityParam
 #endif
 }
 
-public partial class RunPluginParam: PluginParam
+public partial class EntityParamPluginRun: EntityParamPlugin
 {
-    public RunPluginParam()
+    public EntityParamPluginRun ()
     {
         name = "RunPlugin";
-        plugin = typeof(ActionRunPlugin);
+        plugin = typeof(ActionPluginRun);
     }
 #if UNITY_EDITOR
     public override INode Clone(INode node)
     {
-        return new RunPluginParam();
+        return new EntityParamPluginRun ();
     }
 #endif
 }
-public partial class RemovePluginParam : PluginParam
+public partial class EntityParamPluginRemove : EntityParamPlugin
 {
-    public RemovePluginParam()
+    public EntityParamPluginRemove()
     {
         name = "RunPlugin";
-        plugin = typeof(ActionRemovePlugin);
+        plugin = typeof(ActionPluginRemove);
     }
 #if UNITY_EDITOR
     public override INode Clone(INode node)
     {
-        return new RemovePluginParam();
+        return new EntityParamPluginRemove();
     }
 #endif
 }
 
-public partial class RotatePluginParam : PluginParam
+public partial class EntityParamPluginRotate : EntityParamPlugin
 {
-    public RotatePluginParam()
+    public EntityParamPluginRotate()
     {
         name = "RotatePlugin";
-        plugin = typeof(ActionRotatePlugin);
+        plugin = typeof(ActionPluginRotate);
     }
 #if UNITY_EDITOR
     public override INode Clone(INode node)
     {
-        return new RotatePluginParam();
+        return new EntityParamPluginRotate();
     }
 #endif
 }
 
-public partial class JumpPluginParam : PluginParam
+public partial class EntityParamPluginJump : EntityParamPlugin
 {
-    public JumpPluginParam()
+    public EntityParamPluginJump()
     {
         name = "JumpPlugin";
         plugin = typeof(ActionJumpPlugin);
@@ -687,13 +687,13 @@ public partial class JumpPluginParam : PluginParam
 #if UNITY_EDITOR
     public override INode Clone(INode node)
     {
-        return new JumpPluginParam();
+        return new EntityParamPluginJump();
     }
 #endif
 }
 
 
-public partial class AnimationPluginParam : PluginParam
+public partial class EntityParamPluginAnimation : EntityParamPlugin
 {
     public class AnimationClip
     {
@@ -703,10 +703,10 @@ public partial class AnimationPluginParam : PluginParam
 
     public List<AnimationClip> animations =new  List<AnimationClip>();
 
-    public AnimationPluginParam()
+    public EntityParamPluginAnimation()
     {
         name = "AnimationPlugin";
-        plugin = typeof(ActionAnimationPlugin);
+        plugin = typeof(ActionPluginAnimation);
     }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
@@ -734,10 +734,10 @@ public partial class AnimationPluginParam : PluginParam
 
         if (root != null)
         {
-            var action = parent as ActionParam;
+            var action = parent as EntityParamAction;
 
 
-            var anims = root.GetParams<AnimationParam>();
+            var anims = root.GetParams<EntityParamAnimation>();
             var names = anims.Select(a => { return a.animationClip; }).ToList();
             float length = 0;
             for (int i = 0; i < animations.Count; i++)
@@ -780,7 +780,7 @@ public partial class AnimationPluginParam : PluginParam
 
     public override INode Clone(INode node)
     {
-        var param = new AnimationPluginParam();
+        var param = new EntityParamPluginAnimation();
 
         param.animations.AddRange(animations);
 
@@ -825,7 +825,7 @@ public partial class AnimationPluginParam : PluginParam
 }
 
 
-public abstract partial class EffectParam:EntityParam
+public abstract partial class EntityParamEffect :EntityParam
 {
     public EffectType effectType { get; protected set; }
     public EffectArise arise;
@@ -839,7 +839,7 @@ public abstract partial class EffectParam:EntityParam
     public Vector3 offset;
 
     
-    public EffectParam() { type = BattleParamType.Effect; name = type.ToString(); }
+    public EntityParamEffect () { type = EntityParamType.Effect; name = type.ToString(); }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
     {
@@ -863,11 +863,11 @@ public abstract partial class EffectParam:EntityParam
     }
     public override bool LinkAble(INode node)
     {
-        return node.GetType().IsSubclassOf(typeof(EffectParam)) && node != this;
+        return node.GetType().IsSubclassOf(typeof(EntityParamEffect )) && node != this;
     }
     public override INode Clone(INode node)
     {
-        EffectParam param = node as EffectParam;
+        EntityParamEffect  param = node as EntityParamEffect ;
         if(param!= null)
         {
             param.effectType = this.effectType;
@@ -892,9 +892,9 @@ public abstract partial class EffectParam:EntityParam
         {
             attributes = new Dictionary<string, string>();
         }
-        attributes.Add("effectType", ((int)effectType).ToString());
-        attributes.Add("arise", ((int)arise).ToString());
-        attributes.Add("on", ((int)on).ToString());
+        attributes.Add("effectType", effectType.ToString());
+        attributes.Add("arise", arise.ToString());
+        attributes.Add("on", on.ToString());
        
         attributes.Add("assetID", assetID.ToString());    
         attributes.Add("delay", delay.ToString());
@@ -905,9 +905,9 @@ public abstract partial class EffectParam:EntityParam
 
     public override void ParseXml(XmlElement node)
     {
-        effectType = (EffectType)node.GetAttribute("effectType").ToInt32Ex();
-        arise = (EffectArise)node.GetAttribute("arise").ToInt32Ex();
-        on = (EffectOn)node.GetAttribute("on").ToInt32Ex();   
+        effectType = node.GetAttribute("effectType").ToEnumEx<EffectType>();
+        arise = node.GetAttribute("arise").ToEnumEx<EffectArise>();
+        on = node.GetAttribute("on").ToEnumEx<EffectOn>();   
         assetID = node.GetAttribute("assetID").ToUInt32Ex();
         delay = node.GetAttribute("delay").ToFloatEx();
         offset = node.GetAttribute("offset").ToVector3Ex();
@@ -916,7 +916,7 @@ public abstract partial class EffectParam:EntityParam
    
 }
 
-public partial class EffectTimeParam:EffectParam
+public partial class EntityParamEffectTime :EntityParamEffect 
 {
     public BoneType bone;
     public bool bind = false;//绑定
@@ -924,7 +924,7 @@ public partial class EffectTimeParam:EffectParam
     public float duration;
     public float triggerAt;
 
-    public EffectTimeParam()
+    public EntityParamEffectTime ()
     {
         effectType = EffectType.Time;
         name = effectType.ToString() + type.ToString();
@@ -948,10 +948,10 @@ public partial class EffectTimeParam:EffectParam
 
     public override INode Clone(INode node)
     {
-        EffectTimeParam param = node as EffectTimeParam;
+        EntityParamEffectTime  param = node as EntityParamEffectTime ;
         if(param == null)
         {
-            param = new EffectTimeParam();
+            param = new EntityParamEffectTime ();
         }
         param.duration = this.duration;
         param.triggerAt = this.triggerAt;
@@ -969,7 +969,7 @@ public partial class EffectTimeParam:EffectParam
         }
         attributes.Add("duration", duration.ToString());
         attributes.Add("triggerAt", triggerAt.ToString());
-        attributes.Add("bone", ((int)bone).ToString());
+        attributes.Add("bone", bone.ToString());
         attributes.Add("bind", (bind ? 1 : 0).ToString());
         attributes.Add("syncAnimationSpeed", (syncAnimationSpeed ? 1 : 0).ToString());
 
@@ -980,7 +980,7 @@ public partial class EffectTimeParam:EffectParam
     {
         duration = node.GetAttribute("duration").ToFloatEx();
         triggerAt = node.GetAttribute("triggerAt").ToFloatEx();
-        bone = (BoneType)node.GetAttribute("bone").ToInt32Ex();
+        bone = node.GetAttribute("bone").ToEnumEx<BoneType>();
         bind = node.GetAttribute("bind").ToInt32Ex() == 1;
         syncAnimationSpeed = node.GetAttribute("syncAnimationSpeed").ToInt32Ex() == 1;
 
@@ -988,14 +988,14 @@ public partial class EffectTimeParam:EffectParam
     }
 }
 
-public partial class EffectMoveParam:EffectParam
+public partial class EntityParamEffectMove:EntityParamEffect 
 {
     public float speed;
     public float distance;
 
     public Vector3 direction;
 
-    public EffectMoveParam()
+    public EntityParamEffectMove()
     {
         effectType = EffectType.Move;
         name = effectType.ToString() + type.ToString();
@@ -1013,10 +1013,10 @@ public partial class EffectMoveParam:EffectParam
     }
     public override INode Clone(INode node)
     {
-        EffectMoveParam param = node as EffectMoveParam;
+        EntityParamEffectMove param = node as EntityParamEffectMove;
         if(param== null)
         {
-            param = new EffectMoveParam();
+            param = new EntityParamEffectMove();
         }
         param.distance = this.distance;
         param.speed = this.speed;
@@ -1046,11 +1046,11 @@ public partial class EffectMoveParam:EffectParam
     }
 }
 
-public partial class EffectFollowParam:EffectParam
+public partial class EntityParamEffectFollow :EntityParamEffect 
 {
     public float speed;
     
-    public EffectFollowParam()
+    public EntityParamEffectFollow ()
     {
         effectType = EffectType.Follow;
         name = effectType.ToString() + type.ToString();
@@ -1065,10 +1065,10 @@ public partial class EffectFollowParam:EffectParam
     }
     public override INode Clone(INode node)
     {
-        EffectFollowParam param = node as EffectFollowParam;
+        EntityParamEffectFollow  param = node as EntityParamEffectFollow ;
         if (param == null)
         {
-            param = new EffectFollowParam();
+            param = new EntityParamEffectFollow ();
         }
         param.speed = this.speed;
        
@@ -1094,13 +1094,13 @@ public partial class EffectFollowParam:EffectParam
     }
 }
 
-public partial class EffectParabolaParam:EffectParam
+public partial class EntityParamEffectParabola :EntityParamEffect 
 {
     public float speed;      //速度
     public float gravity;    //重力（抛物线特效使用）
     public float heightOffset;
     public float heightLimit;
-    public EffectParabolaParam()
+    public EntityParamEffectParabola ()
     {
         effectType = EffectType.Parabola;
         name = effectType.ToString() + type.ToString();
@@ -1121,10 +1121,10 @@ public partial class EffectParabolaParam:EffectParam
     }
     public override INode Clone(INode node)
     {
-        EffectParabolaParam param = node as EffectParabolaParam;
+        EntityParamEffectParabola  param = node as EntityParamEffectParabola ;
         if(param == null)
         {
-            param = new EffectParabolaParam();
+            param = new EntityParamEffectParabola ();
         }
         param.speed = this.speed;
         param.gravity = this.gravity;

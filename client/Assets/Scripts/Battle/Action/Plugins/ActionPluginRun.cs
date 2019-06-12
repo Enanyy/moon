@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ActionRunPlugin : ActionPlugin
+public class ActionPluginRun : ActionPlugin
 { 
    
     public override void OnExcute(float deltaTime)

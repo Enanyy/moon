@@ -88,7 +88,7 @@ public static class AssetTool
             assetPathString += string.Format("\t{{ AssetID.{0},\"{1}\" }},\n", path.ToUpper(), it.Current.Value);
         }
 
-        string assetPathFile = Application.dataPath + "/Scripts/AssetPath.cs";
+        string assetPathFile = Application.dataPath + "/Scripts/Asset/AssetPath.cs";
 
 
         string content = File.ReadAllText(assetPathFile);
