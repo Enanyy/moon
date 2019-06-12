@@ -44,7 +44,7 @@ public static class BattleParamTool
                 {
                     if (!types[j].IsAbstract)
                     {
-                        if (types[j].IsSubclassOf(typeof(BattleParam)))
+                        if (types[j].IsSubclassOf(typeof(EntityParam)))
                         {
                             TreeNodeMenu menu = new TreeNodeMenu();
                             menu.name = types[j].Name.Replace("Param", "");
@@ -92,7 +92,7 @@ public static class BattleParamTool
 
     public static void Save(ModelParam param, string path)
     {
-        string xml = BattleParam.ToXml(param);
+        string xml = EntityParam.ToXml(param);
         if (!string.IsNullOrEmpty(path))
         {
             File.WriteAllText(path, xml, System.Text.Encoding.UTF8);
@@ -113,7 +113,7 @@ public static class BattleParamTool
 
         string text = File.ReadAllText(path);
 
-        BattleParam param = BattleParam.Create(text);
+        EntityParam param = EntityParam.Create(text);
         if(param!= null)
         {
             return CreateTreeNodeGraph(param);
@@ -155,7 +155,7 @@ public static class BattleParamTool
         var asset = EditorUtility.InstanceIDToObject(instanceID) as TextAsset;
         if (asset != null)
         {
-            BattleParam param = BattleParam.Create(asset.text);
+            EntityParam param = EntityParam.Create(asset.text);
             if (param != null)
             {
                 TreeNodeGraph graph = CreateTreeNodeGraph(param);
@@ -171,7 +171,7 @@ public static class BattleParamTool
    
     
 
-    public static TreeNodeGraph CreateTreeNodeGraph(BattleParam root)
+    public static TreeNodeGraph CreateTreeNodeGraph(EntityParam root)
     {
         if(root == null)
         {
@@ -185,7 +185,7 @@ public static class BattleParamTool
         return graph;
     }
 
-    private static void AddChildNode(ref TreeNodeGraph graph, ref TreeNode parent,BattleParam param)
+    private static void AddChildNode(ref TreeNodeGraph graph, ref TreeNode parent,EntityParam param)
     {
         if(parent != null)
         {

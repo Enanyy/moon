@@ -90,7 +90,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
         }
         else
         {
-            modelParam = BattleParam.Create(File.ReadAllText(configFullPath)) as ModelParam;
+            modelParam = EntityParam.Create(File.ReadAllText(configFullPath)) as ModelParam;
         }
 
         modelParam.model = obj.name.ToLower();

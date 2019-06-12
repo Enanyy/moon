@@ -74,7 +74,7 @@ public enum ActionType
     Hit,
     Jump,
 }
-public abstract partial class BattleParam
+public abstract partial class EntityParam
 #if UNITY_EDITOR    
     :INode
 #endif
@@ -82,11 +82,11 @@ public abstract partial class BattleParam
     public BattleParamType type { get; protected set; }
     public string name { get; set; }
     public Rect rect { get; set; }
-    public List<BattleParam> children = new List<BattleParam>();
+    public List<EntityParam> children = new List<EntityParam>();
 
-    public BattleParam parent { get; set; }
+    public EntityParam parent { get; set; }
 
-    public BattleParam root
+    public EntityParam root
     {
         get
         {
@@ -100,7 +100,7 @@ public abstract partial class BattleParam
         }
     }
 
-    public BattleParam()
+    public EntityParam()
     {
         name = type.ToString();
     }
@@ -167,9 +167,9 @@ public abstract partial class BattleParam
                 {
                     var child = node.ChildNodes[i] as XmlElement;
                     Type type = Type.GetType(child.Name);
-                    if (type != null && type.IsSubclassOf(typeof(BattleParam)))
+                    if (type != null && type.IsSubclassOf(typeof(EntityParam)))
                     {
-                        var param = (BattleParam)Activator.CreateInstance(type);
+                        var param = (EntityParam)Activator.CreateInstance(type);
                         if (param != null)
                         {
                             param.ParseXml(child);
@@ -182,7 +182,7 @@ public abstract partial class BattleParam
         }
     }
 
-    public List<T> GetParams<T>() where T : BattleParam
+    public List<T> GetParams<T>() where T : EntityParam
     {
         List<T> list = new List<T>();
         for (int i = 0; i < children.Count; i++)
@@ -211,7 +211,7 @@ public abstract partial class BattleParam
         return false;
     }
 
-    public static BattleParam Create(string xml)
+    public static EntityParam Create(string xml)
     {
         try
         {
@@ -224,7 +224,7 @@ public abstract partial class BattleParam
                 var child = doc.ChildNodes[i] as XmlElement;
                 if (child != null)
                 {
-                    BattleParam param = (BattleParam)Activator.CreateInstance(Type.GetType(child.Name));
+                    EntityParam param = (EntityParam)Activator.CreateInstance(Type.GetType(child.Name));
                     if (param != null)
                     {
                         param.ParseXml(child);
@@ -241,7 +241,7 @@ public abstract partial class BattleParam
         return null;
     }
 
-    public static int SortParam(BattleParam a, BattleParam b)
+    public static int SortParam(EntityParam a, EntityParam b)
     {
         if (a.type == BattleParamType.Action)
         {
@@ -264,7 +264,7 @@ public abstract partial class BattleParam
         return 0;
     }
 
-    public static string ToXml(BattleParam root)
+    public static string ToXml(EntityParam root)
     {
         root.children.Sort(SortParam);
 
@@ -294,7 +294,7 @@ public abstract partial class BattleParam
 
     public void OnLink(INode node)
     {
-        BattleParam param = node as BattleParam;
+        EntityParam param = node as EntityParam;
         if(param!= null)
         {
             param.parent = this;
@@ -303,7 +303,7 @@ public abstract partial class BattleParam
     }
     public void OnUnLink(INode node)
     {
-        BattleParam param = node as BattleParam;
+        EntityParam param = node as EntityParam;
         if (param != null)
         {
             children.Remove(param);
@@ -312,7 +312,7 @@ public abstract partial class BattleParam
    
     public virtual INode Clone(INode node)
     {
-        var param = node as BattleParam;
+        var param = node as EntityParam;
         if(param!=null)
         {
             param.type = this.type;
@@ -329,7 +329,7 @@ public abstract partial class BattleParam
 #endif
 }
 
-public partial class ModelParam : BattleParam
+public partial class ModelParam : EntityParam
 {
     public string model;
     public uint assetID;
@@ -436,7 +436,7 @@ public partial class ModelParam : BattleParam
     
 }
 
-public partial class ActionParam :BattleParam
+public partial class ActionParam :EntityParam
 {
     public static readonly Dictionary<ActionType, int> ActionWeights = new Dictionary<ActionType, int>
     {
@@ -523,7 +523,7 @@ public partial class ActionParam :BattleParam
     }
 }
 
-public partial class AnimationParam : BattleParam
+public partial class AnimationParam : EntityParam
 {
     public string animationClip;
     public float length;
@@ -596,7 +596,7 @@ public partial class AnimationParam : BattleParam
 /// <summary>
 /// 插件参数
 /// </summary>
-public abstract partial class PluginParam:BattleParam
+public abstract partial class PluginParam:EntityParam
 {
     public Type plugin;
     public PluginParam()
@@ -686,13 +686,13 @@ public partial class JumpPluginParam : PluginParam
 
 public partial class AnimationPluginParam : PluginParam
 {
-    public class AnimationData
+    public class AnimationClip
     {
         public string animationClip;
         public float length;
     }
 
-    public List<AnimationData> animations =new  List<AnimationData>();
+    public List<AnimationClip> animations =new  List<AnimationClip>();
 
     public AnimationPluginParam()
     {
@@ -712,7 +712,7 @@ public partial class AnimationPluginParam : PluginParam
         {
             for (int i = animations.Count; i < size; i++)
             {
-                animations.Add(new AnimationData());
+                animations.Add(new AnimationClip());
             }
         }
         else if(size < animations.Count)
@@ -797,7 +797,7 @@ public partial class AnimationPluginParam : PluginParam
             for (int i = 0; i < node.ChildNodes.Count; i++)
             {
                 var child = node.ChildNodes[i] as XmlElement;
-                var animation = new AnimationData();
+                var animation = new AnimationClip();
                 animation.animationClip = child.GetAttribute("animationClip");
                 animation.length = child.GetAttribute("length").ToFloatEx();
                 animations.Add(animation);
@@ -808,7 +808,7 @@ public partial class AnimationPluginParam : PluginParam
 }
 
 
-public abstract partial class EffectParam:BattleParam
+public abstract partial class EffectParam:EntityParam
 {
     public EffectType effectType { get; protected set; }
     public EffectArise arise;

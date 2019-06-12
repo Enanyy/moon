@@ -91,7 +91,7 @@ public class BattleManager
                     var xml = asset.obj as TextAsset;
                     if (xml)
                     {
-                        var param = BattleParam.Create(xml.text) as ModelParam;
+                        var param = EntityParam.Create(xml.text) as ModelParam;
                         if (param != null)
                         {
                             mParams.Add(configid, param);
