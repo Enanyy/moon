@@ -15,6 +15,7 @@ public interface INode
     void OnLink(INode node);
     void OnUnLink(INode node);
     INode Clone(INode node);
+    Action<INode> OnAddChild { get; set; }
     Color GetColor();
 }
 #endif
@@ -43,7 +44,7 @@ public enum EffectType
     Parabola,
 }
 
-public enum BoneType
+public enum BonePoint
 {
     None,
     Root,      // Root_node
@@ -106,6 +107,7 @@ public abstract partial class EntityParam
         name = type.ToString();
     }
 
+   
    
     public virtual XmlElement ToXml(XmlNode parent, Dictionary<string, string> attributes = null)
     {
@@ -174,8 +176,8 @@ public abstract partial class EntityParam
                         if (param != null)
                         {
                             param.ParseXml(child);
-                            param.parent = this;
-                            children.Add(param);
+                            AddChild(param);
+                           
                         }
                     }
                 }
@@ -286,7 +288,26 @@ public abstract partial class EntityParam
 
         return xml;
     }
-#if UNITY_EDITOR  
+    public void AddChild(EntityParam child)
+    {
+        if (child == null)
+        {
+            return;
+        }
+        child.parent = this;
+        children.Add(child);
+#if UNITY_EDITOR
+        if (OnAddChild != null)
+        {
+            OnAddChild(child);
+        }
+#endif
+    }
+
+#if UNITY_EDITOR
+
+    public Action<INode> OnAddChild { get; set; }
+  
     public virtual void Draw(ref Rect r)
     {
         rect = r;
@@ -296,11 +317,8 @@ public abstract partial class EntityParam
     public void OnLink(INode node)
     {
         EntityParam param = node as EntityParam;
-        if(param!= null)
-        {
-            param.parent = this;
-            children.Add(param);
-        }
+      
+        AddChild(param);
     }
     public void OnUnLink(INode node)
     {
@@ -338,6 +356,8 @@ public partial class EntityParamModel : EntityParam
     public float scale = 1;
     public Vector3 hitPosition = Vector3.zero;
 
+    private UnityEngine.Object mObject;
+
     public EntityParamModel() { type = EntityParamType.Model; name = "Model"; }
 
     
@@ -347,7 +367,7 @@ public partial class EntityParamModel : EntityParam
     {
         base.Draw(ref r);
 
-        model = UnityEditor.EditorGUILayout.TextField("Model" , model);
+        UnityEditor.EditorGUILayout.LabelField("Model" , model);
         r.height += 20;
         assetID = (uint)Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("AssetID", (int)assetID),0,uint.MaxValue);
         r.height += 20;
@@ -356,7 +376,174 @@ public partial class EntityParamModel : EntityParam
         r.height += 20;
         hitPosition = UnityEditor.EditorGUILayout.Vector3Field("HitPosition", hitPosition);
         r.height += 40;
+
+        UnityEngine.Object obj = UnityEditor.EditorGUILayout.ObjectField("Object",mObject, typeof(UnityEngine.GameObject), false, new GUILayoutOption[0]);
+        if(obj!= null && obj!= mObject)
+        {
+            model = obj.name;
+            mObject = obj;
+
+            for (int i = children.Count - 1; i >=0 ; i--)
+            {
+                var animation = children[i] as EntityParamAnimation;
+                if(animation!= null)
+                {
+                    animation.parent = null;
+                    children.RemoveAt(i);
+                }
+            }
+
+            CreateAnimationNode(obj);
+        }
+        r.height += 20;
     }
+
+    private void CreateAnimationNode(UnityEngine.Object go)
+    {
+        if (go == null)
+        {
+            return;
+        }
+
+        string path = UnityEditor.AssetDatabase.GetAssetPath(go);
+
+        string dirName = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/') + 1) + path.Substring(0, path.LastIndexOf('/') + 1);
+
+        DirectoryInfo dir = new DirectoryInfo(dirName);
+        FileInfo[] files = dir.GetFiles("*.fbx");
+
+        int WIDTH = 240;
+        int HEIGHT = 20;
+
+        for (int i = 0; i < files.Length; ++i)
+        {
+            if (files[i].Name.Contains("@") == false)     // 跳过不是动作的文件
+            {
+                //Debug.Log("跳过无效文件：" + fileInfos[i].Name + "   "  + obj.name + "@");
+                continue;
+            }
+
+            string animName = Path.GetFileNameWithoutExtension(files[i].Name).Split('@')[1];
+
+            string animationClip = files[i].FullName.Replace("\\", "/");
+            animationClip = animationClip.Substring(animationClip.LastIndexOf("Assets/"));
+            var clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AnimationClip>(animationClip);
+
+            ActionType type = GetActionType(animName);
+            EntityParamAction actionParam = null;
+            for (int j = 0; j < children.Count; ++j)
+            {
+                var child = children[j] as EntityParamAction;
+                if (child != null && type == child.action)
+                {
+                    actionParam = child; break;
+                }
+            }
+            if (actionParam == null)
+            {
+                actionParam = new EntityParamAction();
+                actionParam.rect = new Rect(300, 20, WIDTH, HEIGHT);
+                AddChild(actionParam);
+            }
+            actionParam.action = type;
+            actionParam.weight = EntityParamAction.ActionWeights[type];
+
+            EntityParamAnimation animationParam = null;
+            for (int j = 0; j < actionParam.children.Count; ++j)
+            {
+                var child = actionParam.children[j] as EntityParamAnimation;
+                if (child != null && child.animationClip == animationClip)
+                {
+                    animationParam = child; break;
+                }
+            }
+            if (animationParam == null)
+            {
+                animationParam = new EntityParamAnimation();
+                animationParam.rect = new Rect(600, 20, WIDTH, HEIGHT);
+                AddChild(animationParam);
+            }
+            animationParam.animationClip = animName;
+            animationParam.length = clip.length;
+            animationParam.mode = GetWrapMode(animName);
+
+        }
+    }
+
+    public static ActionType GetActionType(string animName)
+    {
+        animName = animName.ToLower();
+        if (animName.Contains("idle")
+            || animName.Contains("standby")
+            || animName.Contains("xiuxi")
+            || animName.Contains("free"))
+        {
+            return ActionType.Idle;
+        }
+        //else if (animName.Contains("run_away")
+        //   || animName.Contains("retreat"))
+        //{
+        //    return ActionType.Hit;
+        //}
+        else if (animName.Contains("run")
+            || animName.Contains("walk"))
+        {
+            return ActionType.Run;
+        }
+        else if (animName.Contains("attack")
+          || animName.Contains("skill")
+          || animName.Contains("spell"))
+        {
+            return ActionType.Attack;
+        }
+        else if (animName.Contains("die")
+          || animName.Contains("dead")
+          || animName.Contains("death"))
+        {
+            return ActionType.Die;
+        }
+        else if (animName.Contains("victory"))
+        {
+            return ActionType.Victory;
+        }
+        else if (animName.Contains("hit")
+            || animName.Contains("damage"))
+        {
+            return ActionType.Hit;
+        }
+        return ActionType.Idle;
+    }
+    public static bool IsLoop(string clipName)
+    {
+        if (clipName == "idle"
+               || clipName == "standby"
+               || clipName == "xiuxi"
+               || clipName == "run_away"
+               || clipName == "run"
+               || clipName == "victory")
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public static  WrapMode GetWrapMode(string clipName)
+    {
+        if (IsLoop(clipName))
+        {
+            return WrapMode.Loop;
+        }
+        if (clipName.Contains("die")
+          || clipName.Contains("dead")
+          || clipName.Contains("death"))
+        {
+
+            return WrapMode.ClampForever;
+        }
+
+        return WrapMode.Default;
+    }
+
     public override bool LinkAble(INode node)
     {
         if (node.GetType() == typeof(EntityParamAnimation))
@@ -538,7 +725,7 @@ public partial class EntityParamAnimation : EntityParam
     {
         base.Draw(ref r);
 
-        animationClip = UnityEditor.EditorGUILayout.TextField("AnimationClip",animationClip);
+        UnityEditor.EditorGUILayout.LabelField("AnimationClip",animationClip);
         r.height += 20;
 
         UnityEditor.EditorGUILayout.LabelField("Length", length.ToString());
@@ -846,8 +1033,16 @@ public abstract partial class EntityParamEffect :EntityParam
         base.Draw(ref r);
         UnityEditor.EditorGUILayout.LabelField("EffectType", effectType.ToString());
         r.height += 20;
-        arise = (EffectArise)UnityEditor.EditorGUILayout.EnumPopup("Arise", arise);
-        r.height += 20;
+ 
+        if (parent != null && parent.GetType() == typeof(EntityParamAnimation))
+        {
+            arise = EffectArise.ParentBegin;
+        }
+        else
+        {
+            arise = (EffectArise)UnityEditor.EditorGUILayout.EnumPopup("Arise", arise);
+            r.height += 20;
+        }
         on = (EffectOn)UnityEditor.EditorGUILayout.EnumPopup("On", on);
         r.height += 20;
       
@@ -918,7 +1113,7 @@ public abstract partial class EntityParamEffect :EntityParam
 
 public partial class EntityParamEffectTime :EntityParamEffect 
 {
-    public BoneType bone;
+    public BonePoint bone;
     public bool bind = false;//绑定
     public bool syncAnimationSpeed = false; //特效速度是否同步动作速度
     public float duration;
@@ -937,10 +1132,13 @@ public partial class EntityParamEffectTime :EntityParamEffect
         r.height += 20;
         triggerAt = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Trigger At", triggerAt),0, float.MaxValue);
         r.height += 20;
-        bone = (BoneType)UnityEditor.EditorGUILayout.EnumPopup("Bone", bone);
+        bone = (BonePoint)UnityEditor.EditorGUILayout.EnumPopup("Bone", bone);
         r.height += 20;
-        bind = UnityEditor.EditorGUILayout.Toggle("Bind:", bind);
-        r.height += 20;
+        if (bone != BonePoint.None)
+        {
+            bind = UnityEditor.EditorGUILayout.Toggle("Bind", bind);
+            r.height += 20;
+        }
         syncAnimationSpeed = UnityEditor.EditorGUILayout.Toggle("SyncAnimationSpeed", syncAnimationSpeed);
         r.height += 20;
      
@@ -980,7 +1178,7 @@ public partial class EntityParamEffectTime :EntityParamEffect
     {
         duration = node.GetAttribute("duration").ToFloatEx();
         triggerAt = node.GetAttribute("triggerAt").ToFloatEx();
-        bone = node.GetAttribute("bone").ToEnumEx<BoneType>();
+        bone = node.GetAttribute("bone").ToEnumEx<BonePoint>();
         bind = node.GetAttribute("bind").ToInt32Ex() == 1;
         syncAnimationSpeed = node.GetAttribute("syncAnimationSpeed").ToInt32Ex() == 1;
 

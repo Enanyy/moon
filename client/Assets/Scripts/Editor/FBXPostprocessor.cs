@@ -133,7 +133,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
 
             if (modelParam != null)
             {
-                ActionType type = GetActionType(animName);
+                ActionType type = EntityParamModel.GetActionType(animName);
                 EntityParamAction actionParam = null;
                 for(int j = 0; j < modelParam.children.Count; ++j)
                 {
@@ -147,7 +147,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
                 {
                     actionParam = new EntityParamAction();
                     actionParam.rect = new Rect(300, 20, TreeNode.WIDTH, TreeNode.HEIGHT);
-                    modelParam.children.Add(actionParam);
+                    modelParam.AddChild(actionParam);
                 }
                 actionParam.action = type;
                 actionParam.weight = EntityParamAction.ActionWeights[type];
@@ -165,12 +165,11 @@ public class SUFBXPostprocessor : AssetPostprocessor
                 {
                     animationParam = new EntityParamAnimation();
                     animationParam.rect = new Rect(600, 20, TreeNode.WIDTH, TreeNode.HEIGHT);
-
-                    modelParam.children.Add(animationParam);
+                    modelParam.AddChild(animationParam);
                 }
                 animationParam.animationClip = animName;
                 animationParam.length = clip.length;
-                animationParam.mode = GetWrapMode(animName);
+                animationParam.mode = EntityParamModel.GetWrapMode(animName);
                 
             }
         }
@@ -228,107 +227,64 @@ public class SUFBXPostprocessor : AssetPostprocessor
         string name = t.name;
         if (name.Contains("Root_node"))
         {
-            BonePoint bp = t.GetComponent<BonePoint>();
+            BoneObject bp = t.GetComponent<BoneObject>();
             if (bp == null)
-                bp = t.gameObject.AddComponent<BonePoint>();
+                bp = t.gameObject.AddComponent<BoneObject>();
 
-            bp.type = BoneType.Root;
+            bp.type = BonePoint.Root;
         }
         else if (name.Contains("Bone_Buff"))
         {
-            BonePoint bp = t.GetComponent<BonePoint>();
+            BoneObject bp = t.GetComponent<BoneObject>();
             if (bp == null)
-                bp = t.gameObject.AddComponent<BonePoint>();
+                bp = t.gameObject.AddComponent<BoneObject>();
 
-            bp.type = BoneType.Buff;
+            bp.type = BonePoint.Buff;
         }
         else if (name.Contains("Bone_Head"))
         {
-            BonePoint bp = t.GetComponent<BonePoint>();
+            BoneObject bp = t.GetComponent<BoneObject>();
             if (bp == null)
-                bp = t.gameObject.AddComponent<BonePoint>();
+                bp = t.gameObject.AddComponent<BoneObject>();
 
-            bp.type = BoneType.Head;
+            bp.type = BonePoint.Head;
         }
 
         else if (name.Contains("Bone_Hit"))
         {
-            BonePoint bp = t.GetComponent<BonePoint>();
+            BoneObject bp = t.GetComponent<BoneObject>();
             if (bp == null)
-                bp = t.gameObject.AddComponent<BonePoint>();
+                bp = t.gameObject.AddComponent<BoneObject>();
 
-            bp.type = BoneType.Hit;
+            bp.type = BonePoint.Hit;
         }
         else if (name.Contains("Bip001 Prop1"))
         {
-            BonePoint bp = t.GetComponent<BonePoint>();
+            BoneObject bp = t.GetComponent<BoneObject>();
             if (bp == null)
-                bp = t.gameObject.AddComponent<BonePoint>();
+                bp = t.gameObject.AddComponent<BoneObject>();
 
-            bp.type = BoneType.Weapon1;
+            bp.type = BonePoint.Weapon1;
         }
         else if (name.Contains("Bip001 Prop2"))
         {
-            BonePoint bp = t.GetComponent<BonePoint>();
+            BoneObject bp = t.GetComponent<BoneObject>();
             if (bp == null)
-                bp = t.gameObject.AddComponent<BonePoint>();
+                bp = t.gameObject.AddComponent<BoneObject>();
 
-            bp.type = BoneType.Weapon2;
+            bp.type = BonePoint.Weapon2;
         }
 
         else if (name.Contains("Bip001 Prop3"))
         {
-            BonePoint bp = t.GetComponent<BonePoint>();
+            BoneObject bp = t.GetComponent<BoneObject>();
             if (bp == null)
-                bp = t.gameObject.AddComponent<BonePoint>();
+                bp = t.gameObject.AddComponent<BoneObject>();
 
-            bp.type = BoneType.Weapon3;
+            bp.type = BonePoint.Weapon3;
         }
     }
 
-    static ActionType GetActionType(string animName)
-    {
-        animName = animName.ToLower();
-        if (animName.Contains("idle")
-            || animName.Contains("standby")
-            || animName.Contains("xiuxi")
-            || animName.Contains("free"))
-        {
-            return ActionType.Idle;
-        }
-        //else if (animName.Contains("run_away")
-        //   || animName.Contains("retreat"))
-        //{
-        //    return ActionType.Hit;
-        //}
-        else if (animName.Contains("run")        
-            || animName.Contains("walk"))
-        {
-            return ActionType.Run;
-        }
-        else if (animName.Contains("attack")
-          || animName.Contains("skill")
-          || animName.Contains("spell"))
-        {
-            return ActionType.Attack;
-        }
-        else if (animName.Contains("die")
-          || animName.Contains("dead")
-          || animName.Contains("death"))
-        {
-            return ActionType.Die;
-        }
-        else if (animName.Contains("victory"))
-        {
-            return ActionType.Victory;
-        }
-        else if (animName.Contains("hit")
-            || animName.Contains("damage"))
-        {
-            return ActionType.Hit;
-        }
-        return ActionType.Idle;
-    }
 
     void OnPreprocessAnimation()
     {
@@ -351,7 +307,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
                 clipName = clipName.Substring(indexOf + 1, clipName.Length - indexOf - 1);
             }
            
-            if (IsLoop(clipName))
+            if (EntityParamModel.IsLoop(clipName))
             {
                 clip.loopTime = true;
             }
@@ -359,37 +315,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
         modelImporter.clipAnimations = clipAnimations;
     }
 
-    static bool IsLoop(string clipName)
-    {
-        if (clipName == "idle"
-               || clipName == "standby"
-               || clipName == "xiuxi"
-               || clipName == "run_away"
-               || clipName == "run"
-               || clipName == "victory")
-        {
-            return true;
-        }
-        return false;
-    }
-
-    static WrapMode GetWrapMode(string clipName)
-    {
-        if(IsLoop(clipName))
-        {
-            return WrapMode.Loop;
-        }
-        if (clipName.Contains("die")
-          || clipName.Contains("dead")
-          || clipName.Contains("death"))
-        {
-            
-            return WrapMode.ClampForever;
-        }
-
-        return WrapMode.Default;
-    }
-
+    
    
 }
 

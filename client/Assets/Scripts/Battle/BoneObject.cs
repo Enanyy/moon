@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-public class BonePoint:MonoBehaviour
+public class BoneObject:MonoBehaviour
 {
-    public BoneType type;
+    public BonePoint type;
 
-    public static BonePoint GetBonePoint(Transform transform, BoneType type)
+    public static BoneObject GetBone(Transform transform, BonePoint type)
     {
-        var bones = transform.GetComponentsInChildren<BonePoint>();
+        var bones = transform.GetComponentsInChildren<BoneObject>();
         for (int i = 0; i < bones.Length; ++i)
         {
             if (bones[i].type == type)

@@ -31,9 +31,9 @@ public class EffectEntityTime : EffectEntity
                 if (model != null)
                 {
                     UpdateParticleSystemSpeed(model.animationSpeed);
-                    if (time.bone != BoneType.None && model.gameObject != null)
+                    if (time.bone != BonePoint.None && model.gameObject != null)
                     {
-                        BonePoint point = BonePoint.GetBonePoint(model.gameObject.transform, time.bone);
+                        BoneObject point = BoneObject.GetBone(model.gameObject.transform, time.bone);
                         if (point != null)
                         {
                             if (time.bind)

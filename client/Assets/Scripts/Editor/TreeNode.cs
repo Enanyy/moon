@@ -22,12 +22,16 @@ public class TreeNode
 
     public INode data { get; private set; }
 
-    public TreeNode( int id, INode node)
+    public TreeNodeGraph graph { get; private set; }
+
+    public TreeNode(TreeNodeGraph graph, int id, INode node)
     {
+        this.graph = graph;
         this.id = id;
         data = node;
         name = node.name;
         rect = node.rect;
+        data.OnAddChild = OnAddChild;
     }
 
     public void DrawWindow()
@@ -37,6 +41,12 @@ public class TreeNode
         {
             data.Draw(ref rect);
         }
+    }
+
+    private void OnAddChild(INode node)
+    {
+        TreeNode treeNode = graph.AddNode(node);
+        treeNode.parent = this;
     }
 }
 
