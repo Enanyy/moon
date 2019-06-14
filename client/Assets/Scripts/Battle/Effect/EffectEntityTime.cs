@@ -78,10 +78,7 @@ public class EffectEntityTime : EffectEntity
         {
             float preEffectTime = mEffectTime;
             mEffectTime += deltaTime;
-            if (preEffectTime < time.triggerAt && mEffectTime >= time.triggerAt)
-            {
-                OnTrigger();
-            }
+            
             if (mEffectTime > time.duration)
             {
                 mEffectTime = time.duration;

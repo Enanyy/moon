@@ -21,8 +21,21 @@ public class TreeNodeGraph
 
     public TreeNode AddNode(INode node)
     {
-        TreeNode treeNode = new TreeNode(this, GeneratorID(), node);
-        nodes.Add(treeNode);
+        TreeNode treeNode = null;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            if (nodes[i].data == node)
+            {
+                treeNode = nodes[i]; break;               
+            }
+        }
+
+        if (treeNode == null)
+        {
+            treeNode = new TreeNode(this, GeneratorID(), node);
+            nodes.Add(treeNode);
+        }
+
         return treeNode;
     }
 
