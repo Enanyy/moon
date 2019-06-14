@@ -1,5 +1,84 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml;
+
+public class Asset
+{
+    public string name;
+    public string path;
+}
+
+public class Assets
+{
+    public Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
+
+
+    public static Assets FromXml(string xml)
+    {
+        XmlDocument doc = new XmlDocument();
+
+        doc.LoadXml(xml);
+
+        XmlElement root = doc.DocumentElement;
+
+        Assets assets = new Assets();
+
+        for(int i = 0; i < root.ChildNodes.Count; ++i)
+        {
+            XmlElement child = root.ChildNodes[i] as XmlElement;
+            Asset asset = new Asset();
+            asset.name = child.GetAttribute("name");
+            asset.path = child.GetAttribute("path");
+
+            assets.assets.Add(asset.name, asset);
+        }
+
+
+        return assets;
+    }
+
+    public static string ToXml(Assets assets)
+    {
+        XmlDocument doc = new XmlDocument();
+        XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "utf-8", "yes");
+        doc.InsertBefore(dec, doc.DocumentElement);
+
+
+        XmlElement root = doc.CreateElement("Assets");
+        doc.AppendChild(root);
+        var it = assets.assets.GetEnumerator();
+        while(it.MoveNext())
+        {
+            XmlElement node = doc.CreateElement("asset");
+
+            root.AppendChild(node);
+   
+            XmlAttribute name = doc.CreateAttribute("name");
+            name.Value = it.Current.Value.name;
+
+            node.Attributes.Append(name);
+
+            XmlAttribute path = doc.CreateAttribute("path");
+            path.Value = it.Current.Value.path;
+
+            node.Attributes.Append(path);
+        }
+
+        MemoryStream ms = new MemoryStream();
+        XmlTextWriter xw = new XmlTextWriter(ms, System.Text.Encoding.UTF8);
+        xw.Formatting = Formatting.Indented;
+        doc.Save(xw);
+
+        ms = (MemoryStream)xw.BaseStream;
+        byte[] bytes = ms.ToArray();
+        string xml = System.Text.Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
+
+        return xml;
+    }
+
+}
+
 /// <summary>
 /// Auto gen Code.
 /// </summary>

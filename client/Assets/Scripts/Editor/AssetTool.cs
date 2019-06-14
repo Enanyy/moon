@@ -22,6 +22,9 @@ public static class AssetTool
         List<string> fileList = new List<string>();
         List<string> addList = new List<string>();
         Dictionary<uint, string> assetPathDic = AssetPath.GetAllAssets();
+
+        Assets assets = new Assets();
+
         for (int i = 0; i < files.Length;++i)
         {
             if(files[i].Name.EndsWith(".meta"))
@@ -37,9 +40,22 @@ public static class AssetTool
             {
                 addList.Add(assetPath);
             }
+            Asset asset = new Asset();
+
+            asset.name = files[i].Name;
+            asset.path = assetPath;
+
+            assets.assets.Add(asset.name, asset);
         }
 
-       
+        string assetXmlFile = Application.dataPath + "/asset.txt";
+
+        StreamWriter writerXml = new StreamWriter(assetXmlFile);
+        writerXml.Write(Assets.ToXml(assets));
+        writerXml.Close();
+        writerXml.Dispose();
+
+
         Dictionary<string, uint> maxIDDic = new Dictionary<string, uint>();
         List<uint> removeList = new List<uint>();
        

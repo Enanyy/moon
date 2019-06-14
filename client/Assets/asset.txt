@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Assets>
+  <asset name="airenbubing.txt" path="r/config/airenbubing.txt" />
+  <asset name="airenbubing01.txt" path="r/config/airenbubing01.txt" />
+  <asset name="dafu.txt" path="r/config/dafu.txt" />
+  <asset name="m_airenhuojianpao.txt" path="r/config/m_airenhuojianpao.txt" />
+  <asset name="m_airenzhanshi.txt" path="r/config/m_airenzhanshi.txt" />
+  <asset name="nvjiangjun.txt" path="r/config/nvjiangjun.txt" />
+  <asset name="paoshou.txt" path="r/config/paoshou.txt" />
+  <asset name="trollgiant.txt" path="r/config/trollgiant.txt" />
+  <asset name="yingxiong_kulouqishi.txt" path="r/config/yingxiong_kulouqishi.txt" />
+  <asset name="data.bytes" path="r/database/data.bytes" />
+  <asset name="arrow.mat" path="r/material/arrow.mat" />
+  <asset name="diban.mat" path="r/material/diban.mat" />
+  <asset name="line.mat" path="r/material/line.mat" />
+  <asset name="tile.mat" path="r/material/tile.mat" />
+  <asset name="airenbubing.prefab" path="r/model/airenbubing.prefab" />
+  <asset name="airenbubing01.prefab" path="r/model/airenbubing01.prefab" />
+  <asset name="dafu.prefab" path="r/model/dafu.prefab" />
+  <asset name="m_airenhuojianpao.prefab" path="r/model/m_airenhuojianpao.prefab" />
+  <asset name="m_airenzhanshi.prefab" path="r/model/m_airenzhanshi.prefab" />
+  <asset name="nvjiangjun.prefab" path="r/model/nvjiangjun.prefab" />
+  <asset name="paoshou.prefab" path="r/model/paoshou.prefab" />
+  <asset name="trollgiant.prefab" path="r/model/trollgiant.prefab" />
+  <asset name="yingxiong_kulouqishi.prefab" path="r/model/yingxiong_kulouqishi.prefab" />
+  <asset name="dimain.shader" path="r/shader/dimain.shader" />
+  <asset name="fx_kuloufashi_attack_hit.prefab" path="r/spell_fx/fx_kuloufashi_attack_hit.prefab" />
+  <asset name="fx_kuloufashi_attack_xuli.prefab" path="r/spell_fx/fx_kuloufashi_attack_xuli.prefab" />
+  <asset name="fx_nvjiangjun_attack_01.prefab" path="r/spell_fx/fx_nvjiangjun_attack_01.prefab" />
+  <asset name="fx_nvjiangjun_attack_02.prefab" path="r/spell_fx/fx_nvjiangjun_attack_02.prefab" />
+  <asset name="fx_nvjiangjun_attack_03.prefab" path="r/spell_fx/fx_nvjiangjun_attack_03.prefab" />
+  <asset name="fx_pao01_attack.prefab" path="r/spell_fx/fx_pao01_attack.prefab" />
+  <asset name="fx_pao01_hit.prefab" path="r/spell_fx/fx_pao01_hit.prefab" />
+  <asset name="fx_pao_pandan.prefab" path="r/spell_fx/fx_pao_pandan.prefab" />
+  <asset name="fx_siwang.prefab" path="r/spell_fx/fx_siwang.prefab" />
+  <asset name="fx_xiaopaobing_hit.prefab" path="r/spell_fx/fx_xiaopaobing_hit.prefab" />
+  <asset name="fx_xiaopaobing_paodan.prefab" path="r/spell_fx/fx_xiaopaobing_paodan.prefab" />
+  <asset name="floor.png" path="r/texture/floor.png" />
+</Assets>
