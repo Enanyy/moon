@@ -1,23 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<EntityParamModel model="m_airenzhanshi" assetID="0" scale="1" hitPosition="(0.0, 0.0, 0.0)" name="Model" rect="(20,20,240,20)">
+<EntityParamModel asset="m_airenzhanshi.prefab" scale="1" hitPosition="(0.0, 0.0, 0.0)" name="Model" rect="(20,20,240,20)">
   <EntityParamAction action="Idle" weight="0" duration="86400" name="Action" rect="(307,24,240,20)">
     <EntityParamPluginAnimation name="AnimationPlugin" rect="(633,56,240,20)">
-      <AnimationData animationClip="idle" length="1" />
+      <AnimationClip animationClip="idle" length="1" />
     </EntityParamPluginAnimation>
   </EntityParamAction>
   <EntityParamAction action="Run" weight="1" duration="86400" name="Action" rect="(299,113,240,20)">
     <EntityParamPluginAnimation name="AnimationPlugin" rect="(625,167,240,20)">
-      <AnimationData animationClip="run" length="0.7333333" />
+      <AnimationClip animationClip="run" length="0.7333333" />
     </EntityParamPluginAnimation>
   </EntityParamAction>
   <EntityParamAction action="Attack" weight="1" duration="1.666667" name="Action" rect="(304,230,240,20)">
     <EntityParamPluginAnimation name="AnimationPlugin" rect="(637,299,240,20)">
-      <AnimationData animationClip="attack01" length="1.666667" />
+      <AnimationClip animationClip="attack01" length="1.666667" />
     </EntityParamPluginAnimation>
   </EntityParamAction>
   <EntityParamAction action="Die" weight="10" duration="1.666667" name="Action" rect="(310,329,240,20)">
     <EntityParamPluginAnimation name="AnimationPlugin" rect="(636,441,240,20)">
-      <AnimationData animationClip="die" length="1.666667" />
+      <AnimationClip animationClip="die" length="1.666667" />
     </EntityParamPluginAnimation>
   </EntityParamAction>
   <EntityParamAnimation animationClip="attack01" length="1.666667" mode="Default" name="Animation" rect="(40,374,240,20)" />

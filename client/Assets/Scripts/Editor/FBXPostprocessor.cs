@@ -93,7 +93,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
             modelParam = EntityParam.Create(File.ReadAllText(configFullPath)) as EntityParamModel;
         }
 
-        modelParam.model = obj.name.ToLower();
+        modelParam.asset = obj.name.ToLower() +".prefab";
 
         AnimatorController animatorController = AnimatorController.CreateAnimatorControllerAtPath(path.ToLower().Replace(".fbx", ".controller"));
 

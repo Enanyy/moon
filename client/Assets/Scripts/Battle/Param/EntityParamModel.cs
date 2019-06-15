@@ -5,13 +5,14 @@ using UnityEngine;
 
 public partial class EntityParamModel : EntityParam
 {
-    public string model;
-    public uint assetID;
-
+    public string asset;
+   
     public float scale = 1;
     public Vector3 hitPosition = Vector3.zero;
 
-    private UnityEngine.Object mObject;
+    private UnityEngine.Object mModel;
+    private UnityEngine.GameObject mPrefab;
+
 
     public EntityParamModel() { type = EntityParamType.Model; name = "Model"; }
 
@@ -22,21 +23,21 @@ public partial class EntityParamModel : EntityParam
     {
         base.Draw(ref r);
 
-        UnityEditor.EditorGUILayout.LabelField("Model", model);
+     
+        UnityEditor.EditorGUILayout.LabelField("Asset", asset);
         r.height += 20;
-        assetID = (uint)Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("AssetID", (int)assetID), 0, uint.MaxValue);
-        r.height += 20;
-
+       
         scale = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Scale", scale), 0, float.MaxValue);
         r.height += 20;
         hitPosition = UnityEditor.EditorGUILayout.Vector3Field("HitPosition", hitPosition);
         r.height += 40;
 
-        UnityEngine.Object obj = UnityEditor.EditorGUILayout.ObjectField("Object", mObject, typeof(UnityEngine.GameObject), false, new GUILayoutOption[0]);
-        if (obj != null && obj != mObject)
+      
+        UnityEngine.Object obj = UnityEditor.EditorGUILayout.ObjectField("Model", mModel, typeof(UnityEngine.GameObject), false, new GUILayoutOption[0]);
+        if (obj != null && obj != mModel)
         {
-            model = obj.name;
-            mObject = obj;
+            asset = obj.name +".prefab";
+            mModel = obj;
 
             for (int i = children.Count - 1; i >= 0; i--)
             {
@@ -51,6 +52,22 @@ public partial class EntityParamModel : EntityParam
             CreateAnimationNode(obj);
         }
         r.height += 20;
+
+        if(mPrefab == null && string.IsNullOrEmpty(asset)==false)
+        {
+            string path = string.Format("assets/resources/r/model/{0}", asset);
+            mPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
+        var prefab = (GameObject)UnityEditor.EditorGUILayout.ObjectField("Prefab", mPrefab, typeof(UnityEngine.GameObject), false, new GUILayoutOption[0]);
+        if(prefab!= null && prefab!= mPrefab)
+        {
+            asset = prefab.name + ".prefab";
+
+            mPrefab = prefab;
+        }
+        r.height += 20;
+
     }
 
     private void CreateAnimationNode(UnityEngine.Object go)
@@ -233,9 +250,8 @@ public partial class EntityParamModel : EntityParam
         {
             param = new EntityParamModel();
         }
-        param.model = this.model;
-        param.assetID = this.assetID;
-
+        param.asset = this.asset;
+        
         param.scale = this.scale;
         return base.Clone(param);
     }
@@ -247,9 +263,8 @@ public partial class EntityParamModel : EntityParam
         {
             attributes = new Dictionary<string, string>();
         }
-        attributes.Add("model", model);
-        attributes.Add("assetID", assetID.ToString());
-
+        attributes.Add("asset", asset);
+        
         attributes.Add("scale", scale.ToString());
         attributes.Add("hitPosition", hitPosition.ToString());
 
@@ -257,8 +272,8 @@ public partial class EntityParamModel : EntityParam
     }
     public override void ParseXml(XmlElement node)
     {
-        model = node.GetAttribute("model");
-        assetID = node.GetAttribute("assetID").ToUInt32Ex();
+        asset = node.GetAttribute("asset");
+       
         scale = node.GetAttribute("scale").ToFloatEx();
         hitPosition = node.GetAttribute("hitPosition").ToVector3Ex();
         base.ParseXml(node);

@@ -101,7 +101,7 @@ public class ModelComponent :
         EntityParamModel param = agent.param;
         if (param!=null)
         {
-            LoadAsset(param.assetID);
+            LoadAsset(param.asset);
         }
     }
 
@@ -283,7 +283,7 @@ public class ModelComponent :
         for (int i = 0; i < param.children.Count; ++i)
         {
             var child = param.children[i] as EntityParamEffect ;
-            if (child== null || child.assetID == 0 || child.arise != arise)
+            if (child== null || string.IsNullOrEmpty(child.asset) || child.arise != arise)
             {
                 continue;
             }

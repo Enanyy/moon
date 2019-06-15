@@ -23,10 +23,10 @@ public class AssetEntity :IPoolObject
         
     }
 
-    protected void LoadAsset(uint assetID)
+    protected void LoadAsset(string name)
     {
        
-        AssetManager.Instance.Instantiate(assetID, (asset) => {
+        AssetManager.Instance.Instantiate(name, (asset) => {
             this.gameObject = asset.gameObject;
             this.asset = asset;
             OnAssetLoad();

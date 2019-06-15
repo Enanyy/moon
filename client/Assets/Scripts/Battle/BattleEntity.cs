@@ -36,7 +36,7 @@ public class BattleEntity:
     public string name;         //头顶名字
   
     public uint type;            //实体类型（1为英雄，2为士兵 枚举:EMObjType)
-    public uint configid;        //配置id
+    public string config;        //配置id
 
   
 
@@ -141,7 +141,7 @@ public class BattleEntity:
 
     public virtual void Init()
     {
-        BattleManager.Instance.GetParam(configid, (param) => {
+        BattleManager.Instance.GetParam(config, (param) => {
             this.param = param;
             scale = param.scale;
         });
@@ -154,7 +154,7 @@ public class BattleEntity:
         name = "";
      
         type = 0;
-        configid = 0;             //表的ID
+        config = "";             //表的ID
 
         scale = 1;
 

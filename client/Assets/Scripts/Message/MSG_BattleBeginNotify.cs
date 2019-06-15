@@ -21,7 +21,7 @@ public class MSG_BattleBeginNotify : Message<BattleBeginNotify>
 
             entity.id = data.id;
 
-            entity.configid = 10000 + data.config;
+            //entity.config = 10000 + data.config;
             entity.campflag = data.camp;
 
             entity.type = data.type;

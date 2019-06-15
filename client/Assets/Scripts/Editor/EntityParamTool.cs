@@ -77,7 +77,7 @@ public static class EntityParamTool
         {
             var param = root.data as EntityParamModel;
             
-            string path = EditorUtility.SaveFilePanel("导出特效配置文件", Application.dataPath + "/Resources/r/config/", param.model, "txt");
+            string path = EditorUtility.SaveFilePanel("导出特效配置文件", Application.dataPath + "/Resources/r/config/", param.asset.Replace(".prefab",""), "txt");
             path = path.ToLower();
             EditorUtility.DisplayProgressBar("请稍候", "正在导出特效配置文件", 0.1f);
 

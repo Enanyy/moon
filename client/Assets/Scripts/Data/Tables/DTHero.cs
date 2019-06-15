@@ -6,7 +6,7 @@ public class TBHero
 	public int id;
 	public string name;
 	public int type;
-	public int configid;
+	public string config;
 	public int hp;
 	public int attack;
 	public int defense;
@@ -37,7 +37,7 @@ public class DTHero : IDataTable
 			o.id = table.GetByColumnName("id",0);
 			o.name = table.GetByColumnName("name","");
 			o.type = table.GetByColumnName("type",0);
-			o.configid = table.GetByColumnName("configid",0);
+			o.config = table.GetByColumnName("config","");
 			o.hp = table.GetByColumnName("hp",0);
 			o.attack = table.GetByColumnName("attack",0);
 			o.defense = table.GetByColumnName("defense",0);

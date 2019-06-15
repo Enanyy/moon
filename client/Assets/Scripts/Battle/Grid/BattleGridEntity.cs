@@ -60,7 +60,7 @@ public class BattleGridEntity : BattleEntity
 
         if (hero != null)
         {
-            configid = (uint)hero.configid;
+            config = hero.config;
         }
 
         base.Init();

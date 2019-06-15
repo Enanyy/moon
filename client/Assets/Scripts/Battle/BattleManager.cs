@@ -27,7 +27,7 @@ public class BattleManager
         }
     }
 
-    private Dictionary<uint, EntityParamModel> mParams = new Dictionary<uint, EntityParamModel>();
+    private Dictionary<string, EntityParamModel> mParams = new Dictionary<string, EntityParamModel>();
 
     /// <summary>
     /// <nodeid,list>
@@ -70,21 +70,19 @@ public class BattleManager
         return true;
     }
 
-    public void GetParam(uint configid,Action<EntityParamModel> callback)
+    public void GetParam(string congfig,Action<EntityParamModel> callback)
     {
-        if(mParams.ContainsKey(configid))
+        if(mParams.ContainsKey(congfig))
         {
             if(callback!= null)
             {
-                callback(mParams[configid]);
+                callback(mParams[congfig]);
             }
              
         }
         else
         {
-            string path = AssetPath.Get(configid);
-
-            AssetManager.Instance.Load(configid, (asset) => {
+            AssetManager.Instance.Load(congfig, (asset) => {
 
                 if (asset!= null)
                 { 
@@ -94,14 +92,14 @@ public class BattleManager
                         var param = EntityParam.Create(xml.text) as EntityParamModel;
                         if (param != null)
                         {
-                            mParams.Add(configid, param);
+                            mParams.Add(congfig, param);
                         }
                     }
                     
                 }
                 if (callback != null)
                 {
-                    callback(mParams.ContainsKey(configid)?mParams[configid]:null);
+                    callback(mParams.ContainsKey(congfig)?mParams[congfig]:null);
                 }
 
             });

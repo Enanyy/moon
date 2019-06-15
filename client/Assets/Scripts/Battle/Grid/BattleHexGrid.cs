@@ -80,7 +80,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                     }
                     if (mMaterial == null)
                     {
-                        AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (asset) => {
+                        AssetManager.Instance.Load("tile.mat", (asset) => {
 
                             mMaterial = asset.obj as Material;
                             root = new GameObject("Grid");
@@ -170,7 +170,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
             }
             if(mMaterial == null)
             {
-                AssetManager.Instance.Load(AssetID.R_MATERIAL_TILE, (asset) => {
+                AssetManager.Instance.Load("tile.mat", (asset) => {
 
                     mMaterial = asset.obj as Material;
                     t.radius = radius;
@@ -350,7 +350,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                         mPathRenderer = root.AddComponent<LineRenderer>();
 
                     }
-                    AssetManager.Instance.Load(AssetID.R_MATERIAL_ARROW, (asset) => {
+                    AssetManager.Instance.Load("arrow.mat", (asset) => {
 
                         mPathRenderer.material = asset.obj as Material;
                     });

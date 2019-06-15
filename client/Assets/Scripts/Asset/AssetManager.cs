@@ -17,9 +17,9 @@ public class AssetManager
         }
     }
 
-    private Dictionary<uint, Queue<AssetObject>> mCachePool = new Dictionary<uint, Queue<AssetObject>>();
+    private Dictionary<string, Queue<AssetObject>> mCachePool = new Dictionary<string, Queue<AssetObject>>();
 
-    private Dictionary<uint,List<AssetObject>> mAssetDic = new Dictionary<uint, List<AssetObject>>(); 
+    private Dictionary<string, List<AssetObject>> mAssetDic = new Dictionary<string, List<AssetObject>>(); 
     /// <summary>
     /// 归还对象到对象池
     /// </summary>
@@ -36,20 +36,20 @@ public class AssetManager
             asset.gameObject.SetActive(false);
         }
 
-        if (mCachePool.ContainsKey(asset.id) == false)
+        if (mCachePool.ContainsKey(asset.name) == false)
         {
-            mCachePool.Add(asset.id, new Queue<AssetObject>());
+            mCachePool.Add(asset.name, new Queue<AssetObject>());
         }
-        mCachePool[asset.id].Enqueue(asset);
+        mCachePool[asset.name].Enqueue(asset);
     }
 
-    private AssetObject GetInstance(uint id)
+    private AssetObject GetInstance(string name)
     {
-        if (mCachePool.ContainsKey(id))
+        if (mCachePool.ContainsKey(name))
         {
-            while (mCachePool[id].Count > 0)
+            while (mCachePool[name].Count > 0)
             {
-                var go = mCachePool[id].Dequeue();
+                var go = mCachePool[name].Dequeue();
                 if (go != null)
                 {
                     return go;
@@ -59,11 +59,11 @@ public class AssetManager
         return null;
     }
 
-    public void Clear(uint id)
+    public void Clear(string name)
     {
-        if (mAssetDic.ContainsKey(id))
+        if (mAssetDic.ContainsKey(name))
         {
-            var list = mAssetDic[id];
+            var list = mAssetDic[name];
             for (int i = 0; i < list.Count; i++)
             {
                 if (list[i].gameObject)
@@ -73,12 +73,12 @@ public class AssetManager
             }
             list.Clear();
 
-            mAssetDic.Remove(id);
+            mAssetDic.Remove(name);
         }
 
-        if (mCachePool.ContainsKey(id))
+        if (mCachePool.ContainsKey(name))
         {      
-            mCachePool[id].Clear();
+            mCachePool[name].Clear();
         }
     }
 
@@ -103,9 +103,9 @@ public class AssetManager
         mCachePool.Clear();
     }
 
-    public void Instantiate(uint id,Action<AssetObject> callback)
+    public void Instantiate(string name,Action<AssetObject> callback)
     {
-        var assetObject = GetInstance(id);
+        var assetObject = GetInstance(name);
         if (assetObject != null)
         {
             if (assetObject.gameObject == null)
@@ -120,16 +120,16 @@ public class AssetManager
         }
         else
         {
-            if (mAssetDic.ContainsKey(id) && mAssetDic[id].Count > 0)
+            if (mAssetDic.ContainsKey(name) && mAssetDic[name].Count > 0)
             {
                 assetObject = new AssetObject
                 {
-                    id = id,
-                    obj = mAssetDic[id][0].obj,
-                    gameObject = UnityEngine.Object.Instantiate(mAssetDic[id][0].obj) as GameObject
+                    name = name,
+                    obj = mAssetDic[name][0].obj,
+                    gameObject = UnityEngine.Object.Instantiate(mAssetDic[name][0].obj) as GameObject
 
                 };
-                mAssetDic[id].Add(assetObject);
+                mAssetDic[name].Add(assetObject);
                 if (callback != null)
                 {
                     callback(assetObject);
@@ -137,7 +137,7 @@ public class AssetManager
             }
             else
             {
-                Load(id, (asset) =>
+                Load(name, (asset) =>
                 {
                     if (asset != null)
                     {
@@ -156,24 +156,24 @@ public class AssetManager
         }
     }
 
-    public void Load(uint id, Action<AssetObject> callback)
+    public void Load(string name, Action<AssetObject> callback)
     {
-        var asset = GetInstance(id);
+        var asset = GetInstance(name);
         if (asset == null)
         {
-            string assetPath = AssetPath.Get(id);
+            string assetPath = AssetPath.Get(name);
 
             asset = new AssetObject
             {
-                id = id,
-                obj = Resources.Load<UnityEngine.Object>(assetPath),
+                name = name,
+                obj = Resources.Load<UnityEngine.Object>(assetPath.Contains(".")? assetPath.Substring(0,assetPath.LastIndexOf('.')):assetPath),
             };
 
-            if (mAssetDic.ContainsKey(id) == false)
+            if (mAssetDic.ContainsKey(name) == false)
             {
-                mAssetDic.Add(id,new List<AssetObject>());
+                mAssetDic.Add(name,new List<AssetObject>());
             }
-            mAssetDic[id].Add(asset);
+            mAssetDic[name].Add(asset);
 
             if (callback != null)
             {
@@ -203,9 +203,9 @@ public class AssetManager
 
         asset.gameObject = null;
 
-        if (mAssetDic.ContainsKey(asset.id))
+        if (mAssetDic.ContainsKey(asset.name))
         {
-            var list = mAssetDic[asset.id];
+            var list = mAssetDic[asset.name];
             for (int i = list.Count -1; i >= 0; i--)
             {
                 if (list[i] == asset)

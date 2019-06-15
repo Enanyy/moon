@@ -40,7 +40,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
             return false;
         }
         OnInit(go);
-        LoadAsset(param.assetID);
+        LoadAsset(param.asset);
 
         OnBegin();
         return true;
@@ -165,7 +165,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
         for(int i = 0; i < param.children.Count; ++i)
         {
             var child = param.children[i] as EntityParamEffect ;
-            if (child == null || child.assetID == 0 || child.arise != arise)
+            if (child == null || string.IsNullOrEmpty(child.asset) || child.arise != arise)
             {
                 continue;
             }

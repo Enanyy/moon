@@ -10,12 +10,13 @@ public abstract partial class EntityParamEffect : EntityParam
     public EffectOn on;
 
 
-    public uint assetID;     //资源ID
+    public string asset;     //资源ID
 
     public float delay;      //延迟
 
     public Vector3 offset;
 
+    private GameObject mPrefab;
 
     public EntityParamEffect() { type = EntityParamType.Effect; name = type.ToString(); }
 #if UNITY_EDITOR
@@ -53,8 +54,21 @@ public abstract partial class EntityParamEffect : EntityParam
         }
         on = (EffectOn)UnityEditor.EditorGUILayout.EnumPopup("On", on);
         r.height += 20;
+        asset = UnityEditor.EditorGUILayout.TextField("Asset", asset);
+        r.height += 20;
 
-        assetID = (uint)UnityEditor.EditorGUILayout.IntField("AssetID", (int)assetID);
+        if (mPrefab == null && string.IsNullOrEmpty(asset) == false)
+        {
+            string path = string.Format("assets/resources/r/spell_fx/{0}", asset);
+            mPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
+        var obj = (GameObject)UnityEditor.EditorGUILayout.ObjectField("Prefab", mPrefab, typeof(UnityEngine.GameObject), false, new GUILayoutOption[0]);
+        if (obj != null && obj != mPrefab)
+        {
+            asset = obj.name + ".prefab";
+            mPrefab = obj;
+        }
         r.height += 20;
         delay = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Delay", delay), 0, float.MaxValue);
         r.height += 20;
@@ -78,7 +92,7 @@ public abstract partial class EntityParamEffect : EntityParam
             param.on = this.on;
 
 
-            param.assetID = this.assetID;
+            param.asset = this.asset;
             param.delay = this.delay;
             param.offset = this.offset;
 
@@ -99,7 +113,7 @@ public abstract partial class EntityParamEffect : EntityParam
         attributes.Add("arise", arise.ToString());
         attributes.Add("on", on.ToString());
 
-        attributes.Add("assetID", assetID.ToString());
+        attributes.Add("asset", asset);
         attributes.Add("delay", delay.ToString());
         attributes.Add("offset", offset.ToString());
 
@@ -111,7 +125,7 @@ public abstract partial class EntityParamEffect : EntityParam
         effectType = node.GetAttribute("effectType").ToEnumEx<EffectType>();
         arise = node.GetAttribute("arise").ToEnumEx<EffectArise>();
         on = node.GetAttribute("on").ToEnumEx<EffectOn>();
-        assetID = node.GetAttribute("assetID").ToUInt32Ex();
+        asset = node.GetAttribute("asset");
         delay = node.GetAttribute("delay").ToFloatEx();
         offset = node.GetAttribute("offset").ToVector3Ex();
         base.ParseXml(node);
