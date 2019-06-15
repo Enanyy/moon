@@ -157,7 +157,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
         {
             return childCount;
         }
-        var model = agent.GetComponent<ModelComponent>();
+        var model = agent.GetComponent<EntityComponentModel>();
         if(model== null)
         {
             return childCount;

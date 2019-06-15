@@ -27,7 +27,7 @@ public class EffectEntityTime : EffectEntity
             var entity = on as BattleEntity;
             if (entity != null)
             {
-                var model = entity.GetComponent<ModelComponent>();
+                var model = entity.GetComponent<EntityComponentModel>();
                 if (model != null)
                 {
                     UpdateParticleSystemSpeed(model.animationSpeed);

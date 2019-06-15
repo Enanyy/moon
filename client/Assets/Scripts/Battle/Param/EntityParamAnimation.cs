@@ -11,7 +11,7 @@ public partial class EntityParamAnimation : EntityParam
 
     private AnimationClip mAnimationClip;
 
-    public EntityParamAnimation() { type = EntityParamType.Animation; name = type.ToString(); }
+    public EntityParamAnimation() { type = EntityParamType.Animation; }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
     {

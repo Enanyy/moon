@@ -5,8 +5,8 @@ using UnityEngine;
 /// <summary>
 /// 模型组件
 /// </summary>
-public class ModelComponent :
-    AssetEntity, 
+public class EntityComponentModel :
+    AssetEntity,
     IComponent<BattleEntity>,
     IStateAgent<BattleEntity>
 {
@@ -99,7 +99,7 @@ public class ModelComponent :
     {
         animationSpeed = 1;
         EntityParamModel param = agent.param;
-        if (param!=null)
+        if (param != null)
         {
             LoadAsset(param.asset);
         }
@@ -107,9 +107,9 @@ public class ModelComponent :
 
     protected override bool OnAssetLoad()
     {
-        bool result= base.OnAssetLoad();
-       
-        if(gameObject!= null)
+        bool result = base.OnAssetLoad();
+
+        if (gameObject != null)
         {
             gameObject.name = agent.id.ToString();
             gameObject.transform.position = agent.position;
@@ -143,12 +143,12 @@ public class ModelComponent :
                 mDelayTasks.RemoveAt(i);
             }
         }
-        if (gameObject!= null)
+        if (gameObject != null)
         {
             gameObject.transform.position = agent.position;// Vector3.Lerp(gameObject.transform.position, agent.position, deltaTime * 10);
-            gameObject.transform.rotation = Quaternion.Lerp(gameObject.transform.rotation, agent.rotation, deltaTime * 10* animationSpeed);
+            gameObject.transform.rotation = Quaternion.Lerp(gameObject.transform.rotation, agent.rotation, deltaTime * 10 * animationSpeed);
 
-            gameObject.transform.localScale = agent.scale * Vector3.one;            
+            gameObject.transform.localScale = agent.scale * Vector3.one;
         }
 
 #if UNITY_EDITOR
@@ -169,15 +169,15 @@ public class ModelComponent :
 
     public void OnEnter(State<BattleEntity> state)
     {
-        
+
         //Play(state);
         //ShowEffect(state, EffectArise.ParentBegin);
     }
 
-    public void OnExcute(State<BattleEntity> state,float deltaTime)
+    public void OnExcute(State<BattleEntity> state, float deltaTime)
     {
-      
-       
+
+
     }
 
     public void OnExit(State<BattleEntity> state)
@@ -187,7 +187,7 @@ public class ModelComponent :
 
     public void OnPause(State<BattleEntity> state)
     {
-        if(animator!=null)
+        if (animator != null)
         {
             animator.speed = 0;
         }
@@ -195,7 +195,7 @@ public class ModelComponent :
 
     public void OnResume(State<BattleEntity> state)
     {
-        if(animator!=null)
+        if (animator != null)
         {
             animator.speed = animationSpeed;
         }
@@ -206,9 +206,13 @@ public class ModelComponent :
     }
 
 
-    public void PlayAnimation(EntityAction action, string name)
+    public void PlayAnimation(EntityAction action, EntityParamAnimation animation)
     {
-        var animationClip = GetAnimationClip(name);
+        if (action == null || animation == null)
+        {
+            return;
+        }
+        var animationClip = GetAnimationClip(animation.name);
         if (animationClip == null)
         {
             return;
@@ -229,9 +233,11 @@ public class ModelComponent :
         {
             animator.Play("empty", 0);
             animator.Update(0);
-            animator.Play(name, 0);
+            animator.Play(animation.name, 0);
             animator.speed = animationSpeed;
             mCurrentAnimationClip = animationClip;
+
+            ShowEffect(animation, agent.target);
         }
     }
 
@@ -262,18 +268,9 @@ public class ModelComponent :
         delayTask.Init(delay, callback);
         mDelayTasks.Add(delayTask);
     }
-    private void ShowEffect(State<BattleEntity> state, EffectArise arise)
-    {
-        //EntityAction action = state as EntityAction;
-        //if (action == null || action.animation == null)
-        //{
-        //    return;
-        //}
+   
 
-        //ShowEffect(action.animation, action.target, arise);
-    }
-
-    private void ShowEffect(EntityParamAnimation param,uint target, EffectArise arise)
+    private void ShowEffect(EntityParamAnimation param,uint target)
     {
         if (param == null)
         {
@@ -283,7 +280,7 @@ public class ModelComponent :
         for (int i = 0; i < param.children.Count; ++i)
         {
             var child = param.children[i] as EntityParamEffect ;
-            if (child== null || string.IsNullOrEmpty(child.asset) || child.arise != arise)
+            if (child== null || string.IsNullOrEmpty(child.asset))
             {
                 continue;
             }
@@ -294,8 +291,8 @@ public class ModelComponent :
                 AddDelayTask(child.delay, delegate ()
                 {                 
                     EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
-
-                    if (effect.Init(child, agent, target, null)==false)
+                    
+                    if (effect!= null && effect.Init(child, agent, target, null)==false)
                     {
                         BattleManager.Instance.RemoveEffect(effect);
                     }
@@ -306,7 +303,7 @@ public class ModelComponent :
                 
                 EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
 
-                if (effect.Init(child, agent, target, null) == false)
+                if (effect != null && effect.Init(child, agent, target, null) == false)
                 {
                     BattleManager.Instance.RemoveEffect(effect);
                 }

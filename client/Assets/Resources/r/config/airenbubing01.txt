@@ -1,28 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<EntityParamModel asset="airenbubing01.prefab" scale="1" hitPosition="(0.0, 0.0, 0.0)" name="Model" rect="(20,20,240,20)">
-  <EntityParamAction action="Idle" weight="0" duration="86400" name="Action" rect="(300,20,240,20)">
-    <EntityParamPluginAnimation name="AnimationPlugin" rect="(581,18,240,20)">
+<EntityParamModel asset="airenbubing01.prefab" scale="1" hitPosition="(0.0, 0.0, 0.0)" rect="(20,20,240,20)">
+  <EntityParamAction action="Idle" weight="0" duration="86400" rect="(300,20,240,20)">
+    <EntityParamPluginSingleAnimation rect="(581,18,240,20)">
       <AnimationClip animationClip="idle" length="1" />
-    </EntityParamPluginAnimation>
+    </EntityParamPluginSingleAnimation>
   </EntityParamAction>
-  <EntityParamAction action="Run" weight="1" duration="86400" name="Action" rect="(291,135,240,20)">
-    <EntityParamPluginAnimation name="AnimationPlugin" rect="(581,132,240,20)">
+  <EntityParamAction action="Run" weight="1" duration="86400" rect="(291,135,240,20)">
+    <EntityParamPluginSingleAnimation rect="(581,132,240,20)">
       <AnimationClip animationClip="run" length="0.6666667" />
-    </EntityParamPluginAnimation>
+    </EntityParamPluginSingleAnimation>
   </EntityParamAction>
-  <EntityParamAction action="Attack" weight="1" duration="1" name="Action" rect="(303,241,240,20)">
-    <EntityParamPluginAnimation name="AnimationPlugin" rect="(584,250,240,20)">
+  <EntityParamAction action="Attack" weight="1" duration="1" rect="(303,241,240,20)">
+    <EntityParamPluginSingleAnimation rect="(584,250,240,20)">
       <AnimationClip animationClip="attack01" length="1" />
-    </EntityParamPluginAnimation>
+    </EntityParamPluginSingleAnimation>
   </EntityParamAction>
-  <EntityParamAction action="Die" weight="10" duration="1.4" name="Action" rect="(307,388,240,20)">
-    <EntityParamPluginAnimation name="AnimationPlugin" rect="(585,373,240,20)">
+  <EntityParamAction action="Die" weight="10" duration="1.4" rect="(307,388,240,20)">
+    <EntityParamPluginSingleAnimation rect="(585,373,240,20)">
       <AnimationClip animationClip="die" length="1.4" />
-    </EntityParamPluginAnimation>
+    </EntityParamPluginSingleAnimation>
   </EntityParamAction>
-  <EntityParamAnimation animationClip="attack01" length="1" mode="Default" name="Animation" rect="(40,408,240,20)" />
-  <EntityParamAnimation animationClip="attack02" length="1.333333" mode="Default" name="Animation" rect="(43,516,240,20)" />
-  <EntityParamAnimation animationClip="die" length="1.4" mode="ClampForever" name="Animation" rect="(51,633,240,20)" />
-  <EntityParamAnimation animationClip="idle" length="1" mode="Loop" name="Animation" rect="(23,164,240,20)" />
-  <EntityParamAnimation animationClip="run" length="0.6666667" mode="Loop" name="Animation" rect="(26,304,240,20)" />
+  <EntityParamAnimation animationClip="attack01" length="1" mode="Default" rect="(40,408,240,20)" />
+  <EntityParamAnimation animationClip="attack02" length="1.333333" mode="Default" rect="(43,516,240,20)" />
+  <EntityParamAnimation animationClip="die" length="1.4" mode="ClampForever" rect="(51,633,240,20)" />
+  <EntityParamAnimation animationClip="idle" length="1" mode="Loop" rect="(23,164,240,20)" />
+  <EntityParamAnimation animationClip="run" length="0.6666667" mode="Loop" rect="(26,304,240,20)" />
 </EntityParamModel>

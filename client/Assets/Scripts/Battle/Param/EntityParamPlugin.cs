@@ -15,13 +15,12 @@ public abstract partial class EntityParamPlugin : EntityParam
     public EntityParamPlugin()
     {
         type = EntityParamType.Plugin;
-        name = type.ToString();
     }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
     {
         base.Draw(ref r);
-        UnityEditor.EditorGUILayout.LabelField(plugin.ToString());
+        UnityEditor.EditorGUILayout.LabelField("Plugin",plugin.ToString());
         r.height += 20;
     }
 
@@ -41,7 +40,6 @@ public partial class EntityParamPluginRun : EntityParamPlugin
 {
     public EntityParamPluginRun()
     {
-        name = "RunPlugin";
         plugin = typeof(ActionPluginRun);
     }
 #if UNITY_EDITOR
@@ -55,7 +53,6 @@ public partial class EntityParamPluginRemove : EntityParamPlugin
 {
     public EntityParamPluginRemove()
     {
-        name = "RunPlugin";
         plugin = typeof(ActionPluginRemove);
     }
 #if UNITY_EDITOR
@@ -70,7 +67,6 @@ public partial class EntityParamPluginRotate : EntityParamPlugin
 {
     public EntityParamPluginRotate()
     {
-        name = "RotatePlugin";
         plugin = typeof(ActionPluginRotate);
     }
 #if UNITY_EDITOR
@@ -85,7 +81,6 @@ public partial class EntityParamPluginJump : EntityParamPlugin
 {
     public EntityParamPluginJump()
     {
-        name = "JumpPlugin";
         plugin = typeof(ActionJumpPlugin);
     }
 #if UNITY_EDITOR
@@ -96,8 +91,7 @@ public partial class EntityParamPluginJump : EntityParamPlugin
 #endif
 }
 
-
-public partial class EntityParamPluginAnimation : EntityParamPlugin
+public abstract class EntityParamPluginAnimation : EntityParamPlugin
 {
     public class AnimationClip
     {
@@ -106,92 +100,6 @@ public partial class EntityParamPluginAnimation : EntityParamPlugin
     }
 
     public List<AnimationClip> animations = new List<AnimationClip>();
-
-    public EntityParamPluginAnimation()
-    {
-        name = "AnimationPlugin";
-        plugin = typeof(ActionPluginAnimation);
-    }
-#if UNITY_EDITOR
-    public override void Draw(ref Rect r)
-    {
-        base.Draw(ref r);
-
-        int size = Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("Size", animations.Count), 0, 10);
-
-        r.height += 20;
-
-        if (size > animations.Count)
-        {
-            for (int i = animations.Count; i < size; i++)
-            {
-                animations.Add(new AnimationClip());
-            }
-        }
-        else if (size < animations.Count)
-        {
-            for (int i = animations.Count - 1; i >= size; i--)
-            {
-                animations.RemoveAt(i);
-            }
-        }
-
-        if (root != null)
-        {
-            var action = parent as EntityParamAction;
-
-
-            var anims = root.GetParams<EntityParamAnimation>();
-            var names = anims.Select(a => { return a.animationClip; }).ToList();
-            float length = 0;
-            for (int i = 0; i < animations.Count; i++)
-            {
-                UnityEditor.EditorGUILayout.LabelField("  Element " + i);
-                r.height += 18;
-
-                if (string.IsNullOrEmpty(animations[i].animationClip))
-                {
-                    if (action != null)
-                    {
-                        animations[i].animationClip = action.action.ToString();
-                    }
-                }
-
-                int index = names.IndexOf(animations[i].animationClip);
-
-                int j = UnityEditor.EditorGUILayout.Popup("    AnimationClip", index, names.ToArray());
-                r.height += 18;
-
-                if (j >= 0 && j < anims.Count && j != index)
-                {
-                    animations[i].animationClip = anims[j].animationClip;
-                    animations[i].length = anims[j].length;
-                }
-
-                animations[i].length = UnityEditor.EditorGUILayout.FloatField("    Length", animations[i].length);
-                r.height += 18;
-
-                length += animations[i].length;
-
-            }
-            if (action != null && action.duration != DEFAULT_DURATION)
-            {
-                action.duration = length;
-            }
-
-        }
-    }
-
-    public override INode Clone(INode node)
-    {
-        var param = new EntityParamPluginAnimation();
-
-        param.animations.AddRange(animations);
-
-        return param;
-    }
-#endif
-
     public override XmlElement ToXml(XmlNode parent, Dictionary<string, string> attributes = null)
     {
         if (attributes == null)
@@ -228,3 +136,252 @@ public partial class EntityParamPluginAnimation : EntityParamPlugin
     }
 }
 
+public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimation
+{ 
+    public EntityParamPluginSingleAnimation()
+    {
+        plugin = typeof(ActionPluginSingleAnimation);
+    }
+#if UNITY_EDITOR
+    public override void Draw(ref Rect r)
+    {
+        base.Draw(ref r);
+
+        if(animations.Count > 1)
+        {
+            for (int i = animations.Count - 1; i >= 1; i--)
+            {
+                animations.RemoveAt(i);
+            }
+        }
+       
+        if (root != null)
+        {
+            var action = parent as EntityParamAction;
+
+            if(action!= null && animations.Count == 0)
+            {
+                animations.Add(new AnimationClip());
+            }
+
+            var anims = root.GetParams<EntityParamAnimation>();
+            var names = anims.Select(a => { return a.animationClip; }).ToList();
+            float length = 0;
+            for (int i = 0; i < animations.Count; i++)
+            {            
+                if (string.IsNullOrEmpty(animations[i].animationClip))
+                {
+                    if (action != null)
+                    {
+                        animations[i].animationClip = action.action.ToString();
+                    }
+                }
+
+                int index = names.IndexOf(animations[i].animationClip);
+
+                int j = UnityEditor.EditorGUILayout.Popup("AnimationClip", index, names.ToArray());
+                r.height += 18;
+
+                if (j >= 0 && j < anims.Count && j != index)
+                {
+                    animations[i].animationClip = anims[j].animationClip;
+                    animations[i].length = anims[j].length;
+                }
+
+                animations[i].length = UnityEditor.EditorGUILayout.FloatField("Length", animations[i].length);
+                r.height += 18;
+
+                length += animations[i].length;
+
+            }
+            if (action != null && action.duration != DEFAULT_DURATION)
+            {
+                action.duration = length;
+            }
+        }
+    }
+    public override INode Clone(INode node)
+    {
+        var param = new EntityParamPluginSingleAnimation();
+
+        param.animations.AddRange(animations);
+
+        return param;
+    }
+
+#endif
+
+   
+}
+
+
+public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimation
+{
+    public EntityParamPluginRamdonAnimation()
+    {
+        plugin = typeof(ActionPluginRandomAnimation);
+    }
+#if UNITY_EDITOR
+    public override void Draw(ref Rect r)
+    {
+        base.Draw(ref r);
+
+        int size = Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("Size", animations.Count), 0, 10);
+        r.height += 20;
+
+        if (size > animations.Count)
+        {
+            for (int i = animations.Count; i < size; i++)
+            {
+                animations.Add(new AnimationClip());
+            }
+        }
+        else if (size < animations.Count)
+        {
+            for (int i = animations.Count - 1; i >= size; i--)
+            {
+                animations.RemoveAt(i);
+            }
+        }
+
+        if (root != null)
+        {
+            var action = parent as EntityParamAction;
+
+            var anims = root.GetParams<EntityParamAnimation>();
+            var names = anims.Select(a => { return a.animationClip; }).ToList();
+            for (int i = 0; i < animations.Count; i++)
+            {
+                UnityEditor.EditorGUILayout.LabelField("  Element " + i);
+                r.height += 18;
+
+                if (string.IsNullOrEmpty(animations[i].animationClip))
+                {
+                    if (action != null)
+                    {
+                        animations[i].animationClip = action.action.ToString();
+                    }
+                }
+
+                int index = names.IndexOf(animations[i].animationClip);
+
+                int j = UnityEditor.EditorGUILayout.Popup("     AnimationClip", index, names.ToArray());
+                r.height += 18;
+
+                if (j >= 0 && j < anims.Count && j != index)
+                {
+                    animations[i].animationClip = anims[j].animationClip;
+                    animations[i].length = anims[j].length;
+                }
+
+                animations[i].length = UnityEditor.EditorGUILayout.FloatField("     Length", animations[i].length);
+                r.height += 18;
+
+            }
+            if (action != null 
+                && action.duration != DEFAULT_DURATION
+                && animations.Count > 0
+                )
+            {
+                action.duration = animations[0].length;
+            }
+        }
+    }
+    public override INode Clone(INode node)
+    {
+        var param = new EntityParamPluginRamdonAnimation();
+
+        param.animations.AddRange(animations);
+
+        return param;
+    }
+
+#endif
+
+}
+
+public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnimation
+{
+    public EntityParamPluginMultitudeAnimation()
+    {
+        plugin = typeof(ActionPluginMultitudeAnimation);
+    }
+#if UNITY_EDITOR
+    public override void Draw(ref Rect r)
+    {
+        base.Draw(ref r);
+
+        int size = Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("Size", animations.Count), 0, 10);
+        r.height += 20;
+
+        if (size > animations.Count)
+        {
+            for (int i = animations.Count; i < size; i++)
+            {
+                animations.Add(new AnimationClip());
+            }
+        }
+        else if (size < animations.Count)
+        {
+            for (int i = animations.Count - 1; i >= size; i--)
+            {
+                animations.RemoveAt(i);
+            }
+        }
+
+        if (root != null)
+        {
+            var action = parent as EntityParamAction;
+
+            var anims = root.GetParams<EntityParamAnimation>();
+            var names = anims.Select(a => { return a.animationClip; }).ToList();
+            float length = 0;
+            for (int i = 0; i < animations.Count; i++)
+            {
+                UnityEditor.EditorGUILayout.LabelField("  Element " + i);
+                r.height += 18;
+
+                if (string.IsNullOrEmpty(animations[i].animationClip))
+                {
+                    if (action != null)
+                    {
+                        animations[i].animationClip = action.action.ToString();
+                    }
+                }
+
+                int index = names.IndexOf(animations[i].animationClip);
+
+                int j = UnityEditor.EditorGUILayout.Popup("     AnimationClip", index, names.ToArray());
+                r.height += 18;
+
+                if (j >= 0 && j < anims.Count && j != index)
+                {
+                    animations[i].animationClip = anims[j].animationClip;
+                    animations[i].length = anims[j].length;
+                }
+
+                animations[i].length = UnityEditor.EditorGUILayout.FloatField("     Length", animations[i].length);
+                r.height += 18;
+
+                length += animations[i].length;
+
+            }
+            if (action != null
+                && action.duration != DEFAULT_DURATION
+                )
+            {
+                action.duration = length;
+            }
+        }
+    }
+    public override INode Clone(INode node)
+    {
+        var param = new EntityParamPluginMultitudeAnimation();
+
+        param.animations.AddRange(animations);
+
+        return param;
+    }
+
+#endif
+}

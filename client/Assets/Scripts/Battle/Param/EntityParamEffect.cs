@@ -18,7 +18,7 @@ public abstract partial class EntityParamEffect : EntityParam
 
     private GameObject mPrefab;
 
-    public EntityParamEffect() { type = EntityParamType.Effect; name = type.ToString(); }
+    public EntityParamEffect() { type = EntityParamType.Effect;  }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
     {
@@ -143,7 +143,6 @@ public partial class EntityParamEffectTime : EntityParamEffect
     public EntityParamEffectTime()
     {
         effectType = EffectType.Time;
-        name = effectType.ToString() + type.ToString();
     }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
@@ -215,7 +214,6 @@ public partial class EntityParamEffectMove : EntityParamEffect
     public EntityParamEffectMove()
     {
         effectType = EffectType.Move;
-        name = effectType.ToString() + type.ToString();
     }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
@@ -270,7 +268,6 @@ public partial class EntityParamEffectFollow : EntityParamEffect
     public EntityParamEffectFollow()
     {
         effectType = EffectType.Follow;
-        name = effectType.ToString() + type.ToString();
     }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
@@ -320,7 +317,6 @@ public partial class EntityParamEffectParabola : EntityParamEffect
     public EntityParamEffectParabola()
     {
         effectType = EffectType.Parabola;
-        name = effectType.ToString() + type.ToString();
     }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)

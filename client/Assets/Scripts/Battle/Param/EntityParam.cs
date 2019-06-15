@@ -104,7 +104,7 @@ public abstract partial class EntityParam
 
     public EntityParam()
     {
-        name = type.ToString();
+        name = GetType().ToString().Replace("EntityParam","");
     }
 
    
@@ -116,7 +116,7 @@ public abstract partial class EntityParam
             attributes = new Dictionary<string, string>();
         }
 
-        attributes.Add("name", name);
+        //attributes.Add("name", name);
         attributes.Add("rect", rect.ToStringEx());
 
         var node = CreateXmlNode(parent, GetType().ToString(), attributes);
@@ -162,7 +162,7 @@ public abstract partial class EntityParam
     {
         if(node!= null)
         {
-            name = node.GetAttribute("name");
+            //name = node.GetAttribute("name");
             rect = node.GetAttribute("rect").ToRectEx();
             if(node.ChildNodes != null)
             {

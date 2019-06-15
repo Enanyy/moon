@@ -64,7 +64,7 @@ public class BattleEntity:
             }
         }
     }
-    public  ModelComponent model { get; private set; }
+    public  EntityComponentModel model { get; private set; }
     public bool active
     {
         get { return model!= null; }
@@ -74,7 +74,7 @@ public class BattleEntity:
             {
                 if(model == null)
                 {
-                    model = ObjectPool.GetInstance<ModelComponent>();
+                    model = ObjectPool.GetInstance<EntityComponentModel>();
                     AddComponent(model);
                 }
             }

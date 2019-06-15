@@ -21,7 +21,7 @@ public partial class EntityParamAction : EntityParam
 
 
 
-    public EntityParamAction() { base.type = EntityParamType.Action; name = base.type.ToString(); }
+    public EntityParamAction() { base.type = EntityParamType.Action; }
 #if UNITY_EDITOR
     public override void Draw(ref Rect r)
     {
@@ -44,7 +44,15 @@ public partial class EntityParamAction : EntityParam
     }
     public override bool LinkAble(INode node)
     {
-        return node.GetType().IsSubclassOf(typeof(EntityParamPlugin));
+        Type type = node.GetType();
+        if (type.IsSubclassOf(typeof(EntityParamPluginAnimation)))
+        {
+            if (GetParams<EntityParamPluginAnimation>().Count > 0)
+            {
+                return false;
+            }
+        }
+        return type.IsSubclassOf(typeof(EntityParamPlugin));
     }
 
     public override Color GetColor()

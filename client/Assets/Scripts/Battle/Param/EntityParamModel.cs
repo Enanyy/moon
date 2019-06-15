@@ -14,7 +14,7 @@ public partial class EntityParamModel : EntityParam
     private UnityEngine.GameObject mPrefab;
 
 
-    public EntityParamModel() { type = EntityParamType.Model; name = "Model"; }
+    public EntityParamModel() { type = EntityParamType.Model; }
 
 
 
@@ -284,6 +284,19 @@ public partial class EntityParamModel : EntityParam
         {
             var child = children[i] as EntityParamAction;
             if (child != null && child.action == action)
+            {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    public EntityParamAnimation GetAnimation(string name)
+    {
+        for(int i = 0; i < children.Count;i++)
+        {
+            var child = children[i] as EntityParamAnimation;
+            if(child!= null && child.animationClip == name)
             {
                 return child;
             }
