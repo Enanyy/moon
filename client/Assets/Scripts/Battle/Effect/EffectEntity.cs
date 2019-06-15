@@ -250,7 +250,13 @@ public abstract class EffectEntity :
 
     public void OnExcute(float deltaTime)
     {
-        
+        if(action!= null)
+        {
+            if(mEffectSpeed != action.speed)
+            {
+                UpdateParticleSystemSpeed(action.speed);
+            }
+        }
     }
 
     public void OnExit()

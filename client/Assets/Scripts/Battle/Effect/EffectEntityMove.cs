@@ -48,7 +48,7 @@ public  class EffectEntityMove:EffectEntity
 
         if (mTime > 0)
         {
-            mTime -= Time.deltaTime;
+            mTime -= deltaTime;
             if (mTime < 0) mTime = 0;
             if (mDuration != 0)
             {
