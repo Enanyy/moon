@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-public abstract class EffectEntity :AssetEntity,IGameObject
+public abstract class EffectEntity :
+    AssetEntity,
+    IGameObject,
+    IState<BattleEntity>
 {
     public Vector3 position { get; set; }
     public Quaternion rotation { get; set; }
     public float scale { get; set; }
 
-    public EffectEntity parent { get; private set; }
-    public BattleEntity agent { get; private set; }
+    public EffectEntity parentEffect { get; private set; }
+    public BattleEntity agent { get;  set; }
 
     private uint mTarget;
     public BattleEntity target
@@ -19,6 +22,17 @@ public abstract class EffectEntity :AssetEntity,IGameObject
 
     public EntityParamEffect  param { get; private set; }
 
+ 
+    public EntityAction action
+    {
+        get { return parent as EntityAction; }
+    }
+
+    public  IState<BattleEntity> parent
+    {
+        get;
+        set;     
+    }
 
     private float mEffectSpeed = 1;
     private ParticleSystem[] mParticleSystems;
@@ -29,7 +43,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
     {
         this.param = param;
         this.agent = agent;
-        this.parent = parent;
+        this.parentEffect = parent;
         this.mTarget = target;
         this.scale = agent.scale;
         
@@ -65,7 +79,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
         switch (param.on)
         {
             case EffectOn.Self: return agent;
-            case EffectOn.Parent: return parent;
+            case EffectOn.Parent: return parentEffect;
             case EffectOn.Target: return target;
         }
         return null;
@@ -144,9 +158,9 @@ public abstract class EffectEntity :AssetEntity,IGameObject
 
         base.Recycle();
 
-        if(parent!= null)
+        if(parentEffect!= null)
         {
-            parent.Recycle();
+            parentEffect.Recycle();
         }
     }
 
@@ -176,7 +190,13 @@ public abstract class EffectEntity :AssetEntity,IGameObject
                 model.AddDelayTask(child.delay, delegate ()
                 {                  
                     EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
-                    if (effect.Init(child, agent, mTarget, this) == false)
+                    if (effect != null && effect.Init(child, agent, mTarget, null))
+                    {
+                        if (action!= null) {
+                            action.AddSubState(effect);
+                        }
+                    }
+                    else
                     {
                         BattleManager.Instance.RemoveEffect(effect);
                     }
@@ -186,7 +206,14 @@ public abstract class EffectEntity :AssetEntity,IGameObject
             {
                 EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
 
-                if (effect.Init(child, agent, mTarget, this) == false)
+                if (effect != null && effect.Init(child, agent, mTarget, null))
+                {
+                    if (action != null)
+                    {
+                        action.AddSubState(effect);
+                    }
+                }
+                else
                 {
                     BattleManager.Instance.RemoveEffect(effect);
                 }
@@ -206,7 +233,7 @@ public abstract class EffectEntity :AssetEntity,IGameObject
         mAnimators = null;
         mParticleSystems = null;
         mEffectSpeed = 1;
-        parent = null;
+        parentEffect = null;
         agent = null;
         mTarget = 0;
     }
@@ -215,7 +242,41 @@ public abstract class EffectEntity :AssetEntity,IGameObject
     {
         base.OnDestroy();
     }
+    #region State
+    public void OnEnter()
+    {
+       
+    }
 
-   
+    public void OnExcute(float deltaTime)
+    {
+        
+    }
+
+    public void OnExit()
+    {
+       
+    }
+
+    public void OnCancel()
+    {
+       
+    }
+
+    public void OnPause()
+    {
+        
+    }
+
+    public void OnResume()
+    {
+       
+    }
+
+    public void Clear()
+    {
+       
+    }
+    #endregion
 }
 

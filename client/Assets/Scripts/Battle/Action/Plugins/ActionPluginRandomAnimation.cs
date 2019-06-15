@@ -3,10 +3,9 @@
 
 public class ActionPluginRandomAnimation : ActionPluginSingleAnimation
 {
-    public override void OnEnter()
+    protected override void PlayAnimation()
     {
-        base.OnEnter();
-        if (agent.model == null)
+        if (agent.model == null || agent.param == null)
         {
             return;
         }
@@ -27,6 +26,5 @@ public class ActionPluginRandomAnimation : ActionPluginSingleAnimation
             }
             PlayAnimation(animation);
         }
-
     }
 }

@@ -7,7 +7,12 @@ public class ActionPluginSingleAnimation : ActionPlugin
     public override void OnEnter()
     {
         base.OnEnter();
+        PlayAnimation();
 
+    }
+
+    protected virtual void PlayAnimation()
+    {
         if (agent.model == null)
         {
             return;
@@ -22,7 +27,7 @@ public class ActionPluginSingleAnimation : ActionPlugin
         if (animationPluginParam.animations.Count > 0)
         {
             var animation = animationPluginParam.animations[0];
-          
+
             PlayAnimation(animation);
         }
     }

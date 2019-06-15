@@ -100,13 +100,13 @@ public class EntityAction : State<BattleEntity>,IPoolObject
             return;
         }
 
-        EntityParamAction action = agent.param.GetAction(type);
-        if (action != null)
+        param = agent.param.GetAction(type);
+        if (param != null)
         {
-            weight = action.weight;
-            duration = duration == 0 ? action.duration : duration;
+            weight = param.weight;
+            duration = duration == 0 ? param.duration : duration;
 
-            var plugins = action.GetParams<EntityParamPlugin>();
+            var plugins = param.GetParams<EntityParamPlugin>();
             for (int i = 0; i < plugins.Count; ++i)
             {
                 try
@@ -178,13 +178,17 @@ public class EntityAction : State<BattleEntity>,IPoolObject
 
     public void OnReturn()
     {
-        for(int i = 0; i <mSubStateList.Count; ++i)
+        for (int i = 0; i < mSubStateList.Count; ++i)
         {
             var plugin = mSubStateList[i] as ActionPlugin;
 
-            plugin.agent = null;
+            if (plugin != null)
+            {
+                plugin.agent = null;
+                plugin.parent = null;
 
-            ObjectPool.ReturnInstance(plugin, plugin.GetType());
+                ObjectPool.ReturnInstance(plugin, plugin.GetType());
+            }
         }
         Clear();
     }

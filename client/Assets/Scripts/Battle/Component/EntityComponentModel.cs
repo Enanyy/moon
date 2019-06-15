@@ -212,7 +212,7 @@ public class EntityComponentModel :
         {
             return;
         }
-        var animationClip = GetAnimationClip(animation.name);
+        var animationClip = GetAnimationClip(animation.animationClip);
         if (animationClip == null)
         {
             return;
@@ -233,11 +233,11 @@ public class EntityComponentModel :
         {
             animator.Play("empty", 0);
             animator.Update(0);
-            animator.Play(animation.name, 0);
+            animator.Play(animation.animationClip, 0);
             animator.speed = animationSpeed;
             mCurrentAnimationClip = animationClip;
 
-            ShowEffect(animation, agent.target);
+            ShowEffect(action, animation, agent.target);
         }
     }
 
@@ -270,9 +270,9 @@ public class EntityComponentModel :
     }
    
 
-    private void ShowEffect(EntityParamAnimation param,uint target)
+    private void ShowEffect(EntityAction action, EntityParamAnimation param,uint target)
     {
-        if (param == null)
+        if (action == null || param == null)
         {
             return;
         }
@@ -292,7 +292,11 @@ public class EntityComponentModel :
                 {                 
                     EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
                     
-                    if (effect!= null && effect.Init(child, agent, target, null)==false)
+                    if (effect != null && effect.Init(child, agent, target, null))
+                    {
+                        action.AddSubState(effect);
+                    }
+                    else
                     {
                         BattleManager.Instance.RemoveEffect(effect);
                     }
@@ -303,7 +307,11 @@ public class EntityComponentModel :
                 
                 EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
 
-                if (effect != null && effect.Init(child, agent, target, null) == false)
+                if (effect != null && effect.Init(child, agent, target, null))
+                {
+                    action.AddSubState(effect);
+                }
+                else
                 {
                     BattleManager.Instance.RemoveEffect(effect);
                 }
