@@ -76,7 +76,6 @@ public class EffectEntityTime : EffectEntity
 
         if (mEffectTime < time.duration)
         {
-            float preEffectTime = mEffectTime;
             mEffectTime += deltaTime;
             
             if (mEffectTime > time.duration)
@@ -86,6 +85,19 @@ public class EffectEntityTime : EffectEntity
             }
         }
     }
-   
+
+    public override void OnExcute(float deltaTime)
+    {
+        base.OnExcute(deltaTime);
+        if (action != null)
+        {
+            EntityParamEffectTime timeParam = param as EntityParamEffectTime;
+            if (timeParam.syncAnimationSpeed)
+            {
+                UpdateParticleSystemSpeed(action.speed);
+            }
+        }
+    }
+
 }
 

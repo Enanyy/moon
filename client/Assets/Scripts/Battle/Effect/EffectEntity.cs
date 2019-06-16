@@ -243,43 +243,37 @@ public abstract class EffectEntity :
         base.OnDestroy();
     }
     #region State
-    public void OnEnter()
+    public virtual void OnEnter()
     {
        
     }
 
-    public void OnExcute(float deltaTime)
-    {
-        if(action!= null)
-        {
-            if(mEffectSpeed != action.speed)
-            {
-                UpdateParticleSystemSpeed(action.speed);
-            }
-        }
-    }
-
-    public void OnExit()
+    public virtual void OnExcute(float deltaTime)
     {
        
     }
 
-    public void OnCancel()
+    public virtual void OnExit()
     {
        
     }
 
-    public void OnPause()
+    public virtual void OnCancel()
+    {
+       
+    }
+
+    public virtual void OnPause()
     {
         
     }
 
-    public void OnResume()
+    public virtual void OnResume()
     {
        
     }
 
-    public void Clear()
+    public virtual void Clear()
     {
        
     }
