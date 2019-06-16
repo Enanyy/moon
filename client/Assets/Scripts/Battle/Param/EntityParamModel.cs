@@ -10,15 +10,13 @@ public partial class EntityParamModel : EntityParam
     public float scale = 1;
     public Vector3 hitPosition = Vector3.zero;
 
-    private UnityEngine.Object mModel;
-    private UnityEngine.GameObject mPrefab;
-
-
     public EntityParamModel() { type = EntityParamType.Model; }
 
 
-
 #if UNITY_EDITOR
+    private UnityEngine.Object mModel;
+    private UnityEngine.GameObject mPrefab;
+
     public override void Draw(ref Rect r)
     {
         base.Draw(ref r);
@@ -254,6 +252,24 @@ public partial class EntityParamModel : EntityParam
         
         param.scale = this.scale;
         return base.Clone(param);
+    }
+    public AnimationClip GetAnimationClip(string name)
+    {
+        if(mPrefab!= null)
+        {
+            Animator animator = mPrefab.GetComponent<Animator>();
+            if(animator!= null)
+            {
+                for(int i = 0; i < animator.runtimeAnimatorController.animationClips.Length; ++i)
+                {
+                    if(animator.runtimeAnimatorController.animationClips[i].name == name)
+                    {
+                        return animator.runtimeAnimatorController.animationClips[i];
+                    }
+                }
+            }
+        }
+        return null;
     }
 #endif
 

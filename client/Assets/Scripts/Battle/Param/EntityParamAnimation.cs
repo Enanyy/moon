@@ -9,10 +9,9 @@ public partial class EntityParamAnimation : EntityParam
     public float length;
     public WrapMode mode;
 
-    private AnimationClip mAnimationClip;
-
     public EntityParamAnimation() { type = EntityParamType.Animation; }
 #if UNITY_EDITOR
+    private AnimationClip mAnimationClip;
     public override void Draw(ref Rect r)
     {
         base.Draw(ref r);
@@ -25,6 +24,16 @@ public partial class EntityParamAnimation : EntityParam
 
         mode = (WrapMode)UnityEditor.EditorGUILayout.EnumPopup("Mode", mode);
         r.height += 20;
+
+        if(mAnimationClip == null && string.IsNullOrEmpty(animationClip)==false && parent != null)
+        {
+            EntityParamModel model = parent as EntityParamModel;
+            if(model!= null)
+            {
+                mAnimationClip = model.GetAnimationClip(animationClip);
+            }
+        }
+
 
         AnimationClip clip = (AnimationClip)UnityEditor.EditorGUILayout.ObjectField(mAnimationClip, typeof(AnimationClip), false, new GUILayoutOption[0]);
         if (clip != null && mAnimationClip != clip)

@@ -91,15 +91,15 @@ public partial class EntityParamPluginJump : EntityParamPlugin
 #endif
 }
 
+public class EntityParamPluginAnimationClip
+{
+    public string animationClip;
+    public float length;
+}
+
 public abstract class EntityParamPluginAnimation : EntityParamPlugin
 {
-    public class AnimationClip
-    {
-        public string animationClip;
-        public float length;
-    }
-
-    public List<AnimationClip> animations = new List<AnimationClip>();
+    public List<EntityParamPluginAnimationClip> animations = new List<EntityParamPluginAnimationClip>();
     public override XmlElement ToXml(XmlNode parent, Dictionary<string, string> attributes = null)
     {
         if (attributes == null)
@@ -126,7 +126,7 @@ public abstract class EntityParamPluginAnimation : EntityParamPlugin
             for (int i = 0; i < node.ChildNodes.Count; i++)
             {
                 var child = node.ChildNodes[i] as XmlElement;
-                var animation = new AnimationClip();
+                var animation = new EntityParamPluginAnimationClip();
                 animation.animationClip = child.GetAttribute("animationClip");
                 animation.length = child.GetAttribute("length").ToFloatEx();
                 animations.Add(animation);
@@ -161,7 +161,7 @@ public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimati
 
             if(action!= null && animations.Count == 0)
             {
-                animations.Add(new AnimationClip());
+                animations.Add(new EntityParamPluginAnimationClip());
             }
 
             var anims = root.GetParams<EntityParamAnimation>();
@@ -233,7 +233,7 @@ public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimati
         {
             for (int i = animations.Count; i < size; i++)
             {
-                animations.Add(new AnimationClip());
+                animations.Add(new EntityParamPluginAnimationClip());
             }
         }
         else if (size < animations.Count)
@@ -318,7 +318,7 @@ public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnim
         {
             for (int i = animations.Count; i < size; i++)
             {
-                animations.Add(new AnimationClip());
+                animations.Add(new EntityParamPluginAnimationClip());
             }
         }
         else if (size < animations.Count)

@@ -32,7 +32,7 @@ public class ActionPluginSingleAnimation : ActionPlugin
         }
     }
 
-    protected virtual void PlayAnimation(EntityParamPluginAnimation.AnimationClip animation)
+    protected virtual void PlayAnimation(EntityParamPluginAnimationClip animation)
     {
         if (agent.model != null && agent.param != null)
         {

@@ -55,6 +55,9 @@ public class StateMachine<T> where T: IStateAgent<T>
         {
             mStateList.AddAfter(mStateList.First, state);
         }
+
+        DoNext();
+
         return true;
     }
 

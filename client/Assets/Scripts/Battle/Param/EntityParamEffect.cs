@@ -16,10 +16,11 @@ public abstract partial class EntityParamEffect : EntityParam
 
     public Vector3 offset;
 
-    private GameObject mPrefab;
-
     public EntityParamEffect() { type = EntityParamType.Effect;  }
 #if UNITY_EDITOR
+
+    private GameObject mPrefab;
+
     public override void Draw(ref Rect r)
     {
         base.Draw(ref r);
