@@ -60,7 +60,7 @@ public  class AssetPath
 {
     public static Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
 #if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoadMethod]
+    [RuntimeInitializeOnLoadMethod]
     public static void Init()
     { 
         string path = Application.dataPath + "/asset.txt";

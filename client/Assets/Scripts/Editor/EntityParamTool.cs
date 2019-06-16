@@ -126,10 +126,10 @@ public static class EntityParamTool
     {
         if (Application.isPlaying)
         {
-            //if (BattleTest.entity != null && BattleTest.entity.param != null)
-            //{
-            //    return CreateTreeNodeGraph(BattleTest.entity.param);
-            //}
+            if (Test.Instance!= null && Test.Instance.mEntity!= null)
+            {
+                return CreateTreeNodeGraph(Test.Instance.mEntity.param);
+            }
 
             //foreach (var v in Selection.gameObjects)
             //{

@@ -12,13 +12,13 @@
     <EntityParamPluginRun rect="(823,252,240,20)" />
     <EntityParamPluginRotate rect="(837,297,240,20)" />
   </EntityParamAction>
-  <EntityParamAction action="Attack" weight="1" duration="2.033334" rect="(305,467,240,20)">
+  <EntityParamAction action="Attack" weight="1" duration="5.533334" rect="(305,467,240,20)">
     <EntityParamPluginRotate rect="(401,585,240,20)" />
-    <EntityParamPluginRamdonAnimation rect="(684,422,240,20)">
+    <EntityParamPluginMultitudeAnimation rect="(719,411,240,20)">
       <AnimationClip animationClip="attack01" length="2.033334" />
       <AnimationClip animationClip="attack02" length="1.933333" />
       <AnimationClip animationClip="attack03" length="1.566667" />
-    </EntityParamPluginRamdonAnimation>
+    </EntityParamPluginMultitudeAnimation>
   </EntityParamAction>
   <EntityParamAction action="Die" weight="10" duration="2.266667" rect="(265,715,240,20)">
     <EntityParamPluginSingleAnimation rect="(579,713,240,20)">
@@ -39,19 +39,19 @@
   </EntityParamAction>
   <EntityParamAnimation animationClip="victory" length="1.9" mode="Loop" rect="(49,197,240,20)" />
   <EntityParamAnimation animationClip="standby" length="14.16667" mode="Loop" rect="(47,210,240,20)" />
-  <EntityParamAnimation animationClip="run_away" length="0.5666667" mode="Loop" rect="(47,205,240,20)" />
+  <EntityParamAnimation animationClip="xiuxi" length="1.666667" mode="Loop" rect="(600,20,240,20)" />
   <EntityParamAnimation animationClip="run" length="0.9333334" mode="Loop" rect="(58,337,240,20)" />
-  <EntityParamAnimation animationClip="bufu" length="5" mode="Default" rect="(52,201,240,20)" />
+  <EntityParamAnimation animationClip="idle" length="1.666667" mode="Loop" rect="(22,664,240,20)" />
   <EntityParamAnimation animationClip="die" length="2.266667" mode="ClampForever" rect="(30,527,240,20)" />
-  <EntityParamAnimation animationClip="attack01" length="2.033334" mode="Default" rect="(936,48,240,20)">
-    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="1" effectType="Time" arise="ParentBegin" on="Self" asset="fx_nvjiangjun_attack_01.prefab" delay="0" offset="(0.0, 0.0, 0.0)" rect="(1231,29,240,20)" />
-  </EntityParamAnimation>
+  <EntityParamAnimation animationClip="run_away" length="0.5666667" mode="Loop" rect="(47,205,240,20)" />
   <EntityParamAnimation animationClip="attack03" length="1.566667" mode="Default" rect="(962,161,240,20)">
-    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="1" effectType="Time" arise="ParentBegin" on="Self" asset="fx_nvjiangjun_attack_03.prefab" delay="0" offset="(0.0, 0.0, 0.0)" rect="(1310,221,240,20)" />
+    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="1" effectType="Time" arise="ParentBegin" on="Self" asset="fx_nvjiangjun_attack_03.prefab" delay="0.5" offset="(0.0, 0.0, 0.0)" rect="(1310,221,240,20)" />
   </EntityParamAnimation>
   <EntityParamAnimation animationClip="attack02" length="1.933333" mode="Default" rect="(948,258,240,20)">
-    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="1" effectType="Time" arise="ParentBegin" on="Self" asset="fx_nvjiangjun_attack_02.prefab" delay="0" offset="(0.0, 0.0, 0.0)" rect="(1211,420,240,20)" />
+    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="1" effectType="Time" arise="ParentBegin" on="Self" asset="fx_nvjiangjun_attack_02.prefab" delay="0.5" offset="(0.0, 0.0, 0.0)" rect="(1211,420,240,20)" />
   </EntityParamAnimation>
-  <EntityParamAnimation animationClip="idle" length="1.666667" mode="Loop" rect="(22,664,240,20)" />
-  <EntityParamAnimation animationClip="xiuxi" length="1.666667" mode="Loop" rect="(600,20,240,20)" />
+  <EntityParamAnimation animationClip="attack01" length="2.033334" mode="Default" rect="(936,48,240,20)">
+    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="1" effectType="Time" arise="ParentBegin" on="Self" asset="fx_nvjiangjun_attack_01.prefab" delay="0.3" offset="(0.0, 0.0, 0.0)" rect="(1231,29,240,20)" />
+  </EntityParamAnimation>
+  <EntityParamAnimation animationClip="bufu" length="5" mode="Default" rect="(52,201,240,20)" />
 </EntityParamModel>

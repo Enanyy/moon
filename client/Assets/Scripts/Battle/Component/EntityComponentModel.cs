@@ -218,14 +218,7 @@ public class EntityComponentModel :
             return;
         }
 
-        if (animationClip.isLooping)
-        {
-            animationSpeed = 1;
-        }
-        else
-        {
-            animationSpeed = (animationClip.length / action.duration) * action.speed;
-        }
+       
 
         if (mCurrentAnimationClip == null
             || animationClip != mCurrentAnimationClip
@@ -234,7 +227,7 @@ public class EntityComponentModel :
             animator.Play("empty", 0);
             animator.Update(0);
             animator.Play(animation.animationClip, 0);
-            animator.speed = animationSpeed;
+            animator.speed = action.speed;
             mCurrentAnimationClip = animationClip;
 
             ShowEffect(action, animation, agent.target);
