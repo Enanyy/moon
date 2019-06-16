@@ -5,10 +5,13 @@ using UnityEngine;
 public class Test : MonoBehaviour {
 
 	// Use this for initialization
-    private BattleEntity mEntity;
-    private BattleEntity mEntity1;
+    public BattleEntity mEntity;
+    public BattleEntity mEntity1;
+
+    public static Test Instance { get; private set; }
     void Start ()
     {
+        Instance = this;
 
         CameraManager.Instance.Init();
 
