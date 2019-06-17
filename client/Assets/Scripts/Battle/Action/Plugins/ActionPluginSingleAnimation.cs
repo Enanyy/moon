@@ -32,13 +32,11 @@ public class ActionPluginSingleAnimation : ActionPlugin
         }
     }
 
-    protected virtual void PlayAnimation(EntityParamPluginAnimationClip animation)
+    protected virtual void PlayAnimation(EntityParamPluginAnimationClip animationClip)
     {
         if (agent.model != null && agent.param != null)
-        {
-            var param = agent.param.GetAnimation(animation.animationClip);
-
-            agent.model.PlayAnimation(action, param);
+        {   
+            agent.model.PlayAnimation(action, animationClip);
         }
     }
 }

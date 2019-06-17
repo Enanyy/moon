@@ -170,19 +170,20 @@ public class EntityComponentModel :
     public void OnEnter(State<BattleEntity> state)
     {
 
-        //Play(state);
-        //ShowEffect(state, EffectArise.ParentBegin);
     }
 
     public void OnExcute(State<BattleEntity> state, float deltaTime)
     {
-
+        animationSpeed = state.speed;
+        if (animator != null && animator.speed != animationSpeed)
+        {
+            animator.speed = animationSpeed;
+        }
 
     }
 
     public void OnExit(State<BattleEntity> state)
     {
-        //ShowEffect(state, EffectArise.ParentEnd);
     }
 
     public void OnPause(State<BattleEntity> state)
@@ -206,19 +207,19 @@ public class EntityComponentModel :
     }
 
 
-    public void PlayAnimation(EntityAction action, EntityParamAnimation animation)
+    public void PlayAnimation(EntityAction action, EntityParamPluginAnimationClip clip)
     {
-        if (action == null || animation == null)
+        if (action == null || clip == null)
         {
             return;
         }
-        var animationClip = GetAnimationClip(animation.animationClip);
+        var animationClip = GetAnimationClip(clip.animationClip);
         if (animationClip == null)
         {
             return;
         }
 
-       
+
 
         if (mCurrentAnimationClip == null
             || animationClip != mCurrentAnimationClip
@@ -226,11 +227,13 @@ public class EntityComponentModel :
         {
             animator.Play("empty", 0);
             animator.Update(0);
-            animator.Play(animation.animationClip, 0);
+            animator.Play(clip.animationClip, 0, clip.beginAt / animationClip.length);
             animator.speed = action.speed;
             mCurrentAnimationClip = animationClip;
 
-            ShowEffect(action, animation, agent.target);
+           
+            ShowEffect(action, clip, agent.target);
+            
         }
     }
 
@@ -263,12 +266,19 @@ public class EntityComponentModel :
     }
    
 
-    private void ShowEffect(EntityAction action, EntityParamAnimation param,uint target)
+    private void ShowEffect(EntityAction action, EntityParamPluginAnimationClip clip,uint target)
     {
-        if (action == null || param == null)
+        if (action == null || clip == null || agent.param== null)
         {
             return;
         }
+
+        var param = agent.param.GetAnimation(clip.animationClip);
+        if (param == null)
+        {
+            return;
+        }
+
 
         for (int i = 0; i < param.children.Count; ++i)
         {
@@ -278,10 +288,11 @@ public class EntityComponentModel :
                 continue;
             }
 
+            float delay = child.delay - clip.beginAt;
           
-            if (child.delay > 0)
+            if (delay > 0)
             {
-                AddDelayTask(child.delay, delegate ()
+                AddDelayTask(delay, delegate ()
                 {                 
                     EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
                     
