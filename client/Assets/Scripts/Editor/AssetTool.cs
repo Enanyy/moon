@@ -10,12 +10,13 @@ public static class AssetTool
     private static void InitEditor()
     {
         Debug.Log("AssetPath Init");
-        Debug.Log(Application.dataPath);
         AssetPath.Init();
         Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
         Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
         EditorApplication.quitting -= SaveAsset;
         EditorApplication.quitting += SaveAsset;
+        EditorApplication.projectChanged -= AssetChange;
+        EditorApplication.projectChanged += AssetChange;
     }
 
     static void OnPostHeaderGUI(Editor editor)
@@ -35,7 +36,7 @@ public static class AssetTool
         }
 
         AssetPath.Asset asset = null;
-        string name = Path.GetFileNameWithoutExtension(assetPath);
+        string name = Path.GetFileName(assetPath);
         string path = assetPath.Replace("Assets/Resources/", "").ToLower();
         var it = AssetPath.assets.GetEnumerator();
         while (it.MoveNext())
@@ -75,9 +76,27 @@ public static class AssetTool
 
         if (GUILayout.Toggle(asset != null, "Asset", GUILayout.ExpandWidth(false)) == false)
         {
-            AssetPath.assets.Remove(asset.name);
+            if (asset != null)
+            {
+                AssetPath.assets.Remove(asset.name);
+            }
 
             asset = null;
+        }
+        else
+        {
+            if (AssetPath.assets.ContainsKey(name) == false)
+            {
+                asset = new AssetPath.Asset();
+                asset.name = name;
+                asset.path = path;
+                string fullPath = Application.dataPath + "/Resources/" + path;
+                byte[] bytes = File.ReadAllBytes(fullPath);
+                asset.md5 = MD5Hash.Get(bytes);
+                asset.size = bytes.Length;
+
+                AssetPath.assets.Add(asset.name, asset);
+            }
         }
 
         if (asset != null)
@@ -135,6 +154,11 @@ public static class AssetTool
         writerXml.Write(AssetPath.ToXml());
         writerXml.Close();
         writerXml.Dispose();
+    }
+
+    static void AssetChange()
+    {
+        Debug.Log("Asset change");
     }
 }
 
