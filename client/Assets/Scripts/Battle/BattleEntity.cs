@@ -290,7 +290,14 @@ public class BattleEntity:
 
     public void UpdateProperty(PBMessage.BattleEntityProperty property)
     {
-        SetProperty((PropertyID)property.key, property.value);
+        if (property.ratio != 1)
+        {
+            SetProperty((PropertyID) property.key, property.value * property.ratio);
+        }
+        else
+        {
+            SetProperty((PropertyID)property.key, property.value);
+        }
     }
 
     public  void UpdateProperty(List<PBMessage.BattleEntityProperty> properties)

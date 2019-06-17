@@ -184,6 +184,13 @@ namespace PBMessage
       get { return _value; }
       set { _value = value; }
     }
+    private float _ratio;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"ratio", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    public float ratio
+    {
+      get { return _ratio; }
+      set { _ratio = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

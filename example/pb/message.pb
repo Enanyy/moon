@@ -1,6 +1,5 @@
 
-ñ
-
+€
 message.proto".
 LoginRequest
 name (	
@@ -23,10 +22,11 @@
 result ("
 Point2D	
 x (	
-y ("2
+y ("A
 BattleEntityProperty
 key (
-value ("È
+value (
+ratio ("È
 BattleEntity
 
 id (

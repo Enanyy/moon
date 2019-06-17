@@ -47,6 +47,7 @@ message BattleEntityProperty
 {
 	required uint32 key = 1;
 	required int32 value = 2;
+	required float ratio = 3;   //real value = value * ratio
 }
 
 
