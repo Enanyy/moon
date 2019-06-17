@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class Asset
 {
     public string name;
@@ -54,20 +58,77 @@ public class Asset
     }
 }
 
-
-
 public  class AssetPath
 {
     public static Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod]
-    public static void Init()
+    private static void Init()
     { 
         string path = Application.dataPath + "/asset.txt";
         string xml = File.ReadAllText(path);
 
         FromXml(xml);
     }
+    [InitializeOnLoadMethod]
+    private static void InitEditor()
+    {
+        Debug.Log("AssetPath Init");
+        Init();
+        Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
+        Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
+    }
+
+    static void OnPostHeaderGUI(Editor editor)
+    {
+        if (editor.target == null)
+        {
+            return;
+        }
+        string assetPath = AssetDatabase.GetAssetPath(editor.target);
+
+        if (string.IsNullOrEmpty(assetPath) 
+            || assetPath.EndsWith(".cs")
+            || assetPath.StartsWith("Assets/Resources/") == false
+            )
+        {
+            return;
+        }
+
+        Asset asset = null;
+        string name = Path.GetFileNameWithoutExtension(assetPath);
+        string path = assetPath.Replace("Assets/Resources/", "").ToLower();
+        var it = assets.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if (it.Current.Value.path == path)
+            {
+                asset = it.Current.Value;break;
+            }
+        }
+
+
+        GUILayout.BeginHorizontal();
+
+
+        if (GUILayout.Toggle(asset!= null, "Asset", GUILayout.ExpandWidth(false)) == false)
+        {
+            assets.Remove(asset.name);
+
+            asset = null;
+        }
+
+        if (asset != null)
+        {
+            var assetName = EditorGUILayout.DelayedTextField(asset.name, GUILayout.ExpandWidth(true));
+            if (assetName != asset.name)
+            {
+                asset.name = assetName;
+            }
+        }
+        GUILayout.EndHorizontal();
+    }
+
 #endif
     public static void FromXml(string xml)
     {
