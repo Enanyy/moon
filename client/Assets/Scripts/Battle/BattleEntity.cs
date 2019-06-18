@@ -225,6 +225,17 @@ public class BattleEntity:
         return defaultValue;
     }
 
+    public T GetProperty<T, V>(PropertyID id, V defaultValue = default(V)) where T : EntityProperty<V>
+    {
+        uint key = (uint)id;
+        if (properties.ContainsKey(key))
+        {
+            var property = properties[key] as T;
+            return property;
+        }
+
+        return null;
+    }
     public void PlayAction(ActionType actionType, EntityAction action = null,bool first = false)
     {
         if (machine != null)
@@ -431,6 +442,7 @@ public class BattleEntity:
                 agent.OnDestroy(state);
             }
         }
+
         EntityAction action = state as EntityAction;
         if(action!= null)
         {
