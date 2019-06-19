@@ -73,8 +73,9 @@ public static class AssetTool
 
         GUILayout.BeginHorizontal();
 
+        bool select = asset != null;
 
-        if (GUILayout.Toggle(asset != null, "Asset", GUILayout.ExpandWidth(false)) == false)
+        if (GUILayout.Toggle(select, "Asset", GUILayout.ExpandWidth(false)) == false)
         {
             if (asset != null)
             {
@@ -85,17 +86,20 @@ public static class AssetTool
         }
         else
         {
-            if (AssetPath.assets.ContainsKey(name) == false)
+            if (select == false)
             {
-                asset = new AssetPath.Asset();
-                asset.name = name;
-                asset.path = path;
-                string fullPath = Application.dataPath + "/Resources/" + path;
-                byte[] bytes = File.ReadAllBytes(fullPath);
-                asset.md5 = MD5Hash.Get(bytes);
-                asset.size = bytes.Length;
+                if (AssetPath.assets.ContainsKey(name) == false)
+                {
+                    asset = new AssetPath.Asset();
+                    asset.name = name;
+                    asset.path = path;
+                    string fullPath = Application.dataPath + "/Resources/" + path;
+                    byte[] bytes = File.ReadAllBytes(fullPath);
+                    asset.md5 = MD5Hash.Get(bytes);
+                    asset.size = bytes.Length;
 
-                AssetPath.assets.Add(asset.name, asset);
+                    AssetPath.assets.Add(asset.name, asset);
+                }
             }
         }
 
@@ -107,9 +111,32 @@ public static class AssetTool
                 AssetPath.assets.Remove(asset.name);
                 asset.name = assetName;
                 AssetPath.assets.Add(asset.name, asset);
+                SaveAsset();
             }
         }
         GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal();
+        if (asset != null)
+        {
+            select = string.IsNullOrEmpty(asset.group) == false;
+
+            if (GUILayout.Toggle(select, "Group", GUILayout.ExpandWidth(false)) == false)
+            {
+                asset.group = "";
+            }
+            else
+            {
+                var group = EditorGUILayout.DelayedTextField(asset.group, GUILayout.ExpandWidth(true));
+                if (group != asset.group)
+                {
+                    asset.group = group;
+                    SaveAsset();
+                }
+            }
+        }
+
+        GUILayout.EndHorizontal();
+
     }
 
     [MenuItem("Tools/生成资源配置")]
@@ -158,7 +185,7 @@ public static class AssetTool
 
     static void AssetChange()
     {
-        Debug.Log("Asset change");
+        
     }
 }
 

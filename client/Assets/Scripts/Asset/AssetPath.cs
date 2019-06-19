@@ -10,6 +10,7 @@ public  class AssetPath
     public class Asset
     {
         public string name;
+        public string group;
         public string path;
         public long size;
         public string md5;
@@ -30,28 +31,31 @@ public  class AssetPath
 
             XmlAttribute name = doc.CreateAttribute("name");
             name.Value = this.name;
-
             node.Attributes.Append(name);
+            if (string.IsNullOrEmpty(group) == false)
+            {
+                XmlAttribute group = doc.CreateAttribute("group");
+                group.Value = this.group;
+                node.Attributes.Append(group);
+            }
 
             XmlAttribute path = doc.CreateAttribute("path");
             path.Value = this.path;
-
             node.Attributes.Append(path);
 
             XmlAttribute size = doc.CreateAttribute("size");
             size.Value = this.size.ToString();
-
             node.Attributes.Append(size);
 
             XmlAttribute md5 = doc.CreateAttribute("md5");
             md5.Value = this.md5;
-
             node.Attributes.Append(md5);
         }
 
         public void FromXml(XmlElement element)
         {
             name = element.GetAttribute("name");
+            group = element.GetAttribute("group");
             path = element.GetAttribute("path");
             size = element.GetAttribute("size").ToInt64Ex();
             md5 = element.GetAttribute("md5");
