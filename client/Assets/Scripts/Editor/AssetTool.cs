@@ -27,6 +27,14 @@ public static class AssetTool
         {
             return;
         }
+        string assetPath = AssetDatabase.GetAssetPath(editor.target);
+        if (string.IsNullOrEmpty(assetPath)
+            || assetPath.EndsWith(".cs")
+            || assetPath.StartsWith("Assets/Resources/") == false
+        )
+        {
+            return ;
+        }
 
         if (s_ToggleMixed == null)
         {
