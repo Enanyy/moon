@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public static class AssetTool
 {
@@ -18,26 +19,186 @@ public static class AssetTool
         EditorApplication.projectChanged -= AssetChange;
         EditorApplication.projectChanged += AssetChange;
     }
-
+    static GUIStyle s_ToggleMixed;
+    
     static void OnPostHeaderGUI(Editor editor)
     {
         if (editor.target == null)
         {
             return;
         }
-        string assetPath = AssetDatabase.GetAssetPath(editor.target);
+
+        if (s_ToggleMixed == null)
+        {
+            s_ToggleMixed = new GUIStyle("ToggleMixed");
+        }
+
+        string name;
+        string path;
+        string dir;
+        var asset = GetAsset(editor.target, out name, out path, out dir);
+
+        GUILayout.BeginHorizontal();
+
+        bool select = asset != null;
+        bool mixed = editor.targets.Length > 1;
+        if (mixed)
+        {
+            if (GUILayout.Toggle(select, "Asset", s_ToggleMixed, GUILayout.ExpandWidth(false)) == false)
+            {
+                RemoveAssets(editor.targets);
+                asset = null;
+            }
+            else
+            {
+                AddAssets(editor.targets);
+            }
+        }
+        else
+        {
+            if (GUILayout.Toggle(select, "Asset", GUILayout.ExpandWidth(false)) == false)
+            {
+                RemoveAssets(editor.targets);
+                asset = null;
+            }
+            else
+            {
+                AddAssets(editor.targets);
+            }
+        }
+       
+
+        if (asset != null)
+        {
+            var assetName = EditorGUILayout.DelayedTextField(asset.name, GUILayout.ExpandWidth(true));
+            if (assetName != asset.name)
+            {
+                AssetPath.assets.Remove(asset.name);
+                asset.name = assetName;
+                AssetPath.assets.Add(asset.name, asset);
+                SaveAsset();
+            }
+        }
+        GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal();
+        if (asset != null)
+        {
+            select = string.IsNullOrEmpty(asset.group) == false;
+
+            if (mixed)
+            {
+                if (GUILayout.Toggle(select, "Group",s_ToggleMixed, GUILayout.ExpandWidth(false)) == false)
+                {
+                    SetAssetsGroup(editor.targets,"");
+                }
+
+                else
+                {
+                    if (select == false)
+                    {
+                        asset.group = dir;
+                    }
+
+                    var group = EditorGUILayout.DelayedTextField(asset.group, GUILayout.ExpandWidth(true));
+                    SetAssetsGroup(editor.targets,group);
+                }
+            }
+            else
+            {
+                if (GUILayout.Toggle(select, "Group", GUILayout.ExpandWidth(false)) == false)
+                {
+                    asset.group = "";
+                }
+
+                else
+                {
+                    if (select == false)
+                    {
+                        asset.group = dir;
+                    }
+
+                    var group = EditorGUILayout.DelayedTextField(asset.group, GUILayout.ExpandWidth(true));
+                    if (group != asset.group)
+                    {
+                        asset.group = group;
+
+                        SaveAsset();
+                    }
+                }
+            }
+        }
+
+        GUILayout.EndHorizontal();
+
+    }
+
+    static void AddAssets(Object[] targets)
+    {
+        for (int i = 0; i < targets.Length; i++)
+        {
+            string name, path, dir;
+            var asset = GetAsset(targets[i], out name, out path, out dir);
+            if (asset == null && AssetPath.assets.ContainsKey(name) == false)
+            {
+                asset = new AssetPath.Asset();
+                asset.name = name;
+                asset.path = path;
+                string fullPath = Application.dataPath + "/Resources/" + path;
+                byte[] bytes = File.ReadAllBytes(fullPath);
+                asset.md5 = MD5Hash.Get(bytes);
+                asset.size = bytes.Length;
+
+                AssetPath.assets.Add(asset.name, asset);
+            }
+        }
+    }
+
+    static void RemoveAssets(Object[] targets)
+    {
+        for (int i = 0; i < targets.Length; i++)
+        {
+            string name, path, dir;
+            var asset = GetAsset(targets[i], out name, out path, out dir);
+            if (asset != null)
+            {
+                AssetPath.assets.Remove(asset.name);
+            }
+        }
+    }
+
+    static void SetAssetsGroup(Object[] targets, string group)
+    {
+        for (int i = 0; i < targets.Length; i++)
+        {
+            string name, path, dir;
+            var asset = GetAsset(targets[i], out name, out path, out dir);
+            if (asset != null)
+            {
+                asset.group = group;
+            }
+        }
+    }
+
+    static AssetPath.Asset GetAsset(Object target, out string name, out string path, out string dir)
+    {
+        name = null;
+        path = null;
+        dir = null;
+
+        string assetPath = AssetDatabase.GetAssetPath(target);
 
         if (string.IsNullOrEmpty(assetPath)
             || assetPath.EndsWith(".cs")
             || assetPath.StartsWith("Assets/Resources/") == false
-            )
+        )
         {
-            return;
+            return null;
         }
 
         AssetPath.Asset asset = null;
-        string name = Path.GetFileName(assetPath);
-        string path = assetPath.Replace("Assets/Resources/", "").ToLower();
+        name = Path.GetFileName(assetPath);
+        path = assetPath.Replace("Assets/Resources/", "").ToLower();
+        dir = path.Substring(2, path.LastIndexOf('/') - 2);
         var it = AssetPath.assets.GetEnumerator();
         while (it.MoveNext())
         {
@@ -70,73 +231,7 @@ public static class AssetTool
             }
         }
 
-
-        GUILayout.BeginHorizontal();
-
-        bool select = asset != null;
-
-        if (GUILayout.Toggle(select, "Asset", GUILayout.ExpandWidth(false)) == false)
-        {
-            if (asset != null)
-            {
-                AssetPath.assets.Remove(asset.name);
-            }
-
-            asset = null;
-        }
-        else
-        {
-            if (select == false)
-            {
-                if (AssetPath.assets.ContainsKey(name) == false)
-                {
-                    asset = new AssetPath.Asset();
-                    asset.name = name;
-                    asset.path = path;
-                    string fullPath = Application.dataPath + "/Resources/" + path;
-                    byte[] bytes = File.ReadAllBytes(fullPath);
-                    asset.md5 = MD5Hash.Get(bytes);
-                    asset.size = bytes.Length;
-
-                    AssetPath.assets.Add(asset.name, asset);
-                }
-            }
-        }
-
-        if (asset != null)
-        {
-            var assetName = EditorGUILayout.DelayedTextField(asset.name, GUILayout.ExpandWidth(true));
-            if (assetName != asset.name)
-            {
-                AssetPath.assets.Remove(asset.name);
-                asset.name = assetName;
-                AssetPath.assets.Add(asset.name, asset);
-                SaveAsset();
-            }
-        }
-        GUILayout.EndHorizontal();
-        GUILayout.BeginHorizontal();
-        if (asset != null)
-        {
-            select = string.IsNullOrEmpty(asset.group) == false;
-
-            if (GUILayout.Toggle(select, "Group", GUILayout.ExpandWidth(false)) == false)
-            {
-                asset.group = "";
-            }
-            else
-            {
-                var group = EditorGUILayout.DelayedTextField(asset.group, GUILayout.ExpandWidth(true));
-                if (group != asset.group)
-                {
-                    asset.group = group;
-                    SaveAsset();
-                }
-            }
-        }
-
-        GUILayout.EndHorizontal();
-
+        return asset;
     }
 
     [MenuItem("Tools/生成资源配置")]
