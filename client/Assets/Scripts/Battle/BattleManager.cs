@@ -82,11 +82,11 @@ public class BattleManager
         }
         else
         {
-            AssetManager.Instance.Load(congfig, (asset) => {
+            AssetManager.Instance.LoadAsset<TextAsset>(congfig, (asset) => {
 
                 if (asset!= null)
                 { 
-                    var xml = asset.obj as TextAsset;
+                    var xml = asset.assetObject;
                     if (xml)
                     {
                         var param = EntityParam.Create(xml.text) as EntityParamModel;

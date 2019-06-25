@@ -151,6 +151,7 @@ public static class AssetTool
                 asset = new AssetPath.Asset();
                 asset.name = name;
                 asset.path = path;
+                asset.type = AssetPath.AssetType.Resource;
                 string fullPath = Application.dataPath + "/Resources/" + path;
                 byte[] bytes = File.ReadAllBytes(fullPath);
                 asset.md5 = MD5Hash.Get(bytes);
@@ -269,6 +270,7 @@ public static class AssetTool
 
             byte[] bytes = File.ReadAllBytes(fullPath);
             asset.md5 = MD5Hash.Get(bytes);
+            asset.type = AssetPath.AssetType.Resource;
 
             AssetPath.assets.Add(asset.name, asset);
         }

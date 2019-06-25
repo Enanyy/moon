@@ -7,6 +7,12 @@ using UnityEngine;
 public  class AssetPath
 {
     #region Inner Class
+    public enum AssetType
+    {
+        Resource,
+        StreamingAsset,
+        PersistentAsset,
+    }
     public class Asset
     {
         public string name;
@@ -14,6 +20,7 @@ public  class AssetPath
         public string path;
         public long size;
         public string md5;
+        public AssetType type = AssetType.Resource;
 
         public void ToXml(XmlNode parent)
         {
@@ -50,6 +57,10 @@ public  class AssetPath
             XmlAttribute md5 = doc.CreateAttribute("md5");
             md5.Value = this.md5;
             node.Attributes.Append(md5);
+
+            XmlAttribute type = doc.CreateAttribute("type");
+            type.Value = ((int)this.type).ToString();
+            node.Attributes.Append(type);
         }
 
         public void FromXml(XmlElement element)
@@ -59,6 +70,7 @@ public  class AssetPath
             path = element.GetAttribute("path");
             size = element.GetAttribute("size").ToInt64Ex();
             md5 = element.GetAttribute("md5");
+            type =(AssetType)element.GetAttribute("type").ToInt32Ex();
         }
     }
     #endregion

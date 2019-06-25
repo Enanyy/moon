@@ -17,7 +17,7 @@ public class AssetEntity :IPoolObject
 
     public GameObject gameObject { get; private set; }
 
-    public AssetObject asset { get; private set; }
+    public AssetObject<GameObject> asset { get; private set; }
     public AssetEntity()
     {
         
@@ -26,11 +26,11 @@ public class AssetEntity :IPoolObject
     protected void LoadAsset(string name)
     {
        
-        AssetManager.Instance.Instantiate(name, (asset) => {
-            this.gameObject = asset.gameObject;
+        AssetManager.Instance.LoadAsset<GameObject>(name, name, (obj) => {
+
+            this.gameObject = obj.assetObject;
             this.asset = asset;
             OnAssetLoad();
-
         });
     }
 
@@ -76,7 +76,7 @@ public class AssetEntity :IPoolObject
         if (gameObject != null)
         {
             gameObject.SetActive(false);
-            AssetManager.Instance.ReturnInstance(asset);
+            //AssetManager.Instance.ReturnInstance(asset);
         }
 
         asset = null;
@@ -87,7 +87,7 @@ public class AssetEntity :IPoolObject
         if (gameObject != null)
         { 
             gameObject.SetActive(false);
-            AssetManager.Instance.ReturnInstance(asset);
+            //AssetManager.Instance.ReturnInstance(asset);
         }
         asset = null;
     }

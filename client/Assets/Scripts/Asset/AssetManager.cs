@@ -1,218 +1,386 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
-public class AssetManager 
+public enum LoadMode
 {
-    private static AssetManager _instance;
+    Sync,
+    Async,
+    WWW,
+}
+
+public enum AssetMode
+{
+    Editor,
+    AssetBundle,
+}
+public class LoadTask<T>
+{
+    public string bundleName { get; private set; }
+    public string assetName { get; private set; }
+    public Action<T> callback { get; private set; }
+
+    public LoadTask(string bundleName,string assetName,Action<T> callback)
+    {
+        this.bundleName = bundleName;
+        this.assetName = assetName;
+        this.callback = callback;
+    }
+
+    public void Cancel()
+    {
+        callback = null;
+
+    }
+}
+public class AssetManager : MonoBehaviour
+{
+
+    #region Instance
+    private static AssetManager mInstance;
     public static AssetManager Instance
     {
         get
         {
-            if(_instance==null)
+            if (mInstance == null)
             {
-                _instance = new AssetManager();
+                GameObject go = new GameObject(typeof(AssetManager).Name);
+                mInstance = go.AddComponent<AssetManager>();
+                DontDestroyOnLoad(go);
             }
-            return _instance;
+            return mInstance;
         }
     }
+    #endregion
 
-    private Dictionary<string, Queue<AssetObject>> mCachePool = new Dictionary<string, Queue<AssetObject>>();
 
-    private Dictionary<string, List<AssetObject>> mAssetDic = new Dictionary<string, List<AssetObject>>(); 
-    /// <summary>
-    /// 归还对象到对象池
-    /// </summary>
-    /// <param name="o">对象</param>
-     public void ReturnInstance(AssetObject asset)
+    private List<LoadTask<BundleObject>> mLoadTask = new List<LoadTask<BundleObject>>();
+
+    private AssetBundle mManifestBundle;
+    private AssetBundleManifest mManifest;
+    private string mAssetBundlePath;
+    private Dictionary<string, BundleObject> mAssetBundleDic = new Dictionary<string, BundleObject>();
+
+    public AssetMode assetMode { get; private set; }
+    public LoadMode loadMode { get; private set; }
+    public bool initialized { get; private set; }
+    public void Init(LoadMode mode, string manifest)
     {
-        if (asset == null)
-        {
-            return;
-        }
+        loadMode = mode;
 
-        if (asset.gameObject != null)
-        {
-            asset.gameObject.SetActive(false);
-        }
+        assetMode = (AssetMode)PlayerPrefs.GetInt("assetMode");
 
-        if (mCachePool.ContainsKey(asset.name) == false)
+        if(loadMode == LoadMode.Sync)
         {
-            mCachePool.Add(asset.name, new Queue<AssetObject>());
-        }
-        mCachePool[asset.name].Enqueue(asset);
-    }
+            string path = GetPath(manifest);
 
-    private AssetObject GetInstance(string name)
-    {
-        if (mCachePool.ContainsKey(name))
-        {
-            while (mCachePool[name].Count > 0)
+            var assetBundle = AssetBundle.LoadFromFile(path);
+
+            if (assetBundle)
             {
-                var go = mCachePool[name].Dequeue();
-                if (go != null)
-                {
-                    return go;
-                }
+                OnInitFinish(assetBundle);
+            }
+            else
+            {
+                Debug.LogError(manifest + ": Error!!");
             }
         }
-        return null;
-    }
-
-    public void Clear(string name)
-    {
-        if (mAssetDic.ContainsKey(name))
+        else if(loadMode == LoadMode.Async)
         {
-            var list = mAssetDic[name];
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].gameObject)
-                {
-                    UnityEngine.Object.DestroyImmediate(list[i].gameObject);
-                }
-            }
-            list.Clear();
-
-            mAssetDic.Remove(name);
+            StartCoroutine(InitAsync(manifest));
         }
-
-        if (mCachePool.ContainsKey(name))
-        {      
-            mCachePool[name].Clear();
+        else if(loadMode == LoadMode.WWW)
+        {
+            StartCoroutine(InitWWW(manifest));
         }
     }
-
-    public void Clear()
+    private IEnumerator InitAsync(string manifest)
     {
-        var it = mAssetDic.GetEnumerator();
-        while (it.MoveNext())
+        string path = GetPath(manifest);
+
+        var request = AssetBundle.LoadFromFileAsync(path);
+        yield return request;
+
+        if (request.isDone && request.assetBundle)
         {
-            var list = it.Current.Value;
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].gameObject)
-                {
-                    UnityEngine.Object.DestroyImmediate(list[i].gameObject);
-                }
-            }
-
-            list.Clear();
-        }
-
-        mAssetDic.Clear();
-        mCachePool.Clear();
-    }
-
-    public void Instantiate(string name,Action<AssetObject> callback)
-    {
-        var assetObject = GetInstance(name);
-        if (assetObject != null)
-        {
-            if (assetObject.gameObject == null)
-            {
-                assetObject.gameObject = UnityEngine.Object.Instantiate(assetObject.obj) as GameObject;
-            }
-
-            if (callback != null)
-            {
-                callback(assetObject);
-            }
+            OnInitFinish(request.assetBundle);
         }
         else
         {
-            if (mAssetDic.ContainsKey(name) && mAssetDic[name].Count > 0)
-            {
-                assetObject = new AssetObject
-                {
-                    name = name,
-                    obj = mAssetDic[name][0].obj,
-                    gameObject = UnityEngine.Object.Instantiate(mAssetDic[name][0].obj) as GameObject
+            Debug.LogError("Load assetbundle:" + manifest + " failed!!");
+        }
+    }
+    private IEnumerator InitWWW(string manifest)
+    {
+        string path = GetPath(manifest);
 
-                };
-                mAssetDic[name].Add(assetObject);
-                if (callback != null)
+        using (WWW www = new WWW(path))
+        {
+            yield return www;
+            if (www.isDone && www.assetBundle)
+            {
+                OnInitFinish(www.assetBundle);
+            }
+            else
+            {
+                Debug.LogError("Load assetbundle:" + manifest + " failed!!");
+            }              
+        }
+    }
+    private void OnInitFinish(AssetBundle assetBundle)
+    {
+        mManifestBundle = assetBundle;
+
+        mManifest = mManifestBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+
+        DontDestroyOnLoad(mManifest);
+
+        initialized = true;
+
+        for(int i = 0; i < mLoadTask.Count; ++i)
+        {
+            Load(mLoadTask[i].bundleName, mLoadTask[i].callback);
+        }
+        mLoadTask.Clear();
+    }
+
+    public LoadTask<AssetObject<T>> LoadAsset<T>(string key, System.Action<AssetObject<T>> callback)
+    {
+        var asset = AssetPath.Get(name);
+
+        return null;
+    }
+
+    public LoadTask<AssetObject<T>> LoadAsset<T>(string bundleName, string assetName, System.Action<AssetObject<T>> callback = null) where T : UnityEngine.Object
+    {
+        LoadTask<AssetObject<T>> task = new LoadTask<AssetObject<T>>(bundleName.ToLower(), assetName.ToLower(), callback);
+
+#if UNITY_EDITOR
+        if (assetMode == AssetMode.Editor)
+        {
+            AssetObject<T> assetObject = null;
+
+            var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(task.assetName);
+
+            if (asset)
+            {
+                if (typeof(T) == typeof(GameObject))
                 {
-                    callback(assetObject);
+                    if (task.callback != null)
+                    {
+                        var go = Instantiate(asset) as GameObject;
+
+                        go.transform.localPosition = Vector3.zero;
+                        go.transform.localRotation = Quaternion.identity;
+                        go.transform.localScale = Vector3.one;
+
+                        assetObject = new AssetObject<T>(task.assetName, null, asset, go as T);
+
+                        task.callback(assetObject);
+                    }
+                }
+                else
+                {
+                    if (task.callback != null)
+                    {
+                        assetObject = new AssetObject<T>(task.assetName, null, asset, null);
+                        task.callback(assetObject);
+                    }
                 }
             }
             else
             {
-                Load(name, (asset) =>
+                if (task.callback != null)
                 {
-                    if (asset != null)
-                    {
-                        if (asset.gameObject == null)
-                        {
-                            asset.gameObject = UnityEngine.Object.Instantiate(asset.obj) as GameObject;
-                        }
-                    }
-
-                    if (callback != null)
-                    {
-                        callback(asset);
-                    }
-                });
+                    task.callback(assetObject);
+                }
             }
+            return task;
         }
+#endif
+
+        Load(task.bundleName, (bundle) =>
+        {
+            if (bundle != null)
+            {
+                AssetObject<T> assetObject = bundle.LoadAsset<T>(task.assetName);
+
+                if (task.callback != null)
+                {
+                    task.callback(assetObject);
+                }
+            }
+            else
+            {
+                if (task.callback != null)
+                {
+                    task.callback(null);
+                }
+            }
+        });
+
+        return task;
     }
 
-    public void Load(string name, Action<AssetObject> callback)
+
+    public LoadTask<BundleObject> Load(string bundleName, Action<BundleObject> callback)
     {
-        var asset = GetInstance(name);
-        if (asset == null)
+        LoadTask<BundleObject> task = new LoadTask<BundleObject>(bundleName.ToLower(), null, callback);
+
+        if (initialized == false)
         {
-            string assetPath = AssetPath.Get(name);
+            mLoadTask.Add(task);
 
-            asset = new AssetObject
-            {
-                name = name,
-                obj = Resources.Load<UnityEngine.Object>(assetPath.Contains(".")? assetPath.Substring(0,assetPath.LastIndexOf('.')):assetPath),
-            };
+            return task;
+        }
 
-            if (mAssetDic.ContainsKey(name) == false)
+        BundleObject bundle = CreateBundle(task.bundleName);
+
+        if (bundle.bundle == null)
+        {
+            if (loadMode == LoadMode.Sync)
             {
-                mAssetDic.Add(name,new List<AssetObject>());
+                bundle.LoadSync(task);
             }
-            mAssetDic[name].Add(asset);
-
-            if (callback != null)
+            else if(loadMode== LoadMode.Async)
             {
-                callback(asset);
+                StartCoroutine(bundle.LoadAsync(task));
+            }
+            else if(loadMode == LoadMode.WWW)
+            {
+                StartCoroutine(bundle.LoadWWW(task));
             }
         }
         else
         {
-            if (callback != null)
+            if (task != null && task.callback != null)
             {
-                callback(asset);
+                task.callback(bundle);
             }
         }
+        return task;
     }
 
-    public void Release(AssetObject asset)
+    public BundleObject GetBundle(string bundleName)
     {
-        if (asset == null)
+        BundleObject bundle = null;
+
+        mAssetBundleDic.TryGetValue(bundleName, out bundle);
+
+        return bundle;
+    }
+
+    public BundleObject CreateBundle(string bundleName)
+    {
+        BundleObject bundle = GetBundle(bundleName);
+
+        if(bundle == null)
+        {
+            bundle = new BundleObject(bundleName, GetAllDependencies(bundleName));
+            mAssetBundleDic.Add(bundleName, bundle);
+        }
+        return bundle;
+    }
+
+    public void RemoveBundle(BundleObject bundle)
+    {
+        if(bundle == null)
         {
             return;
         }
-
-        if (asset.gameObject != null)
+        string bundleName = bundle.bundleName;
+        if(mAssetBundleDic.ContainsKey(bundleName))
         {
-            UnityEngine.Object.DestroyImmediate(asset.gameObject);
+            mAssetBundleDic.Remove(bundleName);
         }
+    }
 
-        asset.gameObject = null;
-
-        if (mAssetDic.ContainsKey(asset.name))
+    public string GetPath(string bundleName)
+    {
+        string fullpath = GetRoot() + bundleName;
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
         {
-            var list = mAssetDic[asset.name];
-            for (int i = list.Count -1; i >= 0; i--)
+            fullpath = Uri.EscapeUriString(fullpath);
+        }
+        return fullpath;
+    }
+
+    public string GetRoot()
+    {
+        if (string.IsNullOrEmpty(mAssetBundlePath))
+        {
+            if (Application.platform == RuntimePlatform.Android)
             {
-                if (list[i] == asset)
-                {
-                    list.RemoveAt(i);
-                }
+                mAssetBundlePath = Application.streamingAssetsPath + "/";
+            }
+            else if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                mAssetBundlePath = Application.streamingAssetsPath + "/";
+            }
+            else
+            {
+                mAssetBundlePath = Application.dataPath + "/StreamingAssets/";
             }
         }
+        return mAssetBundlePath;
+
+    }
+
+    public string[] GetAllDependencies(string bundleName)
+    {
+        if (string.IsNullOrEmpty(bundleName) || mManifest == null)
+        {
+            return null;
+        }
+
+        return mManifest.GetAllDependencies(bundleName);
+    }
+
+    public bool OtherDependence(BundleObject entity ,string bundleName)
+    {    
+        var it = mAssetBundleDic.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if (it.Current.Value != entity 
+                && it.Current.Value.Dependence(bundleName))
+            {
+                return true;
+            }
+        }
+        it.Dispose();
+
+        return false;
+    }
+
+    public void UnLoad(string bundleName)
+    {
+        BundleObject bundle = GetBundle(bundleName);
+        if (bundle != null)
+        {
+            bundle.UnLoad();
+        }
+    }
+
+    public void Destroy()
+    {
+        var it = mAssetBundleDic.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if(it.Current.Value.bundle!= null)
+            {
+                it.Current.Value.bundle.Unload(true);
+            }
+            it.Current.Value.references.Clear();
+            it.Current.Value.dependences.Clear();
+        }
+
+        mAssetBundleDic.Clear();
+
+        if (mManifestBundle)
+        {
+            mManifestBundle.Unload(true);
+        }
+        mManifest = null;
     }
 }
