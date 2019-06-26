@@ -347,12 +347,13 @@ public class AssetManager : MonoBehaviour
 
     public string GetPath(string bundleName)
     {
-        string fullpath = GetRoot() + bundleName;
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            fullpath = Uri.EscapeUriString(fullpath);
-        }
-        return fullpath;
+        //string fullpath = GetRoot() + bundleName;
+        //if (Application.platform == RuntimePlatform.IPhonePlayer)
+        //{
+        //    fullpath = Uri.EscapeUriString(fullpath);
+        //}
+        //return fullpath;
+        return AssetPath.GetPath(bundleName);
     }
 
     public string GetRoot()

@@ -101,6 +101,18 @@ public static class AssetTool
 
         if (asset != null)
         {
+            AssetType type = GetAssetType(assetPath);
+            string path = GetAssetPath(assetPath);
+            if (asset.type != type)
+            {
+                asset.type = type;
+            }
+
+            if (asset.path != path)
+            {
+                asset.path = path;
+            }
+
             var assetName = EditorGUILayout.DelayedTextField(asset.name, GUILayout.ExpandWidth(true));
             if (assetName != asset.name)
             {
@@ -109,6 +121,7 @@ public static class AssetTool
                 AssetPath.assets.Add(asset.name, asset);
                 SaveAsset();
             }
+
         }
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
@@ -347,5 +360,99 @@ public static class AssetTool
     {
         
     }
+
+    [MenuItem("Tools/Clear AssetBundleName")]
+    static void ClearAssetBundleName()
+    {
+        string[] files = Directory.GetFiles(Application.dataPath + "/", "*.*", SearchOption.AllDirectories);
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            string path = files[i];
+
+            if (path.EndsWith(".cs")
+                || path.EndsWith(".meta")
+            )
+            {
+                continue;
+            }
+
+            path = path.Replace("\\", "/").Replace(Application.dataPath + "/", "");
+            path = "Assets/" + path;
+            Debug.Log(path);
+            AssetImporter importer = AssetImporter.GetAtPath(path);
+
+            if (importer == null) continue;
+            importer.assetBundleName = "";
+
+            EditorUtility.DisplayProgressBar("Clear AssetBundleName", "Clear:" + path, i / (float)files.Length);
+        }
+        EditorUtility.ClearProgressBar();
+        AssetDatabase.Refresh();
+        AssetDatabase.SaveAssets();
+    }
+
+    [MenuItem("Tools/Build AssetBundle")]
+    static void Build()
+    {
+        List<string> scenes = new List<string>();
+        var it = AssetPath.assets.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if (it.Current.Value.type == AssetType.StreamingAsset)
+            {
+                if (it.Current.Value.path.EndsWith(".unity"))
+                {
+                    scenes.Add(it.Current.Value.path);
+                }
+                else
+                {
+                    AssetImporter importer = AssetImporter.GetAtPath(it.Current.Value.path);
+                    if (importer != null)
+                    {
+                        importer.assetBundleName = string.IsNullOrEmpty(it.Current.Value.group)
+                            ? it.Current.Value.path + AssetPath.EXTENSION
+                            : it.Current.Value.group + AssetPath.EXTENSION;
+
+                    }
+                }
+            }
+        }
+        AssetDatabase.Refresh();
+        AssetDatabase.SaveAssets();
+
+        string outputPath = string.Format("{0}/../assetbundles/{1}/", Application.dataPath, EditorUserBuildSettings.activeBuildTarget);
+
+        if (Directory.Exists(outputPath))
+        {
+            Directory.Delete(outputPath, true);
+        }
+
+        if (Directory.Exists(outputPath) == false)
+        {
+            Directory.CreateDirectory(outputPath);
+        }
+        //打包资源
+        BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
+
+        EditorUtility.DisplayProgressBar("BuildScene", "BuildSceneAssetBundle", 0f);
+        for (int i = 0; i < scenes.Count; i++)
+        {
+            string path = outputPath + scenes[i].ToLower() + AssetPath.EXTENSION;
+            string dir = Path.GetDirectoryName(path);
+            if (Directory.Exists(dir) == false)
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            string[] scene = { scenes[i] };
+            BuildPipeline.BuildPlayer(scene, path, EditorUserBuildSettings.activeBuildTarget, BuildOptions.BuildAdditionalStreamedScenes);
+
+            EditorUtility.DisplayProgressBar("BuildScene", "BuildSceneAssetBundle", i * 1.0f / scenes.Count);
+        }
+
+        EditorUtility.ClearProgressBar();
+    }
+
 }
 

@@ -71,7 +71,7 @@ public class Asset
 }
 public class AssetPath
 {
-   
+    public static string EXTENSION = ".bundle";
     public static Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod]
@@ -79,7 +79,6 @@ public class AssetPath
     { 
         string path = Application.dataPath + "/asset.txt";
         string xml = File.ReadAllText(path);
-
         FromXml(xml);
     }
    
@@ -134,6 +133,53 @@ public class AssetPath
         assets.TryGetValue(name, out asset);
         return asset;
     }
+
+    public static string GetPath(string name)
+    {
+        string path = name;
+        Asset asset = Get(name);
+        if (asset != null)
+        {
+            switch (asset.type)
+            {
+                case AssetType.StreamingAsset:
+                {
+                    if (Application.platform == RuntimePlatform.Android)
+                    {
+                        path = Application.streamingAssetsPath + "!/assets/" + asset.path;
+                    }
+                    else if (Application.platform == RuntimePlatform.IPhonePlayer)
+                    {
+                        path = Application.streamingAssetsPath + "/" + asset.path;
+                    }
+                    else
+                    {
+                        path = Application.dataPath + "/" + asset.path;
+                    }
+                }
+                break;
+                case AssetType.PersistentAsset:
+                {
+                    if (Application.platform == RuntimePlatform.Android)
+                    {
+                        path = Application.persistentDataPath + "/" + asset.path;
+                    }
+                    else if (Application.platform == RuntimePlatform.IPhonePlayer)
+                    {
+                        path = Application.persistentDataPath + "/" + asset.path;
+                    }
+                    else
+                    {
+                        path = Application.dataPath + "/" + asset.path;
+                    }
+                }
+                break;
+            }
+        }
+
+        return path + EXTENSION;
+    }
+
     public static void Clear()
     {
         assets.Clear();
