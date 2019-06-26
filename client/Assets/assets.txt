@@ -1,28 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Assets>
-  <asset name="airenbubing.txt" group="config" path="r/config/airenbubing.txt" size="1794" md5="42ebef4a4d2310f6879ccaa5a7f32f80" type="0" />
-  <asset name="airenbubing01.txt" group="config" path="r/config/airenbubing01.txt" size="1807" md5="f935b206574cc75262274861f2bf33d1" type="0" />
-  <asset name="dafu.txt" group="config" path="r/config/dafu.txt" size="1706" md5="c743148a83ea3260f22d10a8186050cd" type="0" />
-  <asset name="m_airenhuojianpao.txt" group="config" path="r/config/m_airenhuojianpao.txt" size="1738" md5="86e13c2214ec72d8b89d10fd42b06fd3" type="0" />
-  <asset name="m_airenzhanshi.txt" group="config" path="r/config/m_airenzhanshi.txt" size="1844" md5="79337f5135f2405966c53338417a6cd5" type="0" />
-  <asset name="nvjiangjun.txt" group="config" path="r/config/nvjiangjun.txt" size="4348" md5="cae224645857327af683e0d3d1ed25b5" type="0" />
-  <asset name="paoshou.txt" group="config" path="r/config/paoshou.txt" size="1730" md5="c8d756f24e55545d884d91088b3db36e" type="0" />
-  <asset name="trollgiant.txt" group="config" path="r/config/trollgiant.txt" size="2106" md5="34c84353464d5ff91a03babd6bc3ff4d" type="0" />
-  <asset name="yingxiong_kulouqishi.txt" group="config" path="r/config/yingxiong_kulouqishi.txt" size="2227" md5="df8a46e285fb44774917e201bacb75c5" type="0" />
+  <asset name="airenbubing.txt" path="r/config/airenbubing.txt" size="1794" md5="42ebef4a4d2310f6879ccaa5a7f32f80" type="0" />
+  <asset name="airenbubing01.txt" path="r/config/airenbubing01.txt" size="1807" md5="f935b206574cc75262274861f2bf33d1" type="0" />
+  <asset name="dafu.txt" path="r/config/dafu.txt" size="1706" md5="c743148a83ea3260f22d10a8186050cd" type="0" />
+  <asset name="m_airenhuojianpao.txt" path="r/config/m_airenhuojianpao.txt" size="1738" md5="86e13c2214ec72d8b89d10fd42b06fd3" type="0" />
+  <asset name="m_airenzhanshi.txt" path="r/config/m_airenzhanshi.txt" size="1844" md5="79337f5135f2405966c53338417a6cd5" type="0" />
+  <asset name="nvjiangjun.txt" path="r/config/nvjiangjun.txt" size="4348" md5="cae224645857327af683e0d3d1ed25b5" type="0" />
+  <asset name="paoshou.txt" path="r/config/paoshou.txt" size="1730" md5="c8d756f24e55545d884d91088b3db36e" type="0" />
+  <asset name="trollgiant.txt" path="r/config/trollgiant.txt" size="2106" md5="34c84353464d5ff91a03babd6bc3ff4d" type="0" />
+  <asset name="yingxiong_kulouqishi.txt" path="r/config/yingxiong_kulouqishi.txt" size="2227" md5="df8a46e285fb44774917e201bacb75c5" type="0" />
   <asset name="data.bytes" path="r/database/data.bytes" size="20480" md5="6393c89e186790fc8ae2e727295d147d" type="0" />
   <asset name="arrow.mat" path="r/material/arrow.mat" size="2005" md5="6243ba7932a7574972fab5170f2bc153" type="0" />
   <asset name="diban.mat" path="r/material/diban.mat" size="2346" md5="0b847a95107e1a0f202433209079e46d" type="0" />
   <asset name="line.mat" path="r/material/line.mat" size="2004" md5="7460b1f11ea709193d1a368cd13d286a" type="0" />
   <asset name="tile.mat" path="r/material/tile.mat" size="2286" md5="e44eee88f6dfdf42036286aba43afb14" type="0" />
-  <asset name="airenbubing.prefab" path="assets/r/model/airenbubing.prefab" size="67075" md5="282effe0b89ce8573dcab0316f520ae8" type="1" />
-  <asset name="airenbubing01.prefab" path="assets/r/model/airenbubing01.prefab" size="67000" md5="b180c4450733e885a110749d10d39e60" type="1" />
-  <asset name="dafu.prefab" path="assets/r/model/dafu.prefab" size="39959" md5="1c408e403017e127af2b827e65129787" type="1" />
-  <asset name="m_airenhuojianpao.prefab" path="assets/r/model/m_airenhuojianpao.prefab" size="58435" md5="fcedb4eb3535a8fa47980ec944f974f3" type="1" />
-  <asset name="m_airenzhanshi.prefab" path="assets/r/model/m_airenzhanshi.prefab" size="73819" md5="aec22380aaae719bd7eddf717fc60999" type="1" />
-  <asset name="nvjiangjun.prefab" path="assets/r/model/nvjiangjun.prefab" size="99039" md5="a9f468c509d2a2b21aee68a009b2e54e" type="1" />
-  <asset name="paoshou.prefab" path="assets/r/model/paoshou.prefab" size="48563" md5="ef00ba669ca3846fbb8761a2a0f189d4" type="1" />
-  <asset name="trollgiant.prefab" path="assets/r/model/trollgiant.prefab" size="50657" md5="10ad5a25b7b7e42f1de3789b3b6241a3" type="1" />
-  <asset name="yingxiong_kulouqishi.prefab" path="assets/r/model/yingxiong_kulouqishi.prefab" size="106588" md5="f23f271c29b28a513216268670f3926d" type="1" />
   <asset name="dimain.shader" path="r/shader/dimain.shader" size="1192" md5="4273a71c70e4bd683d2469ae84bf67a1" type="0" />
   <asset name="fx_kuloufashi_attack_hit.prefab" path="r/spell_fx/fx_kuloufashi_attack_hit.prefab" size="1188681" md5="5f40e0913f2abcde5026025f90f74d17" type="0" />
   <asset name="fx_kuloufashi_attack_xuli.prefab" path="r/spell_fx/fx_kuloufashi_attack_xuli.prefab" size="355284" md5="070b2b5e66085e99fdc91a2f9b97f72c" type="0" />
@@ -37,4 +28,13 @@
   <asset name="fx_xiaopaobing_paodan.prefab" path="r/spell_fx/fx_xiaopaobing_paodan.prefab" size="450361" md5="25660e132bd0a1106c85630c79f1285d" type="0" />
   <asset name="floor.png" path="r/texture/floor.png" size="44429" md5="363bc544d184051b332f09227d98288d" type="0" />
   <asset name="test.mat" path="assets/r/test.mat" size="1999" md5="ea69c9b5a9cc9fbefcb9611a5e0f64a6" type="1" />
+  <asset name="airenbubing.prefab" path="assets/r/model/airenbubing.prefab" size="67075" md5="282effe0b89ce8573dcab0316f520ae8" type="1" />
+  <asset name="airenbubing01.prefab" path="assets/r/model/airenbubing01.prefab" size="67000" md5="b180c4450733e885a110749d10d39e60" type="1" />
+  <asset name="dafu.prefab" path="assets/r/model/dafu.prefab" size="39959" md5="1c408e403017e127af2b827e65129787" type="1" />
+  <asset name="m_airenhuojianpao.prefab" path="assets/r/model/m_airenhuojianpao.prefab" size="58435" md5="fcedb4eb3535a8fa47980ec944f974f3" type="1" />
+  <asset name="m_airenzhanshi.prefab" path="assets/r/model/m_airenzhanshi.prefab" size="73819" md5="aec22380aaae719bd7eddf717fc60999" type="1" />
+  <asset name="nvjiangjun.prefab" path="assets/r/model/nvjiangjun.prefab" size="99039" md5="a9f468c509d2a2b21aee68a009b2e54e" type="1" />
+  <asset name="paoshou.prefab" path="assets/r/model/paoshou.prefab" size="48563" md5="ef00ba669ca3846fbb8761a2a0f189d4" type="1" />
+  <asset name="trollgiant.prefab" path="assets/r/model/trollgiant.prefab" size="50657" md5="10ad5a25b7b7e42f1de3789b3b6241a3" type="1" />
+  <asset name="yingxiong_kulouqishi.prefab" path="assets/r/model/yingxiong_kulouqishi.prefab" size="106588" md5="f23f271c29b28a513216268670f3926d" type="1" />
 </Assets>

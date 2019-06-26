@@ -9,22 +9,27 @@ public class BundleObject
 
     public Dictionary<string, BundleObject> dependences { get; private set; }
     public string[] dependenceNames { get; private set; }
+    public List<LoadTask<BundleObject>> callbacks { get; private set; }
 
     //场景中实例化出来的,即引用
     public Dictionary<string, List<IAssetObject>> references { get; private set; }
     //已经加载出来的asset
     private Dictionary<string, Object> mAssetDic = new Dictionary<string, Object>();
 
+
     public BundleObject(string bundleName,string[] dependenceNames)
     {
         dependences = new Dictionary<string, BundleObject>();
         references = new Dictionary<string, List<IAssetObject>>();
+        callbacks = new List<LoadTask<BundleObject>>();
         this.bundleName = bundleName;
         this.dependenceNames = dependenceNames; 
     }
 
-    public void LoadSync(LoadTask<BundleObject> task = null)
+    public void LoadSync()
     {
+        
+
         if (dependenceNames != null)
         {
             for (int i =0; i <dependenceNames.Length; ++i)
@@ -51,13 +56,11 @@ public class BundleObject
         {
             Debug.LogError("Load assetbundle:" + bundleName + " failed!!");
         }
-       
-        if (task!= null && task.callback != null)
-        {
-            task.callback(this);
-        }
+
+        Finish();
+
     }
-    public IEnumerator LoadAsync(LoadTask<BundleObject> task = null)
+    public IEnumerator LoadAsync()
     {
         if (dependenceNames != null)
         {
@@ -93,13 +96,12 @@ public class BundleObject
         {
             Debug.LogError("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
         }
-        if (task!= null && task.callback != null)
-        {
-            task.callback(this);
-        }
+
+        Finish();
+
     }
 
-    public IEnumerator LoadWWW(LoadTask<BundleObject> task = null)
+    public IEnumerator LoadWWW()
     {
         if (dependenceNames != null)
         {
@@ -135,11 +137,22 @@ public class BundleObject
             {
                 Debug.LogError("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
             }
-            if (task!= null && task.callback != null)
+
+            Finish();
+        }
+    }
+
+    private void Finish()
+    {
+        for (int i = 0; i < callbacks.Count; i++)
+        {
+            var task = callbacks[i];
+            if (task != null && task.callback != null)
             {
                 task.callback(this);
             }
         }
+        callbacks.Clear();
     }
 
     public Object LoadAsset(string name)

@@ -66,12 +66,12 @@ public class AssetManager : MonoBehaviour
     public AssetMode assetMode { get; private set; }
     public LoadMode loadMode { get; private set; }
     public bool initialized { get; private set; }
-    public void Init(LoadMode mode, string manifest)
+    public void Init(LoadMode loadMode,AssetMode assetMode, string manifest)
     {
-        loadMode = mode;
+        this.loadMode = loadMode;
+        this.assetMode = assetMode;
 
-        assetMode = (AssetMode)PlayerPrefs.GetInt("assetMode");
-
+     
         if(loadMode == LoadMode.Sync)
         {
             string path = GetPath(manifest);
@@ -189,11 +189,17 @@ public class AssetManager : MonoBehaviour
                     break;
                 case AssetType.StreamingAsset:
                 {
-                    return LoadAsset(asset.group, asset.path, callback);
+                    return LoadAsset(string.IsNullOrEmpty(asset.group) ? 
+                            asset.path : asset.group,
+                            asset.path,
+                            callback);
                 }
                 case AssetType.PersistentAsset:
                 {
-                    return LoadAsset(asset.group, asset.path, callback);
+                    return LoadAsset(string.IsNullOrEmpty(asset.group) ? 
+                        asset.path : asset.group,
+                        asset.path, 
+                        callback);
                 }
             }
         }
@@ -288,17 +294,26 @@ public class AssetManager : MonoBehaviour
 
         if (bundle.bundle == null)
         {
-            if (loadMode == LoadMode.Sync)
+            if (bundle.callbacks.Count > 0)
             {
-                bundle.LoadSync(task);
+                bundle.callbacks.Add(task);
             }
-            else if(loadMode== LoadMode.Async)
+            else
             {
-                StartCoroutine(bundle.LoadAsync(task));
-            }
-            else if(loadMode == LoadMode.WWW)
-            {
-                StartCoroutine(bundle.LoadWWW(task));
+                bundle.callbacks.Add(task);
+
+                if (loadMode == LoadMode.Sync)
+                {
+                    bundle.LoadSync();
+                }
+                else if (loadMode == LoadMode.Async)
+                {
+                    StartCoroutine(bundle.LoadAsync());
+                }
+                else if (loadMode == LoadMode.WWW)
+                {
+                    StartCoroutine(bundle.LoadWWW());
+                }
             }
         }
         else
@@ -354,27 +369,6 @@ public class AssetManager : MonoBehaviour
         //}
         //return fullpath;
         return AssetPath.GetPath(bundleName);
-    }
-
-    public string GetRoot()
-    {
-        if (string.IsNullOrEmpty(mAssetBundlePath))
-        {
-            if (Application.platform == RuntimePlatform.Android)
-            {
-                mAssetBundlePath = Application.streamingAssetsPath + "/";
-            }
-            else if (Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                mAssetBundlePath = Application.streamingAssetsPath + "/";
-            }
-            else
-            {
-                mAssetBundlePath = Application.dataPath + "/StreamingAssets/";
-            }
-        }
-        return mAssetBundlePath;
-
     }
 
     public string[] GetAllDependencies(string bundleName)

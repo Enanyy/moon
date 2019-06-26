@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using UnityEditor;
 using UnityEngine;
 public enum AssetType
 {
@@ -71,17 +72,35 @@ public class Asset
 }
 public class AssetPath
 {
-    public static string EXTENSION = ".bundle";
+    public static string manifest;
     public static Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
+
+    public static AssetMode mode;
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod]
     public static void Init()
-    { 
-        string path = Application.dataPath + "/asset.txt";
+    {
+        mode = (AssetMode) PlayerPrefs.GetInt("assetMode");
+
+        string path = Application.dataPath + "/assets.txt";
+        if (Application.isPlaying)
+        {
+            if (mode == AssetMode.AssetBundle)
+            {
+                path = string.Format("{0}/../assetbundles/{1}/assets.txt", Application.dataPath,
+                    EditorUserBuildSettings.activeBuildTarget);
+            }
+        }
+
         string xml = File.ReadAllText(path);
         FromXml(xml);
+
+        if (Application.isPlaying)
+        {
+            AssetManager.Instance.Init(LoadMode.Async, mode, manifest);
+        }
     }
-   
+
 #endif
     public static void FromXml(string xml)
     {
@@ -91,6 +110,8 @@ public class AssetPath
 
         XmlElement root = doc.DocumentElement;
 
+        manifest = root.GetAttribute("manifest");
+
         assets.Clear();
 
         for (int i = 0; i < root.ChildNodes.Count; ++i)
@@ -99,6 +120,10 @@ public class AssetPath
             Asset asset = new Asset();
             asset.FromXml(child);
             assets.Add(asset.name, asset);
+            if (assets.ContainsKey(asset.path) == false)
+            {
+                assets.Add(asset.path, asset);
+            }
         }
     }
 
@@ -109,11 +134,22 @@ public class AssetPath
         doc.InsertBefore(dec, doc.DocumentElement);
 
         XmlElement root = doc.CreateElement("Assets");
+        if (string.IsNullOrEmpty(manifest) == false)
+        {
+            XmlAttribute attribute = doc.CreateAttribute("manifest");
+            attribute.Value = manifest;
+            root.Attributes.Append(attribute);
+        }
         doc.AppendChild(root);
+        HashSet<Asset> set = new HashSet<Asset>();
         var it = assets.GetEnumerator();
         while (it.MoveNext())
         {
-            it.Current.Value.ToXml(root);
+            if (set.Contains(it.Current.Value) == false)
+            {
+                it.Current.Value.ToXml(root);
+                set.Add(it.Current.Value);
+            }
         }
 
         MemoryStream ms = new MemoryStream();
@@ -133,7 +169,6 @@ public class AssetPath
         assets.TryGetValue(name, out asset);
         return asset;
     }
-
     public static string GetPath(string name)
     {
         string path = name;
@@ -155,6 +190,14 @@ public class AssetPath
                     else
                     {
                         path = Application.dataPath + "/" + asset.path;
+
+#if UNITY_EDITOR
+                        if (mode == AssetMode.AssetBundle)
+                        {
+                            path = string.Format("{0}/../assetbundles/{1}/{2}", Application.dataPath,
+                                EditorUserBuildSettings.activeBuildTarget,asset.path);
+                        }
+#endif
                     }
                 }
                 break;
@@ -177,7 +220,7 @@ public class AssetPath
             }
         }
 
-        return path + EXTENSION;
+        return path;
     }
 
     public static void Clear()

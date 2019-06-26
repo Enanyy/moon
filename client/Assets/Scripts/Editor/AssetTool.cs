@@ -10,15 +10,19 @@ public static class AssetTool
     [InitializeOnLoadMethod]
     private static void InitEditor()
     {
-        Debug.Log("AssetPath Init");
-        AssetPath.Init();
-        Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
-        Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
-        EditorApplication.quitting -= SaveAsset;
-        EditorApplication.quitting += SaveAsset;
-        EditorApplication.projectChanged -= AssetChange;
-        EditorApplication.projectChanged += AssetChange;
+        if (Application.isPlaying == false)
+        {
+            Debug.Log("AssetPath Init");
+            AssetPath.Init();
+            Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
+            Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
+            EditorApplication.quitting -= SaveAsset;
+            EditorApplication.quitting += SaveAsset;
+            EditorApplication.projectChanged -= AssetChange;
+            EditorApplication.projectChanged += AssetChange;
+        }
     }
+
     static GUIStyle s_ToggleMixed;
   
     
@@ -294,61 +298,74 @@ public static class AssetTool
         return asset;
     }
 
-    [MenuItem("Tools/生成资源配置")]
+    [MenuItem("Tools/Asset/生成资源配置")]
     static void GenAsset()
     {
         AssetPath.Clear();
         var it = s_AssetDirs.GetEnumerator();
         while (it.MoveNext())
         {
-            DirectoryInfo dirInfo = new DirectoryInfo(Application.dataPath + it.Current.Key.Replace("Assets",""));
-            if (dirInfo.Exists == false)
-            {
-                continue;
-            }
-            FileInfo[] files = dirInfo.GetFiles("*.*", SearchOption.AllDirectories);
-            AssetType type = it.Current.Value;
-           
-
-            for (int j = 0; j < files.Length; ++j)
-            {
-                if (files[j].Name.EndsWith(".meta"))
-                {
-                    continue;
-                }
-                string fullPath = files[j].DirectoryName + "/" + files[j].Name;
-                fullPath = fullPath.Replace("\\", "/");
-
-
-                Asset asset = new Asset();
-
-                asset.name = files[j].Name;
-
-                asset.size = files[j].Length;
-
-                asset.md5 = MD5Hash.Get(File.ReadAllBytes(fullPath));
-
-                asset.type = type;
-                if (type == AssetType.Resource)
-                {
-                    asset.path = fullPath.Substring(fullPath.IndexOf(it.Current.Key ) + it.Current.Key.Length).ToLower(); ;
-                }
-                else
-                {
-                    asset.path = fullPath.Substring(fullPath.IndexOf(it.Current.Key)).ToLower();
-                }
-
-                AssetPath.assets.Add(asset.name, asset);
-            }
+            GenAsset(string.Format("{0}/{1}",Application.dataPath.Replace("Assets",""),it.Current.Key), it.Current.Value);
         }
         
 
         SaveAsset();
     }
-    [MenuItem("Tools/保存资源配置")]
+
+    static void GenAsset(string dir,AssetType type)
+    {
+        DirectoryInfo dirInfo = new DirectoryInfo(dir);
+        if (dirInfo.Exists == false)
+        {
+            return;
+        }
+        FileInfo[] files = dirInfo.GetFiles("*.*", SearchOption.AllDirectories);
+      
+
+        for (int j = 0; j < files.Length; ++j)
+        {
+            if (files[j].Name.EndsWith(".meta")
+            || files[j].Name.EndsWith(".manifest"))
+            {
+                continue;
+            }
+            string fullPath = files[j].DirectoryName + "/" + files[j].Name;
+            fullPath = fullPath.Replace("\\", "/").ToLower();
+
+
+            Asset asset = new Asset();
+
+            asset.name = files[j].Name;
+
+            asset.size = files[j].Length;
+
+            asset.md5 = MD5Hash.Get(File.ReadAllBytes(fullPath));
+
+            asset.type = type;
+            if (type == AssetType.Resource)
+            {
+                asset.path = fullPath.Substring(fullPath.IndexOf("assets/resources/")+ "assets/resources/".Length).ToLower(); ;
+            }
+            else
+            {
+                if (fullPath.Contains("assets/"))
+                {
+                    asset.path = fullPath.Substring(fullPath.IndexOf("assets/")).ToLower();
+                }
+                else
+                {
+                    asset.path = asset.name;
+                }
+            }
+
+            AssetPath.assets.Add(asset.name, asset);
+        }
+    }
+
+    [MenuItem("Tools/Asset/保存资源配置")]
     static void SaveAsset()
     {
-        string assetXmlFile = Application.dataPath + "/asset.txt";
+        string assetXmlFile = Application.dataPath + "/assets.txt";
 
         StreamWriter writerXml = new StreamWriter(assetXmlFile);
         writerXml.Write(AssetPath.ToXml());
@@ -361,7 +378,7 @@ public static class AssetTool
         
     }
 
-    [MenuItem("Tools/Clear AssetBundleName")]
+    [MenuItem("Tools/Asset/Clear AssetBundleName")]
     static void ClearAssetBundleName()
     {
         string[] files = Directory.GetFiles(Application.dataPath + "/", "*.*", SearchOption.AllDirectories);
@@ -392,9 +409,11 @@ public static class AssetTool
         AssetDatabase.SaveAssets();
     }
 
-    [MenuItem("Tools/Build AssetBundle")]
+    [MenuItem("Tools/Asset/Build AssetBundle")]
     static void Build()
     {
+        ClearAssetBundleName();
+
         List<string> scenes = new List<string>();
         var it = AssetPath.assets.GetEnumerator();
         while (it.MoveNext())
@@ -411,8 +430,8 @@ public static class AssetTool
                     if (importer != null)
                     {
                         importer.assetBundleName = string.IsNullOrEmpty(it.Current.Value.group)
-                            ? it.Current.Value.path + AssetPath.EXTENSION
-                            : it.Current.Value.group + AssetPath.EXTENSION;
+                            ? it.Current.Value.path
+                            : it.Current.Value.group;
 
                     }
                 }
@@ -438,7 +457,7 @@ public static class AssetTool
         EditorUtility.DisplayProgressBar("BuildScene", "BuildSceneAssetBundle", 0f);
         for (int i = 0; i < scenes.Count; i++)
         {
-            string path = outputPath + scenes[i].ToLower() + AssetPath.EXTENSION;
+            string path = outputPath + scenes[i].ToLower();
             string dir = Path.GetDirectoryName(path);
             if (Directory.Exists(dir) == false)
             {
@@ -452,6 +471,37 @@ public static class AssetTool
         }
 
         EditorUtility.ClearProgressBar();
+
+        AssetPath.Clear();
+
+        GenAsset(outputPath,AssetType.StreamingAsset);
+        var dirit = s_AssetDirs.GetEnumerator();
+        while (dirit.MoveNext())
+        {
+            if (dirit.Current.Value == AssetType.Resource)
+            {
+                GenAsset(string.Format("{0}/{1}", Application.dataPath.Replace("Assets", ""), dirit.Current.Key), dirit.Current.Value);
+            }
+        }
+
+        AssetPath.manifest = EditorUserBuildSettings.activeBuildTarget.ToString();
+
+        string assetXmlFile = outputPath + "/assets.txt";
+
+        StreamWriter writerXml = new StreamWriter(assetXmlFile);
+        writerXml.Write(AssetPath.ToXml());
+        writerXml.Close();
+        writerXml.Dispose();
+    }
+    [MenuItem("Tools/Asset/Editor Mode")]
+    static void SetEditorMode()
+    {
+        PlayerPrefs.SetInt("assetMode", (int)AssetMode.Editor);
+    }
+    [MenuItem("Tools/Asset/AssetBundle Mode")]
+    static void SetAssetBundleMode()
+    {
+        PlayerPrefs.SetInt("assetMode", (int)AssetMode.AssetBundle);
     }
 
 }
