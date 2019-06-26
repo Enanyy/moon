@@ -20,7 +20,35 @@ public static class AssetTool
         EditorApplication.projectChanged += AssetChange;
     }
     static GUIStyle s_ToggleMixed;
+  
     
+    static  Dictionary<string,AssetType> s_AssetDirs = new Dictionary<string, AssetType>
+    {
+        { "Assets/Resources/",AssetType.Resource },
+        { "Assets/R/",AssetType.StreamingAsset },
+    };
+
+    static bool IsValid(string assetPath)
+    {
+        bool isValid = false;
+
+        if (string.IsNullOrEmpty(assetPath)
+            || assetPath.EndsWith(".cs")
+        )
+        {
+            return isValid;
+        }
+        var it = s_AssetDirs.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if (assetPath.StartsWith(it.Current.Key))
+            {
+                isValid = true; break;
+            }
+        }
+
+        return isValid;
+    }
     static void OnPostHeaderGUI(Editor editor)
     {
         if (editor.target == null)
@@ -28,12 +56,10 @@ public static class AssetTool
             return;
         }
         string assetPath = AssetDatabase.GetAssetPath(editor.target);
-        if (string.IsNullOrEmpty(assetPath)
-            || assetPath.EndsWith(".cs")
-            || assetPath.StartsWith("Assets/Resources/") == false
-        )
+        
+        if (IsValid(assetPath)==false)
         {
-            return ;
+            return;
         }
 
         if (s_ToggleMixed == null)
@@ -41,14 +67,11 @@ public static class AssetTool
             s_ToggleMixed = new GUIStyle("ToggleMixed");
         }
 
-        string name;
-        string path;
-        string dir;
-        var asset = GetAsset(editor.target, out name, out path, out dir);
+        var asset = GetAsset(editor.target);
 
         GUILayout.BeginHorizontal();
 
-        bool select = asset != null;
+        bool select = asset != null && AssetPath.assets.ContainsKey(asset.name);
         bool mixed = editor.targets.Length > 1;
         if (mixed)
         {
@@ -104,6 +127,9 @@ public static class AssetTool
                 {
                     if (select == false)
                     {
+                        string dir = Path.GetDirectoryName(asset.path);
+                        dir = dir.Substring(dir.LastIndexOf("\\") + 1);
+
                         asset.group = dir;
                     }
 
@@ -122,6 +148,9 @@ public static class AssetTool
                 {
                     if (select == false)
                     {
+                        string dir = Path.GetDirectoryName(asset.path);
+                        dir = dir.Substring(dir.LastIndexOf("\\") + 1);
+
                         asset.group = dir;
                     }
 
@@ -144,19 +173,9 @@ public static class AssetTool
     {
         for (int i = 0; i < targets.Length; i++)
         {
-            string name, path, dir;
-            var asset = GetAsset(targets[i], out name, out path, out dir);
-            if (asset == null && AssetPath.assets.ContainsKey(name) == false)
+            var asset = GetAsset(targets[i]);
+            if (asset != null && AssetPath.assets.ContainsKey(asset.name) == false)
             {
-                asset = new AssetPath.Asset();
-                asset.name = name;
-                asset.path = path;
-                asset.type = AssetPath.AssetType.Resource;
-                string fullPath = Application.dataPath + "/Resources/" + path;
-                byte[] bytes = File.ReadAllBytes(fullPath);
-                asset.md5 = MD5Hash.Get(bytes);
-                asset.size = bytes.Length;
-
                 AssetPath.assets.Add(asset.name, asset);
             }
         }
@@ -166,8 +185,7 @@ public static class AssetTool
     {
         for (int i = 0; i < targets.Length; i++)
         {
-            string name, path, dir;
-            var asset = GetAsset(targets[i], out name, out path, out dir);
+            var asset = GetAsset(targets[i]);
             if (asset != null)
             {
                 AssetPath.assets.Remove(asset.name);
@@ -179,8 +197,7 @@ public static class AssetTool
     {
         for (int i = 0; i < targets.Length; i++)
         {
-            string name, path, dir;
-            var asset = GetAsset(targets[i], out name, out path, out dir);
+            var asset = GetAsset(targets[i]);
             if (asset != null)
             {
                 asset.group = group;
@@ -188,57 +205,78 @@ public static class AssetTool
         }
     }
 
-    static AssetPath.Asset GetAsset(Object target, out string name, out string path, out string dir)
+    static AssetType GetAssetType(string assetPath)
     {
-        name = null;
-        path = null;
-        dir = null;
+        var it = s_AssetDirs.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if (assetPath.StartsWith(it.Current.Key))
+            {
+                return it.Current.Value;
+            }
+        }
 
+        return AssetType.Resource;
+    }
+
+    static string GetAssetPath(string assetPath)
+    {
+        var type = GetAssetType(assetPath);
+        string path = assetPath.ToLower();
+        if (type == AssetType.Resource)
+        {
+            path = assetPath.ToLower().Replace("assets/resources/", "");
+        }
+
+        return path;
+    }
+
+    static Asset GetAsset(Object target)
+    {
         string assetPath = AssetDatabase.GetAssetPath(target);
 
-        if (string.IsNullOrEmpty(assetPath)
-            || assetPath.EndsWith(".cs")
-            || assetPath.StartsWith("Assets/Resources/") == false
-        )
+        if (IsValid(assetPath) == false)
         {
             return null;
         }
 
-        AssetPath.Asset asset = null;
-        name = Path.GetFileName(assetPath);
-        path = assetPath.Replace("Assets/Resources/", "").ToLower();
-        dir = path.Substring(2, path.LastIndexOf('/') - 2);
-        var it = AssetPath.assets.GetEnumerator();
-        while (it.MoveNext())
-        {
-            if (it.Current.Value.path == path)
-            {
-                asset = it.Current.Value; break;
-            }
-        }
+        string fullpath = Application.dataPath.Replace("Assets", "/") + assetPath;
+        byte[] bytes = File.Exists(fullpath) ? File.ReadAllBytes(fullpath) : null;
 
+        string name = Path.GetFileName(assetPath);
+        string path = GetAssetPath(assetPath);
+        string md5 = bytes != null ? MD5Hash.Get(bytes) : "";
+        AssetType type = GetAssetType(assetPath);
+
+        Asset asset = AssetPath.Get(name);
         if (asset == null)
         {
-            string fullPath = Application.dataPath + "/Resources/" + path;
-            if (File.Exists(fullPath))
+            var it = AssetPath.assets.GetEnumerator();
+            while (it.MoveNext())
             {
-                string md5 = MD5Hash.Get(File.ReadAllBytes(fullPath));
-                it = AssetPath.assets.GetEnumerator();
-                while (it.MoveNext())
+                if (it.Current.Value.md5 == md5)
                 {
-                    if (it.Current.Value.md5 == md5)
+                    asset = it.Current.Value;
+                    if (asset.path != path)
                     {
-                        asset = it.Current.Value;
-                        if (asset.path != path)
-                        {
-                            asset.path = path;
-                        }
-
-                        break;
+                        asset.path = path;
                     }
+
+                    break;
                 }
             }
         }
+
+        if (asset == null && bytes != null)
+        {
+            asset = new Asset();
+            asset.name = name;
+            asset.path = path;
+            asset.md5 = md5;
+            asset.type = type;
+            asset.size = bytes.Length;
+        }
+
 
         return asset;
     }
@@ -246,38 +284,55 @@ public static class AssetTool
     [MenuItem("Tools/生成资源配置")]
     static void GenAsset()
     {
-        DirectoryInfo dirInfo = new DirectoryInfo(Application.dataPath + "/Resources/r/");
-        FileInfo[] files = dirInfo.GetFiles("*.*", SearchOption.AllDirectories);
-
         AssetPath.Clear();
-
-        for (int i = 0; i < files.Length; ++i)
+        var it = s_AssetDirs.GetEnumerator();
+        while (it.MoveNext())
         {
-            if (files[i].Name.EndsWith(".meta"))
+            DirectoryInfo dirInfo = new DirectoryInfo(Application.dataPath + it.Current.Key.Replace("Assets",""));
+            if (dirInfo.Exists == false)
             {
                 continue;
             }
-            string fullPath = files[i].DirectoryName + "/" + files[i].Name;
-            fullPath = fullPath.Replace("\\", "/");
+            FileInfo[] files = dirInfo.GetFiles("*.*", SearchOption.AllDirectories);
+            AssetType type = it.Current.Value;
+           
 
-            string assetPath = fullPath.Substring(fullPath.IndexOf("/r/") + 1).ToLower();
+            for (int j = 0; j < files.Length; ++j)
+            {
+                if (files[j].Name.EndsWith(".meta"))
+                {
+                    continue;
+                }
+                string fullPath = files[j].DirectoryName + "/" + files[j].Name;
+                fullPath = fullPath.Replace("\\", "/");
 
-            AssetPath.Asset asset = new AssetPath.Asset();
 
-            asset.name = files[i].Name;
-            asset.path = assetPath;
-            asset.size = files[i].Length;
+                Asset asset = new Asset();
 
-            byte[] bytes = File.ReadAllBytes(fullPath);
-            asset.md5 = MD5Hash.Get(bytes);
-            asset.type = AssetPath.AssetType.Resource;
+                asset.name = files[j].Name;
 
-            AssetPath.assets.Add(asset.name, asset);
+                asset.size = files[j].Length;
+
+                asset.md5 = MD5Hash.Get(File.ReadAllBytes(fullPath));
+
+                asset.type = type;
+                if (type == AssetType.Resource)
+                {
+                    asset.path = fullPath.Substring(fullPath.IndexOf(it.Current.Key ) + it.Current.Key.Length).ToLower(); ;
+                }
+                else
+                {
+                    asset.path = fullPath.Substring(fullPath.IndexOf(it.Current.Key)).ToLower();
+                }
+
+                AssetPath.assets.Add(asset.name, asset);
+            }
         }
+        
 
         SaveAsset();
     }
-
+    [MenuItem("Tools/保存资源配置")]
     static void SaveAsset()
     {
         string assetXmlFile = Application.dataPath + "/asset.txt";

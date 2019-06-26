@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 public enum LoadMode
 {
@@ -145,9 +146,57 @@ public class AssetManager : MonoBehaviour
         mLoadTask.Clear();
     }
 
-    public LoadTask<AssetObject<T>> LoadAsset<T>(string key, System.Action<AssetObject<T>> callback)
+    public LoadTask<AssetObject<T>> LoadAsset<T>(string key, System.Action<AssetObject<T>> callback)where  T:Object
     {
-        var asset = AssetPath.Get(name);
+        var asset = AssetPath.Get(key);
+        if (asset != null)
+        {
+            switch (asset.type)
+            {
+                case AssetType.Resource:
+                {
+                    AssetObject<T> assetObject = null;
+                    var obj = Resources.Load(asset.path.Substring(0, asset.path.LastIndexOf('.')));
+                    if (obj != null)
+                    {
+                        if (typeof(T) == typeof(GameObject))
+                        {
+                            if (callback != null)
+                            {
+                                GameObject go = Instantiate(obj) as GameObject;
+                                assetObject = new AssetObject<T>(asset.path, null, obj, go as T);
+                                callback(assetObject);
+                            }
+                        }
+                        else
+                        {
+                            if (callback != null)
+                            {
+                                assetObject = new AssetObject<T>(asset.path, null, obj, obj as T);
+                                callback(assetObject);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (callback != null)
+                        {
+                            callback(null);
+                        }
+                    }
+
+                }
+                    break;
+                case AssetType.StreamingAsset:
+                {
+                    return LoadAsset(asset.group, asset.path, callback);
+                }
+                case AssetType.PersistentAsset:
+                {
+                    return LoadAsset(asset.group, asset.path, callback);
+                }
+            }
+        }
 
         return null;
     }

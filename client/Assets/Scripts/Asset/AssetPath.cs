@@ -3,77 +3,75 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using UnityEngine;
-
-public  class AssetPath
+public enum AssetType
 {
-    #region Inner Class
-    public enum AssetType
-    {
-        Resource,
-        StreamingAsset,
-        PersistentAsset,
-    }
-    public class Asset
-    {
-        public string name;
-        public string group;
-        public string path;
-        public long size;
-        public string md5;
-        public AssetType type = AssetType.Resource;
+    Resource,
+    StreamingAsset,
+    PersistentAsset,
+}
+public class Asset
+{
+    public string name;
+    public string group;
+    public string path;
+    public long size;
+    public string md5;
+    public AssetType type = AssetType.Resource;
 
-        public void ToXml(XmlNode parent)
+    public void ToXml(XmlNode parent)
+    {
+        XmlDocument doc;
+        if (parent.ParentNode == null)
         {
-            XmlDocument doc;
-            if (parent.ParentNode == null)
-            {
-                doc = (XmlDocument)parent;
-            }
-            else
-            {
-                doc = parent.OwnerDocument;
-            }
-            XmlElement node = doc.CreateElement("asset");
-            parent.AppendChild(node);
+            doc = (XmlDocument)parent;
+        }
+        else
+        {
+            doc = parent.OwnerDocument;
+        }
+        XmlElement node = doc.CreateElement("asset");
+        parent.AppendChild(node);
 
-            XmlAttribute name = doc.CreateAttribute("name");
-            name.Value = this.name;
-            node.Attributes.Append(name);
-            if (string.IsNullOrEmpty(group) == false)
-            {
-                XmlAttribute group = doc.CreateAttribute("group");
-                group.Value = this.group;
-                node.Attributes.Append(group);
-            }
-
-            XmlAttribute path = doc.CreateAttribute("path");
-            path.Value = this.path;
-            node.Attributes.Append(path);
-
-            XmlAttribute size = doc.CreateAttribute("size");
-            size.Value = this.size.ToString();
-            node.Attributes.Append(size);
-
-            XmlAttribute md5 = doc.CreateAttribute("md5");
-            md5.Value = this.md5;
-            node.Attributes.Append(md5);
-
-            XmlAttribute type = doc.CreateAttribute("type");
-            type.Value = ((int)this.type).ToString();
-            node.Attributes.Append(type);
+        XmlAttribute name = doc.CreateAttribute("name");
+        name.Value = this.name;
+        node.Attributes.Append(name);
+        if (string.IsNullOrEmpty(group) == false)
+        {
+            XmlAttribute group = doc.CreateAttribute("group");
+            group.Value = this.group;
+            node.Attributes.Append(group);
         }
 
-        public void FromXml(XmlElement element)
-        {
-            name = element.GetAttribute("name");
-            group = element.GetAttribute("group");
-            path = element.GetAttribute("path");
-            size = element.GetAttribute("size").ToInt64Ex();
-            md5 = element.GetAttribute("md5");
-            type =(AssetType)element.GetAttribute("type").ToInt32Ex();
-        }
+        XmlAttribute path = doc.CreateAttribute("path");
+        path.Value = this.path;
+        node.Attributes.Append(path);
+
+        XmlAttribute size = doc.CreateAttribute("size");
+        size.Value = this.size.ToString();
+        node.Attributes.Append(size);
+
+        XmlAttribute md5 = doc.CreateAttribute("md5");
+        md5.Value = this.md5;
+        node.Attributes.Append(md5);
+
+        XmlAttribute type = doc.CreateAttribute("type");
+        type.Value = ((int)this.type).ToString();
+        node.Attributes.Append(type);
     }
-    #endregion
+
+    public void FromXml(XmlElement element)
+    {
+        name = element.GetAttribute("name");
+        group = element.GetAttribute("group");
+        path = element.GetAttribute("path");
+        size = element.GetAttribute("size").ToInt64Ex();
+        md5 = element.GetAttribute("md5");
+        type = (AssetType)element.GetAttribute("type").ToInt32Ex();
+    }
+}
+public class AssetPath
+{
+   
     public static Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod]
@@ -130,15 +128,11 @@ public  class AssetPath
 
         return xml;
     }
-    public static string Get(string name)
+    public static Asset Get(string name)
     {
         Asset asset;
         assets.TryGetValue(name, out asset);
-        if(asset!= null)
-        {
-            return asset.path;
-        }
-        return "";
+        return asset;
     }
     public static void Clear()
     {

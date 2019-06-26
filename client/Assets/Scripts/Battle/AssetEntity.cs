@@ -23,10 +23,9 @@ public class AssetEntity :IPoolObject
         
     }
 
-    protected void LoadAsset(string name)
-    {
-       
-        AssetManager.Instance.LoadAsset<GameObject>(name, name, (obj) => {
+    protected void LoadAsset(string key)
+    {      
+        AssetManager.Instance.LoadAsset<GameObject>(key,(obj) => {
 
             this.gameObject = obj.assetObject;
             this.asset = asset;
