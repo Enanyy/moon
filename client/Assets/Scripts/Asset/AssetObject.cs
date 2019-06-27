@@ -4,7 +4,8 @@ public interface IAssetObject
     string assetName { get; }
     BundleObject bundle { get; }
     Object asset { get; }
-    void Destroy();
+
+    void Destroy(bool removeReference = true);
 }
 public class AssetObject<T>: IAssetObject where T:Object
 {
@@ -28,20 +29,22 @@ public class AssetObject<T>: IAssetObject where T:Object
             bundle.AddReference(this);
         }
     }
-    public virtual void Destroy()
+    public virtual void Destroy(bool removeReference = true)
     {
         asset = null;
-        if (bundle != null)
-        {
-            bundle.RemoveReference(this);
-        }
+
         if (typeof(T) == typeof(GameObject))
         {
             Object.Destroy(assetObject as GameObject);
         }
+
+        if (bundle != null && removeReference)
+        {
+            bundle.RemoveReference(this);
+        }
     }
 
-    public void Recycle()
+    public void ReturnAsset()
     {
         if (bundle != null)
         {

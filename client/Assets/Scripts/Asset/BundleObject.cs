@@ -19,6 +19,14 @@ public class BundleObject
     //缓存的场景资源
     private Dictionary<string,List<IAssetObject>> mCacheAssetDic = new Dictionary<string, List<IAssetObject>>();
 
+    enum BundleType
+    {
+        AssetBundle,
+        Resource
+    }
+
+    private BundleType mType = BundleType.AssetBundle;
+
     public BundleObject(string bundleName,string[] dependenceNames)
     {
         dependences = new Dictionary<string, BundleObject>();
@@ -144,6 +152,8 @@ public class BundleObject
 
     public IEnumerator LoadResource()
     {
+        mType = BundleType.Resource;
+
         var request = Resources.LoadAsync(bundleName);
 
         yield return request;
@@ -158,15 +168,23 @@ public class BundleObject
 
     private void Finish()
     {
+        int count = 0;
         for (int i = 0; i < onFinished.Count; i++)
         {
             var task = onFinished[i];
             if (task != null && task.callback != null)
             {
                 task.callback(this);
+                count++;
             }
         }
+
+        if (onFinished.Count > 0 && count == 0)
+        {
+            UnLoad();
+        }
         onFinished.Clear();
+      
     }
 
     public Object LoadAsset(string name)
@@ -259,13 +277,19 @@ public class BundleObject
         {
             references[name].Remove(reference);
         }
+
+        if (mCacheAssetDic.ContainsKey(name))
+        {
+            mCacheAssetDic[name].Remove(reference);
+        }
+
         int referenceCount = 0;
         var it = references.GetEnumerator();
         while(it.MoveNext())
         {
             referenceCount += it.Current.Value.Count;
         }
-        it.Dispose();
+
         if(referenceCount==0)
         {
             UnLoad();
@@ -300,7 +324,7 @@ public class BundleObject
                 return true;
             }
         }
-        it.Dispose();
+  
 
         return false;
     }
@@ -336,13 +360,33 @@ public class BundleObject
                 bundle = null;
             }
 
-            var it = dependences.GetEnumerator();
-            while(it.MoveNext())
+            var reference = references.GetEnumerator();
+            while (reference.MoveNext())
             {
-                it.Current.Value.UnLoad();
+                for (int i = 0; i < reference.Current.Value.Count; i++)
+                {
+                    reference.Current.Value[i].Destroy(false);
+                }
+                reference.Current.Value.Clear();
             }
-            it.Dispose();
+            references.Clear();
+
+            var dependence = dependences.GetEnumerator();
+            while(dependence.MoveNext())
+            {
+                dependence.Current.Value.UnLoad();
+            }
             dependences.Clear();
+
+            var asset = mAssetDic.GetEnumerator();
+            while (asset.MoveNext())
+            {
+                if (mType == BundleType.Resource)
+                {
+                    Resources.UnloadAsset(asset.Current.Value);
+                }
+            }
+            mAssetDic.Clear();
         }
     }
 }

@@ -267,10 +267,9 @@ public class AssetManager : MonoBehaviour
         {
             if (bundle != null)
             {
-                AssetObject<T> assetObject = bundle.LoadAsset<T>(task.assetName);
-
                 if (task.callback != null)
                 {
+                    AssetObject<T> assetObject = bundle.LoadAsset<T>(task.assetName);
                     task.callback(assetObject);
                 }
             }
@@ -400,8 +399,6 @@ public class AssetManager : MonoBehaviour
                 return true;
             }
         }
-        it.Dispose();
-
         return false;
     }
 

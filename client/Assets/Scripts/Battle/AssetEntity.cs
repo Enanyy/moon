@@ -79,7 +79,7 @@ public class AssetEntity :IPoolObject
         }
         if (asset != null)
         {
-            asset.Recycle();
+            asset.ReturnAsset();
         }
         asset = null;
     }
@@ -92,7 +92,7 @@ public class AssetEntity :IPoolObject
         }
         if (asset != null)
         {
-            asset.Recycle();
+            asset.ReturnAsset();
         }
         asset = null;
     }
