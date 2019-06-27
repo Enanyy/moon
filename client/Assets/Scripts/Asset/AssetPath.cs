@@ -75,11 +75,11 @@ public class AssetPath
     public static string manifest;
     public static Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
 
-    public static AssetMode mode;
+    public static AssetMode mode = AssetMode.AssetBundle;
     public const string ASSETS_FILE = "assets.txt";
 
     /// <summary>
-    /// 带/
+    /// 结尾带/
     /// </summary>
     public static string streamingAssetsPath
     {
@@ -101,7 +101,7 @@ public class AssetPath
     }
 
     /// <summary>
-    /// 带/
+    /// 结尾带/
     /// </summary>
     public static string persistentDataPath
     {
@@ -140,7 +140,7 @@ public class AssetPath
         string xml = File.ReadAllText(path);
         FromXml(xml);
 
-        if (Application.isPlaying)
+        if (Application.isPlaying && mode == AssetMode.AssetBundle)
         {
             AssetManager.Instance.Init(LoadMode.Async, mode, manifest);
         }
@@ -222,35 +222,32 @@ public class AssetPath
             switch (asset.type)
             {
                 case AssetType.StreamingAsset:
-                {
-                    path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
-                   
+                {                
 #if UNITY_EDITOR
-                    if (mode == AssetMode.AssetBundle)
+                    if (mode != AssetMode.AssetBundle)
+                    {
+                         path = Application.dataPath + "/" + asset.path;
+                    }
+                    else
+#endif
                     {
                         path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
                     }
-                    else
-                    {
-                        path = Application.dataPath + "/" + asset.path;
-                    }
-#endif
                 }
                 break;
                 case AssetType.PersistentAsset:
                 {
-                    path = string.Format("{0}{1}", persistentDataPath, asset.path);
-
 #if UNITY_EDITOR
-                    if (mode == AssetMode.AssetBundle)
-                    {
-                        path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
-                    }
-                    else
+                    if (mode != AssetMode.AssetBundle)
                     {
                         path = Application.dataPath + "/" + asset.path;
                     }
+                    else
 #endif
+                    {
+                        path = string.Format("{0}{1}", persistentDataPath, asset.path);
+                    }
+
                 }
                 break;
             }
