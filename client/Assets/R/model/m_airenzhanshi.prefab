@@ -34,7 +34,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4654914907195114}
-  - component: {fileID: 114479241444808870}
   m_Layer: 0
   m_Name: Root_node_airen
   m_TagString: Untagged
@@ -276,7 +275,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4307458246438602}
-  - component: {fileID: 114753555903153448}
   m_Layer: 0
   m_Name: Bip001 Prop2
   m_TagString: Untagged
@@ -322,7 +320,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4707950912401522}
-  - component: {fileID: 114644561231444150}
   m_Layer: 0
   m_Name: Bip001 Prop1
   m_TagString: Untagged

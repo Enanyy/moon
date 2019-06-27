@@ -505,5 +505,40 @@ public static class AssetTool
         PlayerPrefs.SetInt("assetMode", (int)AssetMode.AssetBundle);
     }
 
+    [MenuItem("Tools/Asset/Delete Missing Scripts")]
+    static void CleanupMissingScript()
+    {
+
+        EditorUtility.DisplayProgressBar("Clear Missing Scripts", "Clear Missing Scripts", 0f);
+       
+        GameObject[] pAllObjects = (GameObject[])Resources.FindObjectsOfTypeAll(typeof(GameObject));
+
+        for (int i = 0; i < pAllObjects.Length; ++i)
+        {
+            var item = pAllObjects[i];
+            Debug.Log(item.name);
+            SerializedObject so = new SerializedObject(item);
+            var soProperties = so.FindProperty("m_Component");
+            var components = item.GetComponents<Component>();
+            int propertyIndex = 0;
+            foreach (var c in components)
+            {
+                if (c == null)
+                {
+                    soProperties.DeleteArrayElementAtIndex(propertyIndex);
+                }
+                ++propertyIndex;
+            }
+            so.ApplyModifiedProperties();
+
+            EditorUtility.DisplayProgressBar("Clear Missing Scripts", item.name, i * 1f / pAllObjects.Length);
+
+        }
+        EditorUtility.ClearProgressBar();
+
+        AssetDatabase.Refresh();
+        AssetDatabase.SaveAssets();
+    }
+
 }
 

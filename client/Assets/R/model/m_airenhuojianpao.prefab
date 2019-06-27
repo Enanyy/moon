@@ -727,7 +727,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4932002100601634}
-  - component: {fileID: 114019464544472912}
   m_Layer: 0
   m_Name: Root_node
   m_TagString: Untagged
@@ -818,7 +817,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4356061199309924}
-  - component: {fileID: 114762096821666044}
   m_Layer: 0
   m_Name: Bip001 Prop1
   m_TagString: Untagged

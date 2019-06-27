@@ -222,7 +222,7 @@ public class BundleObject
                     assetObject = list[i] as AssetObject<T>;
                     if (assetObject != null)
                     {
-                        list.RemoveAt(0);break;
+                        list.RemoveAt(i);break;
                     }
                 }    
             }
@@ -329,7 +329,7 @@ public class BundleObject
         return false;
     }
 
-    public void ReturnAsset<T>(AssetObject<T> assetObject) where T : Object
+    public void ReturnAsset(IAssetObject assetObject)
     {
         if (assetObject == null)
         {
