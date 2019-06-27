@@ -9,27 +9,27 @@ public class BundleObject
 
     public Dictionary<string, BundleObject> dependences { get; private set; }
     public string[] dependenceNames { get; private set; }
-    public List<LoadTask<BundleObject>> callbacks { get; private set; }
+    public List<LoadTask<BundleObject>> onFinished { get; private set; }
 
     //场景中实例化出来的,即引用
     public Dictionary<string, List<IAssetObject>> references { get; private set; }
     //已经加载出来的asset
     private Dictionary<string, Object> mAssetDic = new Dictionary<string, Object>();
 
+    //缓存的场景资源
+    private Dictionary<string,List<IAssetObject>> mCacheAssetDic = new Dictionary<string, List<IAssetObject>>();
 
     public BundleObject(string bundleName,string[] dependenceNames)
     {
         dependences = new Dictionary<string, BundleObject>();
         references = new Dictionary<string, List<IAssetObject>>();
-        callbacks = new List<LoadTask<BundleObject>>();
+        onFinished = new List<LoadTask<BundleObject>>();
         this.bundleName = bundleName;
         this.dependenceNames = dependenceNames; 
     }
 
     public void LoadSync()
-    {
-        
-
+    {      
         if (dependenceNames != null)
         {
             for (int i =0; i <dependenceNames.Length; ++i)
@@ -142,17 +142,31 @@ public class BundleObject
         }
     }
 
+    public IEnumerator LoadResource()
+    {
+        var request = Resources.LoadAsync(bundleName);
+
+        yield return request;
+        if (request.asset != null)
+        {
+            mAssetDic.Add(bundleName,request.asset);
+        }
+
+        Finish();
+    }
+
+
     private void Finish()
     {
-        for (int i = 0; i < callbacks.Count; i++)
+        for (int i = 0; i < onFinished.Count; i++)
         {
-            var task = callbacks[i];
+            var task = onFinished[i];
             if (task != null && task.callback != null)
             {
                 task.callback(this);
             }
         }
-        callbacks.Clear();
+        onFinished.Clear();
     }
 
     public Object LoadAsset(string name)
@@ -164,8 +178,12 @@ public class BundleObject
 
         if (bundle && mAssetDic.ContainsKey(name) == false)
         {
-            mAssetDic[name] = bundle.LoadAsset<Object>(name);
+            if (bundle != null)
+            {
+                mAssetDic.Add(name, bundle.LoadAsset<Object>(name));
+            }
         }
+
         if (mAssetDic.ContainsKey(name))
         {
             return mAssetDic[name];
@@ -176,22 +194,37 @@ public class BundleObject
     public AssetObject<T> LoadAsset<T>(string assetName) where T : UnityEngine.Object
     {
         AssetObject<T> assetObject = null;
-
-        var asset = LoadAsset(assetName);
-        if (asset)
+        if (mCacheAssetDic.ContainsKey(assetName) )
         {
-            if (typeof(T) == typeof(GameObject))
+            var list = mCacheAssetDic[assetName];
+            if (list.Count > 0)
             {
-                var go = UnityEngine.Object.Instantiate(asset) as GameObject;
-                go.transform.localPosition = Vector3.zero;
-                go.transform.localRotation = Quaternion.identity;
-                go.transform.localScale = Vector3.one;
-
-                assetObject = new AssetObject<T>(assetName, this, asset, go as T);
+                for (int i = 0; i < list.Count; i++)
+                {
+                    assetObject = list[i] as AssetObject<T>;
+                    if (assetObject != null)
+                    {
+                        list.RemoveAt(0);break;
+                    }
+                }    
             }
-            else
+        }
+
+        if (assetObject == null)
+        {
+            var asset = LoadAsset(assetName);
+            if (asset)
             {
-                assetObject = new AssetObject<T>(assetName, this, asset, asset as T);
+                if (typeof(T) == typeof(GameObject))
+                {
+                    var go = UnityEngine.Object.Instantiate(asset) as GameObject;
+
+                    assetObject = new AssetObject<T>(assetName, this, asset, go as T);
+                }
+                else
+                {
+                    assetObject = new AssetObject<T>(assetName, this, asset, asset as T);
+                }
             }
         }
 
@@ -270,6 +303,25 @@ public class BundleObject
         it.Dispose();
 
         return false;
+    }
+
+    public void ReturnAsset<T>(AssetObject<T> assetObject) where T : Object
+    {
+        if (assetObject == null)
+        {
+            return;
+        }
+
+        if (mCacheAssetDic.ContainsKey(assetObject.assetName) == false)
+        {
+            mCacheAssetDic.Add(assetObject.assetName,new List<IAssetObject>());
+        }
+
+        var list = mCacheAssetDic[assetObject.assetName];
+        if (list.Contains(assetObject) == false)
+        {
+            list.Add(assetObject);
+        }
     }
 
     public void UnLoad()

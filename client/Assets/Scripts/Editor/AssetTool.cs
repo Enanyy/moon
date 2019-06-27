@@ -299,20 +299,20 @@ public static class AssetTool
     }
 
     [MenuItem("Tools/Asset/生成资源配置")]
-    static void GenAsset()
+    static void UpdateAsset()
     {
         AssetPath.Clear();
         var it = s_AssetDirs.GetEnumerator();
         while (it.MoveNext())
         {
-            GenAsset(string.Format("{0}/{1}",Application.dataPath.Replace("Assets",""),it.Current.Key), it.Current.Value);
+            UpdateAsset(string.Format("{0}/{1}",Application.dataPath.Replace("Assets",""),it.Current.Key), it.Current.Value);
         }
         
 
         SaveAsset();
     }
 
-    static void GenAsset(string dir,AssetType type)
+    static void UpdateAsset(string dir,AssetType type)
     {
         DirectoryInfo dirInfo = new DirectoryInfo(dir);
         if (dirInfo.Exists == false)
@@ -322,50 +322,55 @@ public static class AssetTool
         FileInfo[] files = dirInfo.GetFiles("*.*", SearchOption.AllDirectories);
       
 
-        for (int j = 0; j < files.Length; ++j)
+        for (int i = 0; i < files.Length; ++i)
         {
-            if (files[j].Name.EndsWith(".meta")
-            || files[j].Name.EndsWith(".manifest"))
+            if (files[i].Name.EndsWith(".meta")
+            || files[i].Name.EndsWith(".manifest"))
             {
                 continue;
             }
-            string fullPath = files[j].DirectoryName + "/" + files[j].Name;
+            string fullPath = files[i].DirectoryName + "/" + files[i].Name;
             fullPath = fullPath.Replace("\\", "/").ToLower();
 
-
-            Asset asset = new Asset();
-
-            asset.name = files[j].Name;
-
-            asset.size = files[j].Length;
-
-            asset.md5 = MD5Hash.Get(File.ReadAllBytes(fullPath));
-
-            asset.type = type;
+            string name = files[i].Name;
+            string path = name;
             if (type == AssetType.Resource)
             {
-                asset.path = fullPath.Substring(fullPath.IndexOf("assets/resources/")+ "assets/resources/".Length).ToLower(); ;
+                path = fullPath.Substring(fullPath.IndexOf("assets/resources/") + "assets/resources/".Length).ToLower(); ;
             }
             else
             {
                 if (fullPath.Contains("assets/"))
                 {
-                    asset.path = fullPath.Substring(fullPath.IndexOf("assets/")).ToLower();
-                }
-                else
-                {
-                    asset.path = asset.name;
+                    path = fullPath.Substring(fullPath.IndexOf("assets/")).ToLower();
                 }
             }
 
-            AssetPath.assets.Add(asset.name, asset);
+
+            Asset asset = AssetPath.Get(name);
+            if (asset == null) asset = AssetPath.Get(path);
+            if (asset == null)
+            {
+                asset = new Asset();
+                asset.name = name;
+                asset.path = path;
+                AssetPath.assets.Add(asset.name, asset);
+
+            }
+
+            asset.size = files[i].Length;
+
+            asset.md5 = MD5Hash.Get(File.ReadAllBytes(fullPath));
+
+            asset.type = type;
+            
         }
     }
 
     [MenuItem("Tools/Asset/保存资源配置")]
     static void SaveAsset()
     {
-        string assetXmlFile = Application.dataPath + "/assets.txt";
+        string assetXmlFile = Application.dataPath + "/"+ AssetPath.ASSETS_FILE;
 
         StreamWriter writerXml = new StreamWriter(assetXmlFile);
         writerXml.Write(AssetPath.ToXml());
@@ -413,9 +418,11 @@ public static class AssetTool
     static void Build()
     {
         ClearAssetBundleName();
+        EditorUtility.DisplayProgressBar("Set AssetbundleName", "Setting AssetBundleName", 0f);
 
         List<string> scenes = new List<string>();
         var it = AssetPath.assets.GetEnumerator();
+        int count = 0;
         while (it.MoveNext())
         {
             if (it.Current.Value.type == AssetType.StreamingAsset)
@@ -436,11 +443,15 @@ public static class AssetTool
                     }
                 }
             }
+
+            EditorUtility.DisplayProgressBar("Set AssetbundleName", "Setting AssetBundleName", count * 1f/ AssetPath.assets.Count);
+            count++;
         }
+        EditorUtility.ClearProgressBar();
         AssetDatabase.Refresh();
         AssetDatabase.SaveAssets();
 
-        string outputPath = string.Format("{0}/../assetbundles/{1}/", Application.dataPath, EditorUserBuildSettings.activeBuildTarget);
+        string outputPath = AssetPath.streamingAssetsPath;
 
         if (Directory.Exists(outputPath))
         {
@@ -472,21 +483,11 @@ public static class AssetTool
 
         EditorUtility.ClearProgressBar();
 
-        AssetPath.Clear();
-
-        GenAsset(outputPath,AssetType.StreamingAsset);
-        var dirit = s_AssetDirs.GetEnumerator();
-        while (dirit.MoveNext())
-        {
-            if (dirit.Current.Value == AssetType.Resource)
-            {
-                GenAsset(string.Format("{0}/{1}", Application.dataPath.Replace("Assets", ""), dirit.Current.Key), dirit.Current.Value);
-            }
-        }
+        UpdateAsset(outputPath,AssetType.StreamingAsset);
 
         AssetPath.manifest = EditorUserBuildSettings.activeBuildTarget.ToString();
 
-        string assetXmlFile = outputPath + "/assets.txt";
+        string assetXmlFile = outputPath + "/" + AssetPath.ASSETS_FILE;
 
         StreamWriter writerXml = new StreamWriter(assetXmlFile);
         writerXml.Write(AssetPath.ToXml());

@@ -144,6 +144,11 @@ public class BattleEntity:
         BattleManager.Instance.GetParam(config, (param) => {
             this.param = param;
             scale = param.scale;
+
+            if (model != null )
+            {
+                model.LoadModel();
+            }
         });
     }
 

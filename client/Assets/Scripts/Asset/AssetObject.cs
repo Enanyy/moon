@@ -6,7 +6,7 @@ public interface IAssetObject
     Object asset { get; }
     void Destroy();
 }
-public class AssetObject<T>: IAssetObject
+public class AssetObject<T>: IAssetObject where T:Object
 {
     public BundleObject bundle { get; private set; }
 
@@ -41,5 +41,12 @@ public class AssetObject<T>: IAssetObject
         }
     }
 
+    public void Recycle()
+    {
+        if (bundle != null)
+        {
+            bundle.ReturnAsset(this);
+        }
+    }
 }
 

@@ -84,7 +84,7 @@ public class BattleManager
         {
             AssetManager.Instance.LoadAsset<TextAsset>(congfig, (asset) => {
 
-                if (asset!= null)
+                if (asset!= null && mParams.ContainsKey(congfig)==false)
                 { 
                     var xml = asset.assetObject;
                     if (xml)
@@ -99,7 +99,7 @@ public class BattleManager
                 }
                 if (callback != null)
                 {
-                    callback(mParams.ContainsKey(congfig)?mParams[congfig]:null);
+                    callback(mParams.ContainsKey(congfig) ? mParams[congfig] : null);
                 }
 
             });

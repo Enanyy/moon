@@ -76,19 +76,63 @@ public class AssetPath
     public static Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
 
     public static AssetMode mode;
+    public const string ASSETS_FILE = "assets.txt";
+
+    public static string streamingAssetsPath
+    {
+        get
+        {
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                return string.Format("{0}/!/assets/r/", Application.streamingAssetsPath);
+            }
+            else if(Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                return string.Format("{0}/r/", Application.streamingAssetsPath);
+            }
+#if UNITY_EDITOR
+            return string.Format("{0}/../r/{1}/", Application.dataPath,
+                EditorUserBuildSettings.activeBuildTarget);
+#else
+            return Application.streamingAssetsPath;
+#endif
+        }
+    }
+
+    public static string persistentDataPath
+    {
+        get
+        {
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                return string.Format("{0}/r/", Application.persistentDataPath);
+            }
+            else if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                return string.Format("{0}/r/", Application.persistentDataPath);
+            }
+
+#if UNITY_EDITOR
+            return string.Format("{0}/../r/{1}/", Application.dataPath,
+                EditorUserBuildSettings.activeBuildTarget);
+#else
+            return Application.persistentDataPath;
+#endif
+        }
+    }
+
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod]
     public static void Init()
     {
         mode = (AssetMode) PlayerPrefs.GetInt("assetMode");
 
-        string path = Application.dataPath + "/assets.txt";
+        string path = string.Format("{0}/{1}", Application.dataPath, ASSETS_FILE);
         if (Application.isPlaying)
         {
             if (mode == AssetMode.AssetBundle)
             {
-                path = string.Format("{0}/../assetbundles/{1}/assets.txt", Application.dataPath,
-                    EditorUserBuildSettings.activeBuildTarget);
+                path = string.Format("{0}{1}", streamingAssetsPath, ASSETS_FILE);
             }
         }
 
@@ -101,8 +145,21 @@ public class AssetPath
         }
     }
 
+#else
+    public static void Init()
+    {
+        mode = (AssetMode) PlayerPrefs.GetInt("assetMode");
+        string path = string.Format("{0}{1}", persistentDataPath, ASSETS_FILE);
+        if (File.Exists(path)== false)
+        {
+           path = string.Format("{0}{1}", streamingAssetsPath, ASSETS_FILE);
+        }
+        string xml = File.ReadAllText(path);
+        FromXml(xml);
+        AssetManager.Instance.Init(LoadMode.Async, mode, manifest);
+    }
 #endif
-    public static void FromXml(string xml)
+        public static void FromXml(string xml)
     {
         XmlDocument doc = new XmlDocument();
 
@@ -179,42 +236,34 @@ public class AssetPath
             {
                 case AssetType.StreamingAsset:
                 {
-                    if (Application.platform == RuntimePlatform.Android)
+                    path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
+                   
+#if UNITY_EDITOR
+                    if (mode == AssetMode.AssetBundle)
                     {
-                        path = Application.streamingAssetsPath + "!/assets/" + asset.path;
-                    }
-                    else if (Application.platform == RuntimePlatform.IPhonePlayer)
-                    {
-                        path = Application.streamingAssetsPath + "/" + asset.path;
+                        path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
                     }
                     else
                     {
                         path = Application.dataPath + "/" + asset.path;
-
-#if UNITY_EDITOR
-                        if (mode == AssetMode.AssetBundle)
-                        {
-                            path = string.Format("{0}/../assetbundles/{1}/{2}", Application.dataPath,
-                                EditorUserBuildSettings.activeBuildTarget,asset.path);
-                        }
-#endif
                     }
+#endif
                 }
                 break;
                 case AssetType.PersistentAsset:
                 {
-                    if (Application.platform == RuntimePlatform.Android)
+                    path = string.Format("{0}{1}", persistentDataPath, asset.path);
+
+#if UNITY_EDITOR
+                    if (mode == AssetMode.AssetBundle)
                     {
-                        path = Application.persistentDataPath + "/" + asset.path;
-                    }
-                    else if (Application.platform == RuntimePlatform.IPhonePlayer)
-                    {
-                        path = Application.persistentDataPath + "/" + asset.path;
+                        path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
                     }
                     else
                     {
                         path = Application.dataPath + "/" + asset.path;
                     }
+#endif
                 }
                 break;
             }

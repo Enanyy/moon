@@ -28,7 +28,7 @@ public class AssetEntity :IPoolObject
         AssetManager.Instance.LoadAsset<GameObject>(key,(obj) => {
 
             this.gameObject = obj.assetObject;
-            this.asset = asset;
+            this.asset = obj;
             OnAssetLoad();
         });
     }
@@ -75,9 +75,12 @@ public class AssetEntity :IPoolObject
         if (gameObject != null)
         {
             gameObject.SetActive(false);
-            //AssetManager.Instance.ReturnInstance(asset);
+            
         }
-
+        if (asset != null)
+        {
+            asset.Recycle();
+        }
         asset = null;
     }
 
@@ -86,7 +89,10 @@ public class AssetEntity :IPoolObject
         if (gameObject != null)
         { 
             gameObject.SetActive(false);
-            //AssetManager.Instance.ReturnInstance(asset);
+        }
+        if (asset != null)
+        {
+            asset.Recycle();
         }
         asset = null;
     }

@@ -80,7 +80,7 @@ public class AssetManager : MonoBehaviour
 
             if (assetBundle)
             {
-                OnInitFinish(assetBundle);
+                InitFinish(assetBundle);
             }
             else
             {
@@ -105,7 +105,7 @@ public class AssetManager : MonoBehaviour
 
         if (request.isDone && request.assetBundle)
         {
-            OnInitFinish(request.assetBundle);
+            InitFinish(request.assetBundle);
         }
         else
         {
@@ -121,7 +121,7 @@ public class AssetManager : MonoBehaviour
             yield return www;
             if (www.isDone && www.assetBundle)
             {
-                OnInitFinish(www.assetBundle);
+                InitFinish(www.assetBundle);
             }
             else
             {
@@ -129,7 +129,7 @@ public class AssetManager : MonoBehaviour
             }              
         }
     }
-    private void OnInitFinish(AssetBundle assetBundle)
+    private void InitFinish(AssetBundle assetBundle)
     {
         mManifestBundle = assetBundle;
 
@@ -155,38 +155,9 @@ public class AssetManager : MonoBehaviour
             {
                 case AssetType.Resource:
                 {
-                    AssetObject<T> assetObject = null;
-                    var obj = Resources.Load(asset.path.Substring(0, asset.path.LastIndexOf('.')));
-                    if (obj != null)
-                    {
-                        if (typeof(T) == typeof(GameObject))
-                        {
-                            if (callback != null)
-                            {
-                                GameObject go = Instantiate(obj) as GameObject;
-                                assetObject = new AssetObject<T>(asset.path, null, obj, go as T);
-                                callback(assetObject);
-                            }
-                        }
-                        else
-                        {
-                            if (callback != null)
-                            {
-                                assetObject = new AssetObject<T>(asset.path, null, obj, obj as T);
-                                callback(assetObject);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (callback != null)
-                        {
-                            callback(null);
-                        }
-                    }
-
+                    string path = asset.path.Substring(0, asset.path.LastIndexOf('.'));
+                    return LoadResource(path, callback);
                 }
-                    break;
                 case AssetType.StreamingAsset:
                 {
                     return LoadAsset(string.IsNullOrEmpty(asset.group) ? 
@@ -207,6 +178,47 @@ public class AssetManager : MonoBehaviour
         return null;
     }
 
+    public LoadTask<AssetObject<T>> LoadResource<T>(string path,Action<AssetObject<T>> callback) where T : Object
+    {
+        LoadTask<AssetObject<T>> assetTask = new LoadTask<AssetObject<T>>(path, path, callback);
+
+        LoadTask<BundleObject> bundleTask = new LoadTask<BundleObject>(path, null, delegate(BundleObject bundleObject)
+        {
+            AssetObject<T> assetObject = bundleObject.LoadAsset<T>(bundleObject.bundleName);
+            if (assetTask.callback != null)
+            {
+                assetTask.callback(assetObject);
+            }
+           
+        });
+
+        BundleObject bundle = CreateBundle(path);
+        Object obj = bundle.LoadAsset(path);
+        if (obj == null)
+        {
+            if (bundle.onFinished.Count > 0)
+            {
+                bundle.onFinished.Add(bundleTask);
+            }
+            else
+            {
+                bundle.onFinished.Add(bundleTask);
+
+                StartCoroutine(bundle.LoadResource());
+            }
+        }
+        else
+        {
+            AssetObject<T> assetObject = bundle.LoadAsset<T>(path);
+            if (callback != null)
+            {
+                callback(assetObject);
+            }
+        }
+
+        return assetTask;
+    }
+
     public LoadTask<AssetObject<T>> LoadAsset<T>(string bundleName, string assetName, System.Action<AssetObject<T>> callback = null) where T : UnityEngine.Object
     {
         LoadTask<AssetObject<T>> task = new LoadTask<AssetObject<T>>(bundleName.ToLower(), assetName.ToLower(), callback);
@@ -225,10 +237,6 @@ public class AssetManager : MonoBehaviour
                     if (task.callback != null)
                     {
                         var go = Instantiate(asset) as GameObject;
-
-                        go.transform.localPosition = Vector3.zero;
-                        go.transform.localRotation = Quaternion.identity;
-                        go.transform.localScale = Vector3.one;
 
                         assetObject = new AssetObject<T>(task.assetName, null, asset, go as T);
 
@@ -294,13 +302,13 @@ public class AssetManager : MonoBehaviour
 
         if (bundle.bundle == null)
         {
-            if (bundle.callbacks.Count > 0)
+            if (bundle.onFinished.Count > 0)
             {
-                bundle.callbacks.Add(task);
+                bundle.onFinished.Add(task);
             }
             else
             {
-                bundle.callbacks.Add(task);
+                bundle.onFinished.Add(task);
 
                 if (loadMode == LoadMode.Sync)
                 {

@@ -98,6 +98,15 @@ public class EntityComponentModel :
     public void OnStart()
     {
         animationSpeed = 1;
+        LoadModel();
+    }
+
+    public void LoadModel()
+    {
+        if (gameObject != null)
+        {
+            return;
+        }
         EntityParamModel param = agent.param;
         if (param != null)
         {
