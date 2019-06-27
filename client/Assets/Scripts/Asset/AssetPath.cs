@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using UnityEditor;
+
 using UnityEngine;
 public enum AssetType
 {
@@ -78,43 +78,44 @@ public class AssetPath
     public static AssetMode mode;
     public const string ASSETS_FILE = "assets.txt";
 
+    /// <summary>
+    /// ´ø/
+    /// </summary>
     public static string streamingAssetsPath
     {
         get
         {
-            if (Application.platform == RuntimePlatform.Android)
-            {
-                return string.Format("{0}/!/assets/r/", Application.streamingAssetsPath);
-            }
-            else if(Application.platform == RuntimePlatform.IPhonePlayer)
+            if (Application.platform == RuntimePlatform.Android 
+                || Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 return string.Format("{0}/r/", Application.streamingAssetsPath);
             }
+
 #if UNITY_EDITOR
             return string.Format("{0}/../r/{1}/", Application.dataPath,
-                EditorUserBuildSettings.activeBuildTarget);
+                 UnityEditor.EditorUserBuildSettings.activeBuildTarget);
 #else
             return Application.streamingAssetsPath;
 #endif
         }
     }
 
+    /// <summary>
+    /// ´ø/
+    /// </summary>
     public static string persistentDataPath
     {
         get
         {
-            if (Application.platform == RuntimePlatform.Android)
-            {
-                return string.Format("{0}/r/", Application.persistentDataPath);
-            }
-            else if (Application.platform == RuntimePlatform.IPhonePlayer)
+            if (Application.platform == RuntimePlatform.Android
+                || Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 return string.Format("{0}/r/", Application.persistentDataPath);
             }
 
 #if UNITY_EDITOR
             return string.Format("{0}/../r/{1}/", Application.dataPath,
-                EditorUserBuildSettings.activeBuildTarget);
+                UnityEditor.EditorUserBuildSettings.activeBuildTarget);
 #else
             return Application.persistentDataPath;
 #endif
@@ -144,22 +145,8 @@ public class AssetPath
             AssetManager.Instance.Init(LoadMode.Async, mode, manifest);
         }
     }
-
-#else
-    public static void Init()
-    {
-        mode = (AssetMode) PlayerPrefs.GetInt("assetMode");
-        string path = string.Format("{0}{1}", persistentDataPath, ASSETS_FILE);
-        if (File.Exists(path)== false)
-        {
-           path = string.Format("{0}{1}", streamingAssetsPath, ASSETS_FILE);
-        }
-        string xml = File.ReadAllText(path);
-        FromXml(xml);
-        AssetManager.Instance.Init(LoadMode.Async, mode, manifest);
-    }
 #endif
-        public static void FromXml(string xml)
+    public static void FromXml(string xml)
     {
         XmlDocument doc = new XmlDocument();
 

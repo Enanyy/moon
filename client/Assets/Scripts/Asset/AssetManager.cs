@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
+using System.IO;
 
 public enum LoadMode
 {
@@ -66,6 +67,29 @@ public class AssetManager : MonoBehaviour
     public AssetMode assetMode { get; private set; }
     public LoadMode loadMode { get; private set; }
     public bool initialized { get; private set; }
+
+    public void Init()
+    {
+        string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
+        if (File.Exists(path) == false)
+        {
+            path = string.Format("{0}{1}", AssetPath.streamingAssetsPath, AssetPath.ASSETS_FILE);
+        }
+
+        StartCoroutine(path);
+    }
+
+    private IEnumerator LoadAssets(string path)
+    {
+        using (WWW www = new WWW(path))
+        {
+            yield return www;
+            
+            AssetPath.FromXml(www.text);
+            Init(LoadMode.Async, AssetMode.AssetBundle,AssetPath.manifest);
+        }
+    }
+
     public void Init(LoadMode loadMode,AssetMode assetMode, string manifest)
     {
         this.loadMode = loadMode;
