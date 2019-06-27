@@ -508,7 +508,6 @@ public static class AssetTool
     [MenuItem("Tools/Asset/Delete Missing Scripts")]
     static void CleanupMissingScript()
     {
-
         EditorUtility.DisplayProgressBar("Clear Missing Scripts", "Clear Missing Scripts", 0f);
        
         GameObject[] pAllObjects = (GameObject[])Resources.FindObjectsOfTypeAll(typeof(GameObject));
@@ -516,18 +515,16 @@ public static class AssetTool
         for (int i = 0; i < pAllObjects.Length; ++i)
         {
             var item = pAllObjects[i];
-            Debug.Log(item.name);
             SerializedObject so = new SerializedObject(item);
             var soProperties = so.FindProperty("m_Component");
             var components = item.GetComponents<Component>();
-            int propertyIndex = 0;
-            foreach (var c in components)
+
+            for(int j = components.Length - 1; j >=0; --j)
             {
-                if (c == null)
+                if (components[j] == null)
                 {
-                    soProperties.DeleteArrayElementAtIndex(propertyIndex);
+                    soProperties.DeleteArrayElementAtIndex(j);
                 }
-                ++propertyIndex;
             }
             so.ApplyModifiedProperties();
 

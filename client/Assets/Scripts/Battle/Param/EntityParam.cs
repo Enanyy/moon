@@ -239,7 +239,7 @@ public abstract partial class EntityParam
         }
         catch (Exception e)
         {
-            //Debug.LogError(e.Message);
+            Debug.Log(e.Message);
         }
         return null;
     }

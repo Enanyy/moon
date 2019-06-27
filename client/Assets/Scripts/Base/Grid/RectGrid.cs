@@ -59,7 +59,7 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
                 position.x = original.x + i * tileWidth;
                 position.z = original.z + j * tileHeight;
                
-                CreateTile(new TileIndex(j, j * columns + i, i), position);
+                CreateTile(new TileIndex(j, index, i), position);
             }
         }      
     }

@@ -300,7 +300,7 @@ public class Connection
         try
         {
             int count = mSocket.EndSend(result);
-
+            Log(string.Format("Scend bytes:{0}",count));
         }
         catch (SocketException e)
         {
