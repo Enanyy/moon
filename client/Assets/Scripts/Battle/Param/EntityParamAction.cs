@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
 
+[TreeNodeMenu("Action")]
 public partial class EntityParamAction : EntityParam
 {
     public static readonly Dictionary<ActionType, int> ActionWeights = new Dictionary<ActionType, int>

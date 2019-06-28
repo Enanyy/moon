@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
 
+[TreeNodeMenu("Model")]
 public partial class EntityParamModel : EntityParam
 {
     public string asset;

@@ -290,7 +290,17 @@ public abstract partial class EntityParam
 #if UNITY_EDITOR
 
     public Action<ITreeNode> OnAddChild { get; set; }
-  
+
+    List<ITreeNode> ITreeNode.children
+    {
+        get
+        {
+            List<ITreeNode> list = new List<ITreeNode>(children);
+            
+            return list;
+        }
+    }
+
     public virtual void OnDraw(ref Rect r)
     {
         rect = r;

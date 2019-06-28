@@ -139,6 +139,7 @@ public abstract partial class EntityParamEffect : EntityParam
 
 }
 
+[TreeNodeMenu("Effect/Time")]
 public partial class EntityParamEffectTime : EntityParamEffect
 {
     public BonePoint bone;
@@ -209,7 +210,7 @@ public partial class EntityParamEffectTime : EntityParamEffect
         base.ParseXml(node);
     }
 }
-
+[TreeNodeMenu("Effect/Move")]
 public partial class EntityParamEffectMove : EntityParamEffect
 {
     public float speed;
@@ -266,7 +267,7 @@ public partial class EntityParamEffectMove : EntityParamEffect
         base.ParseXml(node);
     }
 }
-
+[TreeNodeMenu("Effect/Follow")]
 public partial class EntityParamEffectFollow : EntityParamEffect
 {
     public float speed;
@@ -313,7 +314,7 @@ public partial class EntityParamEffectFollow : EntityParamEffect
         base.ParseXml(node);
     }
 }
-
+[TreeNodeMenu("Effect/Parabola")]
 public partial class EntityParamEffectParabola : EntityParamEffect
 {
     public float speed;      //速度

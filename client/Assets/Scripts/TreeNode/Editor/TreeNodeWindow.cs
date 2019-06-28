@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System;
 using UnityEditor;
+using System.Reflection;
 
-public class TreeNodeWindow : EditorWindow
+public partial class TreeNodeWindow : EditorWindow
 {
-    public static TreeNodeWindow mTreeWindow;
+    public static TreeNodeWindow window;
     public TreeNodeGraph data;
     private Vector2 mMousePosition;
     private bool mDrawingConnection = false;
@@ -13,62 +14,34 @@ public class TreeNodeWindow : EditorWindow
 
     private Rect mToolBarRect;
 
-    private List<TreeNodeMenu> mNodeMenuList = new List<TreeNodeMenu>();
+    private Dictionary<Type,string> mMenuDic = new Dictionary<Type, string>();
 
-    public Action<TreeNodeGraph> onSave;
-    public Func<TreeNodeGraph> onLoad;
-    public Func<List<TreeNodeMenu>> onInitMenu;
-    public Func<TreeNodeGraph> onDataChange;
-    public Action<ITreeNode> onSelect;
+    public static void Open<T>(TreeNodeGraph graph) where T : TreeNodeWindow
+    {
+        if (window == null || window.GetType() != typeof(T))
+        {
+            window = GetWindow<T>();
+            window.titleContent = new GUIContent(typeof(T).Name);
+        }
 
-    [MenuItem("Tools/Tree Node Editor")]
-    private static void ShowEditor()
-    {
-        mTreeWindow = GetWindow<TreeNodeWindow>();
-        mTreeWindow.titleContent = new GUIContent("NodeTree");
-      
+        window.data = graph;
     }
-    public static void SetData(TreeNodeGraph graph)
-    {
-        if(mTreeWindow== null)
-        {
-            ShowEditor();
-        }
-        if(mTreeWindow!=null)
-        {
-            mTreeWindow.data = graph;
-        }
-    }
+   
 
     private void OnEnable()
     {
         hideFlags = HideFlags.HideAndDontSave;
-
-        onLoad = EntityParamTool.OnLoad;
-        onSave = EntityParamTool.OnSave;
-        onInitMenu = EntityParamTool.OnInitMenu;
-        onDataChange = EntityParamTool.onDataChange;
-
-        if (onInitMenu != null)
-        {
-            mNodeMenuList = onInitMenu();
-        }
+        
+        mMenuDic = GetMenu();
        
         if (data == null)
             data = new TreeNodeGraph();
     
     }
 
-    private void Update()
+    protected void Update()
     {
-        if (onDataChange != null)
-        {
-            var graph = onDataChange();
-            if (graph != null && data != graph)
-            {
-                data = graph;
-            }
-        }
+        
         Repaint();
     }
 
@@ -78,8 +51,10 @@ public class TreeNodeWindow : EditorWindow
         mMousePosition = e.mousePosition;
 
         // create
-        if (mTreeWindow == null)
-            ShowEditor();
+        if (window == null)
+        {
+            return;
+        }
 
         //显示上下文菜单。
         if (e.button == 1)
@@ -89,16 +64,20 @@ public class TreeNodeWindow : EditorWindow
                 if (mDrawingConnection == false)
                 {
                     var node = data.GetNode(mMousePosition);
-                    OnSelectNode(node);
+
+                    mSelectNode = node;
+
+                    OnSelect(mSelectNode);
 
                     // 显示用于创建节点的上下文菜单（单击不在节点上）。
                     if (mSelectNode == null)
                     {
                         GenericMenu menuToAddQuest = new GenericMenu();
-
-                        for (int i = 0; i < mNodeMenuList.Count; ++i)
+                        var it = mMenuDic.GetEnumerator();
+                        while (it.MoveNext())
                         {
-                            menuToAddQuest.AddItem(new GUIContent("Add/"+mNodeMenuList[i].name), false, ContextNodeAddCallback, mNodeMenuList[i].type);
+                            menuToAddQuest.AddItem(new GUIContent("Add/" + it.Current.Value), false,
+                                ContextNodeAddCallback, it.Current.Key);
                         }
                        
                         menuToAddQuest.ShowAsContext();
@@ -247,14 +226,7 @@ public class TreeNodeWindow : EditorWindow
         }
     }
 
-    private void OnSelectNode(TreeNode node)
-    {
-        mSelectNode = node;
-        if (onSelect != null && mSelectNode!= null)
-        {
-            onSelect(mSelectNode.data);
-        }
-    }
+  
 
 
     #region 显示
@@ -336,9 +308,10 @@ public class TreeNodeWindow : EditorWindow
             GUILayout.Width(42f)
         }))
         {
-            if(onLoad!=null)
+            var graph =  OnLoad();
+            if (graph != null)
             {
-               data = onLoad();
+                data = graph;
             }
         }
         if (GUILayout.Button("Save", EditorStyles.toolbarButton, new GUILayoutOption[]
@@ -346,11 +319,7 @@ public class TreeNodeWindow : EditorWindow
              GUILayout.Width(42f)
         }))
         {
-            if(onSave!=null)
-            {
-                onSave(data);
-            }
-           
+            OnSave(data);
         }
        
         GUILayout.FlexibleSpace();
@@ -359,6 +328,77 @@ public class TreeNodeWindow : EditorWindow
         GUILayout.EndArea();
     }
 
-    
+
     #endregion
+
+    #region Get Menu
+
+    public static Dictionary<Type, string> GetMenu()
+    {
+        Dictionary<Type, string> menus = new Dictionary<Type, string>();
+        for (int i = 0; i < 4; i++)
+        {
+            Assembly assembly = null;
+            try
+            {
+                switch (i)
+                {
+                    case 0:
+                        assembly = Assembly.Load("Assembly-CSharp");
+                        break;
+                    case 1:
+                        assembly = Assembly.Load("Assembly-CSharp-firstpass");
+                        break;
+                    case 2:
+                        assembly = Assembly.Load("Assembly-UnityScript");
+                        break;
+                    case 3:
+                        assembly = Assembly.Load("Assembly-UnityScript-firstpass");
+                        break;
+                }
+            }
+            catch (Exception)
+            {
+                assembly = null;
+            }
+            if (assembly != null)
+            {
+                Type[] types = assembly.GetTypes();
+                for (int j = 0; j < types.Length; j++)
+                {
+                    var type = types[j];
+                    if (!type.IsAbstract)
+                    {
+                        if (typeof(ITreeNode).IsAssignableFrom(type) && menus.ContainsKey(type) == false)
+                        {
+                            var menu = type.GetCustomAttribute<TreeNodeMenu>();
+                            if (menu != null && string.IsNullOrEmpty(menu.menu) == false)
+                            {
+                                menus.Add(type, menu.menu);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        return menus;
+    }
+
+    #endregion
+
+    protected virtual void OnSave(TreeNodeGraph graph)
+    {
+
+    }
+
+    protected virtual TreeNodeGraph OnLoad()
+    {
+        return null;
+    }
+
+    protected virtual void OnSelect(TreeNode node)
+    {
+        mSelectNode = node;
+    }
 }

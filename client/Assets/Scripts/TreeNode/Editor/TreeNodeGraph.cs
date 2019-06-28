@@ -113,4 +113,30 @@ public class TreeNodeGraph
         }
         return null;
     }
+
+    public static TreeNodeGraph CreateGraph(ITreeNode root)
+    {
+        if (root == null)
+        {
+            return null;
+        }
+        TreeNodeGraph graph = new TreeNodeGraph();
+
+        var node = graph.AddNode(root);
+        AddChildNode(ref graph, ref node, root);
+        return graph;
+    }
+
+    protected static void AddChildNode(ref TreeNodeGraph graph, ref TreeNode parent, ITreeNode param)
+    {
+        if (parent != null)
+        {
+            for (int i = 0; i < param.children.Count; ++i)
+            {
+                TreeNode node = graph.AddNode(param.children[i]);
+                node.parent = parent;
+                AddChildNode(ref graph, ref node, param.children[i]);
+            }
+        }
+    }
 }

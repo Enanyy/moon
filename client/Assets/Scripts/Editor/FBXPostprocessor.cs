@@ -181,7 +181,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
         {
             File.Delete(configFullPath);
         }
-        EntityParamTool.Save(modelParam, configFullPath);
+        EntityParamWindow.Save(modelParam, configFullPath);
        
         // 如果目录下预制体不存在，则创建预制体
         string prefabPath = string.Format("Assets/Resources/r/model/{0}.prefab", obj.name.ToLower());

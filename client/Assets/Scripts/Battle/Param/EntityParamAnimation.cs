@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
 
+[TreeNodeMenu("Animation")]
 public partial class EntityParamAnimation : EntityParam
 {
     public string animationClip;

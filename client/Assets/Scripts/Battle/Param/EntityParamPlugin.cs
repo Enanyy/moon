@@ -35,7 +35,7 @@ public abstract partial class EntityParamPlugin : EntityParam
     }
 #endif
 }
-
+[TreeNodeMenu("Plugin/Run")]
 public partial class EntityParamPluginRun : EntityParamPlugin
 {
     public EntityParamPluginRun()
@@ -49,6 +49,7 @@ public partial class EntityParamPluginRun : EntityParamPlugin
     }
 #endif
 }
+[TreeNodeMenu("Plugin/Remove")]
 public partial class EntityParamPluginRemove : EntityParamPlugin
 {
     public EntityParamPluginRemove()
@@ -62,7 +63,7 @@ public partial class EntityParamPluginRemove : EntityParamPlugin
     }
 #endif
 }
-
+[TreeNodeMenu("Plugin/Rotate")]
 public partial class EntityParamPluginRotate : EntityParamPlugin
 {
     public EntityParamPluginRotate()
@@ -76,7 +77,7 @@ public partial class EntityParamPluginRotate : EntityParamPlugin
     }
 #endif
 }
-
+[TreeNodeMenu("Plugin/Jump")]
 public partial class EntityParamPluginJump : EntityParamPlugin
 {
     public EntityParamPluginJump()
@@ -90,14 +91,13 @@ public partial class EntityParamPluginJump : EntityParamPlugin
     }
 #endif
 }
-
 public class EntityParamPluginAnimationClip
 {
     public float beginAt;
     public string animationClip;
     public float length;
 }
-
+[TreeNodeMenu("Plugin/Animation")]
 public abstract class EntityParamPluginAnimation : EntityParamPlugin
 {
     public List<EntityParamPluginAnimationClip> animations = new List<EntityParamPluginAnimationClip>();
@@ -138,7 +138,7 @@ public abstract class EntityParamPluginAnimation : EntityParamPlugin
         base.ParseXml(node);
     }
 }
-
+[TreeNodeMenu("Plugin/Single Animation")]
 public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimation
 { 
     public EntityParamPluginSingleAnimation()
@@ -240,6 +240,7 @@ public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimati
    
 }
 
+[TreeNodeMenu("Plugin/Ramdon Animation")]
 
 public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimation
 {
@@ -348,7 +349,7 @@ public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimati
 #endif
 
 }
-
+[TreeNodeMenu("Plugin/Multitude Animation")]
 public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnimation
 {
     public EntityParamPluginMultitudeAnimation()
