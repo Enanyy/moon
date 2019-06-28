@@ -64,8 +64,7 @@ public abstract partial class EntityParam
 #endif
 {
     public EntityParamType type { get; protected set; }
-    public string name { get; set; }
-    public Rect rect { get; set; }
+ 
     public List<EntityParam> children = new List<EntityParam>();
 
     public EntityParam parent { get; set; }
@@ -87,7 +86,9 @@ public abstract partial class EntityParam
 
     public EntityParam()
     {
+#if UNITY_EDITOR
         name = GetType().ToString().Replace("EntityParam","");
+#endif
     }
 
    
@@ -100,8 +101,9 @@ public abstract partial class EntityParam
         }
 
         //attributes.Add("name", name);
+#if UNITY_EDITOR
         attributes.Add("rect", rect.ToStringEx());
-
+#endif
         var node = CreateXmlNode(parent, GetType().ToString(), attributes);
 
         for (int i = 0; i < children.Count; ++i)
@@ -145,9 +147,12 @@ public abstract partial class EntityParam
     {
         if(node!= null)
         {
+#if UNITY_EDITOR
             //name = node.GetAttribute("name");
             rect = node.GetAttribute("rect").ToRectEx();
-            if(node.ChildNodes != null)
+#endif
+
+            if (node.ChildNodes != null)
             {
                 for(int i = 0; i< node.ChildNodes.Count; ++ i)
                 {
@@ -288,6 +293,9 @@ public abstract partial class EntityParam
     }
 
 #if UNITY_EDITOR
+
+    public string name { get; set; }
+    public Rect rect { get; set; }
 
     public Action<ITreeNode> OnAddChild { get; set; }
 

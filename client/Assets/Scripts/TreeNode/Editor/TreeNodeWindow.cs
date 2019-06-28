@@ -301,7 +301,7 @@ public partial class TreeNodeWindow : EditorWindow
             GUILayout.Width(42f)
         }))
         {
-            data = new TreeNodeGraph();
+            data = OnNew();
         }
         if (GUILayout.Button("Load", EditorStyles.toolbarButton, new GUILayoutOption[]
         {
@@ -400,5 +400,10 @@ public partial class TreeNodeWindow : EditorWindow
     protected virtual void OnSelect(TreeNode node)
     {
         mSelectNode = node;
+    }
+
+    protected virtual TreeNodeGraph OnNew()
+    {
+        return  new TreeNodeGraph();
     }
 }

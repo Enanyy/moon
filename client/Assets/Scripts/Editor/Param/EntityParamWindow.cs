@@ -10,7 +10,28 @@ public class EntityParamWindow : TreeNodeWindow
     [MenuItem("Tools/Param Editor")]
     private static void ShowEditor()
     {
-        Open<EntityParamWindow>(null);
+        Open<EntityParamWindow>(CreateTemplate());
+    }
+
+    protected override TreeNodeGraph OnNew()
+    {
+        return CreateTemplate();
+    }
+
+    private static TreeNodeGraph CreateTemplate()
+    {
+        var modelParam = new EntityParamModel();
+        modelParam.rect = new Rect(20, 20, TreeNode.WIDTH, TreeNode.HEIGHT);
+
+        var actionParam = new EntityParamAction();
+        actionParam.rect = new Rect(300, 20, TreeNode.WIDTH, TreeNode.HEIGHT);
+        modelParam.AddChild(actionParam);
+
+        var animationParam = new EntityParamAnimation();
+        animationParam.rect = new Rect(600, 20, TreeNode.WIDTH, TreeNode.HEIGHT);
+        modelParam.AddChild(animationParam);
+
+        return TreeNodeGraph.CreateGraph(modelParam);
     }
 
     protected override TreeNodeGraph OnLoad()
@@ -47,7 +68,12 @@ public class EntityParamWindow : TreeNodeWindow
         {
             var param = root.data as EntityParamModel;
 
-            string path = EditorUtility.SaveFilePanel("导出特效配置文件", Application.dataPath + "/Resources/r/config/", param.asset.Replace(".prefab", ""), "txt");
+            string name = "model";
+            if (string.IsNullOrEmpty(param.asset) == false)
+            {
+                name = param.asset.Replace(".prefab", "");
+            }
+            string path = EditorUtility.SaveFilePanel("导出特效配置文件", Application.dataPath + "/Resources/r/config/", name, "txt");
             path = path.ToLower();
             EditorUtility.DisplayProgressBar("请稍候", "正在导出特效配置文件", 0.1f);
 
