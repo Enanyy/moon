@@ -21,9 +21,9 @@ public abstract partial class EntityParamEffect : EntityParam
 
     private GameObject mPrefab;
 
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
         UnityEditor.EditorGUILayout.LabelField("EffectType", effectType.ToString());
         r.height += 20;
 
@@ -62,6 +62,11 @@ public abstract partial class EntityParamEffect : EntityParam
         {
             string path = string.Format("assets/resources/r/spell_fx/{0}", asset);
             mPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (mPrefab == null)
+            {
+                path = string.Format("assets/r/spell_fx/{0}", asset);
+                mPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            }
         }
 
         var obj = (GameObject)UnityEditor.EditorGUILayout.ObjectField("Prefab", mPrefab, typeof(UnityEngine.GameObject), false, new GUILayoutOption[0]);
@@ -79,11 +84,11 @@ public abstract partial class EntityParamEffect : EntityParam
 
 
     }
-    public override bool LinkAble(INode node)
+    public override bool ConnectableTo(ITreeNode node)
     {
         return node.GetType().IsSubclassOf(typeof(EntityParamEffect)) && node != this;
     }
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         EntityParamEffect param = node as EntityParamEffect;
         if (param != null)
@@ -146,9 +151,9 @@ public partial class EntityParamEffectTime : EntityParamEffect
         effectType = EffectType.Time;
     }
 #if UNITY_EDITOR
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
         duration = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Duration", duration), 0, float.MaxValue);
         r.height += 20;
 
@@ -164,7 +169,7 @@ public partial class EntityParamEffectTime : EntityParamEffect
 
     }
 
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         EntityParamEffectTime param = node as EntityParamEffectTime;
         if (param == null)
@@ -217,9 +222,9 @@ public partial class EntityParamEffectMove : EntityParamEffect
         effectType = EffectType.Move;
     }
 #if UNITY_EDITOR
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
         distance = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Distance", distance), 0, float.MaxValue);
         r.height += 20;
         speed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Speed", speed), 0, float.MaxValue);
@@ -227,7 +232,7 @@ public partial class EntityParamEffectMove : EntityParamEffect
         direction = UnityEditor.EditorGUILayout.Vector3Field("Direction", direction);
         r.height += 25;
     }
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         EntityParamEffectMove param = node as EntityParamEffectMove;
         if (param == null)
@@ -271,14 +276,14 @@ public partial class EntityParamEffectFollow : EntityParamEffect
         effectType = EffectType.Follow;
     }
 #if UNITY_EDITOR
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
         speed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Speed", speed), 0, float.MaxValue);
         r.height += 20;
 
     }
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         EntityParamEffectFollow param = node as EntityParamEffectFollow;
         if (param == null)
@@ -320,9 +325,9 @@ public partial class EntityParamEffectParabola : EntityParamEffect
         effectType = EffectType.Parabola;
     }
 #if UNITY_EDITOR
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
         speed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Speed", speed), 0, float.MaxValue);
         r.height += 20;
         gravity = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Gravity", gravity), 0, 100);
@@ -333,7 +338,7 @@ public partial class EntityParamEffectParabola : EntityParamEffect
         heightLimit = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Height Limit", heightLimit), 0, 100);
         r.height += 20;
     }
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         EntityParamEffectParabola param = node as EntityParamEffectParabola;
         if (param == null)

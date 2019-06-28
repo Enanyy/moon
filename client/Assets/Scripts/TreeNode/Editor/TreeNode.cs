@@ -20,11 +20,11 @@ public class TreeNode
     public Rect rect;
 
 
-    public INode data { get; private set; }
+    public ITreeNode data { get; private set; }
 
     public TreeNodeGraph graph { get; private set; }
 
-    public TreeNode(TreeNodeGraph graph, int id, INode node)
+    public TreeNode(TreeNodeGraph graph, int id, ITreeNode node)
     {
         this.graph = graph;
         this.id = id;
@@ -39,11 +39,11 @@ public class TreeNode
         rect.height = HEIGHT;
         if (data != null)
         {
-            data.Draw(ref rect);
+            data.OnDraw(ref rect);
         }
     }
 
-    private void OnAddChild(INode node)
+    private void OnAddChild(ITreeNode node)
     {
         TreeNode treeNode = graph.AddNode(node);
         treeNode.parent = this;

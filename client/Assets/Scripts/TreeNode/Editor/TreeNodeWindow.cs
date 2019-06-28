@@ -8,7 +8,7 @@ public class TreeNodeWindow : EditorWindow
     public static TreeNodeWindow mTreeWindow;
     public TreeNodeGraph data;
     private Vector2 mMousePosition;
-    private bool mDrawingLink = false;
+    private bool mDrawingConnection = false;
     private TreeNode mSelectNode = null;
 
     private Rect mToolBarRect;
@@ -19,6 +19,7 @@ public class TreeNodeWindow : EditorWindow
     public Func<TreeNodeGraph> onLoad;
     public Func<List<TreeNodeMenu>> onInitMenu;
     public Func<TreeNodeGraph> onDataChange;
+    public Action<ITreeNode> onSelect;
 
     [MenuItem("Tools/Tree Node Editor")]
     private static void ShowEditor()
@@ -85,11 +86,10 @@ public class TreeNodeWindow : EditorWindow
         {
             if (e.type == EventType.MouseDown)
             {
-                if (mDrawingLink == false)
+                if (mDrawingConnection == false)
                 {
-                    
-                    mSelectNode = data.GetNode(mMousePosition);
-                   
+                    var node = data.GetNode(mMousePosition);
+                    OnSelectNode(node);
 
                     // 显示用于创建节点的上下文菜单（单击不在节点上）。
                     if (mSelectNode == null)
@@ -116,12 +116,12 @@ public class TreeNodeWindow : EditorWindow
 
                             if (mSelectNode.parent != null)
                             {
-                                menuToControlQuest.AddItem(new GUIContent("Delete Connection"), false, ContextNodeDeleteLinkCallback, null);
+                                menuToControlQuest.AddItem(new GUIContent("Delete Connection"), false, ContextNodeDeleteConnectionCallback, null);
 
                             }
                             else
                             {
-                                menuToControlQuest.AddItem(new GUIContent("Make Connection"), false, ContextNodeAddLinkCallback, null);
+                                menuToControlQuest.AddItem(new GUIContent("Make Connection"), false, ContextNodeAddConnectionCallback, null);
                             }
 
 
@@ -137,27 +137,27 @@ public class TreeNodeWindow : EditorWindow
 
                     if (parentNode != null && mSelectNode != null)
                     {
-                        if (parentNode.data.LinkAble(mSelectNode.data))
+                        if (parentNode.data.ConnectableTo(mSelectNode.data))
                         {
                             mSelectNode.parent = parentNode;
-                            parentNode.data.OnLink(mSelectNode.data);
+                            parentNode.data.OnConnect(mSelectNode.data);
                         }
                     }
                     mSelectNode = null;
-                    mDrawingLink = false;
+                    mDrawingConnection = false;
                 }
             }
         }
 
 
 
-        if (mDrawingLink)
+        if (mDrawingConnection)
         {
             if (mSelectNode != null)
             {
                 Color color = Color.green;
                 var current = data.GetNode(mMousePosition);
-                if (current != null && current.data.LinkAble(mSelectNode.data) == false)
+                if (current != null && current.data.ConnectableTo(mSelectNode.data) == false)
                 {
                     color = Color.red;
                 }
@@ -173,7 +173,7 @@ public class TreeNodeWindow : EditorWindow
             }
             else
             {
-                mDrawingLink = false;
+                mDrawingConnection = false;
             }
         }
 
@@ -188,7 +188,7 @@ public class TreeNodeWindow : EditorWindow
     /// <param name="obj">Object.</param>
     private void ContextNodeAddCallback(object obj)
     {
-        INode param = (INode)Activator.CreateInstance((Type)obj);
+        ITreeNode param = (ITreeNode)Activator.CreateInstance((Type)obj);
        
         TreeNode node = data.AddNode(param);
       
@@ -200,10 +200,10 @@ public class TreeNodeWindow : EditorWindow
     /// <param name="obj">Object.</param>
     private void ContextNodeCloneCallback(object obj)
     {
-        INode original = (INode)obj;
+        ITreeNode original = (ITreeNode)obj;
         if (original != null)
         {
-            INode param = original.Clone(null);
+            ITreeNode param = original.Clone(null);
 
             TreeNode node = data.AddNode(param);
 
@@ -211,13 +211,13 @@ public class TreeNodeWindow : EditorWindow
         }
     }
 
-    private void ContextNodeDeleteLinkCallback(object obj)
+    private void ContextNodeDeleteConnectionCallback(object obj)
     {
         if (mSelectNode != null)
         {
             if(mSelectNode.parent!=null)
             {
-                mSelectNode.parent.data.OnUnLink(mSelectNode.data);
+                mSelectNode.parent.data.OnDisconnect(mSelectNode.data);
             }
             mSelectNode.parent = null;
         }
@@ -239,14 +239,22 @@ public class TreeNodeWindow : EditorWindow
     /// 删除已删除节点中的传出/输入边缘。
     /// </summary>
     /// <param name="nodeGuid"></param>
-    private void ContextNodeAddLinkCallback(object obj)
+    private void ContextNodeAddConnectionCallback(object obj)
     {
         if (mSelectNode != null && mSelectNode.parent == null)
         {
-            mDrawingLink = true;
+            mDrawingConnection = true;
         }
     }
 
+    private void OnSelectNode(TreeNode node)
+    {
+        mSelectNode = node;
+        if (onSelect != null && mSelectNode!= null)
+        {
+            onSelect(mSelectNode.data);
+        }
+    }
 
 
     #region 显示
@@ -265,7 +273,7 @@ public class TreeNodeWindow : EditorWindow
         {
             data.nodes[i].rect = GUI.Window(i, data.nodes[i].rect, DrawNode, data.nodes[i].id + "-" + data.nodes[i].name );
 
-            DrawLink(data.nodes[i]);
+            DrawConnection(data.nodes[i]);
         }
         EndWindows();
     }
@@ -275,7 +283,7 @@ public class TreeNodeWindow : EditorWindow
     /// </summary>
     /// <param name="nodeFrom">Node from.</param>
     /// <param name="nodeTo">Node to.</param>
-    private void DrawLink(TreeNode node)
+    private void DrawConnection(TreeNode node)
     {
         var parent = node.parent;
         if (parent != null)
@@ -288,7 +296,7 @@ public class TreeNodeWindow : EditorWindow
             Vector3 startTan = startPos + Vector3.right * 50;
             Vector3 endTan = endPos + Vector3.left * 50;
 
-            Handles.DrawBezier(startPos, endPos, startTan, endTan, node.data.GetColor(), null, 3);
+            Handles.DrawBezier(startPos, endPos, startTan, endTan, node.data.GetConnectionColor(), null, 3);
         }
     }
 
@@ -350,5 +358,7 @@ public class TreeNodeWindow : EditorWindow
         GUILayout.EndVertical();
         GUILayout.EndArea();
     }
+
+    
     #endregion
 }

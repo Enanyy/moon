@@ -12,9 +12,9 @@ public partial class EntityParamAnimation : EntityParam
     public EntityParamAnimation() { type = EntityParamType.Animation; }
 #if UNITY_EDITOR
     private AnimationClip mAnimationClip;
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
 
         UnityEditor.EditorGUILayout.LabelField("AnimationClip", animationClip);
         r.height += 20;
@@ -45,12 +45,12 @@ public partial class EntityParamAnimation : EntityParam
         }
         r.height += 20;
     }
-    public override bool LinkAble(INode node)
+    public override bool ConnectableTo(ITreeNode node)
     {
         return node.GetType().IsSubclassOf(typeof(EntityParamEffect));
     }
 
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         EntityParamAnimation param = node as EntityParamAnimation;
         if (param == null)

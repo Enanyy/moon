@@ -17,9 +17,9 @@ public partial class EntityParamModel : EntityParam
     private UnityEngine.Object mModel;
     private UnityEngine.GameObject mPrefab;
 
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
 
      
         UnityEditor.EditorGUILayout.LabelField("Asset", asset);
@@ -54,7 +54,13 @@ public partial class EntityParamModel : EntityParam
         if(mPrefab == null && string.IsNullOrEmpty(asset)==false)
         {
             string path = string.Format("assets/resources/r/model/{0}", asset);
+            
             mPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (mPrefab == null)
+            {
+                path = string.Format("assets/r/model/{0}", asset);
+                mPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            }
         }
 
         var prefab = (GameObject)UnityEditor.EditorGUILayout.ObjectField("Prefab", mPrefab, typeof(UnityEngine.GameObject), false, new GUILayoutOption[0]);
@@ -214,7 +220,7 @@ public partial class EntityParamModel : EntityParam
         return WrapMode.Default;
     }
 
-    public override bool LinkAble(INode node)
+    public override bool ConnectableTo(ITreeNode node)
     {
         if (node.GetType() == typeof(EntityParamAnimation))
         {
@@ -241,7 +247,7 @@ public partial class EntityParamModel : EntityParam
         return false;
     }
 
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         EntityParamModel param = node as EntityParamModel;
         if (param == null)

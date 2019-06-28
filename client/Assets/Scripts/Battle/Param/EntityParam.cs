@@ -4,23 +4,6 @@ using UnityEngine;
 using System.Xml;
 using System.IO;
 
-#if UNITY_EDITOR
-using System.Linq;
-public interface INode
-{
-    string name { get; set; }
-    Rect rect { get; set; }
-    void Draw(ref Rect rect);
-    bool LinkAble(INode node);
-    void OnLink(INode node);
-    void OnUnLink(INode node);
-    INode Clone(INode node);
-    Action<INode> OnAddChild { get; set; }
-    Color GetColor();
-}
-#endif
-
-
 public enum EffectArise
 {
     ParentBegin,
@@ -77,7 +60,7 @@ public enum ActionType
 }
 public abstract partial class EntityParam
 #if UNITY_EDITOR    
-    :INode
+    :ITreeNode
 #endif
 {
     public EntityParamType type { get; protected set; }
@@ -306,21 +289,21 @@ public abstract partial class EntityParam
 
 #if UNITY_EDITOR
 
-    public Action<INode> OnAddChild { get; set; }
+    public Action<ITreeNode> OnAddChild { get; set; }
   
-    public virtual void Draw(ref Rect r)
+    public virtual void OnDraw(ref Rect r)
     {
         rect = r;
     }
-    public abstract bool LinkAble(INode node);
+    public abstract bool ConnectableTo(ITreeNode node);
 
-    public void OnLink(INode node)
+    public void OnConnect(ITreeNode node)
     {
         EntityParam param = node as EntityParam;
       
         AddChild(param);
     }
-    public void OnUnLink(INode node)
+    public void OnDisconnect(ITreeNode node)
     {
         EntityParam param = node as EntityParam;
         if (param != null)
@@ -329,7 +312,7 @@ public abstract partial class EntityParam
         }
     }
    
-    public virtual INode Clone(INode node)
+    public virtual ITreeNode Clone(ITreeNode node)
     {
         var param = node as EntityParam;
         if(param!=null)
@@ -341,7 +324,7 @@ public abstract partial class EntityParam
         return param;
     }
 
-    public  virtual Color GetColor()
+    public  virtual Color GetConnectionColor()
     {
         return Color.green;
     }

@@ -299,7 +299,7 @@ public static class AssetTool
     }
 
     [MenuItem("Tools/Asset/生成资源配置")]
-    static void UpdateAsset()
+    static void GenAsset()
     {
         AssetPath.Clear();
         var it = s_AssetDirs.GetEnumerator();

@@ -19,7 +19,7 @@ public class TreeNodeGraph
         return id + 1;
     }
 
-    public TreeNode AddNode(INode node)
+    public TreeNode AddNode(ITreeNode node)
     {
         TreeNode treeNode = null;
         for (int i = 0; i < nodes.Count; i++)
@@ -73,7 +73,7 @@ public class TreeNodeGraph
         {
             if(node.parent!= null)
             {
-                node.parent.data.OnUnLink(node.data);
+                node.parent.data.OnDisconnect(node.data);
             }
            
             nodes.Remove(node);

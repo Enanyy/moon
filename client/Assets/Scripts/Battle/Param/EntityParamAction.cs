@@ -23,9 +23,9 @@ public partial class EntityParamAction : EntityParam
 
     public EntityParamAction() { base.type = EntityParamType.Action; }
 #if UNITY_EDITOR
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
 
         action = (ActionType)UnityEditor.EditorGUILayout.EnumPopup("Action", action);
         r.height += 20;
@@ -42,7 +42,7 @@ public partial class EntityParamAction : EntityParam
         UnityEditor.EditorGUILayout.EndHorizontal();
         r.height += 20;
     }
-    public override bool LinkAble(INode node)
+    public override bool ConnectableTo(ITreeNode node)
     {
         Type type = node.GetType();
         if (type.IsSubclassOf(typeof(EntityParamPluginAnimation)))
@@ -55,12 +55,12 @@ public partial class EntityParamAction : EntityParam
         return type.IsSubclassOf(typeof(EntityParamPlugin));
     }
 
-    public override Color GetColor()
+    public override Color GetConnectionColor()
     {
         return Color.blue;
     }
 
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         EntityParamAction param = node as EntityParamAction;
         if (param == null)

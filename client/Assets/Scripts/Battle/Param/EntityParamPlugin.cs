@@ -17,19 +17,19 @@ public abstract partial class EntityParamPlugin : EntityParam
         type = EntityParamType.Plugin;
     }
 #if UNITY_EDITOR
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
         UnityEditor.EditorGUILayout.LabelField("Plugin",plugin.ToString());
         r.height += 20;
     }
 
-    public override bool LinkAble(INode node)
+    public override bool ConnectableTo(ITreeNode node)
     {
         return false;
     }
 
-    public override Color GetColor()
+    public override Color GetConnectionColor()
     {
         return Color.yellow;
     }
@@ -43,7 +43,7 @@ public partial class EntityParamPluginRun : EntityParamPlugin
         plugin = typeof(ActionPluginRun);
     }
 #if UNITY_EDITOR
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         return new EntityParamPluginRun();
     }
@@ -56,7 +56,7 @@ public partial class EntityParamPluginRemove : EntityParamPlugin
         plugin = typeof(ActionPluginRemove);
     }
 #if UNITY_EDITOR
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         return new EntityParamPluginRemove();
     }
@@ -70,7 +70,7 @@ public partial class EntityParamPluginRotate : EntityParamPlugin
         plugin = typeof(ActionPluginRotate);
     }
 #if UNITY_EDITOR
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         return new EntityParamPluginRotate();
     }
@@ -84,7 +84,7 @@ public partial class EntityParamPluginJump : EntityParamPlugin
         plugin = typeof(ActionJumpPlugin);
     }
 #if UNITY_EDITOR
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         return new EntityParamPluginJump();
     }
@@ -146,9 +146,9 @@ public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimati
         plugin = typeof(ActionPluginSingleAnimation);
     }
 #if UNITY_EDITOR
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
 
         if(animations.Count > 1)
         {
@@ -226,7 +226,7 @@ public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimati
             }
         }
     }
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         var param = new EntityParamPluginSingleAnimation();
 
@@ -248,9 +248,9 @@ public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimati
         plugin = typeof(ActionPluginRandomAnimation);
     }
 #if UNITY_EDITOR
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
 
         int size = Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("Size", animations.Count), 0, 10);
         r.height += 20;
@@ -336,7 +336,7 @@ public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimati
             }
         }
     }
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         var param = new EntityParamPluginRamdonAnimation();
 
@@ -356,9 +356,9 @@ public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnim
         plugin = typeof(ActionPluginMultitudeAnimation);
     }
 #if UNITY_EDITOR
-    public override void Draw(ref Rect r)
+    public override void OnDraw(ref Rect r)
     {
-        base.Draw(ref r);
+        base.OnDraw(ref r);
 
         int size = Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("Size", animations.Count), 0, 10);
         r.height += 20;
@@ -446,7 +446,7 @@ public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnim
             }
         }
     }
-    public override INode Clone(INode node)
+    public override ITreeNode Clone(ITreeNode node)
     {
         var param = new EntityParamPluginMultitudeAnimation();
 
