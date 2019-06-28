@@ -336,26 +336,19 @@ public partial class TreeNodeWindow : EditorWindow
     public static Dictionary<Type, string> GetMenu()
     {
         Dictionary<Type, string> menus = new Dictionary<Type, string>();
-        for (int i = 0; i < 4; i++)
+        List<string> assemblies = new List<string>
+        {
+            "Assembly-CSharp",
+            "Assembly-CSharp-firstpass",
+            "Assembly-UnityScript",
+            "Assembly-UnityScript-firstpass"
+        };
+        for (int i = 0; i < assemblies.Count; i++)
         {
             Assembly assembly = null;
             try
             {
-                switch (i)
-                {
-                    case 0:
-                        assembly = Assembly.Load("Assembly-CSharp");
-                        break;
-                    case 1:
-                        assembly = Assembly.Load("Assembly-CSharp-firstpass");
-                        break;
-                    case 2:
-                        assembly = Assembly.Load("Assembly-UnityScript");
-                        break;
-                    case 3:
-                        assembly = Assembly.Load("Assembly-UnityScript-firstpass");
-                        break;
-                }
+                assembly = Assembly.Load(assemblies[i]);
             }
             catch (Exception)
             {
