@@ -1,4 +1,4 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
 Shader "Effect/Additive" {
 Properties {
@@ -11,7 +11,7 @@ Properties {
 Category {
 	Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 	Blend SrcAlpha One
-	ColorMask RGB
+	//ColorMask RGB
 	Cull Off Lighting Off ZWrite Off
 	
 	SubShader {
