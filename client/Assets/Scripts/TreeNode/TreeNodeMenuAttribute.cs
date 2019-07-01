@@ -1,11 +1,11 @@
 ﻿using System;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-public class TreeNodeMenu : Attribute
+public class TreeNodeMenuAttribute : Attribute
 {
     public string menu { get; private set; }
 
-    public TreeNodeMenu(string menu)
+    public TreeNodeMenuAttribute(string menu)
     {
         this.menu = menu;
     }

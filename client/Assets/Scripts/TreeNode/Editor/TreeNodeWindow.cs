@@ -364,7 +364,7 @@ public partial class TreeNodeWindow : EditorWindow
                     {
                         if (typeof(ITreeNode).IsAssignableFrom(type) && menus.ContainsKey(type) == false)
                         {
-                            var menu = type.GetCustomAttribute<TreeNodeMenu>();
+                            var menu = type.GetCustomAttribute<TreeNodeMenuAttribute>();
                             if (menu != null && string.IsNullOrEmpty(menu.menu) == false)
                             {
                                 menus.Add(type, menu.menu);
