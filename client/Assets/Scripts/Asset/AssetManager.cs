@@ -97,12 +97,27 @@ public class AssetManager : MonoBehaviour
 
     private IEnumerator InitAssets(string path)
     {
+        if(Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            path = System.Uri.EscapeUriString(path);
+        }
+       
+        Debug.Log(path);
         using (WWW www = new WWW(path))
         {
             yield return www;
-            
-            AssetPath.FromXml(www.text);
-            Init(LoadMode.Async, AssetPath.mode, AssetPath.manifest);
+            if (string.IsNullOrEmpty(www.text) == false)
+            {
+                AssetPath.FromXml(www.text);
+                Init(LoadMode.Async, AssetPath.mode, AssetPath.manifest);
+            }
+            else
+            {
+                
+                Debug.Log(www.url);
+                Debug.LogError(www.error);
+            }
+           
         }
     }
 
@@ -424,7 +439,13 @@ public class AssetManager : MonoBehaviour
         //    fullpath = Uri.EscapeUriString(fullpath);
         //}
         //return fullpath;
-        return AssetPath.GetPath(bundleName);
+        string path = AssetPath.GetPath(bundleName);
+        if(Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            path = Uri.EscapeUriString(path);
+        }
+       
+        return path;
     }
 
     public string[] GetAllDependencies(string bundleName)

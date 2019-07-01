@@ -85,17 +85,22 @@ public class AssetPath
     {
         get
         {
-            if (Application.platform == RuntimePlatform.Android 
+            if (Application.platform == RuntimePlatform.Android
                 || Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 return string.Format("{0}/r/", Application.streamingAssetsPath);
             }
+			else if (Application.platform == RuntimePlatform.OSXEditor
+		   || Application.platform == RuntimePlatform.OSXPlayer)
+			{
+				return string.Format("file://{0}/r/", Application.streamingAssetsPath);
+			}
 
 #if UNITY_EDITOR
             return string.Format("{0}/../r/{1}/", Application.dataPath,
                  UnityEditor.EditorUserBuildSettings.activeBuildTarget);
 #else
-            return Application.streamingAssetsPath;
+			return Application.streamingAssetsPath;
 #endif
         }
     }
@@ -112,39 +117,52 @@ public class AssetPath
             {
                 return string.Format("{0}/r/", Application.persistentDataPath);
             }
+		    else if (Application.platform == RuntimePlatform.OSXEditor
+			|| Application.platform == RuntimePlatform.OSXPlayer)
+			{
+				return string.Format("file://{0}/r/", Application.persistentDataPath);
+			}
 
 #if UNITY_EDITOR
             return string.Format("{0}/../r/{1}/", Application.dataPath,
                 UnityEditor.EditorUserBuildSettings.activeBuildTarget);
 #else
-            return Application.persistentDataPath;
+			return Application.persistentDataPath;
 #endif
         }
     }
     public static void FromXml(string xml)
     {
-        XmlDocument doc = new XmlDocument();
-
-        doc.LoadXml(xml);
-
-        XmlElement root = doc.DocumentElement;
-
-        manifest = root.GetAttribute("manifest");
-
-        assets.Clear();
-
-        for (int i = 0; i < root.ChildNodes.Count; ++i)
+        try
         {
-            XmlElement child = root.ChildNodes[i] as XmlElement;
-            Asset asset = new Asset();
-            asset.FromXml(child);
-            assets.Add(asset.name, asset);
-            if (assets.ContainsKey(asset.path) == false)
+            Debug.Log(xml);
+            XmlDocument doc = new XmlDocument();
+
+            doc.LoadXml(xml);
+           
+            XmlElement root = doc.DocumentElement;
+
+            manifest = root.GetAttribute("manifest");
+
+            assets.Clear();
+
+            for (int i = 0; i < root.ChildNodes.Count; ++i)
             {
-                assets.Add(asset.path, asset);
+                XmlElement child = root.ChildNodes[i] as XmlElement;
+                Asset asset = new Asset();
+                asset.FromXml(child);
+                assets.Add(asset.name, asset);
+                if (assets.ContainsKey(asset.path) == false)
+                {
+                    assets.Add(asset.path, asset);
+                }
             }
         }
-    }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    } 
 
     public static string ToXml()
     {

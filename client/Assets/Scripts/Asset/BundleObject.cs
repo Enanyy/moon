@@ -46,13 +46,13 @@ public class BundleObject
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    BundleObject bundle = AssetManager.Instance.CreateBundle(dependenceName);
+                    BundleObject bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
 
-                    dependences[dependenceName] = bundle;
+                    dependences[dependenceName] = bundleObject;
 
-                    if (bundle.bundle == null)
+                    if (bundleObject.bundle == null)
                     {
-                        bundle.LoadSync();
+                        bundleObject.LoadSync();
                     }
                 }
             }
@@ -78,13 +78,13 @@ public class BundleObject
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    BundleObject bundle = AssetManager.Instance.CreateBundle(dependenceName);
+                    BundleObject bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
 
-                    dependences[dependenceName] = bundle;
+                    dependences[dependenceName] = bundleObject;
 
-                    if (bundle.bundle == null)
+                    if (bundleObject.bundle == null)
                     {
-                        var coroutine =  AssetManager.Instance.StartCoroutine(bundle.LoadAsync());
+                        var coroutine =  AssetManager.Instance.StartCoroutine(bundleObject.LoadAsync());
                         yield return coroutine;
                     }
                 }
@@ -119,13 +119,13 @@ public class BundleObject
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    BundleObject bundle = AssetManager.Instance.CreateBundle(dependenceName);
+                    BundleObject bundleObject= AssetManager.Instance.CreateBundle(dependenceName);
 
-                    dependences[dependenceName] = bundle;
+                    dependences[dependenceName] = bundleObject;
 
-                    if (bundle.bundle == null)
+                    if (bundleObject.bundle == null)
                     {
-                        var coroutine = AssetManager.Instance.StartCoroutine(bundle.LoadWWW());
+                        var coroutine = AssetManager.Instance.StartCoroutine(bundleObject.LoadWWW());
                         yield return coroutine;
                     }
                 }
