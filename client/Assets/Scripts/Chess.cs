@@ -20,6 +20,11 @@ public class Chess : MonoBehaviour
     public bool jump = true;
 
     public static Chess Instance { get; private set; }
+
+    void Awake()
+    {
+        AssetManager.Instance.Init();
+    }
     // Use this for initialization
     void Start()
     {

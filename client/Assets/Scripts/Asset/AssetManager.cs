@@ -69,21 +69,30 @@ public class AssetManager : MonoBehaviour
     
     public void Init()
     {
+#if UNITY_EDITOR
+        string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
+
+        AssetPath.mode = (AssetMode)PlayerPrefs.GetInt("assetMode");
+        if (AssetPath.mode == AssetMode.Editor)
+        {
+            path = string.Format("{0}/{1}", Application.dataPath,AssetPath.ASSETS_FILE);
+            string xml = File.ReadAllText(path);
+            AssetPath.FromXml(xml);
+            InitFinish(null);
+        }
+        else
+        {
+            StartCoroutine(InitAssets(path));
+        }
+#else
         string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
         if (File.Exists(path) == false)
         {
             path = string.Format("{0}{1}", AssetPath.streamingAssetsPath, AssetPath.ASSETS_FILE);
         }
         AssetPath.mode = AssetMode.AssetBundle;
-
-#if UNITY_EDITOR
-        AssetPath.mode = (AssetMode)PlayerPrefs.GetInt("assetMode");
-        if (AssetPath.mode == AssetMode.Editor)
-        {
-            path = string.Format("{0}/{1}", Application.dataPath,AssetPath.ASSETS_FILE);
-        }
-#endif
         StartCoroutine(InitAssets(path));
+#endif
     }
 
     private IEnumerator InitAssets(string path)
@@ -162,11 +171,14 @@ public class AssetManager : MonoBehaviour
     }
     private void InitFinish(AssetBundle assetBundle)
     {
-        mManifestBundle = assetBundle;
+        if (assetBundle != null)
+        {
+            mManifestBundle = assetBundle;
 
-        mManifest = mManifestBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+            mManifest = mManifestBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
 
-        DontDestroyOnLoad(mManifest);
+            DontDestroyOnLoad(mManifest);
+        }
 
         initialized = true;
 
