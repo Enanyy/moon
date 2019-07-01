@@ -69,7 +69,7 @@ public class AssetManager : MonoBehaviour
     
     public void Init()
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_EDITOR_OSX
         string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
 
         AssetPath.mode = (AssetMode)PlayerPrefs.GetInt("assetMode");
@@ -85,7 +85,7 @@ public class AssetManager : MonoBehaviour
             StartCoroutine(InitAssets(path));
         }
 #else
-        string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
+		string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
         if (File.Exists(path) == false)
         {
             path = string.Format("{0}{1}", AssetPath.streamingAssetsPath, AssetPath.ASSETS_FILE);
@@ -288,7 +288,7 @@ public class AssetManager : MonoBehaviour
     {
         LoadTask<AssetObject<T>> task = new LoadTask<AssetObject<T>>(bundleName.ToLower(), assetName.ToLower(), callback);
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_EDITOR_OSX
         if (assetMode == AssetMode.Editor)
         {
             AssetObject<T> assetObject = null;

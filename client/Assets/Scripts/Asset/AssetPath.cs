@@ -96,7 +96,7 @@ public class AssetPath
 				return string.Format("file://{0}/r/", Application.streamingAssetsPath);
 			}
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_EDITOR_OSX
             return string.Format("{0}/../r/{1}/", Application.dataPath,
                  UnityEditor.EditorUserBuildSettings.activeBuildTarget);
 #else
@@ -123,7 +123,7 @@ public class AssetPath
 				return string.Format("file://{0}/r/", Application.persistentDataPath);
 			}
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_EDITOR_OSX
             return string.Format("{0}/../r/{1}/", Application.dataPath,
                 UnityEditor.EditorUserBuildSettings.activeBuildTarget);
 #else
@@ -215,30 +215,30 @@ public class AssetPath
             switch (asset.type)
             {
                 case AssetType.StreamingAsset:
-                {                
-#if UNITY_EDITOR
+                {
+#if UNITY_EDITOR || UNITY_EDITOR_OSX
                     if (mode != AssetMode.AssetBundle)
                     {
                          path = Application.dataPath + "/" + asset.path;
                     }
                     else
 #endif
-                    {
-                        path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
+						{
+							path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
                     }
                 }
                 break;
                 case AssetType.PersistentAsset:
                 {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_EDITOR_OSX
                     if (mode != AssetMode.AssetBundle)
                     {
                         path = Application.dataPath + "/" + asset.path;
                     }
                     else
 #endif
-                    {
-                        path = string.Format("{0}{1}", persistentDataPath, asset.path);
+						{
+							path = string.Format("{0}{1}", persistentDataPath, asset.path);
                     }
 
                 }
