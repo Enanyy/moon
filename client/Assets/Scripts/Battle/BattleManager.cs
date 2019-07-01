@@ -95,7 +95,7 @@ public class BattleManager
                             mParams.Add(congfig, param);
                         }
                     }
-                    
+                    asset.Destroy();
                 }
                 if (callback != null)
                 {

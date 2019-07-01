@@ -57,8 +57,7 @@ public class AssetManager : MonoBehaviour
     #endregion
 
 
-    private List<LoadTask<BundleObject>> mLoadTask = new List<LoadTask<BundleObject>>();
-
+    private List<Action> mLoadTask = new List<Action>();
     private AssetBundle mManifestBundle;
     private AssetBundleManifest mManifest;
     private string mAssetBundlePath;
@@ -67,7 +66,7 @@ public class AssetManager : MonoBehaviour
     public AssetMode assetMode { get; private set; }
     public LoadMode loadMode { get; private set; }
     public bool initialized { get; private set; }
-
+    
     public void Init()
     {
         string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
@@ -75,18 +74,26 @@ public class AssetManager : MonoBehaviour
         {
             path = string.Format("{0}{1}", AssetPath.streamingAssetsPath, AssetPath.ASSETS_FILE);
         }
+        AssetPath.mode = AssetMode.AssetBundle;
 
-        StartCoroutine(path);
+#if UNITY_EDITOR
+        AssetPath.mode = (AssetMode)PlayerPrefs.GetInt("assetMode");
+        if (AssetPath.mode == AssetMode.Editor)
+        {
+            path = string.Format("{0}/{1}", Application.dataPath,AssetPath.ASSETS_FILE);
+        }
+#endif
+        StartCoroutine(InitAssets(path));
     }
 
-    private IEnumerator LoadAssets(string path)
+    private IEnumerator InitAssets(string path)
     {
         using (WWW www = new WWW(path))
         {
             yield return www;
             
             AssetPath.FromXml(www.text);
-            Init(LoadMode.Async, AssetMode.AssetBundle,AssetPath.manifest);
+            Init(LoadMode.Async, AssetPath.mode, AssetPath.manifest);
         }
     }
 
@@ -163,15 +170,22 @@ public class AssetManager : MonoBehaviour
 
         initialized = true;
 
-        for(int i = 0; i < mLoadTask.Count; ++i)
+        for (int i = 0; i < mLoadTask.Count; i++)
         {
-            Load(mLoadTask[i].bundleName, mLoadTask[i].callback);
+            mLoadTask[i]();
         }
         mLoadTask.Clear();
     }
 
     public LoadTask<AssetObject<T>> LoadAsset<T>(string key, System.Action<AssetObject<T>> callback)where  T:Object
     {
+        if (initialized == false)
+        {
+            Action action = new Action(delegate() { LoadAsset(key, callback); });
+            mLoadTask.Add(action);
+
+            return null;
+        }
         var asset = AssetPath.Get(key);
         if (asset != null)
         {
@@ -312,14 +326,13 @@ public class AssetManager : MonoBehaviour
 
     public LoadTask<BundleObject> Load(string bundleName, Action<BundleObject> callback)
     {
-        LoadTask<BundleObject> task = new LoadTask<BundleObject>(bundleName.ToLower(), null, callback);
-
         if (initialized == false)
         {
-            mLoadTask.Add(task);
-
-            return task;
+            Action action = new Action(delegate() { Load(bundleName, callback); });
+            mLoadTask.Add(action);
+            return null;
         }
+        LoadTask<BundleObject> task = new LoadTask<BundleObject>(bundleName.ToLower(), null, callback);
 
         BundleObject bundle = CreateBundle(task.bundleName);
 

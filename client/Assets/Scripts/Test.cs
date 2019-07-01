@@ -13,6 +13,8 @@ public class Test : MonoBehaviour {
     {
         Instance = this;
 
+        AssetManager.Instance.Init();
+
         CameraManager.Instance.Init();
 
         mEntity = ObjectPool.GetInstance<BattleEntity>();

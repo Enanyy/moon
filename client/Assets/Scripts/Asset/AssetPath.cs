@@ -121,31 +121,6 @@ public class AssetPath
 #endif
         }
     }
-
-#if UNITY_EDITOR
-    [RuntimeInitializeOnLoadMethod]
-    public static void Init()
-    {
-        mode = (AssetMode) PlayerPrefs.GetInt("assetMode");
-
-        string path = string.Format("{0}/{1}", Application.dataPath, ASSETS_FILE);
-        if (Application.isPlaying)
-        {
-            if (mode == AssetMode.AssetBundle)
-            {
-                path = string.Format("{0}{1}", streamingAssetsPath, ASSETS_FILE);
-            }
-        }
-
-        string xml = File.ReadAllText(path);
-        FromXml(xml);
-
-        if (Application.isPlaying && mode == AssetMode.AssetBundle)
-        {
-            AssetManager.Instance.Init(LoadMode.Async, mode, manifest);
-        }
-    }
-#endif
     public static void FromXml(string xml)
     {
         XmlDocument doc = new XmlDocument();

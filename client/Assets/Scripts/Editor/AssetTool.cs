@@ -10,10 +10,14 @@ public static class AssetTool
     [InitializeOnLoadMethod]
     private static void InitEditor()
     {
-        if (Application.isPlaying == false)
+        if (EditorApplication.isPlaying == false && EditorApplication.isPlayingOrWillChangePlaymode==false)
         {
             Debug.Log("AssetPath Init");
-            AssetPath.Init();
+
+            string path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);
+            string xml = File.ReadAllText(path);
+            AssetPath.FromXml(xml);
+
             Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
             Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
             EditorApplication.quitting -= SaveAsset;

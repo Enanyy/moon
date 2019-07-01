@@ -30,9 +30,7 @@ public class AssetObject<T>: IAssetObject where T:Object
         }
     }
     public virtual void Destroy(bool removeReference = true)
-    {
-        asset = null;
-
+    { 
         if (typeof(T) == typeof(GameObject))
         {
             Object.Destroy(assetObject as GameObject);
@@ -42,6 +40,7 @@ public class AssetObject<T>: IAssetObject where T:Object
         {
             bundle.RemoveReference(this);
         }
+        asset = null;
     }
 
     public void ReturnAsset()
