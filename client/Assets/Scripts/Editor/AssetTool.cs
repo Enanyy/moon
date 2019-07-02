@@ -7,24 +7,39 @@ using Object = UnityEngine.Object;
 
 public static class AssetTool
 {
+   
     [InitializeOnLoadMethod]
     private static void InitEditor()
     {
-        if (EditorApplication.isPlaying == false && EditorApplication.isPlayingOrWillChangePlaymode==false)
+        Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
+        Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
+        EditorApplication.quitting -= SaveAsset;
+        EditorApplication.quitting += SaveAsset;
+        EditorApplication.projectChanged -= AssetChange;
+        EditorApplication.projectChanged += AssetChange;
+        EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+        EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        if (EditorApplication.isPlayingOrWillChangePlaymode==false)
         {
-            Debug.Log("AssetPath Init");
-
-            string path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);
-            string xml = File.ReadAllText(path);
-            AssetPath.FromXml(xml);
-
-            Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
-            Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
-            EditorApplication.quitting -= SaveAsset;
-            EditorApplication.quitting += SaveAsset;
-            EditorApplication.projectChanged -= AssetChange;
-            EditorApplication.projectChanged += AssetChange;
+            InitAssetPath();
         }
+    }
+
+    static void OnPlayModeStateChanged(PlayModeStateChange state)
+    {
+        if (state == PlayModeStateChange.EnteredEditMode)
+        {
+            InitAssetPath();
+        }
+    }
+
+    static void InitAssetPath()
+    {
+        Debug.Log("AssetPath Init");
+
+        string path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);
+        string xml = File.ReadAllText(path);
+        AssetPath.FromXml(xml);
     }
 
     static GUIStyle s_ToggleMixed;
@@ -80,34 +95,42 @@ public static class AssetTool
         GUILayout.BeginHorizontal();
 
         bool select = asset != null && AssetPath.assets.ContainsKey(asset.name);
-        bool mixed = editor.targets.Length > 1;
+        bool mixed = false;
+        if (editor.targets.Length > 1)
+        {
+            int selectCount = GetSelectCount(editor.targets);
+            mixed = (select && selectCount != editor.targets.Length) || (select == false && selectCount != 0);
+        }
+
         if (mixed)
         {
-            if (GUILayout.Toggle(select, "Asset", s_ToggleMixed, GUILayout.ExpandWidth(false)) == false)
+            bool check = GUILayout.Toggle(select, "Asset", s_ToggleMixed, GUILayout.ExpandWidth(false));
+            if (select && check== false)
             {
                 RemoveAssets(editor.targets);
                 asset = null;
             }
-            else
+            else if(select == false && check)
             {
                 AddAssets(editor.targets);
             }
         }
         else
         {
-            if (GUILayout.Toggle(select, "Asset", GUILayout.ExpandWidth(false)) == false)
+            bool check = GUILayout.Toggle(select, "Asset", GUILayout.ExpandWidth(false));
+            if (select && check == false)
             {
                 RemoveAssets(editor.targets);
                 asset = null;
             }
-            else
+            else if (select == false && check)
             {
                 AddAssets(editor.targets);
             }
         }
-       
 
-        if (asset != null)
+
+        if (asset != null && select && editor.targets.Length == 1)
         {
             AssetType type = GetAssetType(assetPath);
             string path = GetAssetPath(assetPath);
@@ -131,9 +154,10 @@ public static class AssetTool
             }
 
         }
+
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
-        if (asset != null)
+        if (asset != null && select)
         {
             select = string.IsNullOrEmpty(asset.group) == false;
 
@@ -250,6 +274,22 @@ public static class AssetTool
         }
 
         return path;
+    }
+
+    static int GetSelectCount(Object[] targets)
+    {
+        int select = 0;
+        
+        for (int i = 0; i < targets.Length; ++i)
+        {
+            var asset = GetAsset(targets[i]);
+            if (AssetPath.assets.ContainsKey(asset.name))
+            {
+                select++;
+            }
+        }
+
+        return select;
     }
 
     static AssetPath GetAsset(Object target)
@@ -459,6 +499,19 @@ public static class AssetTool
 
         if (Directory.Exists(outputPath))
         {
+            DirectoryInfo dirInfo = new DirectoryInfo(outputPath);
+            if (dirInfo.Exists)
+            {
+                FileInfo[] files = dirInfo.GetFiles();
+                for (int i = 0; i < files.Length; i++)
+                {
+                    if (files[i].Exists)
+                    {
+                        files[i].Delete();
+                    }
+                }
+            }
+
             Directory.Delete(outputPath, true);
         }
 

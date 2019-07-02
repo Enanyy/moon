@@ -87,16 +87,18 @@ public class AssetPath
         get
         {
 #if UNITY_ANDROID
-                return string.Format("{0}/r/", Application.streamingAssetsPath);
+            return string.Format("{0}/r/", Application.streamingAssetsPath);
 
 #elif UNITY_IOS
-                return string.Format("{0}/r/", Application.streamingAssetsPath);
+            return string.Format("{0}/r/", Application.streamingAssetsPath);
 #elif UNITY_EDITOR_OSX
-                return string.Format("file://{0}/../r/{1}/", Application.dataPath,
+            return string.Format("file://{0}/../r/{1}/", Application.dataPath,
                     UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#else
+#elif UNITY_EDITOR
             return string.Format("{0}/../r/{1}/", Application.dataPath,
                 UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+#else
+            return Application.streamingAssetsPath;
 #endif
 
         }
@@ -117,9 +119,11 @@ public class AssetPath
 #elif UNITY_EDITOR_OSX
                 return string.Format("file://{0}/../r/{1}/", Application.dataPath,
                     UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#else
+#elif UNITY_EDITOR
             return string.Format("{0}/../r/{1}/", Application.dataPath,
                 UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+#else
+            return Application.persistentDataPath;
 #endif
         }
     }
@@ -244,6 +248,6 @@ public class AssetPath
     {
         assets.Clear();
     }
-    #endregion
+#endregion
 }
 
