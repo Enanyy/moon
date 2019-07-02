@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
-public interface IAssetObject
+public interface IAsset
 {
     string assetName { get; }
-    BundleObject bundle { get; }
+    Bundle bundle { get; }
     Object asset { get; }
 
     void Destroy(bool removeReference = true);
 }
-public class AssetObject<T>: IAssetObject where T:Object
+public class Asset<T>: IAsset where T:Object
 {
-    public BundleObject bundle { get; private set; }
+    public Bundle bundle { get; private set; }
 
     public string assetName { get; private set; }
 
@@ -17,7 +17,7 @@ public class AssetObject<T>: IAssetObject where T:Object
 
     public T assetObject { get; private set; }
 
-    public AssetObject(string assetName, BundleObject bundle, Object asset, T assetObject)
+    public Asset(string assetName, Bundle bundle, Object asset, T assetObject)
     {
         this.assetName = assetName;
         this.bundle = bundle;

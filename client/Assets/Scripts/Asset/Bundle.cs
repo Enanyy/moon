@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using System.Collections;
 
-public class BundleObject
+public class Bundle
 {
     public string bundleName { get; private set; }
     public AssetBundle bundle { get; private set; }
 
-    public Dictionary<string, BundleObject> dependences { get; private set; }
+    public Dictionary<string, Bundle> dependences { get; private set; }
     public string[] dependenceNames { get; private set; }
-    public List<LoadTask<BundleObject>> onFinished { get; private set; }
+    public List<LoadTask<Bundle>> onFinished { get; private set; }
 
     //场景中实例化出来的,即引用
-    public Dictionary<string, List<IAssetObject>> references { get; private set; }
+    public Dictionary<string, List<IAsset>> references { get; private set; }
     //已经加载出来的asset
     private Dictionary<string, Object> mAssetDic = new Dictionary<string, Object>();
 
     //缓存的场景资源
-    private Dictionary<string,List<IAssetObject>> mCacheAssetDic = new Dictionary<string, List<IAssetObject>>();
+    private Dictionary<string,List<IAsset>> mCacheAssetDic = new Dictionary<string, List<IAsset>>();
 
     enum BundleType
     {
@@ -27,11 +27,11 @@ public class BundleObject
 
     private BundleType mType = BundleType.AssetBundle;
 
-    public BundleObject(string bundleName,string[] dependenceNames)
+    public Bundle(string bundleName,string[] dependenceNames)
     {
-        dependences = new Dictionary<string, BundleObject>();
-        references = new Dictionary<string, List<IAssetObject>>();
-        onFinished = new List<LoadTask<BundleObject>>();
+        dependences = new Dictionary<string, Bundle>();
+        references = new Dictionary<string, List<IAsset>>();
+        onFinished = new List<LoadTask<Bundle>>();
         this.bundleName = bundleName;
         this.dependenceNames = dependenceNames; 
     }
@@ -46,7 +46,7 @@ public class BundleObject
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    BundleObject bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
+                    Bundle bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
 
                     dependences[dependenceName] = bundleObject;
 
@@ -78,7 +78,7 @@ public class BundleObject
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    BundleObject bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
+                    Bundle bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
 
                     dependences[dependenceName] = bundleObject;
 
@@ -119,7 +119,7 @@ public class BundleObject
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    BundleObject bundleObject= AssetManager.Instance.CreateBundle(dependenceName);
+                    Bundle bundleObject= AssetManager.Instance.CreateBundle(dependenceName);
 
                     dependences[dependenceName] = bundleObject;
 
@@ -209,9 +209,9 @@ public class BundleObject
         return null;
     }
 
-    public AssetObject<T> LoadAsset<T>(string assetName) where T : UnityEngine.Object
+    public Asset<T> LoadAsset<T>(string assetName) where T : UnityEngine.Object
     {
-        AssetObject<T> assetObject = null;
+        Asset<T> assetObject = null;
         if (mCacheAssetDic.ContainsKey(assetName) )
         {
             var list = mCacheAssetDic[assetName];
@@ -219,7 +219,7 @@ public class BundleObject
             {
                 for (int i = 0; i < list.Count; i++)
                 {
-                    assetObject = list[i] as AssetObject<T>;
+                    assetObject = list[i] as Asset<T>;
                     if (assetObject != null)
                     {
                         list.RemoveAt(i);break;
@@ -237,11 +237,11 @@ public class BundleObject
                 {
                     var go = UnityEngine.Object.Instantiate(asset) as GameObject;
 
-                    assetObject = new AssetObject<T>(assetName, this, asset, go as T);
+                    assetObject = new Asset<T>(assetName, this, asset, go as T);
                 }
                 else
                 {
-                    assetObject = new AssetObject<T>(assetName, this, asset, asset as T);
+                    assetObject = new Asset<T>(assetName, this, asset, asset as T);
                 }
             }
         }
@@ -249,7 +249,7 @@ public class BundleObject
         return assetObject;
     }
 
-    public void AddReference(IAssetObject reference)
+    public void AddReference(IAsset reference)
     {
         if(reference== null)
         {
@@ -258,7 +258,7 @@ public class BundleObject
         string name = reference.assetName;
         if(references.ContainsKey(name)==false)
         {
-            references.Add(name, new List<IAssetObject>());
+            references.Add(name, new List<IAsset>());
         }
         if(references[name].Contains(reference)==false)
         {
@@ -266,7 +266,7 @@ public class BundleObject
         }
     }
 
-    public void RemoveReference(IAssetObject reference)
+    public void RemoveReference(IAsset reference)
     {
         if (reference == null)
         {
@@ -329,7 +329,7 @@ public class BundleObject
         return false;
     }
 
-    public void ReturnAsset(IAssetObject assetObject)
+    public void ReturnAsset(IAsset assetObject)
     {
         if (assetObject == null)
         {
@@ -338,7 +338,7 @@ public class BundleObject
 
         if (mCacheAssetDic.ContainsKey(assetObject.assetName) == false)
         {
-            mCacheAssetDic.Add(assetObject.assetName,new List<IAssetObject>());
+            mCacheAssetDic.Add(assetObject.assetName,new List<IAsset>());
         }
 
         var list = mCacheAssetDic[assetObject.assetName];

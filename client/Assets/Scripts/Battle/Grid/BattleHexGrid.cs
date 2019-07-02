@@ -59,7 +59,9 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
 
     private Plane mPlane = new Plane(Vector3.up, Vector3.zero);
 
-    public GameObject root { get; private set; }
+    public GameObject root { get; private set; } = null;
+    public bool initialized { get; private set; } = false;
+
 
     private Mesh mTileMesh;
     private bool mShowGrid = false;
@@ -82,15 +84,18 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                     {
                         AssetManager.Instance.LoadAsset<Material>("tile.mat", (asset) => {
 
-                            mMaterial = asset.assetObject;
-                            root = new GameObject("Grid");
-                            root.transform.position = original;
-                            var it = tiles.GetEnumerator();
-                            while (it.MoveNext())
+                            if (root == null)
                             {
-                                it.Current.Value.radius = radius;
-                                it.Current.Value.hexOrientation = orientation;
-                                it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                                mMaterial = asset.assetObject;
+                                root = new GameObject("Grid");
+                                root.transform.position = original;
+                                var it = tiles.GetEnumerator();
+                                while (it.MoveNext())
+                                {
+                                    it.Current.Value.radius = radius;
+                                    it.Current.Value.hexOrientation = orientation;
+                                    it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                                }
                             }
                         });
                     }
@@ -128,6 +133,8 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
         HexOrientation orientation)
     {
         base.Init(original, shape, lines, columns, radius, orientation);
+
+        initialized = true;
 
         BattleGridEntity entity = ObjectPool.GetInstance<BattleGridEntity>();
         entity.id = 1;

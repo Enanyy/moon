@@ -34,7 +34,9 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
     private Plane mPlane = new Plane(Vector3.up, Vector3.zero);
 
-    public GameObject root { get; private set; }
+    public GameObject root { get; private set; } = null;
+
+    public bool initialized { get; private set; } = false;
 
     private Mesh mTileMesh;
     private bool mShowGrid = false;
@@ -57,13 +59,16 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
                     {
                         AssetManager.Instance.LoadAsset<Material>("tile.mat", (asset) => {
 
-                            mMaterial = asset.assetObject;
-                            root = new GameObject("Grid");
-                            root.transform.position = original;
-                            var it = tiles.GetEnumerator();
-                            while (it.MoveNext())
+                            if (root == null)
                             {
-                                it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                                mMaterial = asset.assetObject;
+                                root = new GameObject("Grid");
+                                root.transform.position = original;
+                                var it = tiles.GetEnumerator();
+                                while (it.MoveNext())
+                                {
+                                    it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
+                                }
                             }
                         });
                     }
@@ -97,6 +102,8 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
     public override void Init(Vector3 original, int lines, int columns, float tileWidth, float tileHeight)
     {
         base.Init(original, lines, columns, tileWidth, tileHeight);
+
+        initialized = true;
 
         BattleGridEntity entity = ObjectPool.GetInstance<BattleGridEntity>();
         entity.id = 1;

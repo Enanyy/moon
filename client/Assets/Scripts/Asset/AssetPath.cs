@@ -10,7 +10,8 @@ public enum AssetType
     StreamingAsset,
     PersistentAsset,
 }
-public class Asset
+
+public class AssetPath
 {
     public string name;
     public string group;
@@ -69,11 +70,11 @@ public class Asset
         md5 = element.GetAttribute("md5");
         type = (AssetType)element.GetAttribute("type").ToInt32Ex();
     }
-}
-public class AssetPath
-{
+
+    #region Static
+
     public static string manifest;
-    public static Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
+    public static Dictionary<string, AssetPath> assets = new Dictionary<string, AssetPath>();
 
     public static AssetMode mode = AssetMode.AssetBundle;
     public const string ASSETS_FILE = "assets.txt";
@@ -85,23 +86,19 @@ public class AssetPath
     {
         get
         {
-            if (Application.platform == RuntimePlatform.Android
-                || Application.platform == RuntimePlatform.IPhonePlayer)
-            {
+#if UNITY_ANDROID
                 return string.Format("{0}/r/", Application.streamingAssetsPath);
-            }
-			else if (Application.platform == RuntimePlatform.OSXEditor
-		   || Application.platform == RuntimePlatform.OSXPlayer)
-			{
-				return string.Format("file://{0}/r/", Application.streamingAssetsPath);
-			}
 
-#if UNITY_EDITOR || UNITY_EDITOR_OSX
-            return string.Format("{0}/../r/{1}/", Application.dataPath,
-                 UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+#elif UNITY_IOS
+                return string.Format("{0}/r/", Application.streamingAssetsPath);
+#elif UNITY_EDITOR_OSX
+                return string.Format("file://{0}/../r/{1}/", Application.dataPath,
+                    UnityEditor.EditorUserBuildSettings.activeBuildTarget);
 #else
-			return Application.streamingAssetsPath;
+            return string.Format("{0}/../r/{1}/", Application.dataPath,
+                UnityEditor.EditorUserBuildSettings.activeBuildTarget);
 #endif
+
         }
     }
 
@@ -112,22 +109,17 @@ public class AssetPath
     {
         get
         {
-            if (Application.platform == RuntimePlatform.Android
-                || Application.platform == RuntimePlatform.IPhonePlayer)
-            {
+#if UNITY_ANDROID
                 return string.Format("{0}/r/", Application.persistentDataPath);
-            }
-		    else if (Application.platform == RuntimePlatform.OSXEditor
-			|| Application.platform == RuntimePlatform.OSXPlayer)
-			{
-				return string.Format("file://{0}/r/", Application.persistentDataPath);
-			}
 
-#if UNITY_EDITOR || UNITY_EDITOR_OSX
+#elif UNITY_IOS
+                return string.Format("{0}/r/", Application.persistentDataPath);
+#elif UNITY_EDITOR_OSX
+                return string.Format("file://{0}/../r/{1}/", Application.dataPath,
+                    UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+#else
             return string.Format("{0}/../r/{1}/", Application.dataPath,
                 UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#else
-			return Application.persistentDataPath;
 #endif
         }
     }
@@ -135,7 +127,6 @@ public class AssetPath
     {
         try
         {
-            Debug.Log(xml);
             XmlDocument doc = new XmlDocument();
 
             doc.LoadXml(xml);
@@ -149,7 +140,7 @@ public class AssetPath
             for (int i = 0; i < root.ChildNodes.Count; ++i)
             {
                 XmlElement child = root.ChildNodes[i] as XmlElement;
-                Asset asset = new Asset();
+                AssetPath asset = new AssetPath();
                 asset.FromXml(child);
                 assets.Add(asset.name, asset);
                 if (assets.ContainsKey(asset.path) == false)
@@ -178,7 +169,7 @@ public class AssetPath
             root.Attributes.Append(attribute);
         }
         doc.AppendChild(root);
-        HashSet<Asset> set = new HashSet<Asset>();
+        HashSet<AssetPath> set = new HashSet<AssetPath>();
         var it = assets.GetEnumerator();
         while (it.MoveNext())
         {
@@ -200,16 +191,16 @@ public class AssetPath
 
         return xml;
     }
-    public static Asset Get(string name)
+    public static AssetPath Get(string name)
     {
-        Asset asset;
+        AssetPath asset;
         assets.TryGetValue(name, out asset);
         return asset;
     }
     public static string GetPath(string name)
     {
         string path = name;
-        Asset asset = Get(name);
+        AssetPath asset = Get(name);
         if (asset != null)
         {
             switch (asset.type)
@@ -223,8 +214,8 @@ public class AssetPath
                     }
                     else
 #endif
-						{
-							path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
+					{
+						 path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
                     }
                 }
                 break;
@@ -237,8 +228,8 @@ public class AssetPath
                     }
                     else
 #endif
-						{
-							path = string.Format("{0}{1}", persistentDataPath, asset.path);
+					{
+						path = string.Format("{0}{1}", persistentDataPath, asset.path);
                     }
 
                 }
@@ -253,5 +244,6 @@ public class AssetPath
     {
         assets.Clear();
     }
+    #endregion
 }
 

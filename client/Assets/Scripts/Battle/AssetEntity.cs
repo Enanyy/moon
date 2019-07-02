@@ -17,7 +17,7 @@ public class AssetEntity :IPoolObject
 
     public GameObject gameObject { get; private set; }
 
-    public AssetObject<GameObject> asset { get; private set; }
+    public Asset<GameObject> asset { get; private set; }
     public AssetEntity()
     {
         

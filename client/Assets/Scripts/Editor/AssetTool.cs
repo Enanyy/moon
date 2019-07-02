@@ -252,7 +252,7 @@ public static class AssetTool
         return path;
     }
 
-    static Asset GetAsset(Object target)
+    static AssetPath GetAsset(Object target)
     {
         string assetPath = AssetDatabase.GetAssetPath(target);
 
@@ -269,7 +269,7 @@ public static class AssetTool
         string md5 = bytes != null ? MD5Hash.Get(bytes) : "";
         AssetType type = GetAssetType(assetPath);
 
-        Asset asset = AssetPath.Get(name);
+        AssetPath asset = AssetPath.Get(name);
         if (asset == null)
         {
             var it = AssetPath.assets.GetEnumerator();
@@ -290,7 +290,7 @@ public static class AssetTool
 
         if (asset == null && bytes != null)
         {
-            asset = new Asset();
+            asset = new AssetPath();
             asset.name = name;
             asset.path = path;
             asset.md5 = md5;
@@ -351,11 +351,11 @@ public static class AssetTool
             }
 
 
-            Asset asset = AssetPath.Get(name);
+            AssetPath asset = AssetPath.Get(name);
             if (asset == null) asset = AssetPath.Get(path);
             if (asset == null)
             {
-                asset = new Asset();
+                asset = new AssetPath();
                 asset.name = name;
                 asset.path = path;
                 AssetPath.assets.Add(asset.name, asset);

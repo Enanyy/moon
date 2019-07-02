@@ -21,29 +21,30 @@ public class Chess : MonoBehaviour
 
     public static Chess Instance { get; private set; }
 
-    void Awake()
-    {
-        AssetManager.Instance.Init();
-    }
+   
     // Use this for initialization
     void Start()
     {
         Instance = this;
 
         CameraManager.Instance.Init();
-        TextAsset data = Resources.Load<TextAsset>("r/database/data");
-        if (data != null)
+        AssetManager.Instance.LoadAsset<TextAsset>("data.bytes", (asset) =>
         {
-            DataTableManager.Instance.Init(data.bytes);
-        }
-        if (grid == BattleGrid.Rect)
-        {
-            BattleRectGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
-        }
-        else
-        {
-            BattleHexGrid.Instance.Init(original, shape, lines, columns, Mathf.Max(tileWidth, tileHeight), orientation);
-        }
+            if (asset != null)
+            {
+                DataTableManager.Instance.Init(asset.assetObject.bytes);
+
+                if (grid == BattleGrid.Rect)
+                {
+                    BattleRectGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
+                }
+                else
+                {
+                    BattleHexGrid.Instance.Init(original, shape, lines, columns, Mathf.Max(tileWidth, tileHeight), orientation);
+                }
+            }
+        });
+        
     }
 
     // Update is called once per frame
@@ -51,18 +52,22 @@ public class Chess : MonoBehaviour
     {
         if (grid == BattleGrid.Rect)
         {
-            BattleRectGrid.Instance.Update();
+            if (BattleRectGrid.Instance.initialized)
+            {
+                BattleRectGrid.Instance.Update();
 
-            BattleRectGrid.Instance.showGrid = showGrid;
+                BattleRectGrid.Instance.showGrid = showGrid;
 
+            }
         }
         else
         {
-            BattleHexGrid.Instance.Update();
+            if (BattleHexGrid.Instance.initialized)
+            {
+                BattleHexGrid.Instance.Update();
 
-            BattleHexGrid.Instance.showGrid = showGrid;
+                BattleHexGrid.Instance.showGrid = showGrid;
+            }
         }
-        
-     
     }
 }
