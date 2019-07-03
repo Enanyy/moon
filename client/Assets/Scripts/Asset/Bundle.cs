@@ -74,47 +74,6 @@ public class Bundle
         Finish();
 
     }
-
-    public IEnumerator LoadWWW()
-    {
-        if (dependenceNames != null)
-        {
-            for (int i = 0; i < dependenceNames.Length; ++i)
-            {
-                string dependenceName = dependenceNames[i];
-
-                if (dependences.ContainsKey(dependenceName) == false)
-                {
-                    Bundle bundleObject= AssetManager.Instance.CreateBundle(dependenceName);
-
-                    dependences[dependenceName] = bundleObject;
-
-                    if (bundleObject.bundle == null)
-                    {
-                        yield return bundleObject.LoadWWW();
-                    }
-                }
-            }
-        }
-
-        string path = AssetManager.Instance.GetPath(bundleName);
-
-        using (WWW www = new WWW(path))
-        {
-            yield return www;
-            if(www.isDone && www.assetBundle)
-            {
-                bundle = www.assetBundle;
-            }
-            else
-            {
-                Debug.LogError("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
-            }
-
-            Finish();
-        }
-    }
-
     public IEnumerator LoadResource()
     {
         mType = BundleType.Resource;

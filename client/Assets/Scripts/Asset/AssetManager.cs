@@ -4,13 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 using System.IO;
-
-public enum LoadMode
-{
-    Async,
-    WWW,
-}
-
+using UnityEngine.Networking;
 public enum AssetMode
 {
     Editor,
@@ -70,7 +64,6 @@ public class AssetManager : MonoBehaviour
     private Dictionary<string, Bundle> mAssetBundleDic = new Dictionary<string, Bundle>();
 
     public AssetMode assetMode { get; private set; }
-    public LoadMode loadMode { get; private set; }
     public bool initialized { get; private set; }
 
     private bool mInitializing = false;
@@ -85,21 +78,19 @@ public class AssetManager : MonoBehaviour
         }
 
         mInitializing = true;
+        StartCoroutine(InitManifest());
+    }
+
+    private IEnumerator InitManifest()
+    {
 #if UNITY_EDITOR
         string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
 
         AssetPath.mode = (AssetMode)PlayerPrefs.GetInt("assetMode");
         if (AssetPath.mode == AssetMode.Editor)
         {
-            path = string.Format("{0}/{1}", Application.dataPath,AssetPath.ASSETS_FILE);
-            string xml = File.ReadAllText(path);
-            AssetPath.FromXml(xml);
-            InitFinish(null);
-        }
-        else
-        {
-            StartCoroutine(InitAssets(path));
-        }
+            path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);    
+        }    
 #else
 		string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
         if (File.Exists(path) == false)
@@ -107,72 +98,47 @@ public class AssetManager : MonoBehaviour
             path = string.Format("{0}{1}", AssetPath.streamingAssetsPath, AssetPath.ASSETS_FILE);
         }
         AssetPath.mode = AssetMode.AssetBundle;
-        StartCoroutine(InitAssets(path));
+
 #endif
-    }
+        assetMode = AssetPath.mode;
 
-    private IEnumerator InitAssets(string path)
-    {
-        using (WWW www = new WWW(path))
+        using (UnityWebRequest request = UnityWebRequest.Get(path))
         {
-            yield return www;
-            if (string.IsNullOrEmpty(www.text) == false)
+            yield return request.SendWebRequest();
+
+            if (string.IsNullOrEmpty(request.downloadHandler.text) == false)
             {
-                AssetPath.FromXml(www.text);
-                Init(LoadMode.Async, AssetPath.mode, AssetPath.manifest);
+                AssetPath.FromXml(request.downloadHandler.text);
+                if (assetMode == AssetMode.AssetBundle)
+                {
+                    string manifest = GetPath(AssetPath.manifest);
+
+                    var manifestRequest = AssetBundle.LoadFromFileAsync(manifest);
+
+                    yield return manifestRequest;
+
+                    if (manifestRequest.isDone && manifestRequest.assetBundle)
+                    {
+                        InitFinish(manifestRequest.assetBundle);
+                    }
+                    else
+                    {
+                        Debug.LogError("Load assetbundle:" + manifest + " failed!!");
+                    }
+                }
+                else
+                {
+                    InitFinish(null);
+                }
             }
             else
             {
-                Debug.LogError(www.error+":"+www.url);
-            }          
-        }
-    }
-
-    public void Init(LoadMode loadMode, AssetMode assetMode, string manifest)
-    {
-        this.loadMode = loadMode;
-        this.assetMode = assetMode;
-
-        switch (loadMode)
-        { 
-            case LoadMode.Async: StartCoroutine(InitAsync(manifest));break;        
-            case LoadMode.WWW: StartCoroutine(InitWWW(manifest));break;
-        }
-    }
-
-    private IEnumerator InitAsync(string manifest)
-    {
-        string path = GetPath(manifest);
-
-        var request = AssetBundle.LoadFromFileAsync(path);
-        yield return request;
-
-        if (request.isDone && request.assetBundle)
-        {
-            InitFinish(request.assetBundle);
-        }
-        else
-        {
-            Debug.LogError("Load assetbundle:" + manifest + " failed!!");
-        }
-    }
-    private IEnumerator InitWWW(string manifest)
-    {
-        string path = GetPath(manifest);
-
-        using (WWW www = new WWW(path))
-        {
-            yield return www;
-            if (www.isDone && www.assetBundle)
-            {
-                InitFinish(www.assetBundle);
+                Debug.LogError(request.error + ":" + request.url);
             }
-            else
-            {
-                Debug.LogError("Load assetbundle:" + manifest + " failed!!");
-            }              
-        }
+        } 
     }
+
+  
     private void InitFinish(AssetBundle assetBundle)
     {
         if (assetBundle != null)
@@ -302,7 +268,7 @@ public class AssetManager : MonoBehaviour
                 {
                     if (task.callback != null)
                     {
-                        assetObject = new Asset<T>(task.assetName, null, asset, null);
+                        assetObject = new Asset<T>(task.assetName, null, asset, asset as T);
                         task.OnComplete(assetObject);
                     }
                 }
@@ -356,12 +322,7 @@ public class AssetManager : MonoBehaviour
             else
             {
                 bundle.onFinished.Add(task);
-
-                switch (loadMode)
-                {
-                    case LoadMode.Async: StartCoroutine(bundle.LoadAsync());break;
-                    case LoadMode.WWW: StartCoroutine(bundle.LoadWWW());break;
-                }
+                StartCoroutine(bundle.LoadAsync());
             }
         }
         else
