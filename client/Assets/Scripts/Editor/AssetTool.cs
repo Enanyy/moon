@@ -29,6 +29,8 @@ public static class AssetTool
     {
         if (state == PlayModeStateChange.EnteredEditMode)
         {
+            SaveAsset();
+
             InitAssetPath();
         }
     }

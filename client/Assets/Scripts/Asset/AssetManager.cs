@@ -4,14 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 using UnityEngine.Networking;
-
+using UnityEngine.SceneManagement;
+using System.IO;
 public enum AssetMode
 {
     Editor,
     AssetBundle,
 }
 
-public class LoadTask<T>  where T: IAsset
+public class LoadTask<T> 
 {
     public string key { get; private set; }
 
@@ -263,9 +264,49 @@ public class AssetManager : MonoBehaviour
         StartCoroutine(bundle.LoadAsset(task));
     }
 
-    public void LoadScene(string key, Action callback)
+    public void LoadScene(string key, LoadSceneMode mode, Action<Scene> callback)
     {
+        LoadTask<Scene> task = new LoadTask<Scene>(key, callback);
+        StartCoroutine(LoadSceneAsync(task,mode));
+    }
 
+    private IEnumerator LoadSceneAsync(LoadTask<Scene> task, LoadSceneMode mode)
+    {
+        if(initialized== false)
+        {
+            Init();
+            yield return new WaitUntil(() => initialized == true);
+        }
+        string sceneName = Path.GetFileNameWithoutExtension(task.assetName);
+  
+        if (assetMode == AssetMode.AssetBundle)
+        {
+            Bundle bundle = CreateBundle(task.assetName);
+            yield return bundle.LoadBundleAsync();
+
+            var request = SceneManager.LoadSceneAsync(sceneName, mode);
+            yield return request;
+
+            task.OnComplete(SceneManager.GetActiveScene());
+        }
+        else
+        {
+            var request = SceneManager.LoadSceneAsync(sceneName);
+            yield return request;
+            task.OnComplete(SceneManager.GetActiveScene());
+
+            yield break;
+        }
+    }
+    public void UnLoadScene(Scene scene)
+    {
+        StartCoroutine(UnloadSceneAsync(scene));
+    }
+
+    private IEnumerator UnloadSceneAsync(Scene scene)
+    {
+        var request = SceneManager.UnloadSceneAsync(scene);
+        yield return request;
     }
 
     public Bundle GetBundle(string bundleName)
