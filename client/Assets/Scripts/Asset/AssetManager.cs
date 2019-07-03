@@ -263,6 +263,11 @@ public class AssetManager : MonoBehaviour
         StartCoroutine(bundle.LoadAsset(task));
     }
 
+    public void LoadScene(string key, Action callback)
+    {
+
+    }
+
     public Bundle GetBundle(string bundleName)
     {
         Bundle bundle = null;

@@ -30,7 +30,7 @@ public class Bundle
         this.bundleName = bundleName;
         this.dependenceNames = dependenceNames; 
     }
-    public IEnumerator LoadBundle()
+    public IEnumerator LoadBundleAsync()
     {
         if (dependenceNames != null)
         {
@@ -46,7 +46,7 @@ public class Bundle
 
                     if (bundleObject.bundle == null)
                     {
-                        yield return bundleObject.LoadBundle();
+                        yield return bundleObject.LoadBundleAsync();
                     }
                 }
             }
@@ -102,7 +102,7 @@ public class Bundle
                 {
                     if (mAsyncOperation == null)
                     {
-                        yield return LoadBundle();
+                        yield return LoadBundleAsync();
                     }
                     else
                     {
