@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 using System.IO;
+using UnityEditor;
 using UnityEngine.Networking;
 public enum AssetMode
 {
@@ -11,16 +12,65 @@ public enum AssetMode
     AssetBundle,
 }
 
-public class LoadTask<T> 
+
+
+public class LoadTask<T>  where T: IAsset
 {
-    public string bundleName { get; private set; }
-    public string assetName { get; private set; }
+    public string key { get; private set; }
+
+    public string bundleName
+    {
+        get
+        {
+            if (path != null)
+            {
+                return string.IsNullOrEmpty(path.group) ? path.path : path.group;
+            }
+            return key;
+        }
+    }
+
+    public string assetName
+    {
+        get
+        {
+            if (path != null)
+            {
+                if (path.type == AssetType.Resource)
+                {
+                    if (path.path.Contains("."))
+                    {
+                        return path.path.Substring(0, path.path.LastIndexOf('.'));
+                    }
+                }
+                return path.path;
+            }
+            return key;
+        }
+    }
+
     public Action<T> callback { get; private set; }
 
-    public LoadTask(string bundleName, string assetName, Action<T> callback)
+    private AssetPath mPath;
+    public AssetPath path {
+        get
+        {
+            if (mPath == null)
+            {
+                mPath= AssetPath.Get(key);
+            }
+            return mPath;
+        }
+    }
+
+    public AssetType type
     {
-        this.bundleName = bundleName;
-        this.assetName = assetName;
+        get { return path != null ? path.type : AssetType.Resource; }
+    }
+
+    public LoadTask(string key, Action<T> callback)
+    {
+        this.key = key;
         this.callback = callback;
     }
 
@@ -162,87 +212,20 @@ public class AssetManager : MonoBehaviour
 
     public LoadTask<Asset<T>> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T:Object
     {
-        if (initialized == false)
-        {
-            Init();
-            mLoadTask.Add(new Action(() => LoadAsset(key,callback)));
-            return null;
-        }
-        var asset = AssetPath.Get(key);
-        if (asset != null)
-        {
-            switch (asset.type)
-            {
-                case AssetType.Resource:
-                {
-                    string path = asset.path.Substring(0, asset.path.LastIndexOf('.'));
-                    return LoadResource(path, callback);
-                }
-                case AssetType.StreamingAsset:
-                case AssetType.PersistentAsset:
-                {
-                    return LoadAsset(string.IsNullOrEmpty(asset.group) ? 
-                            asset.path : asset.group,
-                            asset.path,
-                            callback);
-                }
-            }
-        }
-        else
-        {
-            Debug.LogError("Can not find AssetPath by:" + key);
-        }
+        LoadTask<Asset<T> > task = new LoadTask<Asset<T>>(key,callback);
 
-        return null;
-    }
-   
+        StartCoroutine(LoadAsset(task));
 
-
-    public LoadTask<Asset<T>> LoadResource<T>(string path,Action<Asset<T>> callback) where T : Object
-    {
-        LoadTask<Asset<T>> task = new LoadTask<Asset<T>>(path, path, callback);
-
-        LoadTask<Bundle> bundleTask = new LoadTask<Bundle>(task.bundleName, null, delegate (Bundle bundleObject)
-        {
-            if (task.callback != null)
-            {
-                bundleObject.LoadAsset<T>(bundleObject.bundleName, task.OnComplete);
-            }
-        });
-
-        Bundle bundle = CreateBundle(task.bundleName);
-        bundle.LoadAsset<T>(task.assetName, (asset) =>
-        {
-            if (asset != null)
-            {
-                task.OnComplete(asset);
-            }
-            else
-            {
-                if (task.callback != null)
-                {
-                    if (bundle.onFinished.Count > 0)
-                    {
-                        bundle.onFinished.Add(bundleTask);
-                    }
-                    else
-                    {
-                        bundle.onFinished.Add(bundleTask);
-
-                        StartCoroutine(bundle.LoadResource());
-                    }
-                }
-            }
-        });
-       
         return task;
     }
 
-   
-
-    public LoadTask<Asset<T>> LoadAsset<T>(string bundleName, string assetName, System.Action<Asset<T>> callback = null) where T : UnityEngine.Object
+    private IEnumerator LoadAsset<T>(LoadTask<Asset<T>> task) where T : UnityEngine.Object
     {
-        LoadTask<Asset<T>> task = new LoadTask<Asset<T>>(bundleName.ToLower(), assetName.ToLower(), callback);
+        if (initialized == false)
+        {
+            Init();
+            yield return new WaitUntil(() => initialized == true);
+        }
 
 #if UNITY_EDITOR
         if (assetMode == AssetMode.Editor)
@@ -277,63 +260,13 @@ public class AssetManager : MonoBehaviour
             {
                 task.OnComplete(assetObject);
             }
-            return task;
+            yield break;
         }
 #endif
 
-        Load(task.bundleName, (bundle) =>
-        {
-            if (bundle != null)
-            {
-                if (task.callback != null)
-                {
-                    bundle.LoadAsset<T>(task.assetName, task.OnComplete);           
-                }
-            }
-            else
-            {
-                task.OnComplete(null);
-            }
-        });
-
-        return task;
-    }
-
-    
-    public LoadTask<Bundle> Load(string bundleName, Action<Bundle> callback)
-    {
-        if (initialized == false)
-        {
-            Init();
-            mLoadTask.Add(new Action(()=>Load(bundleName,callback)));
-            return null;
-        }
-
-        LoadTask<Bundle> task = new LoadTask<Bundle>(bundleName.ToLower(), null, callback);
-
         Bundle bundle = CreateBundle(task.bundleName);
-
-        if (bundle.bundle == null)
-        {
-            if (bundle.onFinished.Count > 0)
-            {
-                bundle.onFinished.Add(task);
-            }
-            else
-            {
-                bundle.onFinished.Add(task);
-                StartCoroutine(bundle.LoadAsync());
-            }
-        }
-        else
-        {
-            task.OnComplete(bundle);
-        }
-
-        return task;
+        StartCoroutine(bundle.LoadAsset(task));
     }
-
-    
 
     public Bundle GetBundle(string bundleName)
     {

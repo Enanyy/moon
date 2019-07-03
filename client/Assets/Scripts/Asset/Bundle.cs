@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 
+
 public class Bundle
 {
     public string bundleName { get; private set; }
@@ -9,7 +10,7 @@ public class Bundle
 
     public Dictionary<string, Bundle> dependences { get; private set; }
     public string[] dependenceNames { get; private set; }
-    public List<LoadTask<Bundle>> onFinished { get; private set; }
+
 
     //场景中实例化出来的,即引用
     public Dictionary<string, List<IAsset>> references { get; private set; }
@@ -19,23 +20,17 @@ public class Bundle
     //缓存的场景资源
     private Dictionary<string,List<IAsset>> mCacheAssetDic = new Dictionary<string, List<IAsset>>();
 
-    enum BundleType
-    {
-        AssetBundle,
-        Resource
-    }
-
-    private BundleType mType = BundleType.AssetBundle;
+    private AsyncOperation mAsyncOperation;
 
     public Bundle(string bundleName,string[] dependenceNames)
     {
         dependences = new Dictionary<string, Bundle>();
         references = new Dictionary<string, List<IAsset>>();
-        onFinished = new List<LoadTask<Bundle>>();
+
         this.bundleName = bundleName;
         this.dependenceNames = dependenceNames; 
     }
-    public IEnumerator LoadAsync()
+    public IEnumerator LoadBundle()
     {
         if (dependenceNames != null)
         {
@@ -51,7 +46,7 @@ public class Bundle
 
                     if (bundleObject.bundle == null)
                     {
-                        yield return bundleObject.LoadAsync();
+                        yield return bundleObject.LoadBundle();
                     }
                 }
             }
@@ -59,8 +54,11 @@ public class Bundle
 
         string path = AssetManager.Instance.GetPath(bundleName);
 
-        var request = AssetBundle.LoadFromFileAsync(path);
-        yield return request;
+        mAsyncOperation = AssetBundle.LoadFromFileAsync(path);
+
+        yield return mAsyncOperation;
+
+        var request = mAsyncOperation as AssetBundleCreateRequest;
 
         if (request.isDone && request.assetBundle)
         {
@@ -70,82 +68,12 @@ public class Bundle
         {
             Debug.LogError("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
         }
-
-        Finish();
-
     }
-    public IEnumerator LoadResource()
-    {
-        mType = BundleType.Resource;
-
-        var request = Resources.LoadAsync(bundleName);
-
-        yield return request;
-        if (request.asset != null)
-        {
-            mAssetDic.Add(bundleName,request.asset);
-        }
-
-        Finish();
-    }
-
-
-    private void Finish()
-    {
-        int count = 0;
-        for (int i = 0; i < onFinished.Count; i++)
-        {
-            var task = onFinished[i];
-            if (task != null && task.callback != null)
-            {
-                task.callback(this);
-                count++;
-            }
-        }
-
-        if (onFinished.Count > 0 && count == 0)
-        {
-            UnLoad();
-        }
-        onFinished.Clear();
-      
-    }
-
-    private IEnumerator LoadAssetAsync(string name, System.Action<Object> callback)
-    {
-        if (string.IsNullOrEmpty(name) == false)
-        {
-            if (bundle && mAssetDic.ContainsKey(name) == false)
-            {
-                if (bundle != null)
-                {
-                    var request = bundle.LoadAssetAsync(name);
-
-                    yield return request;
-                    if (mAssetDic.ContainsKey(name) == false)
-                    {
-                        mAssetDic.Add(name, request.asset);
-                    }
-                }
-            }
-            if (callback != null)
-            {
-                callback(mAssetDic.ContainsKey(name) ? mAssetDic[name] : null);
-            }
-        }
-        else
-        {
-            if (callback != null)
-            {
-                callback(null);
-            }
-        }
-    }
-
-
-    public void LoadAsset<T>(string assetName,System.Action<Asset<T>> callback) where T : UnityEngine.Object
+    
+    public IEnumerator LoadAsset<T>(LoadTask<Asset<T>> task) where T : UnityEngine.Object
     {
         Asset<T> assetObject = null;
+        string assetName = task.assetName;
         if (mCacheAssetDic.ContainsKey(assetName) )
         {
             var list = mCacheAssetDic[assetName];
@@ -164,34 +92,78 @@ public class Bundle
 
         if (assetObject != null)
         {
-            if (callback != null)
-            {
-                callback(assetObject);
-            }          
+            task.OnComplete(assetObject);             
         }
         else
         {
-            AssetManager.Instance.StartCoroutine(LoadAssetAsync(assetName, (asset) =>
+            if (task.type != AssetType.Resource)
             {
-                if (asset)
+                if (bundle == null)
                 {
-                    if (typeof(T) == typeof(GameObject))
+                    if (mAsyncOperation == null)
                     {
-                        var go = UnityEngine.Object.Instantiate(asset) as GameObject;
-
-                        assetObject = new Asset<T>(assetName, this, asset, go as T);
+                        yield return LoadBundle();
                     }
                     else
                     {
-                        assetObject = new Asset<T>(assetName, this, asset, asset as T);
+                        yield return new WaitUntil(()=>mAsyncOperation.isDone);
                     }
                 }
 
-                if (callback != null)
+                if (mAssetDic.ContainsKey(assetName) == false)
                 {
-                    callback(assetObject);
+                    if (bundle != null)
+                    {
+                        var request = bundle.LoadAssetAsync(assetName);
+
+                        yield return request;
+                        if (mAssetDic.ContainsKey(assetName) == false)
+                        {
+                            mAssetDic.Add(assetName, request.asset);
+                        }
+                    }
                 }
-            }));
+            }
+            else
+            {
+                if (mAssetDic.ContainsKey(assetName) == false)
+                {
+                    if (mAsyncOperation == null)
+                    {
+                        mAsyncOperation = Resources.LoadAsync(assetName);
+                    }
+
+                    yield return mAsyncOperation;
+
+                    var request = mAsyncOperation as ResourceRequest;
+
+                    if (request.asset != null && mAssetDic.ContainsKey(assetName) == false)
+                    {
+                        mAssetDic.Add(assetName, request.asset);
+                    }
+                }
+            }
+            
+            Object asset = null;
+
+            mAssetDic.TryGetValue(assetName, out asset);
+
+            if (asset)
+            {
+                if (typeof(T) == typeof(GameObject))
+                {
+                    var go = UnityEngine.Object.Instantiate(asset) as GameObject;
+
+                    assetObject = new Asset<T>(assetName, this, asset, go as T);
+                }
+                else
+                {
+                    assetObject = new Asset<T>(assetName, this, asset, asset as T);
+                }
+            }
+
+            task.OnComplete(assetObject);
+
         }
     }
 
@@ -327,10 +299,7 @@ public class Bundle
             var asset = mAssetDic.GetEnumerator();
             while (asset.MoveNext())
             {
-                if (mType == BundleType.Resource)
-                {
-                    Resources.UnloadAsset(asset.Current.Value);
-                }
+                Resources.UnloadAsset(asset.Current.Value);              
             }
             mAssetDic.Clear();
         }
