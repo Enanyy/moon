@@ -74,6 +74,7 @@ public class AssetPath
     #region Static
 
     public static string manifest;
+    public static int version;
     public static Dictionary<string, AssetPath> assets = new Dictionary<string, AssetPath>();
 
     public static AssetMode mode = AssetMode.AssetBundle;
@@ -138,6 +139,7 @@ public class AssetPath
             XmlElement root = doc.DocumentElement;
 
             manifest = root.GetAttribute("manifest");
+            version = root.GetAttribute("version").ToInt32Ex();
 
             assets.Clear();
 
@@ -172,6 +174,11 @@ public class AssetPath
             attribute.Value = manifest;
             root.Attributes.Append(attribute);
         }
+
+        XmlAttribute ver = doc.CreateAttribute("version");
+        ver.Value = version.ToString();
+        root.Attributes.Append(ver);
+
         doc.AppendChild(root);
         HashSet<AssetPath> set = new HashSet<AssetPath>();
         var it = assets.GetEnumerator();

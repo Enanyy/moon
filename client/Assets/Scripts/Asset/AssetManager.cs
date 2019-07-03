@@ -17,13 +17,14 @@ public enum AssetMode
     Editor,
     AssetBundle,
 }
-public class LoadTask<T>
+
+public class LoadTask<T> 
 {
     public string bundleName { get; private set; }
     public string assetName { get; private set; }
     public Action<T> callback { get; private set; }
 
-    public LoadTask(string bundleName,string assetName,Action<T> callback)
+    public LoadTask(string bundleName, string assetName, Action<T> callback)
     {
         this.bundleName = bundleName;
         this.assetName = assetName;
@@ -33,9 +34,9 @@ public class LoadTask<T>
     public void Cancel()
     {
         callback = null;
-
     }
 }
+
 public class AssetManager : MonoBehaviour
 {
 

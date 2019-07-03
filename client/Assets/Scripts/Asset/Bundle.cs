@@ -84,8 +84,7 @@ public class Bundle
 
                     if (bundleObject.bundle == null)
                     {
-                        var coroutine =  AssetManager.Instance.StartCoroutine(bundleObject.LoadAsync());
-                        yield return coroutine;
+                        yield return bundleObject.LoadAsync();
                     }
                 }
             }
@@ -125,8 +124,7 @@ public class Bundle
 
                     if (bundleObject.bundle == null)
                     {
-                        var coroutine = AssetManager.Instance.StartCoroutine(bundleObject.LoadWWW());
-                        yield return coroutine;
+                        yield return bundleObject.LoadWWW();
                     }
                 }
             }
