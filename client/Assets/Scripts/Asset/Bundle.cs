@@ -35,39 +35,6 @@ public class Bundle
         this.bundleName = bundleName;
         this.dependenceNames = dependenceNames; 
     }
-
-    public void LoadSync()
-    {      
-        if (dependenceNames != null)
-        {
-            for (int i =0; i <dependenceNames.Length; ++i)
-            {
-                string dependenceName = dependenceNames[i];
-
-                if (dependences.ContainsKey(dependenceName) == false)
-                {
-                    Bundle bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
-
-                    dependences[dependenceName] = bundleObject;
-
-                    if (bundleObject.bundle == null)
-                    {
-                        bundleObject.LoadSync();
-                    }
-                }
-            }
-        }
-        string path = AssetManager.Instance.GetPath(bundleName);
-
-        bundle = AssetBundle.LoadFromFile(path);
-        if (bundle == null)
-        {
-            Debug.LogError("Load assetbundle:" + bundleName + " failed!!");
-        }
-
-        Finish();
-
-    }
     public IEnumerator LoadAsync()
     {
         if (dependenceNames != null)
@@ -185,29 +152,39 @@ public class Bundle
       
     }
 
-    public Object LoadAsset(string name)
+    private IEnumerator LoadAssetAsync(string name, System.Action<Object> callback)
     {
-        if (string.IsNullOrEmpty(name))
+        if (string.IsNullOrEmpty(name) == false)
         {
-            return null;
-        }
-
-        if (bundle && mAssetDic.ContainsKey(name) == false)
-        {
-            if (bundle != null)
+            if (bundle && mAssetDic.ContainsKey(name) == false)
             {
-                mAssetDic.Add(name, bundle.LoadAsset<Object>(name));
+                if (bundle != null)
+                {
+                    var request = bundle.LoadAssetAsync(name);
+
+                    yield return request;
+                    if (mAssetDic.ContainsKey(name) == false)
+                    {
+                        mAssetDic.Add(name, request.asset);
+                    }
+                }
+            }
+            if (callback != null)
+            {
+                callback(mAssetDic.ContainsKey(name) ? mAssetDic[name] : null);
             }
         }
-
-        if (mAssetDic.ContainsKey(name))
+        else
         {
-            return mAssetDic[name];
+            if (callback != null)
+            {
+                callback(null);
+            }
         }
-        return null;
     }
 
-    public Asset<T> LoadAsset<T>(string assetName) where T : UnityEngine.Object
+
+    public void LoadAsset<T>(string assetName,System.Action<Asset<T>> callback) where T : UnityEngine.Object
     {
         Asset<T> assetObject = null;
         if (mCacheAssetDic.ContainsKey(assetName) )
@@ -226,25 +203,37 @@ public class Bundle
             }
         }
 
-        if (assetObject == null)
+        if (assetObject != null)
         {
-            var asset = LoadAsset(assetName);
-            if (asset)
+            if (callback != null)
             {
-                if (typeof(T) == typeof(GameObject))
-                {
-                    var go = UnityEngine.Object.Instantiate(asset) as GameObject;
-
-                    assetObject = new Asset<T>(assetName, this, asset, go as T);
-                }
-                else
-                {
-                    assetObject = new Asset<T>(assetName, this, asset, asset as T);
-                }
-            }
+                callback(assetObject);
+            }          
         }
+        else
+        {
+            AssetManager.Instance.StartCoroutine(LoadAssetAsync(assetName, (asset) =>
+            {
+                if (asset)
+                {
+                    if (typeof(T) == typeof(GameObject))
+                    {
+                        var go = UnityEngine.Object.Instantiate(asset) as GameObject;
 
-        return assetObject;
+                        assetObject = new Asset<T>(assetName, this, asset, go as T);
+                    }
+                    else
+                    {
+                        assetObject = new Asset<T>(assetName, this, asset, asset as T);
+                    }
+                }
+
+                if (callback != null)
+                {
+                    callback(assetObject);
+                }
+            }));
+        }
     }
 
     public void AddReference(IAsset reference)

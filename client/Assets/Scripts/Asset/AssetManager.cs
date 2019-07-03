@@ -7,7 +7,6 @@ using System.IO;
 
 public enum LoadMode
 {
-    Sync,
     Async,
     WWW,
 }
@@ -34,6 +33,14 @@ public class LoadTask<T>
     public void Cancel()
     {
         callback = null;
+    }
+
+    public void OnComplete(T t)
+    {
+        if (callback != null)
+        {
+            callback(t);
+        }
     }
 }
 
@@ -127,27 +134,12 @@ public class AssetManager : MonoBehaviour
         this.assetMode = assetMode;
 
         switch (loadMode)
-        {
-            case LoadMode.Sync: InitSync(manifest);break;   
+        { 
             case LoadMode.Async: StartCoroutine(InitAsync(manifest));break;        
             case LoadMode.WWW: StartCoroutine(InitWWW(manifest));break;
         }
     }
 
-    private void InitSync(string manifest)
-    {
-        string path = GetPath(manifest);
-        var assetBundle = AssetBundle.LoadFromFile(path);
-
-        if (assetBundle)
-        {
-            InitFinish(assetBundle);
-        }
-        else
-        {
-            Debug.LogError(manifest + ": Error!!");
-        }
-    }
     private IEnumerator InitAsync(string manifest)
     {
         string path = GetPath(manifest);
@@ -246,37 +238,37 @@ public class AssetManager : MonoBehaviour
 
         LoadTask<Bundle> bundleTask = new LoadTask<Bundle>(task.bundleName, null, delegate (Bundle bundleObject)
         {
-            Asset<T> assetObject = bundleObject.LoadAsset<T>(bundleObject.bundleName);
             if (task.callback != null)
             {
-                task.callback(assetObject);
+                bundleObject.LoadAsset<T>(bundleObject.bundleName, task.OnComplete);
             }
         });
 
         Bundle bundle = CreateBundle(task.bundleName);
-        Object obj = bundle.LoadAsset(task.assetName);
-        if (obj == null)
+        bundle.LoadAsset<T>(task.assetName, (asset) =>
         {
-            if (bundle.onFinished.Count > 0)
+            if (asset != null)
             {
-                bundle.onFinished.Add(bundleTask);
+                task.OnComplete(asset);
             }
             else
             {
-                bundle.onFinished.Add(bundleTask);
+                if (task.callback != null)
+                {
+                    if (bundle.onFinished.Count > 0)
+                    {
+                        bundle.onFinished.Add(bundleTask);
+                    }
+                    else
+                    {
+                        bundle.onFinished.Add(bundleTask);
 
-                StartCoroutine(bundle.LoadResource());
+                        StartCoroutine(bundle.LoadResource());
+                    }
+                }
             }
-        }
-        else
-        {
-            Asset<T> assetObject = bundle.LoadAsset<T>(task.assetName);
-            if (task.callback != null)
-            {
-                task.callback(assetObject);
-            }
-        }
-
+        });
+       
         return task;
     }
 
@@ -303,7 +295,7 @@ public class AssetManager : MonoBehaviour
 
                         assetObject = new Asset<T>(task.assetName, null, asset, go as T);
 
-                        task.callback(assetObject);
+                        task.OnComplete(assetObject);
                     }
                 }
                 else
@@ -311,16 +303,13 @@ public class AssetManager : MonoBehaviour
                     if (task.callback != null)
                     {
                         assetObject = new Asset<T>(task.assetName, null, asset, null);
-                        task.callback(assetObject);
+                        task.OnComplete(assetObject);
                     }
                 }
             }
             else
             {
-                if (task.callback != null)
-                {
-                    task.callback(assetObject);
-                }
+                task.OnComplete(assetObject);
             }
             return task;
         }
@@ -332,16 +321,12 @@ public class AssetManager : MonoBehaviour
             {
                 if (task.callback != null)
                 {
-                    Asset<T> assetObject = bundle.LoadAsset<T>(task.assetName);
-                    task.callback(assetObject);
+                    bundle.LoadAsset<T>(task.assetName, task.OnComplete);           
                 }
             }
             else
             {
-                if (task.callback != null)
-                {
-                    task.callback(null);
-                }
+                task.OnComplete(null);
             }
         });
 
@@ -374,7 +359,6 @@ public class AssetManager : MonoBehaviour
 
                 switch (loadMode)
                 {
-                    case LoadMode.Sync: bundle.LoadSync();break;
                     case LoadMode.Async: StartCoroutine(bundle.LoadAsync());break;
                     case LoadMode.WWW: StartCoroutine(bundle.LoadWWW());break;
                 }
@@ -382,10 +366,7 @@ public class AssetManager : MonoBehaviour
         }
         else
         {
-            if (task != null && task.callback != null)
-            {
-                task.callback(bundle);
-            }
+            task.OnComplete(bundle);
         }
 
         return task;
