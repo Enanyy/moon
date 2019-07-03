@@ -3,16 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
-using System.IO;
-using UnityEditor;
 using UnityEngine.Networking;
+
 public enum AssetMode
 {
     Editor,
     AssetBundle,
 }
-
-
 
 public class LoadTask<T>  where T: IAsset
 {
@@ -116,18 +113,16 @@ public class AssetManager : MonoBehaviour
     public AssetMode assetMode { get; private set; }
     public bool initialized { get; private set; }
 
-    private bool mInitializing = false;
+    private AsyncOperation mAsyncOperation;
 
-    private List<Action> mLoadTask = new List<Action>();
-    
+
+
     public void Init()
     {
-        if (initialized || mInitializing)
+        if (initialized )
         {
             return;
         }
-
-        mInitializing = true;
         StartCoroutine(InitManifest());
     }
 
@@ -136,11 +131,11 @@ public class AssetManager : MonoBehaviour
 #if UNITY_EDITOR
         string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
 
-        AssetPath.mode = (AssetMode)PlayerPrefs.GetInt("assetMode");
+        AssetPath.mode = (AssetMode) PlayerPrefs.GetInt("assetMode");
         if (AssetPath.mode == AssetMode.Editor)
         {
-            path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);    
-        }    
+            path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);
+        }
 #else
 		string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
         if (File.Exists(path) == false)
@@ -151,44 +146,50 @@ public class AssetManager : MonoBehaviour
 
 #endif
         assetMode = AssetPath.mode;
-
-        using (UnityWebRequest request = UnityWebRequest.Get(path))
+        if (mAsyncOperation != null)
         {
-            yield return request.SendWebRequest();
-
-            if (string.IsNullOrEmpty(request.downloadHandler.text) == false)
+            yield return new WaitUntil(() => mAsyncOperation.isDone);
+        }
+        else
+        {
+            using (UnityWebRequest request = UnityWebRequest.Get(path))
             {
-                AssetPath.FromXml(request.downloadHandler.text);
-                if (assetMode == AssetMode.AssetBundle)
+                mAsyncOperation = request.SendWebRequest();
+                yield return mAsyncOperation;
+
+                if (string.IsNullOrEmpty(request.downloadHandler.text) == false)
                 {
-                    string manifest = GetPath(AssetPath.manifest);
-
-                    var manifestRequest = AssetBundle.LoadFromFileAsync(manifest);
-
-                    yield return manifestRequest;
-
-                    if (manifestRequest.isDone && manifestRequest.assetBundle)
+                    AssetPath.FromXml(request.downloadHandler.text);
+                    if (assetMode == AssetMode.AssetBundle)
                     {
-                        InitFinish(manifestRequest.assetBundle);
+                        string manifest = GetPath(AssetPath.manifest);
+
+                        var manifestRequest = AssetBundle.LoadFromFileAsync(manifest);
+
+                        yield return manifestRequest;
+
+                        if (manifestRequest.isDone && manifestRequest.assetBundle)
+                        {
+                            InitFinish(manifestRequest.assetBundle);
+                        }
+                        else
+                        {
+                            Debug.LogError("Load assetbundle:" + manifest + " failed!!");
+                        }
                     }
                     else
                     {
-                        Debug.LogError("Load assetbundle:" + manifest + " failed!!");
+                        InitFinish(null);
                     }
                 }
                 else
                 {
-                    InitFinish(null);
+                    Debug.LogError(request.error + ":" + request.url);
                 }
             }
-            else
-            {
-                Debug.LogError(request.error + ":" + request.url);
-            }
-        } 
+        }
     }
 
-  
     private void InitFinish(AssetBundle assetBundle)
     {
         if (assetBundle != null)
@@ -201,13 +202,7 @@ public class AssetManager : MonoBehaviour
         }
 
         initialized = true;
-        mInitializing = false;
-
-        for (int i = 0; i < mLoadTask.Count; i++)
-        {
-            mLoadTask[i]();
-        }
-        mLoadTask.Clear();
+       
     }
 
     public LoadTask<Asset<T>> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T:Object
