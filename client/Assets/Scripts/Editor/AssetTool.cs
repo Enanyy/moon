@@ -32,6 +32,14 @@ public static class AssetTool
             SaveAsset();
 
             InitAssetPath();
+
+            UpdateBuildSettingScene(false);
+
+
+        }
+        else if(state == PlayModeStateChange.ExitingEditMode)
+        {
+            UpdateBuildSettingScene(true);
         }
     }
 
@@ -42,6 +50,43 @@ public static class AssetTool
         string path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);
         string xml = File.ReadAllText(path);
         AssetPath.FromXml(xml);
+    }
+
+    static void UpdateBuildSettingScene(bool add)
+    {
+       List<EditorBuildSettingsScene> scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
+       var it = AssetPath.assets.GetEnumerator();
+       while (it.MoveNext())
+       {
+           string path = it.Current.Value.path;
+           if (path.EndsWith(".unity"))
+           {
+               var scene = GetScene(scenes, path);
+               if (scene == null && add)
+               {
+                   scenes.Add(new EditorBuildSettingsScene(path, true));
+               }
+               else if(scene!= null && !add)
+               {
+                   scenes.Remove(scene);
+                }
+           }
+       }
+       EditorBuildSettings.scenes = scenes.ToArray();
+    }
+
+   
+    static EditorBuildSettingsScene GetScene(List<EditorBuildSettingsScene> scenes, string path)
+    {
+        for (int i = 0; i < scenes.Count; i++)
+        {
+            if (scenes[i].path.ToLower() == path)
+            {
+                return scenes[i];
+            }
+        }
+
+        return null;
     }
 
     static GUIStyle s_ToggleMixed;
