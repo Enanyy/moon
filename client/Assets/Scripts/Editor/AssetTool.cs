@@ -29,16 +29,15 @@ public static class AssetTool
     {
         if (state == PlayModeStateChange.EnteredEditMode)
         {
-            SaveAsset();
-
             InitAssetPath();
 
             UpdateBuildSettingScene(false);
 
-
         }
         else if(state == PlayModeStateChange.ExitingEditMode)
         {
+            SaveAsset();
+
             UpdateBuildSettingScene(true);
         }
     }
@@ -147,6 +146,11 @@ public static class AssetTool
         {
             int selectCount = GetSelectCount(editor.targets);
             mixed = (select && selectCount != editor.targets.Length) || (select == false && selectCount != 0);
+
+            if (mixed)
+            {
+                select = false;
+            }
         }
 
         if (mixed)
@@ -204,7 +208,7 @@ public static class AssetTool
 
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
-        if (asset != null && select)
+        if (asset != null && AssetPath.assets.ContainsKey(asset.name))
         {
             select = string.IsNullOrEmpty(asset.group) == false;
 
