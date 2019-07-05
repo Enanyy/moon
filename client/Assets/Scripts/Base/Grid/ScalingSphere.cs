@@ -59,8 +59,36 @@ public class ScalingSphere : MonoBehaviour {
 
         Debug.Log(Time.time - time);
         grid.Show(transform,material);
+
+        for(int i = 0; i < grid.roots.Count;++i)
+        {
+            SetColor(grid.roots[i], new Color(i * 0.05f, i*0.05f, i * 0.05f));
+        }
+
     }
 
+    void SetColor(Triangle triangle, Color color)
+    {
+        if(triangle != null)
+        {
+            if(triangle.children.Count == 0)
+            {
+                if(triangle.go!= null)
+                {
+                    var r = triangle.go.GetComponent<MeshRenderer>();
+                    r.material.SetColor("_Color", color);
+                }
+            }
+            else
+            {
+                for(int i = 0; i < triangle.children.Count; ++i)
+
+                {
+                    SetColor(triangle.children[i], color);
+                }
+            }
+        }
+    }
    
 
 
@@ -70,7 +98,7 @@ public class ScalingSphere : MonoBehaviour {
         grid.original = (Vector3) d;
 
         grid.GenerateTriangle(SphereRadius,SphereDetail);
-        grid.CalculateNeihbors();
+
         ThreadRunner.ExportData(grid);
         ThreadRunner.MarkComplete();
 
