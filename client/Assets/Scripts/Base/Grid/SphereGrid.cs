@@ -109,7 +109,7 @@ public class SphereGrid
     public List<Tile> roots = new List<Tile>();
 
     // return index of point in the middle of p1 and p2
-    private static int getMiddlePoint(int p1, int p2, ref List<Vector3> vertices, ref Dictionary<long, int> cache, float radius)
+    private static int GetMiddlePoint(int p1, int p2, ref List<Vector3> vertices, ref Dictionary<long, int> cache, float radius)
     {
         // first check if we have it already
         bool firstIsSmaller = p1 < p2;
@@ -277,9 +277,9 @@ public class SphereGrid
                 }
 
                 // replace triangle by 4 triangles
-                int a = getMiddlePoint(tri.index.x, tri.index.y, ref vertList, ref middlePointIndexCache, radius);
-                int b = getMiddlePoint(tri.index.y, tri.index.z, ref vertList, ref middlePointIndexCache, radius);
-                int c = getMiddlePoint(tri.index.z, tri.index.x, ref vertList, ref middlePointIndexCache, radius);
+                int a = GetMiddlePoint(tri.index.x, tri.index.y, ref vertList, ref middlePointIndexCache, radius);
+                int b = GetMiddlePoint(tri.index.y, tri.index.z, ref vertList, ref middlePointIndexCache, radius);
+                int c = GetMiddlePoint(tri.index.z, tri.index.x, ref vertList, ref middlePointIndexCache, radius);
 
                 faces2.Add(new TriangleIndices(tile, new Vector3Int(tri.index.x, a, c)));
                 faces2.Add(new TriangleIndices(tile, new Vector3Int(tri.index.y, b, a)));
@@ -291,7 +291,7 @@ public class SphereGrid
             faces2 = temp;
         }
 
-        Dictionary<Segment, List<Tile>> segmentToTriangeDic = new Dictionary<Segment, List<Tile>>();
+        Dictionary<Segment, List<Tile>> segmentToTileDic = new Dictionary<Segment, List<Tile>>();
 
         for(int i = 0; i <faces.Count; ++i)
         {
@@ -313,22 +313,21 @@ public class SphereGrid
             Segment ac = new Segment(tile.a, tile.c);
             Segment bc = new Segment(tile.b, tile.c);
 
-            SetNeihbors(ref segmentToTriangeDic, ab, tile);
-            SetNeihbors(ref segmentToTriangeDic, ac, tile);
-            SetNeihbors(ref segmentToTriangeDic, bc, tile);
+            SetNeihbors(ref segmentToTileDic, ab, tile);
+            SetNeihbors(ref segmentToTileDic, ac, tile);
+            SetNeihbors(ref segmentToTileDic, bc, tile);
 
         }
 
     }
-    private void SetNeihbors(ref Dictionary<Segment, List<Tile>> segmentToTriangeDic,Segment segment,Tile triangle)
+    private void SetNeihbors(ref Dictionary<Segment, List<Tile>> segmentToTileDic,Segment segment,Tile triangle)
     {
-        if (segmentToTriangeDic.ContainsKey(segment))
+        if (segmentToTileDic.ContainsKey(segment))
         {
-            var list = segmentToTriangeDic[segment];
+            var list = segmentToTileDic[segment];
 
             for(int i = 0; i <list.Count; ++i)
             {
-
                 if (list[i].neihbors.Contains(triangle)==false)
                 {
                     list[i].neihbors.Add(triangle);
@@ -342,8 +341,8 @@ public class SphereGrid
         }
         else
         {
-            segmentToTriangeDic.Add(segment, new List<Tile>());
-            segmentToTriangeDic[segment].Add(triangle);
+            segmentToTileDic.Add(segment, new List<Tile>());
+            segmentToTileDic[segment].Add(triangle);
         }
             
     }
@@ -360,5 +359,168 @@ public class SphereGrid
             tiles[i].Show(root, material);
         }
     }
+
+
+    #region FindPath
+
+    private class PathNode
+    {
+        public Tile tile;
+        public int h;
+        public int g;
+        public int f
+        {
+            get { return h + g; }
+        }
+        public Tile parent = null;
+
+        public void Clear()
+        {
+            h = 0;
+            g = 0;
+            parent = null;
+        }
+    }
+
+    private List<Tile> mOpenList = new List<Tile>();
+    private List<Tile> mCloseList = new List<Tile>();
+    private Dictionary<Tile, PathNode> mNodeDic = new Dictionary<Tile, PathNode>();
+
+    private PathNode GetNode(Tile t)
+    {
+        if (mNodeDic.ContainsKey(t) == false)
+        {
+            mNodeDic.Add(t, new PathNode
+            {
+                h = 0,
+                g = 0,
+                tile = t,
+                parent = null,
+            });
+        }
+
+        return mNodeDic[t];
+    }
+
+    public Stack<Tile> FindPath(Tile from, Tile to, Func<Tile, bool> isValid
+        )
+    {
+        Stack<Tile> result = new Stack<Tile>();
+
+        if (from == null || to == null || isValid == null )
+        {
+            Debug.LogError("参数不能为空");
+            return result;
+        }
+
+        mOpenList.Clear();
+        mCloseList.Clear();
+
+        var it = mNodeDic.GetEnumerator();
+        while (it.MoveNext())
+        {
+            it.Current.Value.Clear();
+        }
+
+
+        //将起点作为待处理的点放入开启列表，
+        mOpenList.Add(from);
+
+        //如果开启列表没有待处理点表示寻路失败，此路不通
+        while (mOpenList.Count > 0)
+        {
+            //遍历开启列表，找到消费最小的点作为检查点
+            Tile cur = mOpenList[0];
+
+
+
+            var curNode = GetNode(cur);
+
+            for (int i = 0; i < mOpenList.Count; i++)
+            {
+                var t = mOpenList[i];
+
+                var node = GetNode(t);
+
+                if (node.f < curNode.f && node.h < curNode.h)
+                {
+                    cur = mOpenList[i];
+                    curNode = node;
+                }
+            }
+
+
+            //从开启列表中删除检查点，把它加入到一个“关闭列表”，列表中保存所有不需要再次检查的方格。
+            mOpenList.Remove(cur);
+            mCloseList.Add(cur);
+
+            //检查是否找到终点
+            if (cur == to)
+            {
+                var tile = cur;
+                while (tile != null)
+                {
+                    result.Push(tile);
+                    var node = GetNode(tile);
+                    if (node != null)
+                    {
+                        tile = node.parent;
+                    }
+                    else
+                    {
+                        tile = null;
+                    }
+                }
+
+                break;
+            }
+
+            ////根据检查点来找到周围可行走的点
+            //1.如果是墙或者在关闭列表中则跳过
+            //2.如果点不在开启列表中则添加
+            //3.如果点在开启列表中且当前的总花费比之前的总花费小，则更新该点信息
+            List<Tile> neighbours = cur.neihbors;
+            for (int i = 0; i < neighbours.Count; i++)
+            {
+                var neighbour = neighbours[i];
+
+                if (isValid(neighbour) == false || mCloseList.Contains(neighbour))
+                    continue;
+
+                int cost = curNode.g + GetCostValue(neighbour, cur);
+
+                var neighborNode = GetNode(neighbour);
+
+                if (cost < neighborNode.g || !mOpenList.Contains(neighbour))
+                {
+                    neighborNode.g = cost;
+                    neighborNode.h = GetCostValue(neighbour, to);
+                    neighborNode.parent = cur;
+
+                    if (!mOpenList.Contains(neighbour))
+                    {
+                        mOpenList.Add(neighbour);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+    public virtual int GetCostValue(Tile a, Tile b)
+    {
+        int cntX = (int)Mathf.Abs(a.center.x - b.center.x);
+        int cntY = (int)Mathf.Abs(a.center.y - b.center.y);
+        // 判断到底是那个轴相差的距离更远
+        if (cntX > cntY)
+        {
+            return 14 * cntY + 10 * (cntX - cntY);
+        }
+        else
+        {
+            return 14 * cntX + 10 * (cntY - cntX);
+        }
+    }
+    #endregion
 }
 
