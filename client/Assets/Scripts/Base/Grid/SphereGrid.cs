@@ -2,42 +2,45 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Triangle
+public class Tile
 {
+   
     /// <summary>
-    /// 世界坐标
+    /// localPosition
     /// </summary>
     public Vector3 a { get; private set; }
     /// <summary>
-    /// 世界坐标
+    /// localPosition
     /// </summary>
     public Vector3 b { get; private set; }
     /// <summary>
-    /// 世界坐标
+    /// localPosition
     /// </summary>
     public Vector3 c { get; private set; }
     /// <summary>
-    /// 世界坐标
+    /// localPosition
     /// </summary>
     public Vector3 center { get; private set; }
 
-    public Vector3Int index { get; private set; }
+    public int index;
    
-    public List<Triangle> neihbors { get; private set; }
+    public List<Tile> neihbors { get; private set; }
 
-    public List<Triangle> children { get; private set; }
+    public List<Tile> children { get; private set; }
+
+    public Tile parent { get; private set; }
 
     public GameObject go { get; private set; }
 
-    public Triangle(Vector3Int index, Vector3 a, Vector3 b, Vector3 c)
+    public Tile(Tile parent, Vector3 a, Vector3 b, Vector3 c)
     {
-        this.index = index;
+        this.parent = parent;
         this.a = a;
         this.b = b;
         this.c = c;
         center = (a + b + c) / 3f;
-        neihbors = new List<Triangle>();
-        children = new List<Triangle>();
+        neihbors = new List<Tile>();
+        children = new List<Tile>();
     }
 
     public void Show(Transform parent, Material material)
@@ -96,14 +99,14 @@ public class Triangle
 }
 public class SphereGrid
 {
-    public List<Triangle> triangles = new List<Triangle>();
+    public List<Tile> tiles = new List<Tile>();
 
     public float radius;
     public int recursion;
 
-    public Vector3 original = Vector3.zero;
+    public Transform root { get; private set; }
 
-    public List<Triangle> roots = new List<Triangle>();
+    public List<Tile> roots = new List<Tile>();
 
     // return index of point in the middle of p1 and p2
     private static int getMiddlePoint(int p1, int p2, ref List<Vector3> vertices, ref Dictionary<long, int> cache, float radius)
@@ -142,11 +145,11 @@ public class SphereGrid
 
     private struct TriangleIndices
     {
-        public Triangle triangle { get; private set; }
+        public Tile tile { get; private set; }
         public Vector3Int index { get; private set; }
-        public TriangleIndices(Triangle triangle, Vector3Int index)
+        public TriangleIndices(Tile triangle, Vector3Int index)
         {
-            this.triangle = triangle;
+            this.tile = triangle;
             this.index = index;
         }
     }
@@ -159,6 +162,10 @@ public class SphereGrid
         { 
             this.from = from;
             this.to = to;
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
         public static bool operator ==(Segment a, Segment b)
         {
@@ -175,12 +182,12 @@ public class SphereGrid
             Segment o = (Segment)obj;
             if ((object)o == null)
                 return false;
-            return (from == o.from && to == o.to);
+            return (from == o.from && to == o.to) || (from == o.to && to == o.from);
         }
 
         public bool Equals(Segment o)
         {
-            return (from == o.from && to == o.to);
+            return (from == o.from && to == o.to) || (from == o.to && to == o.from);
         }
     }
 
@@ -247,7 +254,7 @@ public class SphereGrid
         faces.Add(new TriangleIndices(null, new Vector3Int(9, 8, 1)));
 
 
-        roots = new List<Triangle>();
+        roots = new List<Tile>();
        
         // refine triangles
         for (int i = 0; i < recursion; i++)
@@ -255,16 +262,18 @@ public class SphereGrid
             faces2.Clear();
             foreach (var tri in faces)
             {
-                var triangle = new Triangle(tri.index, vertList[tri.index.x], vertList[tri.index.y], vertList[tri.index.z]);
-
-                if (tri.triangle == null)
+                Tile tile = null;
+                if (tri.tile == null)
                 {
-                    roots.Add(triangle);
+                    tile = new Tile(null, vertList[tri.index.x], vertList[tri.index.y], vertList[tri.index.z]);
+                    tile.index = roots.Count;
+                    roots.Add(tile);
                 }
                 else
                 {
-                   
-                    tri.triangle.children.Add(triangle);
+                    tile = new Tile(tri.tile, vertList[tri.index.x], vertList[tri.index.y], vertList[tri.index.z]);
+                    tile.index = tri.tile.index * 10 + tri.tile.children.Count;
+                    tri.tile.children.Add(tile);
                 }
 
                 // replace triangle by 4 triangles
@@ -272,42 +281,46 @@ public class SphereGrid
                 int b = getMiddlePoint(tri.index.y, tri.index.z, ref vertList, ref middlePointIndexCache, radius);
                 int c = getMiddlePoint(tri.index.z, tri.index.x, ref vertList, ref middlePointIndexCache, radius);
 
-                faces2.Add(new TriangleIndices(triangle, new Vector3Int(tri.index.x, a, c)));
-                faces2.Add(new TriangleIndices(triangle, new Vector3Int(tri.index.y, b, a)));
-                faces2.Add(new TriangleIndices(triangle, new Vector3Int(tri.index.z, c, b)));
-                faces2.Add(new TriangleIndices(triangle, new Vector3Int(a, b, c)));
+                faces2.Add(new TriangleIndices(tile, new Vector3Int(tri.index.x, a, c)));
+                faces2.Add(new TriangleIndices(tile, new Vector3Int(tri.index.y, b, a)));
+                faces2.Add(new TriangleIndices(tile, new Vector3Int(tri.index.z, c, b)));
+                faces2.Add(new TriangleIndices(tile, new Vector3Int(a, b, c)));
             }
             var temp = faces;
             faces = faces2;
             faces2 = temp;
         }
 
-        Dictionary<Segment, List<Triangle>> segmentToTriangeDic = new Dictionary<Segment, List<Triangle>>();
+        Dictionary<Segment, List<Tile>> segmentToTriangeDic = new Dictionary<Segment, List<Tile>>();
 
         for(int i = 0; i <faces.Count; ++i)
         {
-            var tri = faces[i];
+            var face = faces[i];
+            
+            Tile tile  = new Tile(face.tile, vertList[face.index.x], vertList[face.index.y], vertList[face.index.z]);
 
-            var triangle = new Triangle(tri.index, vertList[tri.index.x], vertList[tri.index.y], vertList[tri.index.z]);
+            tile.index = i;
 
-            triangles.Add(triangle);
-            if(tri.triangle!= null)
+            if (face.tile != null)
             {
-                tri.triangle.children.Add(triangle);
+                face.tile.children.Add(tile);
             }
+         
+            tiles.Add(tile);
+           
 
-            Segment ab = new Segment(triangle.a, triangle.b);
-            Segment ac = new Segment(triangle.a, triangle.c);
-            Segment bc = new Segment(triangle.b, triangle.c);
+            Segment ab = new Segment(tile.a, tile.b);
+            Segment ac = new Segment(tile.a, tile.c);
+            Segment bc = new Segment(tile.b, tile.c);
 
-            SetNeihbors(ref segmentToTriangeDic, ab, triangle);
-            SetNeihbors(ref segmentToTriangeDic, ac, triangle);
-            SetNeihbors(ref segmentToTriangeDic, bc, triangle);
+            SetNeihbors(ref segmentToTriangeDic, ab, tile);
+            SetNeihbors(ref segmentToTriangeDic, ac, tile);
+            SetNeihbors(ref segmentToTriangeDic, bc, tile);
 
         }
 
     }
-    private void SetNeihbors(ref Dictionary<Segment, List<Triangle>> segmentToTriangeDic,Segment segment,Triangle triangle)
+    private void SetNeihbors(ref Dictionary<Segment, List<Tile>> segmentToTriangeDic,Segment segment,Tile triangle)
     {
         if (segmentToTriangeDic.ContainsKey(segment))
         {
@@ -327,14 +340,24 @@ public class SphereGrid
             }
             list.Add(triangle);
         }
+        else
+        {
+            segmentToTriangeDic.Add(segment, new List<Tile>());
+            segmentToTriangeDic[segment].Add(triangle);
+        }
             
     }
 
-    public void Show(Transform parent, Material material)
+    public void Show(Material material)
     {
-        for (int i = 0; i < triangles.Count; i++)
+        if(root== null)
         {
-            triangles[i].Show(parent,material);
+            root = new GameObject("grid").transform;
+
+        }
+        for (int i = 0; i < tiles.Count; i++)
+        {
+            tiles[i].Show(root, material);
         }
     }
 }

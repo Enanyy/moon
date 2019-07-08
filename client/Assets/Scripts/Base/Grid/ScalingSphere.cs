@@ -9,25 +9,33 @@ public class ScalingSphere : MonoBehaviour {
    
     public float SphereRadius = 1;
     public int SphereDetail = 0;
-    public bool Activate = false;
-    public bool SaveSphere = false;
 
     public Material material;
 
-   
+
+    public SphereGrid grid;
+
 	// Use this for initialization
 	void Awake () {
-       
+         grid = new SphereGrid();
+        float time = Time.time;
+
+        grid.GenerateTriangle(SphereRadius, SphereDetail);
+        Debug.Log(Time.time - time);
+        grid.Show(material);
+
+        grid.root.position = transform.position;
+
+        for (int i = 0; i < grid.roots.Count; ++i)
+        {
+            SetColor(grid.roots[i], new Color(i * 0.05f, i * 0.05f, i * 0.05f));
+        }
+
     }
 
     void Update()
     {
-        // avoiding the use of a UI class.
-        if (Activate)
-        {
-            StartCoroutine(ThreadGenerateGrid());
-            Activate = false;
-        }
+       
 
         //index = Mathf.Clamp(index, 0, tiles.Count -1);
         //if (tiles.ContainsKey(index))
@@ -43,31 +51,7 @@ public class ScalingSphere : MonoBehaviour {
     }
 	
   
-
-    IEnumerator ThreadGenerateGrid()
-    {
-        float time = Time.time;
-        int task = ThreadRunner.CreateThread(new System.Threading.ParameterizedThreadStart(ThreadedSphere), (object)transform.position);
-        ThreadRunner.StartThread(task);
-
-        while (!ThreadRunner.isComplete(task))
-        {
-            yield return null;
-        }
-
-        SphereGrid grid = (SphereGrid)ThreadRunner.FetchData(task);
-
-        Debug.Log(Time.time - time);
-        grid.Show(transform,material);
-
-        for(int i = 0; i < grid.roots.Count;++i)
-        {
-            SetColor(grid.roots[i], new Color(i * 0.05f, i*0.05f, i * 0.05f));
-        }
-
-    }
-
-    void SetColor(Triangle triangle, Color color)
+    void SetColor(Tile triangle, Color color)
     {
         if(triangle != null)
         {
@@ -88,20 +72,6 @@ public class ScalingSphere : MonoBehaviour {
                 }
             }
         }
-    }
-   
-
-
-    void ThreadedSphere(object d)
-    {
-        SphereGrid grid = new SphereGrid();
-        grid.original = (Vector3) d;
-
-        grid.GenerateTriangle(SphereRadius,SphereDetail);
-
-        ThreadRunner.ExportData(grid);
-        ThreadRunner.MarkComplete();
-
     }
 
     float Area(Vector2 one, Vector2 two, Vector2 three) { return Area((Vector3)one, (Vector3)two, (Vector3)three); }
