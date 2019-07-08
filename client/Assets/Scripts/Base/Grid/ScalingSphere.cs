@@ -20,7 +20,7 @@ public class ScalingSphere : MonoBehaviour {
          grid = new SphereGrid();
         float time = Time.time;
 
-        grid.GenerateTriangle(SphereRadius, SphereDetail);
+        grid.Init(SphereRadius, SphereDetail);
         Debug.Log(Time.time - time);
         grid.Show(material);
 

@@ -147,9 +147,9 @@ public class SphereGrid
     {
         public Tile tile { get; private set; }
         public Vector3Int index { get; private set; }
-        public TriangleIndices(Tile triangle, Vector3Int index)
+        public TriangleIndices(Tile tile, Vector3Int index)
         {
-            this.tile = triangle;
+            this.tile = tile;
             this.index = index;
         }
     }
@@ -191,7 +191,7 @@ public class SphereGrid
         }
     }
 
-    public void GenerateTriangle(float radius, int recursion)
+    public void Init(float radius, int recursion)
     {
 
         this.radius = radius;
@@ -431,8 +431,6 @@ public class SphereGrid
         {
             //遍历开启列表，找到消费最小的点作为检查点
             Tile cur = mOpenList[0];
-
-
 
             var curNode = GetNode(cur);
 
