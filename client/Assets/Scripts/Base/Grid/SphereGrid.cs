@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml;
 using UnityEngine;
 
 
@@ -23,28 +25,54 @@ public class Tile
     /// localPosition
     /// </summary>
     public Vector3 center { get; private set; }
-
+    /// <summary>
+    /// 三角网格
+    /// </summary>
     public SphereGrid grid { get; private set; }
-   
+
+    /// <summary>
+    /// 邻边三角形（不包括自己）
+    /// </summary>
     public List<Tile> neihbors { get; private set; }
 
+    /// <summary>
+    /// 每个顶点对应的三角形(不包含自己)
+    /// </summary>
+    public Dictionary<Vector3, List<Tile>> corners { get; private set; }
+    /// <summary>
+    /// 父三角形
+    /// </summary>
     public Tile parent { get; private set; }
+    /// <summary>
+    /// 所有三角形
+    /// </summary>
     public List<Tile> children { get; private set; }
 
     public GameObject go { get; private set; }
 
+    public bool isValid = true;
+
+    /// <summary>
+    ///获取根三角形，也就是属于20个面的哪个
+    /// </summary>
     public Tile root
     {
         get
         {
             Tile tile = this;
-            while (tile.parent!= null)
+            while (tile.parent != null)
             {
                 tile = tile.parent;
             }
 
             return tile;
         }
+    }
+
+    public Tile(SphereGrid grid, Tile parent)
+    {
+        this.grid = grid;
+        this.parent = parent;
     }
 
     public Tile(SphereGrid grid, Tile parent, Vector3 a, Vector3 b, Vector3 c)
@@ -60,9 +88,11 @@ public class Tile
         center = (a + b + c) / 3f;
         neihbors = new List<Tile>();
         children = new List<Tile>();
+        corners = new Dictionary<Vector3, List<Tile>>();
     }
 
-    public void Show( Material material)
+    #region 可视化相关
+    public void Show(Material material)
     {
         if (grid.root)
         {
@@ -70,9 +100,9 @@ public class Tile
             List<int> tris = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
 
-            verts.Add(a );
-            verts.Add(b );
-            verts.Add(c );
+            verts.Add(a);
+            verts.Add(b);
+            verts.Add(c);
 
             tris.Add(0);
             tris.Add(1);
@@ -98,7 +128,7 @@ public class Tile
             go.transform.localPosition = Vector3.zero;
             var mr = go.AddComponent<MeshRenderer>();
             var mf = go.AddComponent<MeshFilter>();
-          
+
             mf.mesh = ms;
             mr.material = material;
             mr.enabled = true;
@@ -111,7 +141,7 @@ public class Tile
         if (go != null)
         {
             var r = go.GetComponent<MeshRenderer>();
-            r.material.SetColor("_Color",color);
+            r.material.SetColor("_Color", color);
         }
     }
 
@@ -123,6 +153,8 @@ public class Tile
             r.enabled = active;
         }
     }
+    #endregion
+
 
     /// <summary>
     /// 
@@ -144,7 +176,7 @@ public class Tile
     /// <param name="c"></param>
     /// <param name="p"></param>
     /// <returns></returns>
-    public static bool PointInTriangle( Vector3 a, Vector3 b, Vector3 c, Vector3 p)
+    public static bool PointInTriangle(Vector3 a, Vector3 b, Vector3 c, Vector3 p)
     {
 
         Vector3 sa = a - p; //new Vector2(a.x - p.x, a.z - p.z);
@@ -158,21 +190,112 @@ public class Tile
         {
             return false;
         }
-        
+
         return true;
     }
 
-    
+    public XmlElement ToXml(XmlNode parent)
+    {
+        Dictionary<string, string> attributes = new Dictionary<string, string>();
+
+        attributes.Add("index", index.ToString());
+        attributes.Add("a", a.ToStringEx());
+        attributes.Add("b", b.ToStringEx());
+        attributes.Add("c", c.ToStringEx());
+        if (isValid == false)
+        {
+            attributes.Add("isValid", "0");
+        }
+
+        var node = CreateXmlNode(parent, GetType().ToString(), attributes);
+
+        for (int i = 0; i < children.Count; ++i)
+        {
+            children[i].ToXml(node);
+        }
+
+        return node;
+    } 
+
+
+    public static XmlElement CreateXmlNode(XmlNode parent, string tag, Dictionary<string, string> attributes)
+    {
+        XmlDocument doc;
+        if (parent.ParentNode == null)
+        {
+            doc = (XmlDocument)parent;
+        }
+        else
+        {
+            doc = parent.OwnerDocument;
+        }
+        XmlElement node = doc.CreateElement(tag);
+
+        parent.AppendChild(node);
+
+        foreach (var v in attributes)
+        {
+            //创建一个属性
+            XmlAttribute attribute = doc.CreateAttribute(v.Key);
+            attribute.Value = v.Value;
+            //xml节点附件属性
+            node.Attributes.Append(attribute);
+        }
+
+        return node;
+    }
+
+
+    public virtual void ParseXml(XmlElement node)
+    {
+        if (node != null)
+        {
+            index = node.GetAttribute("index").ToInt32Ex();
+            a = node.GetAttribute("a").ToVector3Ex();
+            b = node.GetAttribute("b").ToVector3Ex();
+            c = node.GetAttribute("c").ToVector3Ex();
+            isValid = node.GetAttribute("isValid") == "1";
+            if (node.ChildNodes != null)
+            {
+                for (int i = 0; i < node.ChildNodes.Count; ++i)
+                {
+                    var child = node.ChildNodes[i] as XmlElement;
+                    Type type = Type.GetType(child.Name);
+                    if (type == GetType())
+                    {
+                        Tile tile = new Tile(grid,this);
+                        tile.ParseXml(child);
+
+                        children.Add(tile);
+                        grid.tiles.Add(tile);
+                    }
+                }
+            }
+        }
+    }
+
 }
 public class SphereGrid
 {
+    /// <summary>
+    /// 所有最小三角面
+    /// </summary>
     public List<Tile> tiles = new List<Tile>();
-
+    /// <summary>
+    /// 球半径
+    /// </summary>
     public float radius;
+    /// <summary>
+    /// 递归细分次数
+    /// </summary>
     public int recursion;
-
+    /// <summary>
+    /// 20个三角面的树结构
+    /// </summary>
     public List<Tile> roots = new List<Tile>();
-
+    /// <summary>
+    /// 球的Transform，SphereCollider，用于点击定位球面位置已及三角形的顶点转换为世界坐标
+    /// </summary>
     public Transform root { get; private set; }
 
     public SphereGrid()
@@ -183,14 +306,16 @@ public class SphereGrid
     {
         this.root = root;
 
-        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.transform.SetParent(root);
-        sphere.transform.localPosition = Vector3.zero;
-        sphere.transform.localScale = Vector3.one * radius * 2;
-
-        sphere.GetComponent<MeshRenderer>().enabled = false;
+        SphereCollider collider = root.GetComponent<SphereCollider>();
+        if (collider == null) collider = root.gameObject.AddComponent<SphereCollider>();
+        collider.center = Vector3.zero;
+        collider.radius = radius;
     }
-
+    /// <summary>
+    /// 初始化球形三角网格
+    /// </summary>
+    /// <param name="radius">球形半径</param>
+    /// <param name="recursion">递归细分次数</param>
     public void Init(float radius, int recursion)
     {
         this.radius = radius;
@@ -302,7 +427,7 @@ public class SphereGrid
         }
 
         Dictionary<Segment, List<Tile>> segmentToTriangeDic = new Dictionary<Segment, List<Tile>>();
-
+        Dictionary<Vector3, List<Tile>> pointToTriangeDic = new Dictionary<Vector3, List<Tile>>();
         for (int i = 0; i < faces.Count; ++i)
         {
             var tri = faces[i];
@@ -326,6 +451,10 @@ public class SphereGrid
             SetNeihbors(ref segmentToTriangeDic, ab, tile);
             SetNeihbors(ref segmentToTriangeDic, ac, tile);
             SetNeihbors(ref segmentToTriangeDic, bc, tile);
+
+            SetCorners(ref pointToTriangeDic, tile.a, tile);
+            SetCorners(ref pointToTriangeDic, tile.b, tile);
+            SetCorners(ref pointToTriangeDic, tile.c, tile);
         }
 
 
@@ -405,8 +534,8 @@ public class SphereGrid
         {
             if (obj == null)
                 return false;
-            Segment o = (Segment) obj;
-            if ((object) o == null)
+            Segment o = (Segment)obj;
+            if ((object)o == null)
                 return false;
             return (from == o.from && to == o.to) || (from == o.to && to == o.from);
         }
@@ -418,20 +547,20 @@ public class SphereGrid
     }
 
 
-    private void SetNeihbors(ref Dictionary<Segment, List<Tile>> segmentToTriangeDic,Segment segment,Tile tile)
+    private void SetNeihbors(ref Dictionary<Segment, List<Tile>> segmentToTriangeDic, Segment segment, Tile tile)
     {
         if (segmentToTriangeDic.ContainsKey(segment))
         {
             var list = segmentToTriangeDic[segment];
 
-            for(int i = 0; i <list.Count; ++i)
+            for (int i = 0; i < list.Count; ++i)
             {
 
-                if (list[i].neihbors.Contains(tile)==false)
+                if (list[i].neihbors.Contains(tile) == false)
                 {
                     list[i].neihbors.Add(tile);
                 }
-                if(tile.neihbors.Contains(list[i])==false)
+                if (tile.neihbors.Contains(list[i]) == false)
                 {
                     tile.neihbors.Add(list[i]);
                 }
@@ -440,10 +569,46 @@ public class SphereGrid
         }
         else
         {
-            segmentToTriangeDic.Add(segment,new List<Tile>());
+            segmentToTriangeDic.Add(segment, new List<Tile>());
             segmentToTriangeDic[segment].Add(tile);
         }
-            
+
+    }
+
+    private void SetCorners(ref Dictionary<Vector3, List<Tile>> pointToTriangeDic, Vector3 point, Tile tile)
+    {
+        if (pointToTriangeDic.ContainsKey(point))
+        {
+            var list = pointToTriangeDic[point];
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].corners.ContainsKey(point) == false)
+                {
+                    list[i].corners.Add(point, new List<Tile>());
+                }
+
+                if (list[i].corners[point].Contains(tile) == false)
+                {
+                    list[i].corners[point].Add(tile);
+                }
+
+                if (tile.corners.ContainsKey(point) == false)
+                {
+                    tile.corners.Add(point, new List<Tile>());
+                }
+
+                if (tile.corners[point].Contains(list[i]) == false)
+                {
+                    tile.corners[point].Add(list[i]);
+                }
+            }
+            list.Add(tile);
+        }
+        else
+        {
+            pointToTriangeDic.Add(point, new List<Tile>());
+            pointToTriangeDic[point].Add(tile);
+        }
     }
 
     public void Show(Material material)
@@ -494,12 +659,18 @@ public class SphereGrid
 
         return mNodeDic[t];
     }
-
+    /// <summary>
+    /// 网格寻路
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <param name="isValid">返回该tile是否可走</param>
+    /// <returns></returns>
     public Stack<Tile> FindPath(Tile from, Tile to, Func<Tile, bool> isValid)
     {
         Stack<Tile> result = new Stack<Tile>();
 
-        if (from == null || to == null || isValid == null )
+        if (from == null || to == null || isValid == null)
         {
             Debug.LogError("参数不能为空");
             return result;
@@ -523,8 +694,6 @@ public class SphereGrid
         {
             //遍历开启列表，找到消费最小的点作为检查点
             Tile cur = mOpenList[0];
-
-
 
             var curNode = GetNode(cur);
 
@@ -599,8 +768,13 @@ public class SphereGrid
 
         return result;
     }
-
-    public virtual int GetCostValue(Tile a, Tile b)
+    /// <summary>
+    /// 获取格子权重
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    protected virtual int GetCostValue(Tile a, Tile b)
     {
         int cntX = (int)Mathf.Abs(a.center.x - b.center.x);
         int cntY = (int)Mathf.Abs(a.center.y - b.center.y);
@@ -616,21 +790,20 @@ public class SphereGrid
     }
     #endregion
 
-
     /// <summary>
-    /// WorldPosition
+    /// 根据位置定位三角形
     /// </summary>
-    /// <param name="position"></param>
+    /// <param name="worldPosition"></param>
     /// <returns></returns>
     public Tile TileAt(Vector3 worldPosition)
     {
         Ray ray = new Ray(root.position, worldPosition - root.position);
 
-        return TileAt(ray, roots,worldPosition);
+        return TileAt(ray, roots, worldPosition);
     }
 
 
-    private Tile TileAt(Ray ray, List<Tile> list, Vector3 worldPosition)
+    private Tile TileAt(Ray ray, List<Tile> list, Vector3 position)
     {
         for (int i = 0; i < list.Count; i++)
         {
@@ -648,7 +821,7 @@ public class SphereGrid
                 {
                     if (tile.children.Count > 0)
                     {
-                        var t = TileAt(ray, tile.children, worldPosition);
+                        var t = TileAt(ray, tile.children, position);
                         if (t != null)
                         {
                             return t;
@@ -664,6 +837,118 @@ public class SphereGrid
 
         return null;
     }
+    /// <summary>
+    /// 根据位置和范围获取三角形
+    /// </summary>
+    /// <param name="worldPosition"></param>
+    /// <param name="r"></param>
+    /// <returns></returns>
+    public List<Tile> TilesInRange(Vector3 worldPosition, int r)
+    {
+        List<Tile> ret = new List<Tile>();
 
+        var tile = TileAt(worldPosition);
+        if (tile != null)
+        {
+            ret.Add(tile);
+            List<Tile> neihbors = new List<Tile>();
+            List<Tile> neihbors2 = new List<Tile>();
+            neihbors.Add(tile);
+
+            for (int i = 1; i <= r; ++i)
+            {
+                neihbors2.Clear();
+                for (int j = neihbors.Count - 1; j >= 0; j--)
+                {
+                    for (int k = 0; k < neihbors[j].neihbors.Count; k++)
+                    {
+                        if (ret.Contains(neihbors[j].neihbors[k]) == false)
+                        {
+                            ret.Add(neihbors[j].neihbors[k]);
+                            neihbors2.Add(neihbors[j].neihbors[k]);
+                        }
+                    }
+
+                    if (i == r - 1)
+                    {
+                        var it = neihbors[j].corners.GetEnumerator();
+                        while (it.MoveNext())
+                        {
+                            for (int k = 0; k < it.Current.Value.Count; k++)
+                            {
+                                if (ret.Contains(it.Current.Value[k]) == false)
+                                {
+                                    ret.Add(it.Current.Value[k]);
+                                }
+                            }
+                        }
+                    }
+                }
+                var temp = neihbors;
+                neihbors = neihbors2;
+                neihbors2 = temp;
+            }
+
+
+        }
+
+        return ret;
+    }
+    /// <summary>
+    /// 采样球面点
+    /// </summary>
+    /// <param name="worldPosition"></param>
+    /// <returns></returns>
+    public Vector3 Sample(Vector3 worldPosition)
+    {
+        Ray ray = new Ray(root.position, worldPosition - root.position);
+        worldPosition = ray.GetPoint(radius);
+        return worldPosition;
+    }
+
+    public string ToXml()
+    {
+        XmlDocument doc = new XmlDocument();
+        XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "utf-8", "yes");
+        doc.InsertBefore(dec, doc.DocumentElement);
+
+        var grid = doc.CreateElement("Grid");
+        doc.AppendChild(grid);
+        for (int i = 0; i < roots.Count; i++)
+        {
+            grid.AppendChild(roots[i].ToXml(grid));
+        }
+        
+        MemoryStream ms = new MemoryStream();
+        XmlTextWriter xw = new XmlTextWriter(ms, System.Text.Encoding.UTF8);
+        xw.Formatting = Formatting.Indented;
+        doc.Save(xw);
+
+        ms = (MemoryStream)xw.BaseStream;
+        byte[] bytes = ms.ToArray();
+        string xml = System.Text.Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
+
+        return xml;
+    }
+
+    public void FromXml(string xml)
+    {
+        XmlDocument doc = new XmlDocument();
+
+        doc.LoadXml(xml);
+
+        var grid = doc.DocumentElement;
+
+        for (int i = 0; i < grid.ChildNodes.Count; ++i)
+        {
+            var child = grid.ChildNodes[i] as XmlElement;
+            if (child != null && child.Name == "Tile")
+            {
+                Tile tile = new Tile(this,null);
+                tile.ParseXml(child);
+                roots.Add(tile);
+            }
+        }
+    }
 }
 
