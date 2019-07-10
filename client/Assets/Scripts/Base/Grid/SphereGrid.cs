@@ -48,8 +48,7 @@ public class Tile
     /// </summary>
     public List<Tile> children { get; private set; }
 
-    public GameObject go { get; private set; }
-
+   
     public bool isValid = true;
 
     /// <summary>
@@ -82,6 +81,7 @@ public class Tile
         this.a = a;
         this.b = b;
         this.c = c;
+        
         Debug.Assert(a != b);
         Debug.Assert(b != c);
         Debug.Assert(a != c);
@@ -92,67 +92,36 @@ public class Tile
     }
 
     #region 可视化相关
-    public void Show(Material material)
-    {
-        if (grid.root)
-        {
-            List<Vector3> verts = new List<Vector3>();
-            List<int> tris = new List<int>();
-            List<Vector2> uvs = new List<Vector2>();
-
-            verts.Add(a);
-            verts.Add(b);
-            verts.Add(c);
-
-            tris.Add(0);
-            tris.Add(1);
-            tris.Add(2);
-
-
-            uvs.Add(new Vector2(0, 0));
-            uvs.Add(new Vector2(0.5f, 1));
-            uvs.Add(new Vector2(1, 0));
-
-            Mesh ms = new Mesh();
-            ms.vertices = verts.ToArray();
-            ms.triangles = tris.ToArray();
-            ms.uv = uvs.ToArray();
-
-            ms.RecalculateBounds();
-            ms.RecalculateNormals();
-
-            go = new GameObject();
-            go.name = index.ToString();
-            go.transform.SetParent(grid.root);
-            go.transform.localRotation = Quaternion.identity;
-            go.transform.localPosition = Vector3.zero;
-            var mr = go.AddComponent<MeshRenderer>();
-            var mf = go.AddComponent<MeshFilter>();
-
-            mf.mesh = ms;
-            mr.material = material;
-            mr.enabled = true;
-        }
-    }
 
     public Color defaultColor;
-    public void SetColor(Color color)
+
+    public Color color = Color.green;
+
+    public void SetColor(Color c)
     {
-        if (go != null)
-        {
-            var r = go.GetComponent<MeshRenderer>();
-            r.material.SetColor("_Color", color);
-        }
+        color = c;
+    }
+    public void GLDraw(Transform transform)
+    {
+        
+        // Draw lines
+
+     
+
+        // Vertex colors change from red to green
+
+        GL.Color(color);
+
+        // 以第一个为原点，绘制三角形面
+
+
+        GL.Vertex3(a.x, a.y, a.z);
+        GL.Vertex3(b.x, b.y, b.z);
+        GL.Vertex3(c.x, c.y, c.z);
+
+       
     }
 
-    public void SetActive(bool active)
-    {
-        if (go != null)
-        {
-            var r = go.GetComponent<MeshRenderer>();
-            r.enabled = active;
-        }
-    }
     #endregion
 
 
@@ -297,6 +266,9 @@ public class SphereGrid
     /// 球的Transform，SphereCollider，用于点击定位球面位置已及三角形的顶点转换为世界坐标
     /// </summary>
     public Transform root { get; private set; }
+
+    public List<int> blackList = new List<int>();
+
 
     public SphereGrid()
     {
@@ -611,12 +583,23 @@ public class SphereGrid
         }
     }
 
-    public void Show(Material material)
+    public void GLDraw(Material material)
     {
-        for (int i = 0; i < tiles.Count; i++)
+        material.SetPass(0);
+        GL.PushMatrix();
+
+        // match our transform
+
+        GL.MultMatrix(root.localToWorldMatrix);
+        GL.Begin(GL.TRIANGLES);
+        for (int i = 0; i < tiles.Count; ++i)
         {
-            tiles[i].Show(material);
+            tiles[i].GLDraw(root);
         }
+
+        GL.End();
+
+        GL.PopMatrix();
     }
 
     #region FindPath
