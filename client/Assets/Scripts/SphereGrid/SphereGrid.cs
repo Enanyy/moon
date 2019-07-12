@@ -965,6 +965,13 @@ public class SphereGrid
         }
     }
 
+    public static SphereGrid CreateFromXml(string xml)
+    {
+        SphereGrid grid = new SphereGrid();
+        grid.FromXml(xml);
+        return grid;
+    }
+
     public string ToXml()
     {
         RemoveDiscard(roots);
