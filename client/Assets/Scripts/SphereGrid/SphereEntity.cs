@@ -50,9 +50,24 @@ public class SphereEntity : MonoBehaviour
 
                 Vector3 position = transform.position + dir.normalized * moveSpeed * Time.deltaTime;
 
-                transform.position = grid.Sample(position);
+                position = grid.Sample(position);
 
-                RotateTo(destination);
+                normal = (position - grid.root.position).normalized;
+                plane.SetNormalAndPosition(normal, position);
+
+                ray.direction = normal;
+                ray.origin = position;
+
+                plane.Raycast(ray, out distance);
+
+                point = ray.GetPoint(distance);
+
+                dir = point - transform.position;
+
+                var rotation = Quaternion.LookRotation(dir, normal);
+
+                transform.SetPositionAndRotation(position, rotation);
+                
             }
             else
             {
