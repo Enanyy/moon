@@ -4,7 +4,7 @@ using System.Collections;
 public class SphereRotate : MonoBehaviour
 {
     private bool onDrag = false;  //是否被拖拽//    
-    public float speed = 6f;   //旋转速度//    
+    public float speed = 60f;   //旋转速度//    
     private float currentSpeed;   //阻尼速度// 
     private float axisX = 1;
     //鼠标沿水平方向移动的增量//   
@@ -15,6 +15,7 @@ public class SphereRotate : MonoBehaviour
 
     public Transform target;
 
+    private Vector3 lastMousePosition;
    
 
     void Start()
@@ -24,27 +25,19 @@ public class SphereRotate : MonoBehaviour
             target = transform;
         }
     }
-    void OnMouseDown()
-    {
-        //接受鼠标按下的事件// 
-        axisX = 0f; axisY = 0f;
-    }
-    void OnMouseDrag()     //鼠标拖拽时的操作// 
-    {
-        onDrag = true;
-        axisX = -Input.GetAxis("Mouse X");
-        //获得鼠标增量// 
-        axisY = Input.GetAxis("Mouse Y");
-    }
-
-    void OnMouseUp()
-    {
-        onDrag = false;
-        currentSpeed = speed;
-    }
-
+ 
     void Update()
     {
+        if(Input.GetMouseButtonDown(0))
+        {
+            onDrag = true;
+            lastMousePosition = Input.mousePosition;
+        }
+        if(Input.GetMouseButtonUp(0))
+        {
+            onDrag = false;
+        }
+
         if (onDrag == false)
         {
             if (currentSpeed > 0.01f)
@@ -60,17 +53,23 @@ public class SphereRotate : MonoBehaviour
         else
         {
             currentSpeed = speed;
+    
+            Vector3 mousePosition = Input.mousePosition;
+
+            axisX = (lastMousePosition.x - mousePosition.x) / Screen.width;
+            axisY = (mousePosition.y - lastMousePosition.y) / Screen.height;
+
+            lastMousePosition = mousePosition;
         }
         if (currentSpeed != 0)
         {
             if (target == transform)
             {
-                target.Rotate(new Vector3(axisY, axisX, 0) * currentSpeed, Space.World);
+                target.Rotate(new Vector3(axisY, axisX, 0).normalized * currentSpeed, Space.World);
             }
             else
             {
-                Debug.Log(-axisY+"," +(-axisX).ToString());
-                target.Rotate(new Vector3(-axisY, -axisX, 0) * currentSpeed, Space.Self);
+                target.Rotate(new Vector3(-axisY, -axisX, 0).normalized * currentSpeed, Space.Self);
             }
         }
     }

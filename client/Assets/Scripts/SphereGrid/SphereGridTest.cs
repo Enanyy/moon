@@ -24,6 +24,7 @@ public class SphereGridTest : MonoBehaviour {
 
         
         click = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        click.transform.SetParent(transform);
         click.GetComponent<SphereCollider>().enabled = false;
 
         grid = new SphereGrid();
@@ -55,7 +56,7 @@ public class SphereGridTest : MonoBehaviour {
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonUp(0))
         {
             if (grid != null)
             {
@@ -77,7 +78,7 @@ public class SphereGridTest : MonoBehaviour {
             }
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonUp(1))
         {
             if (grid != null && mSelectTile != null)
             {

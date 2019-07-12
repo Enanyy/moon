@@ -15,7 +15,8 @@ public class SphereEntity : MonoBehaviour
     {
         if (grid != null)
         {
-            destination = grid.Sample(worldPosition);
+           
+            destination = grid.root.InverseTransformPoint(grid.Sample(worldPosition));
             
         }
     }
@@ -33,14 +34,16 @@ public class SphereEntity : MonoBehaviour
         {
             float displacement = Time.deltaTime * moveSpeed;
 
-            float distance = Vector3.Distance(destination, transform.position);
+            Vector3 worldPosition = grid.root.TransformPoint(destination);
+
+            float distance = Vector3.Distance(worldPosition, transform.position);
             if(distance > displacement)
             {
                 Vector3 normal = (transform.position - grid.root.position).normalized;
 
                 Plane plane = new Plane(normal, transform.position);
 
-                var ray = new Ray(destination, normal);
+                var ray = new Ray(worldPosition, normal);
 
                 plane.Raycast(ray, out distance);
 
@@ -71,7 +74,7 @@ public class SphereEntity : MonoBehaviour
             }
             else
             {
-                transform.position = destination;
+                transform.position = worldPosition;
             }
         }
     }
