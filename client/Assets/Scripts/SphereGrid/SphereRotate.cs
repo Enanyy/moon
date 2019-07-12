@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SphereRoate : MonoBehaviour
+public class SphereRotate : MonoBehaviour
 {
     private bool onDrag = false;  //是否被拖拽//    
     public float speed = 6f;   //旋转速度//    
@@ -15,7 +15,7 @@ public class SphereRoate : MonoBehaviour
 
     public Transform target;
 
-    private bool controll = false;
+   
 
     void Start()
     {
@@ -45,16 +45,6 @@ public class SphereRoate : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftControl))
-        {
-            controll = true;
-        }
-
-        if (Input.GetKeyUp(KeyCode.LeftControl))
-        {
-            controll = false;
-        }
-
         if (onDrag == false)
         {
             if (currentSpeed > 0.01f)
@@ -71,7 +61,7 @@ public class SphereRoate : MonoBehaviour
         {
             currentSpeed = speed;
         }
-        if (currentSpeed != 0 && controll ==false)
+        if (currentSpeed != 0)
         {
             if (target == transform)
             {

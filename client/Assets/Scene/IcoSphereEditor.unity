@@ -122,9 +122,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1149838085}
   - component: {fileID: 1149838084}
-  - component: {fileID: 1149838086}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: SphereEditor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -138,13 +137,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1149838083}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3428a0188ecece44faad7afcce93a6ca, type: 3}
+  m_Script: {fileID: 11500000, guid: b700b1393c782184f92c8cb71656010f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SphereRadius: 100
   SphereDetail: 6
-  material: {fileID: 2100000, guid: 1cde7b63fab259f429453a5116fee1a0, type: 2}
-  range: 1
+  brushSize: 2
+  type: 2
 --- !u!4 &1149838085
 Transform:
   m_ObjectHideFlags: 0
@@ -158,19 +157,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1149838086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1149838083}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae0dfac7541373846a2a02fb514bf22f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 6
-  target: {fileID: 0}
 --- !u!1 &1299929520
 GameObject:
   m_ObjectHideFlags: 0

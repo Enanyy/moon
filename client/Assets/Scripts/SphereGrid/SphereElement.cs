@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class SphereFixed : MonoBehaviour
+public class SphereElement : MonoBehaviour
 {
 
-    public Transform sphere;
+    private SphereCenter center;
 
     public float distance = 100;
 
@@ -14,13 +14,14 @@ public class SphereFixed : MonoBehaviour
 
     void LateUpdate()
     {
-        if (sphere != null)
+
+        if (center != null)
         {
-            Vector3 direction = (transform.position - sphere.position).normalized;
+            Vector3 direction = (transform.position - center.transform.position).normalized;
 
             transform.up = direction;
 
-            Ray ray = new Ray(sphere.position, direction);
+            Ray ray = new Ray(center.transform.position, direction);
             Vector3 point = ray.GetPoint(distance);
 
             transform.position = point;

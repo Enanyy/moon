@@ -1,14 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Xml;
 using UnityEngine;
 
-
+public enum TileType{
+    Discard,  //丢弃的
+    Obstacle, //障碍物
+    Free,     //空闲的
+}
 
 public class Tile
 {
-    public int index;
+    public static Dictionary<TileType, Color> colors = new Dictionary<TileType, Color>
+    {
+        {TileType.Discard, Color.black},
+        {TileType.Obstacle, Color.red},
+        {TileType.Free, Color.green},
+    };
+
+    public int index { get; set; }
+
+    public int depth { get; set; }
     /// <summary>
     /// localPosition
     /// </summary>
@@ -47,9 +61,6 @@ public class Tile
     /// 所有三角形
     /// </summary>
     public List<Tile> children { get; private set; }
-
-   
-    public bool isValid = true;
 
     /// <summary>
     ///获取根三角形，也就是属于20个面的哪个
@@ -90,39 +101,6 @@ public class Tile
         children = new List<Tile>();
         corners = new Dictionary<Vector3, List<Tile>>();
     }
-
-    #region 可视化相关
-
-    public Color defaultColor;
-
-    public Color color = Color.green;
-
-    public void SetColor(Color c)
-    {
-        color = c;
-    }
-    public void GLDraw(Transform transform)
-    {
-        
-        // Draw lines
-
-     
-
-        // Vertex colors change from red to green
-
-        GL.Color(color);
-
-        // 以第一个为原点，绘制三角形面
-
-
-        GL.Vertex3(a.x, a.y, a.z);
-        GL.Vertex3(b.x, b.y, b.z);
-        GL.Vertex3(c.x, c.y, c.z);
-
-       
-    }
-
-    #endregion
 
 
     /// <summary>
@@ -171,10 +149,8 @@ public class Tile
         attributes.Add("a", a.ToStringEx());
         attributes.Add("b", b.ToStringEx());
         attributes.Add("c", c.ToStringEx());
-        if (isValid == false)
-        {
-            attributes.Add("isValid", "0");
-        }
+        attributes.Add("depth", depth.ToString());
+
 
         var node = CreateXmlNode(parent, GetType().ToString(), attributes);
 
@@ -223,7 +199,7 @@ public class Tile
             a = node.GetAttribute("a").ToVector3Ex();
             b = node.GetAttribute("b").ToVector3Ex();
             c = node.GetAttribute("c").ToVector3Ex();
-            isValid = node.GetAttribute("isValid") == "1";
+            depth = node.GetAttribute("depth").ToInt32Ex();
             if (node.ChildNodes != null)
             {
                 for (int i = 0; i < node.ChildNodes.Count; ++i)
@@ -267,7 +243,10 @@ public class SphereGrid
     /// </summary>
     public Transform root { get; private set; }
 
-    public List<int> blackList = new List<int>();
+    /// <summary>
+    /// tile的类型
+    /// </summary>
+    public Dictionary<int,TileType> tilesType = new Dictionary<int, TileType>();
 
 
     public SphereGrid()
@@ -367,6 +346,7 @@ public class SphereGrid
                         vertList[face.index.z]);
 
                     tile.index = roots.Count;
+                    tile.depth = i;
 
                     roots.Add(tile);
                 }
@@ -378,6 +358,7 @@ public class SphereGrid
                         vertList[face.index.z]);
 
                     tile.index = face.tile.index * 10 + face.tile.children.Count;
+                    tile.depth = i;
 
                     face.tile.children.Add(tile);
                 }
@@ -403,34 +384,56 @@ public class SphereGrid
         for (int i = 0; i < faces.Count; ++i)
         {
             var tri = faces[i];
-
-            var tile = new Tile(this, tri.tile,
-                vertList[tri.index.x],
-                vertList[tri.index.y],
-                vertList[tri.index.z]);
-
-            tiles.Add(tile);
-            if (tri.tile != null)
+            if (tilesType.Count == 0 || (tilesType.Count > 0 && tilesType.ContainsKey(i)))
             {
-                tile.index = i;
-                tri.tile.children.Add(tile);
+                var tile = new Tile(this, tri.tile,
+                    vertList[tri.index.x],
+                    vertList[tri.index.y],
+                    vertList[tri.index.z]);
+
+                tiles.Add(tile);
+                if (tri.tile != null)
+                {
+                    tile.index = i;
+                    tile.depth = tri.tile.depth + 1;
+                    tri.tile.children.Add(tile);
+                }
+
+                Segment ab = new Segment(tile.a, tile.b);
+                Segment ac = new Segment(tile.a, tile.c);
+                Segment bc = new Segment(tile.b, tile.c);
+
+                SetNeihbors(ref segmentToTriangeDic, ab, tile);
+                SetNeihbors(ref segmentToTriangeDic, ac, tile);
+                SetNeihbors(ref segmentToTriangeDic, bc, tile);
+
+                SetCorners(ref pointToTriangeDic, tile.a, tile);
+                SetCorners(ref pointToTriangeDic, tile.b, tile);
+                SetCorners(ref pointToTriangeDic, tile.c, tile);
             }
-
-            Segment ab = new Segment(tile.a, tile.b);
-            Segment ac = new Segment(tile.a, tile.c);
-            Segment bc = new Segment(tile.b, tile.c);
-
-            SetNeihbors(ref segmentToTriangeDic, ab, tile);
-            SetNeihbors(ref segmentToTriangeDic, ac, tile);
-            SetNeihbors(ref segmentToTriangeDic, bc, tile);
-
-            SetCorners(ref pointToTriangeDic, tile.a, tile);
-            SetCorners(ref pointToTriangeDic, tile.b, tile);
-            SetCorners(ref pointToTriangeDic, tile.c, tile);
         }
 
-
+        RemoveEmpty(roots);
     }
+
+    private void RemoveEmpty( List<Tile> list)
+    {
+        for (int i = list.Count - 1; i >= 0; i--)
+        {
+            var tile = list[i];
+            if (tile.depth < recursion)
+            {
+                RemoveEmpty(tile.children);
+
+                if (tile.children.Count == 0)
+                {
+                    list.RemoveAt(i);
+                }
+            }
+        }
+    }
+
+   
 
     // return index of point in the middle of p1 and p2
     private static int GetMiddlePoint(int p1, int p2, ref List<Vector3> vertices, ref Dictionary<long, int> cache, float radius)
@@ -583,9 +586,45 @@ public class SphereGrid
         }
     }
 
-    public void GLDraw(Material material)
+#if  UNITY_EDITOR
+    
+    private static Material mMaterial;
+
+    private static Material material
+    {
+        get
+        {
+            if (mMaterial == null)
+            {
+                Shader shader = Shader.Find("Hidden/Internal-Colored");
+
+                mMaterial = new Material(shader);
+
+                mMaterial.hideFlags = HideFlags.HideAndDontSave;
+
+                // Turn on alpha blending
+
+                mMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+
+                mMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+
+                // Turn backface culling off
+
+                mMaterial.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Back);
+
+                // Turn off depth writes
+
+                mMaterial.SetInt("_ZWrite", 0);
+            }
+
+            return mMaterial;
+        }
+    }
+
+    public void GLDraw()
     {
         material.SetPass(0);
+
         GL.PushMatrix();
 
         // match our transform
@@ -594,13 +633,25 @@ public class SphereGrid
         GL.Begin(GL.TRIANGLES);
         for (int i = 0; i < tiles.Count; ++i)
         {
-            tiles[i].GLDraw(root);
+            var tile = tiles[i];
+            Color color = Color.black;
+            if (tilesType.ContainsKey(tile.index))
+            {
+                color = Tile.colors[tilesType[tile.index]];
+            }
+            GL.Color(color);
+
+            GL.Vertex3(tile.a.x, tile.a.y, tile.a.z);
+            GL.Vertex3(tile.b.x, tile.b.y, tile.b.z);
+            GL.Vertex3(tile.c.x, tile.c.y, tile.c.z);
         }
 
         GL.End();
 
         GL.PopMatrix();
     }
+#endif
+
 
     #region FindPath
 
@@ -889,8 +940,35 @@ public class SphereGrid
         return worldPosition;
     }
 
+    private void RemoveDiscard(List<Tile> list)
+    {
+        for (int i = list.Count - 1; i >= 0; i--)
+        {
+            var tile = list[i];
+
+            RemoveDiscard(tile.children);
+
+            if (tile.depth == recursion)
+            {
+                if (tilesType.ContainsKey(tile.index) == false || tilesType[tile.index] == TileType.Discard)
+                {
+                    list.RemoveAt(i);
+                }
+            }
+            else
+            {
+                if (tile.children.Count == 0)
+                {
+                    list.RemoveAt(i);
+                }
+            }
+        }
+    }
+
     public string ToXml()
     {
+        RemoveDiscard(roots);
+
         XmlDocument doc = new XmlDocument();
         XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "utf-8", "yes");
         doc.InsertBefore(dec, doc.DocumentElement);
@@ -930,6 +1008,38 @@ public class SphereGrid
                 Tile tile = new Tile(this,null);
                 tile.ParseXml(child);
                 roots.Add(tile);
+            }
+        }
+    }
+
+    public string FormatTilesType()
+    {
+        StringBuilder builder = new StringBuilder();
+        var it = tilesType.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if (it.Current.Value != TileType.Discard)
+            {
+                builder.AppendFormat("{0}:{1};", it.Current.Key, (int) it.Current.Value);
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    public void ParseTilesType(string text)
+    {
+        string[] indexs = text.Split(';');
+        for (int i = 0; i < indexs.Length; i++)
+        {
+            string[] str = indexs[i].Split(':');
+            if (str.Length == 2)
+            {
+                int index = str[0].ToInt32Ex();
+                if (tilesType.ContainsKey(index) == false)
+                {
+                    tilesType.Add(index, (TileType)str[1].ToInt32Ex());
+                }
             }
         }
     }
