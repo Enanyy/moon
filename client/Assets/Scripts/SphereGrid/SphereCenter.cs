@@ -5,11 +5,20 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class SphereCenter : MonoBehaviour
 {
-    public static SphereCenter Instance;
-
-    void Awake()
+    private static SphereCenter mInstance;
+    public static SphereCenter Instance
     {
-        Instance = this;
+        get
+        {
+            if(mInstance == null)
+            {
+                mInstance = FindObjectOfType<SphereCenter>();
+            }
+            return mInstance;
+        }
     }
+
+    public float radius = 100;
+   
 }
 

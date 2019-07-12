@@ -5,35 +5,26 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class SphereElement : MonoBehaviour
 {
+    public float offset;
 
-    private SphereCenter center;
-
-    public float distance = 100;
-
-    public Vector3 lookAtWorldPosition;
+    public float angle;
 
     void LateUpdate()
     {
-
-        if (center != null)
+        if (SphereCenter.Instance!= null)
         {
-            Vector3 direction = (transform.position - center.transform.position).normalized;
+            Vector3 direction = (transform.position - SphereCenter.Instance.transform.position).normalized;
 
             transform.up = direction;
 
-            Ray ray = new Ray(center.transform.position, direction);
-            Vector3 point = ray.GetPoint(distance);
+            Ray ray = new Ray(SphereCenter.Instance.transform.position, direction);
+            Vector3 point = ray.GetPoint(SphereCenter.Instance.radius+ offset);
 
             transform.position = point;
-
-            Plane plane = new Plane(direction, point);
-            ray = new Ray(lookAtWorldPosition, direction);
-            float d;
-            plane.Raycast(ray, out d);
-            point = ray.GetPoint(d);
-
-            transform.LookAt(point, transform.up);
+   
+            transform.Rotate(transform.up, angle, Space.World);
 
         }
     }
+   
 }

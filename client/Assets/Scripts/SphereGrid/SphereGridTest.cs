@@ -17,6 +17,8 @@ public class SphereGridTest : MonoBehaviour {
 
     public int range = 1;
 
+    public SphereEntity entity;
+
     // Use this for initialization
     void Awake () {
 
@@ -62,6 +64,11 @@ public class SphereGridTest : MonoBehaviour {
                 if (tile != null)
                 {   
                     mSelectTile = tile;
+
+                    if(entity!= null)
+                    {
+                        entity.MoveTo(mSelectTile);
+                    }
                 }
                 else
                 {
@@ -89,7 +96,7 @@ public class SphereGridTest : MonoBehaviour {
                         while (points.Count > 0)
                         {
                             var p = points.Pop();
-                            //p.SetColor(Color.green);
+                            Debug.Log(p.index);
                         }
                     }
                 }
