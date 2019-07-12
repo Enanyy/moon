@@ -3,12 +3,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
-public class ScalingSphere : MonoBehaviour {
 
-    
-   
+public class SphereGridTest : MonoBehaviour {
+
     public float SphereRadius = 1;
     public int SphereDetail = 0;
 
@@ -61,25 +59,12 @@ public class ScalingSphere : MonoBehaviour {
             {
                 var tile = GetMousePositionTile();
 
-
                 if (tile != null)
-                {
-                    //if (mSelectTile != null)
-                    //{
-                    //    mSelectTile.SetColor(grid.tilesType.ContainsKey(mSelectTile.index) ? mSelectTile.defaultColor : Color.black);
-                    //}
-
-                    //tile.SetColor(Color.green);
-
+                {   
                     mSelectTile = tile;
                 }
                 else
                 {
-                    //if (mSelectTile != null)
-                    //{
-                    //     mSelectTile.SetColor(grid.tilesType.ContainsKey(mSelectTile.index) ? mSelectTile.defaultColor : Color.black);
-                    //}
-
                     mSelectTile = null;
                 }
             }

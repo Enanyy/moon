@@ -156,6 +156,21 @@ public class SphereGridEditor : MonoBehaviour {
             File.WriteAllText(path, text);
         }
     }
+    [ContextMenu("Save as XML")]
+    void SaveAsXml()
+    {
+        if (grid != null)
+        {
+            string text = grid.ToXml();
+
+            string path = Application.dataPath + "/spheregrid.xml";
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            File.WriteAllText(path, text);
+        }
+    }
 
     void Brush()
     {
