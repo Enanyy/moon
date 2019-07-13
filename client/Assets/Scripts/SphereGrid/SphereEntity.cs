@@ -35,7 +35,20 @@ public class SphereEntity : MonoBehaviour
         }
         else
         {
+
+            var it = paths.GetEnumerator();
+            while (it.MoveNext())
+            {
+                it.Current.SetDefaultColor();
+            }
+
             paths = grid.FindPath(current, tile, (t) => { return grid.tilesType.ContainsKey(t.index) && grid.tilesType[t.index] == TileType.Free; });
+
+            it = paths.GetEnumerator();
+            while(it.MoveNext())
+            { 
+                it.Current.SetColor(Color.blue);
+            }
         }
     }
 
@@ -87,12 +100,15 @@ public class SphereEntity : MonoBehaviour
 
                     var rotation = Quaternion.LookRotation(dir, normal);
 
+                    rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 10);
+
                     transform.SetPositionAndRotation(position, rotation);
 
                 }
                 else
                 {
                     transform.position = worldPosition;
+                    current.SetDefaultColor();
                     paths.Pop();
                 }
             }

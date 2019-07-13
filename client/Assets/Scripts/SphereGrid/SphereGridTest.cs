@@ -40,7 +40,11 @@ public class SphereGridTest : MonoBehaviour {
         grid.Init(SphereRadius,SphereDetail);
         grid.SetRoot(transform);
 
-        
+        for (int i = 0; i < grid.tiles.Count; ++i)
+        {
+            grid.tiles[i].SetDefaultColor();
+        }
+
 
     }
     private Tile mSelectTile;

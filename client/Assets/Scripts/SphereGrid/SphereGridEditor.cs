@@ -46,7 +46,10 @@ public class SphereGridEditor : MonoBehaviour {
             grid.ParseTilesType(text);
         }
 
-        
+        for(int i = 0; i < grid.tiles.Count; ++i)
+        {
+            grid.tiles[i].SetDefaultColor();
+        }
     }
    
 

@@ -78,7 +78,25 @@ public class Tile
             return tile;
         }
     }
+#if UNITY_EDITOR
+    public Color color;
 
+    public void SetColor(Color color)
+    {
+        this.color = color;
+    }
+    public void SetDefaultColor()
+    {
+        if(grid.tilesType.ContainsKey(index))
+        {
+            color = colors[grid.tilesType[index]];
+        }
+        else
+        {
+            color = Color.black;
+        }
+    }
+#endif
     public Tile(SphereGrid grid, Tile parent)
     {
         this.grid = grid;
@@ -634,12 +652,8 @@ public class SphereGrid
         for (int i = 0; i < tiles.Count; ++i)
         {
             var tile = tiles[i];
-            Color color = Color.black;
-            if (tilesType.ContainsKey(tile.index))
-            {
-                color = Tile.colors[tilesType[tile.index]];
-            }
-            GL.Color(color);
+            
+            GL.Color(tile.color);
 
             GL.Vertex3(tile.a.x, tile.a.y, tile.a.z);
             GL.Vertex3(tile.b.x, tile.b.y, tile.b.z);
