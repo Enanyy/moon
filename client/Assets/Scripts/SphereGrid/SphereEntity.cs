@@ -1,80 +1,100 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class SphereEntity : MonoBehaviour
 {
 
-    public SphereGrid grid;
-    public float moveSpeed = 6;
-
-    private Vector3 destination;
+    private SphereGrid grid;
+    public float moveSpeed = 10;
 
 
+    public Tile current;
 
-    public void MoveTo(Vector3 worldPosition)
+    public Stack<Tile> paths = new Stack<Tile>();
+
+    void Awake()
     {
-        if (grid != null)
-        {
-           
-            destination = grid.root.InverseTransformPoint(grid.Sample(worldPosition));
-            
-        }
+        grid = FindObjectOfType<SphereGridTest>().grid;
     }
+
+    public void SetTile(Tile tile)
+    {
+        current = tile;
+        grid = current.grid;
+        
+    }
+     
+  
 
     public void MoveTo(Tile tile)
     {
         grid = tile.grid;
-        Vector3 worldPosition = grid.root.TransformPoint(tile.center);
-        MoveTo(worldPosition);
+        if (current == null)
+        {
+            paths.Push(tile);
+        }
+        else
+        {
+            paths = grid.FindPath(current, tile, (t) => { return grid.tilesType.ContainsKey(t.index) && grid.tilesType[t.index] == TileType.Free; });
+        }
     }
 
     void Update()
     {
         if (grid != null)
         {
-            float displacement = Time.deltaTime * moveSpeed;
 
-            Vector3 worldPosition = grid.root.TransformPoint(destination);
-
-            float distance = Vector3.Distance(worldPosition, transform.position);
-            if(distance > displacement)
+            if (paths.Count > 0)
             {
-                Vector3 normal = (transform.position - grid.root.position).normalized;
+                current = paths.Peek();
 
-                Plane plane = new Plane(normal, transform.position);
+                Vector3 destination = current.center;
 
-                var ray = new Ray(worldPosition, normal);
+                float displacement = Time.deltaTime * moveSpeed;
 
-                plane.Raycast(ray, out distance);
+                Vector3 worldPosition = grid.root.TransformPoint(destination);
 
-                Vector3 point = ray.GetPoint(distance);
+                float distance = Vector3.Distance(worldPosition, transform.position);
+                if (distance > displacement)
+                {
+                    Vector3 normal = (transform.position - grid.root.position).normalized;
 
-                Vector3 dir = point - transform.position;
+                    Plane plane = new Plane(normal, transform.position);
 
-                Vector3 position = transform.position + dir.normalized * moveSpeed * Time.deltaTime;
+                    var ray = new Ray(worldPosition, normal);
 
-                position = grid.Sample(position);
+                    plane.Raycast(ray, out distance);
 
-                normal = (position - grid.root.position).normalized;
-                plane.SetNormalAndPosition(normal, position);
+                    Vector3 point = ray.GetPoint(distance);
 
-                ray.direction = normal;
-                ray.origin = position;
+                    Vector3 dir = point - transform.position;
 
-                plane.Raycast(ray, out distance);
+                    Vector3 position = transform.position + dir.normalized * moveSpeed * Time.deltaTime;
 
-                point = ray.GetPoint(distance);
+                    position = grid.Sample(position);
 
-                dir = point - transform.position;
+                    normal = (position - grid.root.position).normalized;
+                    plane.SetNormalAndPosition(normal, position);
 
-                var rotation = Quaternion.LookRotation(dir, normal);
+                    ray.direction = normal;
+                    ray.origin = position;
 
-                transform.SetPositionAndRotation(position, rotation);
-                
-            }
-            else
-            {
-                transform.position = worldPosition;
+                    plane.Raycast(ray, out distance);
+
+                    point = ray.GetPoint(distance);
+
+                    dir = point - transform.position;
+
+                    var rotation = Quaternion.LookRotation(dir, normal);
+
+                    transform.SetPositionAndRotation(position, rotation);
+
+                }
+                else
+                {
+                    transform.position = worldPosition;
+                    paths.Pop();
+                }
             }
         }
     }

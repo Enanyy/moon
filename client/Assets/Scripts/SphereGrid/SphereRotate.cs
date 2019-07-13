@@ -3,7 +3,7 @@ using System.Collections;
 
 public class SphereRotate : MonoBehaviour
 {
-    private bool onDrag = false;  //是否被拖拽//    
+    public bool onDrag = false;  //是否被拖拽//    
     public float speed = 60f;   //旋转速度//    
     private float currentSpeed;   //阻尼速度// 
     private float axisX = 1;
@@ -28,12 +28,12 @@ public class SphereRotate : MonoBehaviour
  
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButtonDown(1))
         {
             onDrag = true;
             lastMousePosition = Input.mousePosition;
         }
-        if(Input.GetMouseButtonUp(0))
+        if(Input.GetMouseButtonUp(1))
         {
             onDrag = false;
         }

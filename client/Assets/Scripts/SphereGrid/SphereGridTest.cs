@@ -13,7 +13,7 @@ public class SphereGridTest : MonoBehaviour {
 
     public Material material;
 
-    private SphereGrid grid;
+    public SphereGrid grid;
 
     public int range = 1;
 
@@ -22,7 +22,8 @@ public class SphereGridTest : MonoBehaviour {
     // Use this for initialization
     void Awake () {
 
-        
+        mainCamera = Camera.main;
+
         click = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         click.transform.SetParent(transform);
         click.GetComponent<SphereCollider>().enabled = false;
@@ -66,10 +67,7 @@ public class SphereGridTest : MonoBehaviour {
                 {   
                     mSelectTile = tile;
 
-                    if(entity!= null)
-                    {
-                        entity.MoveTo(mSelectTile);
-                    }
+                    entity.MoveTo(mSelectTile);
                 }
                 else
                 {
@@ -77,36 +75,10 @@ public class SphereGridTest : MonoBehaviour {
                 }
             }
         }
-
-        if (Input.GetMouseButtonUp(1))
-        {
-            if (grid != null && mSelectTile != null)
-            {
-
-                var tile = GetMousePositionTile();
-
-                if (tile != null)
-                {
-                    var points = grid.FindPath(mSelectTile,
-                        tile,
-                        (t) => { return true; }
-                    );
-
-                    if (points != null)
-                    {
-                        while (points.Count > 0)
-                        {
-                            var p = points.Pop();
-                            Debug.Log(p.index);
-                        }
-                    }
-                }
-            }
-
-        }
+        Scroll();
     }
 
-    Tile GetMousePositionTile()
+    public  Tile GetMousePositionTile()
     {
         if (grid != null)
         {
@@ -154,9 +126,42 @@ public class SphereGridTest : MonoBehaviour {
         return null;
     }
 
-    void ShowPoint(Vector3 position)
+
+
+    public Camera mainCamera { get; private set; }
+
+  
+    //缩放距离限制   
+
+    private float minScrollDistance = 120;
+    private float maxScrollDistance = 500;
+    private float scrollSpeed = 20;
+    void Scroll()
     {
-        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        go.transform.position = position;
+        // 鼠标滚轮触发缩放
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+
+        if ((scroll < -0.001 || scroll > 0.001) && mainCamera)
+        {
+            float displacement = scrollSpeed * scroll;
+
+            mainCamera.transform.position += mainCamera.transform.forward * displacement;
+            Ray ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
+            float distance = 0;
+
+            Plane plane = new Plane(mainCamera.transform.position - grid.root.position, grid.root.position);
+
+            plane.Raycast(ray, out distance);
+
+            if (distance < minScrollDistance)
+            {
+                mainCamera.transform.position = ray.GetPoint(distance - minScrollDistance);
+            }
+            else if (distance > maxScrollDistance)
+            {
+                mainCamera.transform.position = ray.GetPoint(distance - maxScrollDistance);
+            }
+        }
+
     }
 }
