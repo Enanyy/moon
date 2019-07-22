@@ -61,7 +61,7 @@ public class SphereEntity : MonoBehaviour
             {
                 current = paths.Peek();
 
-                Vector3 destination = current.center;
+                Vector3 destination = GetPathPoint(paths);
 
                 float displacement = Time.deltaTime * moveSpeed;
 
@@ -137,5 +137,35 @@ public class SphereEntity : MonoBehaviour
 
             transform.rotation = Quaternion.LookRotation(dir, transform.up);
         }
+    }
+
+    Vector3 GetPathPoint(Stack<Tile> paths)
+    {
+        if (paths.Count > 1)
+        {
+            var current = paths.Pop();
+            var next = paths.Peek();
+            paths.Push(current);
+
+            var it = next.neihbors.GetEnumerator();
+            while (it.MoveNext())
+            {
+                if (current.neihbors.ContainsKey(it.Current.Key))
+                {
+                    var edge = it.Current.Key;
+
+                    return (edge.from + edge.to) / 2;
+                }
+            }
+
+            return current.center;
+
+        }
+        else if(paths.Count > 0)
+        {
+            return paths.Peek().center;
+        }
+
+        return  Vector3.zero;
     }
 }

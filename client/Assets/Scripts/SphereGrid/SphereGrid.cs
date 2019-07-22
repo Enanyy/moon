@@ -13,6 +13,46 @@ public enum TileType{
 
 public class Tile
 {
+    public struct Edge
+    {
+        public Vector3 from;
+        public Vector3 to;
+
+        public Edge(Vector3 from, Vector3 to)
+        {
+            this.from = from;
+            this.to = to;
+        }
+        public override int GetHashCode()
+        {
+            return from.GetHashCode() + to.GetHashCode();
+        }
+        public static bool operator ==(Edge a, Edge b)
+        {
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(Edge a, Edge b)
+        {
+            return !a.Equals(b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+            Edge o = (Edge)obj;
+            if ((object)o == null)
+                return false;
+            return (from == o.from && to == o.to) || (from == o.to && to == o.from);
+        }
+
+        public bool Equals(Edge o)
+        {
+            return (from == o.from && to == o.to) || (from == o.to && to == o.from);
+        }
+    }
+
     public static Dictionary<TileType, Color> colors = new Dictionary<TileType, Color>
     {
         {TileType.Discard, Color.black},
@@ -43,11 +83,10 @@ public class Tile
     /// 三角网格
     /// </summary>
     public SphereGrid grid { get; private set; }
-
     /// <summary>
-    /// 邻边三角形（不包括自己）
+    /// 边对应的三角形
     /// </summary>
-    public List<Tile> neihbors { get; private set; }
+    public Dictionary<Edge,Tile> neihbors { get; private set; }
 
     /// <summary>
     /// 每个顶点对应的三角形(不包含自己)
@@ -115,8 +154,8 @@ public class Tile
         Debug.Assert(b != c);
         Debug.Assert(a != c);
         center = (a + b + c) / 3f;
-        neihbors = new List<Tile>();
         children = new List<Tile>();
+        neihbors = new Dictionary<Edge, Tile>();
         corners = new Dictionary<Vector3, List<Tile>>();
     }
 
@@ -397,7 +436,7 @@ public class SphereGrid
             faces2 = temp;
         }
 
-        Dictionary<Segment, List<Tile>> segmentToTriangeDic = new Dictionary<Segment, List<Tile>>();
+        Dictionary<Tile.Edge, List<Tile>> segmentToTriangeDic = new Dictionary<Tile.Edge, List<Tile>>();
         Dictionary<Vector3, List<Tile>> pointToTriangeDic = new Dictionary<Vector3, List<Tile>>();
         for (int i = 0; i < faces.Count; ++i)
         {
@@ -417,9 +456,9 @@ public class SphereGrid
                     tri.tile.children.Add(tile);
                 }
 
-                Segment ab = new Segment(tile.a, tile.b);
-                Segment ac = new Segment(tile.a, tile.c);
-                Segment bc = new Segment(tile.b, tile.c);
+                Tile.Edge ab = new Tile.Edge(tile.a, tile.b);
+                Tile.Edge ac = new Tile.Edge(tile.a, tile.c);
+                Tile.Edge bc = new Tile.Edge(tile.b, tile.c);
 
                 SetNeihbors(ref segmentToTriangeDic, ab, tile);
                 SetNeihbors(ref segmentToTriangeDic, ac, tile);
@@ -499,71 +538,33 @@ public class SphereGrid
         }
     }
 
-    private struct Segment
+ 
+
+
+    private void SetNeihbors(ref Dictionary<Tile.Edge, List<Tile>> edgeToTriangeDic, Tile.Edge edge, Tile tile)
     {
-        public Vector3 from;
-        public Vector3 to;
-
-        public Segment(Vector3 from, Vector3 to)
+        if (edgeToTriangeDic.ContainsKey(edge))
         {
-            this.from = from;
-            this.to = to;
-        }
-        public override int GetHashCode()
-        {
-            return from.GetHashCode() + to.GetHashCode();
-        }
-        public static bool operator ==(Segment a, Segment b)
-        {
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(Segment a, Segment b)
-        {
-            return !a.Equals(b);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-                return false;
-            Segment o = (Segment)obj;
-            if ((object)o == null)
-                return false;
-            return (from == o.from && to == o.to) || (from == o.to && to == o.from);
-        }
-
-        public bool Equals(Segment o)
-        {
-            return (from == o.from && to == o.to) || (from == o.to && to == o.from);
-        }
-    }
-
-
-    private void SetNeihbors(ref Dictionary<Segment, List<Tile>> segmentToTriangeDic, Segment segment, Tile tile)
-    {
-        if (segmentToTriangeDic.ContainsKey(segment))
-        {
-            var list = segmentToTriangeDic[segment];
+            var list = edgeToTriangeDic[edge];
 
             for (int i = 0; i < list.Count; ++i)
             {
-
-                if (list[i].neihbors.Contains(tile) == false)
+                if (list[i].neihbors.ContainsKey(edge) == false)
                 {
-                    list[i].neihbors.Add(tile);
+                    list[i].neihbors.Add(edge,tile);
                 }
-                if (tile.neihbors.Contains(list[i]) == false)
+
+                if (tile.neihbors.ContainsKey(edge) == false)
                 {
-                    tile.neihbors.Add(list[i]);
+                   tile.neihbors.Add(edge,list[i]);
                 }
             }
             list.Add(tile);
         }
         else
         {
-            segmentToTriangeDic.Add(segment, new List<Tile>());
-            segmentToTriangeDic[segment].Add(tile);
+            edgeToTriangeDic.Add(edge, new List<Tile>());
+            edgeToTriangeDic[edge].Add(tile);
         }
 
     }
@@ -788,10 +789,11 @@ public class SphereGrid
             //1.如果是墙或者在关闭列表中则跳过
             //2.如果点不在开启列表中则添加
             //3.如果点在开启列表中且当前的总花费比之前的总花费小，则更新该点信息
-            List<Tile> neighbours = cur.neihbors;
-            for (int i = 0; i < neighbours.Count; i++)
+            
+            var nit = cur.neihbors.GetEnumerator();
+            while (nit.MoveNext())
             {
-                var neighbour = neighbours[i];
+                var neighbour = nit.Current.Value;
 
                 if (isValid(neighbour) == false || mCloseList.Contains(neighbour))
                     continue;
@@ -908,25 +910,27 @@ public class SphereGrid
                 neihbors2.Clear();
                 for (int j = neihbors.Count - 1; j >= 0; j--)
                 {
-                    for (int k = 0; k < neihbors[j].neihbors.Count; k++)
+                    var nit = neihbors[j].neihbors.GetEnumerator();
+                    while (nit.MoveNext())
                     {
-                        if (ret.Contains(neihbors[j].neihbors[k]) == false)
+                        var neihbor = nit.Current.Value;
+                        if (ret.Contains(neihbor) == false)
                         {
-                            ret.Add(neihbors[j].neihbors[k]);
-                            neihbors2.Add(neihbors[j].neihbors[k]);
+                            ret.Add(neihbor);
+                            neihbors2.Add(neihbor);
                         }
                     }
 
                     if (i == r - 1)
                     {
-                        var it = neihbors[j].corners.GetEnumerator();
-                        while (it.MoveNext())
+                        var cit = neihbors[j].corners.GetEnumerator();
+                        while (cit.MoveNext())
                         {
-                            for (int k = 0; k < it.Current.Value.Count; k++)
+                            for (int k = 0; k < cit.Current.Value.Count; k++)
                             {
-                                if (ret.Contains(it.Current.Value[k]) == false)
+                                if (ret.Contains(cit.Current.Value[k]) == false)
                                 {
-                                    ret.Add(it.Current.Value[k]);
+                                    ret.Add(cit.Current.Value[k]);
                                 }
                             }
                         }
