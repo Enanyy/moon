@@ -108,7 +108,6 @@ public class AssetManager : MonoBehaviour
 
     private AssetBundle mManifestBundle;
     private AssetBundleManifest mManifest;
-    private string mAssetBundlePath;
     private Dictionary<string, Bundle> mAssetBundleDic = new Dictionary<string, Bundle>();
 
     public AssetMode assetMode { get; private set; }

@@ -20,8 +20,8 @@ public class MSG_BattleBeginNotify : Message<BattleBeginNotify>
             BattleEntity entity = ObjectPool.GetInstance<BattleEntity>();
 
             entity.id = data.id;
-
-            //entity.config = 10000 + data.config;
+            var table = DTHero.Get((int)data.config);
+            entity.config = table.config;
             entity.campflag = data.camp;
 
             entity.type = data.type;
