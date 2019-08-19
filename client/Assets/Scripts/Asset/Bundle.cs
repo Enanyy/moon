@@ -32,6 +32,12 @@ public class Bundle
     }
     public IEnumerator LoadBundleAsync()
     {
+#if UNITY_EDITOR
+        if (AssetManager.Instance.assetMode == AssetMode.Editor)
+        {
+            yield break;
+        }
+#endif
         if (dependenceNames != null)
         {
             for (int i = 0; i < dependenceNames.Length; ++i)
