@@ -25,7 +25,7 @@ public class Test : MonoBehaviour {
         mEntity = ObjectPool.GetInstance<BattleEntity>();
         mEntity.id = 1;
         mEntity.position = Vector3.zero;
-        mEntity.config = "nvjiangjun.txt";
+        mEntity.config = "yingxiong_kulouqishi.txt";
 
         BattleManager.Instance.AddEntity(mEntity);
         mEntity.active = true;
