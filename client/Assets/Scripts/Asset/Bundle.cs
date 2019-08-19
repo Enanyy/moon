@@ -98,77 +98,54 @@ public class Bundle
         }
         else
         {
-#if UNITY_EDITOR
-            if (AssetManager.Instance.assetMode == AssetMode.Editor)
+            if (task.type != AssetType.Resource)
             {
-                mAssetDic.TryGetValue(assetName, out asset);
-
-                if (asset == null)
+#if UNITY_EDITOR
+                if (AssetManager.Instance.assetMode == AssetMode.Editor)
                 {
-                    asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetName);
-                    if (asset)
-                    {
-                        mAssetDic.Add(assetName, asset);
-                    }
-                }
+                    mAssetDic.TryGetValue(assetName, out asset);
 
-                if (asset)
-                {                   
-                    if (typeof(T) == typeof(GameObject))
+                    if (asset == null)
                     {
-                        if (task.callback != null)
+                        asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetName);
+                        if (asset)
                         {
-                            var go = Object.Instantiate(asset) as GameObject;
-
-                            assetObject = new Asset<T>(assetName, this, asset, go as T);
-
-                            task.OnComplete(assetObject);
-                        }
-                    }
-                    else
-                    {
-                        if (task.callback != null)
-                        {
-                            assetObject = new Asset<T>(assetName, this, asset, asset as T);
-                            task.OnComplete(assetObject);
+                            mAssetDic.Add(assetName, asset);
                         }
                     }
                 }
                 else
                 {
-                    task.OnComplete(assetObject);
-                }
-                yield break;
-            }
 #endif
-
-            if (task.type != AssetType.Resource)
-            {
-                if (bundle == null)
-                {
-                    if (mAsyncOperation == null)
+                    if (bundle == null)
                     {
-                        yield return LoadBundleAsync();
-                    }
-                    else
-                    {
-                        yield return new WaitUntil(()=>mAsyncOperation.isDone);
-                    }
-                }
-
-                if (mAssetDic.ContainsKey(assetName) == false)
-                {
-                    if (bundle != null)
-                    {
-                        var request = bundle.LoadAssetAsync(assetName);
-
-                        yield return request;
-                        if (mAssetDic.ContainsKey(assetName) == false)
+                        if (mAsyncOperation == null)
                         {
-                            mAssetDic.Add(assetName, request.asset);
+                            yield return LoadBundleAsync();
+                        }
+                        else
+                        {
+                            yield return new WaitUntil(() => mAsyncOperation.isDone);
                         }
                     }
+
+                    if (mAssetDic.ContainsKey(assetName) == false)
+                    {
+                        if (bundle != null)
+                        {
+                            var request = bundle.LoadAssetAsync(assetName);
+
+                            yield return request;
+                            if (mAssetDic.ContainsKey(assetName) == false)
+                            {
+                                mAssetDic.Add(assetName, request.asset);
+                            }
+                        }
+                    }
+#if UNITY_EDITOR
                 }
+#endif
+
             }
             else
             {
