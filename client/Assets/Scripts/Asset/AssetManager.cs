@@ -222,43 +222,6 @@ public class AssetManager : MonoBehaviour
             yield return new WaitUntil(() => initialized == true);
         }
 
-#if UNITY_EDITOR
-        if (assetMode == AssetMode.Editor)
-        {
-            Asset<T> assetObject = null;
-
-            var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(task.assetName);
-
-            if (asset)
-            {
-                if (typeof(T) == typeof(GameObject))
-                {
-                    if (task.callback != null)
-                    {
-                        var go = Instantiate(asset) as GameObject;
-
-                        assetObject = new Asset<T>(task.assetName, null, asset, go as T);
-
-                        task.OnComplete(assetObject);
-                    }
-                }
-                else
-                {
-                    if (task.callback != null)
-                    {
-                        assetObject = new Asset<T>(task.assetName, null, asset, asset as T);
-                        task.OnComplete(assetObject);
-                    }
-                }
-            }
-            else
-            {
-                task.OnComplete(assetObject);
-            }
-            yield break;
-        }
-#endif
-
         Bundle bundle = CreateBundle(task.bundleName);
         StartCoroutine(bundle.LoadAsset(task));
     }

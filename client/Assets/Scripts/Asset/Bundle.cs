@@ -73,6 +73,8 @@ public class Bundle
     public IEnumerator LoadAsset<T>(LoadTask<Asset<T>> task) where T : UnityEngine.Object
     {
         Asset<T> assetObject = null;
+        Object asset = null;
+
         string assetName = task.assetName;
         if (mCacheAssetDic.ContainsKey(assetName) )
         {
@@ -96,6 +98,50 @@ public class Bundle
         }
         else
         {
+#if UNITY_EDITOR
+            if (AssetManager.Instance.assetMode == AssetMode.Editor)
+            {
+                mAssetDic.TryGetValue(assetName, out asset);
+
+                if (asset == null)
+                {
+                    asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetName);
+                    if (asset)
+                    {
+                        mAssetDic.Add(assetName, asset);
+                    }
+                }
+
+                if (asset)
+                {                   
+                    if (typeof(T) == typeof(GameObject))
+                    {
+                        if (task.callback != null)
+                        {
+                            var go = Object.Instantiate(asset) as GameObject;
+
+                            assetObject = new Asset<T>(assetName, this, asset, go as T);
+
+                            task.OnComplete(assetObject);
+                        }
+                    }
+                    else
+                    {
+                        if (task.callback != null)
+                        {
+                            assetObject = new Asset<T>(assetName, this, asset, asset as T);
+                            task.OnComplete(assetObject);
+                        }
+                    }
+                }
+                else
+                {
+                    task.OnComplete(assetObject);
+                }
+                yield break;
+            }
+#endif
+
             if (task.type != AssetType.Resource)
             {
                 if (bundle == null)
@@ -144,7 +190,6 @@ public class Bundle
                 }
             }
             
-            Object asset = null;
 
             mAssetDic.TryGetValue(assetName, out asset);
 
