@@ -1,39 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<EntityParamModel asset="yingxiong_kulouqishi.prefab" scale="1" hitPosition="(0.0, 0.0, 0.0)" rect="(20,20,240,20)">
-  <EntityParamAction action="Idle" weight="0" duration="86400" rect="(308,63,240,20)">
-    <EntityParamPluginSingleAnimation rect="(615,30,240,20)">
-      <AnimationClip beginAt="0" animationClip="idle" length="1.666667" />
+<EntityParamModel asset="m_airenhuojianpao.prefab" scale="1" hitPosition="(0.0, 0.0, 0.0)" rect="(20,20,240,20)">
+  <EntityParamAction action="Idle" weight="0" duration="86400" rect="(292,34,240,20)">
+    <EntityParamPluginSingleAnimation rect="(575,17,240,20)">
+      <AnimationClip beginAt="0" animationClip="idle" length="1" />
     </EntityParamPluginSingleAnimation>
   </EntityParamAction>
-  <EntityParamAction action="Run" weight="1" duration="86400" rect="(312,170,240,20)">
-    <EntityParamPluginSingleAnimation rect="(620,161,240,20)">
-      <AnimationClip beginAt="0" animationClip="run" length="1" />
+  <EntityParamAction action="Run" weight="1" duration="86400" rect="(282,139,240,20)">
+    <EntityParamPluginSingleAnimation rect="(570,146,240,20)">
+      <AnimationClip beginAt="0" animationClip="run" length="0.9333334" />
     </EntityParamPluginSingleAnimation>
-    <EntityParamPluginRun rect="(920,197,240,20)" />
+    <EntityParamPluginRun rect="(855,155,240,20)" />
+    <EntityParamPluginRotate rect="(863,209,240,20)" />
   </EntityParamAction>
-  <EntityParamAction action="Attack" weight="1" duration="1.8" rect="(310,277,240,20)">
-    <EntityParamPluginSingleAnimation rect="(616,295,240,20)">
-      <AnimationClip beginAt="0" animationClip="attack01" length="1.8" />
+  <EntityParamAction action="Attack" weight="1" duration="1.566667" rect="(286,233,240,20)">
+    <EntityParamPluginSingleAnimation rect="(574,272,240,20)">
+      <AnimationClip beginAt="0" animationClip="attack01" length="1.566667" />
     </EntityParamPluginSingleAnimation>
-    <EntityParamPluginRotate rect="(900,283,240,20)" />
+    <EntityParamPluginRotate rect="(934,369,240,20)" />
   </EntityParamAction>
-  <EntityParamAction action="Die" weight="10" duration="2.633333" rect="(310,411,240,20)">
-    <EntityParamPluginSingleAnimation rect="(630,428,240,20)">
-      <AnimationClip beginAt="0" animationClip="die" length="2.633333" />
+  <EntityParamAction action="Die" weight="10" duration="4.733334" rect="(294,334,240,20)">
+    <EntityParamPluginSingleAnimation rect="(572,405,240,20)">
+      <AnimationClip beginAt="0" animationClip="die" length="4.733334" />
     </EntityParamPluginSingleAnimation>
-    <EntityParamPluginRemove rect="(905,465,240,20)" />
   </EntityParamAction>
-  <EntityParamAction action="Jump" weight="0" duration="86400" rect="(326,525,240,20)">
-    <EntityParamPluginSingleAnimation rect="(619,610,240,20)">
-      <AnimationClip beginAt="0" animationClip="idle" length="1.666667" />
-    </EntityParamPluginSingleAnimation>
-    <EntityParamPluginJump rect="(945,608,240,20)" />
-  </EntityParamAction>
-  <EntityParamAnimation animationClip="attack01" length="1.8" mode="Default" rect="(21,398,240,20)">
-    <EntityParamEffectTime duration="2" bone="Weapon1" bind="1" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Self" asset="fx_kuloufashi_attack_xuli.prefab" delay="0" offset="(0.0, 0.0, 0.0)" rect="(1235,325,240,20)" />
-    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Target" asset="fx_kuloufashi_attack_hit.prefab" delay="0.5" offset="(0.0, 0.0, 0.0)" rect="(1231,563,240,20)" />
+  <EntityParamAnimation animationClip="attack01" length="1.566667" mode="Default" rect="(23,384,240,20)">
+    <EntityParamEffectParabola speed="30" gravity="10" heightOffset="2" heightLimit="20" effectType="Parabola" arise="ParentBegin" on="Self" asset="fx_xiaopaobing_paodan.prefab" delay="0.3" offset="(0.5, 1.0, 0.0)" rect="(892,449,240,20)">
+      <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="0" effectType="Time" arise="ParentTrigger" on="Target" asset="fx_xiaopaobing_hit.prefab" delay="0" offset="(0.0, 0.0, 0.0)" rect="(1344,463,240,20)" />
+    </EntityParamEffectParabola>
   </EntityParamAnimation>
-  <EntityParamAnimation animationClip="die" length="2.633333" mode="ClampForever" rect="(19,528,240,20)" />
-  <EntityParamAnimation animationClip="idle" length="1.666667" mode="Loop" rect="(8,175,240,20)" />
-  <EntityParamAnimation animationClip="run" length="1" mode="Loop" rect="(12,282,240,20)" />
+  <EntityParamAnimation animationClip="die" length="4.733334" mode="ClampForever" rect="(25,493,240,20)" />
+  <EntityParamAnimation animationClip="idle" length="1" mode="Loop" rect="(12,155,240,20)" />
+  <EntityParamAnimation animationClip="run" length="0.9333334" mode="Loop" rect="(15,272,240,20)" />
 </EntityParamModel>

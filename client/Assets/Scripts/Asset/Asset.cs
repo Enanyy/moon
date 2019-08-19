@@ -49,6 +49,10 @@ public class Asset<T>: IAsset where T:Object
         {
             bundle.ReturnAsset(this);
         }
+        else
+        {
+            Destroy();
+        }
     }
 }
 
