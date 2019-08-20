@@ -22,6 +22,12 @@ public class EntityProperty<T>:IEntityProperty
 
     public T defaultValue;
 
+    public  EntityProperty(T value, T defaultValue)
+    {
+        this.value = value;
+        this.defaultValue = defaultValue;
+    }
+
     protected virtual void OnValueChanged(T from, T to)
     {
 

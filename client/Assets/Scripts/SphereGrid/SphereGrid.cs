@@ -653,8 +653,10 @@ public class SphereGrid
         for (int i = 0; i < tiles.Count; ++i)
         {
             var tile = tiles[i];
+
+            Color color = tile.color;
             
-            GL.Color(tile.color);
+            GL.Color(color);
 
             GL.Vertex3(tile.a.x, tile.a.y, tile.a.z);
             GL.Vertex3(tile.b.x, tile.b.y, tile.b.z);

@@ -24,7 +24,7 @@
     </EntityParamPluginSingleAnimation>
   </EntityParamAction>
   <EntityParamAnimation animationClip="attack01" length="1.566667" mode="Default" rect="(23,384,240,20)">
-    <EntityParamEffectParabola speed="20" gravity="10" heightOffset="2" heightLimit="20" effectType="Parabola" arise="ParentBegin" on="Self" asset="fx_xiaopaobing_paodan.prefab" delay="0.3" offset="(0.3, 1.0, 0.5)" rect="(892,449,240,20)">
+    <EntityParamEffectParabola speed="20" gravity="10" heightOffset="0" heightLimit="20" effectType="Parabola" arise="ParentBegin" on="Self" asset="fx_xiaopaobing_paodan.prefab" delay="0.3" offset="(0.3, 1.0, 0.5)" rect="(892,449,240,20)">
       <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="0" effectType="Time" arise="ParentTrigger" on="Target" asset="fx_xiaopaobing_hit.prefab" delay="0" offset="(0.0, 1.0, 0.0)" rect="(1344,463,240,20)" />
     </EntityParamEffectParabola>
   </EntityParamAnimation>

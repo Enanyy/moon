@@ -205,11 +205,8 @@ public class BattleEntity:
         uint key = (uint)id;
         if(properties.ContainsKey(key)==false)
         {
-            properties.Add(key, new EntityProperty<T>
-            {
-                value = value,
-                defaultValue = value,
-            });
+            properties.Add(key, new EntityProperty<T>(value, value));
+          
         }
         else
         {

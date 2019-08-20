@@ -4,7 +4,7 @@ using System.Collections;
 public class SphereRotate : MonoBehaviour
 {
     public bool onDrag = false;  //是否被拖拽//    
-    public float speed = 60f;   //旋转速度//    
+    public float speed = 10f;   //旋转速度//    
     private float currentSpeed;   //阻尼速度// 
     private float axisX = 1;
     //鼠标沿水平方向移动的增量//   

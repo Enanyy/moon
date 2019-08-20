@@ -63,13 +63,13 @@ public class SphereGridEditor : MonoBehaviour {
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(0))
         {
             brushing = true;
             rotate.enabled = false;
         }
 
-        if (Input.GetMouseButtonUp(1))
+        if (Input.GetMouseButtonUp(0))
         {
             brushing = false;
             rotate.enabled = true;
@@ -202,6 +202,7 @@ public class SphereGridEditor : MonoBehaviour {
                         grid.tilesType[tile.index] = type;
                     }
                 }
+                tile.SetDefaultColor();
                
             }
         }
