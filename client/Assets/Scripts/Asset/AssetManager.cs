@@ -115,7 +115,12 @@ public class AssetManager : MonoBehaviour
 
     private AsyncOperation mAsyncOperation;
 
-
+    private List<string> mBundleNameList = new List<string>();
+    private float mLastUnloadTime;
+    /// <summary>
+    /// 60s自动检测已经销毁的资源，并释放对应的Bundle
+    /// </summary>
+    public float unloadInterval = 60;
 
     public void Init()
     {
@@ -205,6 +210,26 @@ public class AssetManager : MonoBehaviour
        
     }
 
+    private void Update()
+    {
+        if (Time.time - mLastUnloadTime > unloadInterval)
+        {
+            mLastUnloadTime = Time.time;
+
+            mBundleNameList.AddRange(mAssetBundleDic.Keys);
+          
+            for (int i = 0; i < mBundleNameList.Count; i++)
+            {
+                Bundle bundle;
+                if (mAssetBundleDic.TryGetValue(mBundleNameList[i], out bundle))
+                {
+                    bundle.RemoveReference();
+                }
+            }
+            mBundleNameList.Clear();
+        }
+    }
+
     public LoadTask<Asset<T>> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T:Object
     {
         LoadTask<Asset<T> > task = new LoadTask<Asset<T>>(key,callback);
@@ -222,7 +247,7 @@ public class AssetManager : MonoBehaviour
             yield return new WaitUntil(() => initialized == true);
         }
 
-        Bundle bundle = CreateBundle(task.bundleName);
+        Bundle bundle = CreateBundle(task.bundleName,task.type);
         StartCoroutine(bundle.LoadAsset(task));
     }
 
@@ -243,7 +268,7 @@ public class AssetManager : MonoBehaviour
   
         if (assetMode == AssetMode.AssetBundle)
         {
-            Bundle bundle = CreateBundle(task.assetName);
+            Bundle bundle = CreateBundle(task.assetName, task.type);
             yield return bundle.LoadBundleAsync();
 
             var request = SceneManager.LoadSceneAsync(sceneName, mode);
@@ -260,15 +285,19 @@ public class AssetManager : MonoBehaviour
             yield break;
         }
     }
-    public void UnLoadScene(Scene scene)
+    public void UnLoadScene(Scene scene,Action callback)
     {
-        StartCoroutine(UnloadSceneAsync(scene));
+        StartCoroutine(UnloadSceneAsync(scene,callback));
     }
 
-    private IEnumerator UnloadSceneAsync(Scene scene)
+    private IEnumerator UnloadSceneAsync(Scene scene,Action callback)
     {
         var request = SceneManager.UnloadSceneAsync(scene);
         yield return request;
+        if (callback != null)
+        {
+            callback();
+        }
     }
 
     public Bundle GetBundle(string bundleName)
@@ -280,13 +309,13 @@ public class AssetManager : MonoBehaviour
         return bundle;
     }
 
-    public Bundle CreateBundle(string bundleName)
+    public Bundle CreateBundle(string bundleName,AssetType assetType)
     {
         Bundle bundle = GetBundle(bundleName);
 
         if(bundle == null)
         {
-            bundle = new Bundle(bundleName, GetAllDependencies(bundleName));
+            bundle = new Bundle(bundleName, GetAllDependencies(bundleName),assetType);
             mAssetBundleDic.Add(bundleName, bundle);
         }
         return bundle;

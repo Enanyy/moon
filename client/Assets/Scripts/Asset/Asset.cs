@@ -4,8 +4,11 @@ public interface IAsset
     string assetName { get; }
     Bundle bundle { get; }
     Object asset { get; }
+    bool needDestroy { get; }
+
 
     void Destroy(bool removeReference = true);
+
 }
 public class Asset<T>: IAsset where T:Object
 {
@@ -16,6 +19,8 @@ public class Asset<T>: IAsset where T:Object
     public Object asset { get; private set; }
 
     public T assetObject { get; private set; }
+
+    public bool needDestroy{ get { return assetObject == null; } }
 
     public Asset(string assetName, Bundle bundle, Object asset, T assetObject)
     {
@@ -41,6 +46,7 @@ public class Asset<T>: IAsset where T:Object
             bundle.RemoveReference(this);
         }
         asset = null;
+        assetObject = null;
     }
 
     public void ReturnAsset()

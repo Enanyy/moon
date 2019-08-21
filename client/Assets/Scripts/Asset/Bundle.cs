@@ -7,6 +7,7 @@ public class Bundle
 {
     public string bundleName { get; private set; }
     public AssetBundle bundle { get; private set; }
+    public AssetType assetType { get; private set; }
 
     public Dictionary<string, Bundle> dependences { get; private set; }
     public string[] dependenceNames { get; private set; }
@@ -22,13 +23,14 @@ public class Bundle
 
     private AsyncOperation mAsyncOperation;
 
-    public Bundle(string bundleName,string[] dependenceNames)
+    public Bundle(string bundleName,string[] dependenceNames,AssetType assetType)
     {
         dependences = new Dictionary<string, Bundle>();
         references = new Dictionary<string, List<IAsset>>();
 
         this.bundleName = bundleName;
-        this.dependenceNames = dependenceNames; 
+        this.dependenceNames = dependenceNames;
+        this.assetType = assetType;
     }
     public IEnumerator LoadBundleAsync()
     {
@@ -46,7 +48,7 @@ public class Bundle
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    Bundle bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
+                    Bundle bundleObject = AssetManager.Instance.CreateBundle(dependenceName,assetType);
 
                     dependences[dependenceName] = bundleObject;
 
@@ -142,9 +144,10 @@ public class Bundle
                             var request = bundle.LoadAssetAsync(assetName);
 
                             yield return request;
-                            if (mAssetDic.ContainsKey(assetName) == false)
+                            if (request.asset!=null && mAssetDic.ContainsKey(assetName) == false)
                             {
-                                mAssetDic.Add(assetName, request.asset);
+                                asset = request.asset;
+                                mAssetDic.Add(assetName, asset);
                             }
                         }
                     }
@@ -168,13 +171,17 @@ public class Bundle
 
                     if (request.asset != null && mAssetDic.ContainsKey(assetName) == false)
                     {
-                        mAssetDic.Add(assetName, request.asset);
+                        asset = request.asset;
+
+                        mAssetDic.Add(assetName, asset);
                     }
                 }
             }
-            
 
-            mAssetDic.TryGetValue(assetName, out asset);
+            if (asset == null)
+            {
+                mAssetDic.TryGetValue(assetName, out asset);
+            }
 
             if (asset)
             {
@@ -240,6 +247,33 @@ public class Bundle
         {
             UnLoad();
         }
+    }
+    /// <summary>
+    /// 移除已经destroy的资源引用
+    /// </summary>
+    public void RemoveReference()
+    {
+        int referenceCount = 0;
+        var it = references.GetEnumerator();
+        while (it.MoveNext())
+        {
+            var list = it.Current.Value;
+            for (int i = list.Count - 1; i >= 0; --i)
+            {
+                if (list[i].needDestroy)
+                {
+                    list.RemoveAt(i);
+                }
+            }
+
+            referenceCount += list.Count;
+        }
+
+        if (referenceCount == 0)
+        {
+            UnLoad();
+        }
+
     }
 
     public bool Dependence(string bundleName)
@@ -324,11 +358,15 @@ public class Bundle
             }
             dependences.Clear();
 
-            var asset = mAssetDic.GetEnumerator();
-            while (asset.MoveNext())
+            if (assetType == AssetType.Resource)
             {
-                Resources.UnloadAsset(asset.Current.Value);              
+                var asset = mAssetDic.GetEnumerator();
+                while (asset.MoveNext())
+                {
+                    Resources.UnloadAsset(asset.Current.Value);
+                }
             }
+
             mAssetDic.Clear();
         }
     }
