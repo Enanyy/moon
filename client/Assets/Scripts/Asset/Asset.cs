@@ -4,7 +4,10 @@ public interface IAsset
     string assetName { get; }
     Bundle bundle { get; }
     Object asset { get; }
-    bool needDestroy { get; }
+    /// <summary>
+    /// 已经被销毁
+    /// </summary>
+    bool destroyed { get; }
 
 
     void Destroy(bool removeReference = true);
@@ -20,7 +23,7 @@ public class Asset<T>: IAsset where T:Object
 
     public T assetObject { get; private set; }
 
-    public bool needDestroy{ get { return assetObject == null; } }
+    public bool destroyed{ get { return assetObject == null; } }
 
     public Asset(string assetName, Bundle bundle, Object asset, T assetObject)
     {

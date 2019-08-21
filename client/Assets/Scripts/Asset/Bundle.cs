@@ -260,7 +260,7 @@ public class Bundle
             var list = it.Current.Value;
             for (int i = list.Count - 1; i >= 0; --i)
             {
-                if (list[i].needDestroy)
+                if (list[i].destroyed)
                 {
                     list.RemoveAt(i);
                 }
