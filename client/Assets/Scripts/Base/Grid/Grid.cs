@@ -62,7 +62,7 @@ public abstract class Grid<T> where T: class, ITile,new()
     public int lines { get; protected set; }
     public int columns { get; protected set; }
 
-    public Vector3 original { get; protected set; }
+    public Transform root { get; protected set; }
 
     public Dictionary<TileIndex, T> tiles { get; } = new Dictionary<TileIndex, T>();
 

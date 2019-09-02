@@ -59,7 +59,6 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
 
     private Plane mPlane = new Plane(Vector3.up, Vector3.zero);
 
-    public GameObject root { get; private set; } = null;
     public bool initialized { get; private set; } = false;
 
 
@@ -72,37 +71,32 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
         set
         {
             mShowGrid = value;
-            if(mShowGrid)
+            if (mShowGrid)
             {
-                if(root == null)
+                if (root && mTileMesh == null)
                 {
-                    if (mTileMesh == null)
-                    {
-                        mTileMesh = GenerateHexMesh(radius,orientation);
-                    }
+
+                    mTileMesh = GenerateHexMesh(radius, orientation);
+
                     if (mMaterial == null)
                     {
-                        AssetManager.Instance.LoadAsset<Material>("tile.mat", (asset) => {
+                        AssetManager.Instance.LoadAsset<Material>("tile.mat", (asset) =>
+                        {
 
-                            if (root == null)
+                            mMaterial = asset.assetObject;
+
+                            var it = tiles.GetEnumerator();
+                            while (it.MoveNext())
                             {
-                                mMaterial = asset.assetObject;
-                                root = new GameObject("Grid");
-                                root.transform.position = original;
-                                var it = tiles.GetEnumerator();
-                                while (it.MoveNext())
-                                {
-                                    it.Current.Value.radius = radius;
-                                    it.Current.Value.hexOrientation = orientation;
-                                    it.Current.Value.Show(root.transform, mTileMesh, mMaterial);
-                                }
+                                it.Current.Value.radius = radius;
+                                it.Current.Value.hexOrientation = orientation;
+                                it.Current.Value.Show(root, mTileMesh, mMaterial);
                             }
+
                         });
                     }
                     else
                     {
-                        root = new GameObject("Grid");
-                        root.transform.position = original;
                         var it = tiles.GetEnumerator();
                         while (it.MoveNext())
                         {
@@ -112,27 +106,30 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                         }
                     }
 
-                    
+
                 }
                 else
                 {
-                    root.SetActive(true);
+                    if (root)
+                    {
+                        root.gameObject.SetActive(true);
+                    }
                 }
             }
             else
             {
-                if(root)
+                if (root)
                 {
-                    root.SetActive(false);
+                    root.gameObject.SetActive(false);
                 }
             }
         }
     }
 
-    public override void Init(Vector3 original, HexGridShape shape, int lines, int columns, float radius,
+    public override void Init(Transform root, HexGridShape shape, int lines, int columns, float radius,
         HexOrientation orientation)
     {
-        base.Init(original, shape, lines, columns, radius, orientation);
+        base.Init(root, shape, lines, columns, radius, orientation);
 
         initialized = true;
 
@@ -354,7 +351,7 @@ public class BattleHexGrid :HexGrid<BattleHexTile>
                     mPathRenderer = root.GetComponent<LineRenderer>();
                     if (mPathRenderer == null)
                     {
-                        mPathRenderer = root.AddComponent<LineRenderer>();
+                        mPathRenderer = root.gameObject.AddComponent<LineRenderer>();
 
                     }
                     AssetManager.Instance.LoadAsset<Material>("arrow.mat", (asset) => {

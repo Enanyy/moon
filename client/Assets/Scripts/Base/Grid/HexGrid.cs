@@ -31,10 +31,10 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
 
     #region Public Methods
 
-    public virtual void Init(Vector3 original, HexGridShape shape, int lines, int columns, float radius,
+    public virtual void Init(Transform root, HexGridShape shape, int lines, int columns, float radius,
         HexOrientation orientation)
     {
-        this.original = original;
+        this.root = root;
         this.shape = shape;
         this.lines = lines;
         this.columns = columns;
@@ -68,15 +68,22 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
         return new TileIndex(x, -x - z, z);
     }
 
-    public TileIndex IndexOf(Vector3 position)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    public TileIndex IndexOf(Vector3 worldPosition)
     {
-        return IndexOf(position.x, position.z);
+        return IndexOf(worldPosition.x, worldPosition.z);
     }
 
     public TileIndex IndexOf(float x, float z)
     {
-        x -= original.x;
-        z -= original.z;
+       
+        Vector3 localPosition = root.InverseTransformPoint(new Vector3(x, 0, z));
+        x = localPosition.x;
+        z = localPosition.z;
 
         switch (orientation)
         {
@@ -116,9 +123,9 @@ public class HexGrid<T> : Grid<T> where T : class, ITile, new()
     /// </summary>
     /// <param name="position"></param>
     /// <returns></returns>
-    public T TileAt(Vector3 position)
+    public T TileAt(Vector3 worldPosition)
     {
-        return TileAt(position.x, position.z);
+        return TileAt(worldPosition.x, worldPosition.z);
     }
 
     public T TileAt(float x, float z)

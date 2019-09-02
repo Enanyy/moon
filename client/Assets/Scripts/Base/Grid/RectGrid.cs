@@ -41,9 +41,9 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
     };
  
 	// Use this for initialization
-	public virtual void Init (Vector3 original, int lines, int columns,float tileWidth,float tileHeight)
+	public virtual void Init (Transform root, int lines, int columns,float tileWidth,float tileHeight)
     {
-        this.original = original;
+        this.root = root;
         this.lines = lines;
         this.columns = columns;
         this.tileWidth = tileWidth;
@@ -56,8 +56,8 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
                 int index = j * columns + i;
                
                 Vector3 position = Vector3.zero;
-                position.x = original.x + i * tileWidth;
-                position.z = original.z + j * tileHeight;
+                position.x = i * tileWidth;
+                position.z = j * tileHeight;
                
                 CreateTile(new TileIndex(j, index, i), position);
             }
@@ -67,16 +67,22 @@ public class RectGrid <T>:Grid<T> where T:class, ITile, new ()
 
     public TileIndex IndexOf(Vector3 position)
     {
-        float x = position.x - original.x + tileWidth * 0.5f;
-        float z = position.z - original.z + tileHeight * 0.5f;
+        if (root)
+        {
+            Vector3 localPosition = root.InverseTransformPoint(position);
 
-        int i = (int)(x / tileWidth);
+            float x = localPosition.x - tileWidth * 0.5f;
+            float z = localPosition.z - tileHeight * 0.5f;
 
-        int j = (int)(z / tileHeight);
+            int i = (int)(x / tileWidth);
 
-        int index = j * columns + i;
+            int j = (int)(z / tileHeight);
 
-        return new TileIndex(j,index,i);
+            int index = j * columns + i;
+
+            return new TileIndex(j, index, i);
+        }
+        return new TileIndex();
     }
 
     public TileIndex IndexOf(int index)

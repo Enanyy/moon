@@ -36,11 +36,11 @@ public class Chess : MonoBehaviour
 
                 if (grid == BattleGrid.Rect)
                 {
-                    BattleRectGrid.Instance.Init(original, lines, columns, tileWidth, tileHeight);
+                    BattleRectGrid.Instance.Init(transform, lines, columns, tileWidth, tileHeight);
                 }
                 else
                 {
-                    BattleHexGrid.Instance.Init(original, shape, lines, columns, Mathf.Max(tileWidth, tileHeight), orientation);
+                    BattleHexGrid.Instance.Init(transform, shape, lines, columns, Mathf.Max(tileWidth, tileHeight), orientation);
                 }
             }
         });

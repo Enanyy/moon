@@ -235,6 +235,7 @@ public class StateMachine<T> where T: IStateAgent<T>
             var state = mStateList.First.Value;
             if (state.IsValid()==false)
             {
+                state.OnCancel();
                 state.OnDestroy();
                 mStateList.RemoveFirst();
             }
