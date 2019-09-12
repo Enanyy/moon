@@ -22,6 +22,11 @@ public class Bundle
     private Dictionary<string,List<IAsset>> mCacheAssetDic = new Dictionary<string, List<IAsset>>();
 
     private AsyncOperation mAsyncOperation;
+    public bool isDone
+    {
+        get { return mAsyncOperation != null && mAsyncOperation.isDone; }
+    }
+    public bool isLoading { get { return mAsyncOperation != null && mAsyncOperation.isDone == false; } }
 
     public Bundle(string bundleName,string[] dependenceNames,AssetType assetType)
     {
