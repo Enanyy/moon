@@ -65,10 +65,13 @@ public class Bundle
             }
         }
 
-        string path = AssetManager.Instance.GetPath(bundleName);
+        if (mAsyncOperation == null)
+        {
+            string path = AssetManager.Instance.GetPath(bundleName);
 
-        mAsyncOperation = AssetBundle.LoadFromFileAsync(path);
-
+            mAsyncOperation = AssetBundle.LoadFromFileAsync(path);
+        }
+        
         yield return mAsyncOperation;
 
         var request = mAsyncOperation as AssetBundleCreateRequest;
