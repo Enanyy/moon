@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate void MessageHandler(Connection c, byte[] packet);
+public delegate void PacketHandler(Connection c, byte[] packet);
 
 public class NetworkManager 
 {
@@ -25,16 +25,28 @@ public class NetworkManager
 
     #endregion
 
+    internal class Packet
+    {
+        public Connection connection;
+        public byte[] data;
+        public Packet(Connection connection, byte[] data)
+        {
+            this.connection = connection;
+            this.data = data;
+        }
+    }
+
     private Dictionary<int, Connection> mConnectionDic = new Dictionary<int, Connection>();
 
-    
-    private Queue<KeyValuePair<Connection, byte[]> > mPacketList = new Queue<KeyValuePair<Connection, byte[]>>();
+    private ConcurrentQueue<Packet> mPacketList = new ConcurrentQueue<Packet>();
+   
     private Queue<Connection> mConnectResults = new Queue<Connection>();
     private Dictionary<int, OnConnectionHandler> mConnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
     private Dictionary<int, OnConnectionHandler> mDisconnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
-    private object mLock = new object();
-    public event MessageHandler onReceive;
+
+    public event PacketHandler onReceive;
     private DateTime D1970 = new DateTime(1970, 1, 1, 0, 0, 0);
+
 
 
     public void Connect(int id, string ip, int port, OnConnectionHandler connectCallback, OnConnectionHandler disconnectCallback)
@@ -85,18 +97,16 @@ public class NetworkManager
     /// </summary>
     public void Update()
     {
-        if (mPacketList.Count > 0)
+        while (mPacketList.isEmpty == false)
         {
-            lock (mLock)
+
+            Packet data;
+            if(mPacketList.TryDequeue(out data))
             {
-                while (mPacketList.Count > 0)
+                //这里分发网络包
+                if (onReceive != null)
                 {
-                    var data = mPacketList.Dequeue();
-                    //这里分发网络包
-                    if (onReceive != null)
-                    {
-                        onReceive(data.Key, data.Value);
-                    }
+                    onReceive(data.connection, data.data);
                 }
             }
         }
@@ -178,11 +188,9 @@ public class NetworkManager
         {
             return;
         }
-
-        lock (mLock)
-        {
-            mPacketList.Enqueue(new KeyValuePair<Connection, byte[]>(connection,packet));
-        }
+        
+        mPacketList.Enqueue(new Packet(connection,packet));
+        
 
     }
     private void OnConnect(Connection c)
