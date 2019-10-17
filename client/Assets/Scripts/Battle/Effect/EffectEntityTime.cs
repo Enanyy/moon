@@ -15,9 +15,9 @@ public class EffectEntityTime : EffectEntity
             OnEnd();
         }
     }
-    protected override bool OnAssetLoad()
+    protected override void OnAssetLoad(Asset<GameObject> asset)
     {
-        bool result = base.OnAssetLoad();
+        base.OnAssetLoad(asset);
 
         if (gameObject)
         {
@@ -67,7 +67,6 @@ public class EffectEntityTime : EffectEntity
             }
         }
 
-        return result;
     }
     public override void OnUpdate(float deltaTime)
     {

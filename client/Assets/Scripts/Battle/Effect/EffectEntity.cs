@@ -85,17 +85,15 @@ public abstract class EffectEntity :
         return null;
     }
 
-    protected override bool OnAssetLoad()
+    protected override void OnAssetLoad(Asset<GameObject> asset)
     {
-        bool result = base.OnAssetLoad();
+        base.OnAssetLoad(asset);
         if (gameObject != null)
         {
             gameObject.transform.localScale = agent.scale * Vector3.one;
             mParticleSystems = gameObject.GetComponentsInChildren<ParticleSystem>();
             mAnimators = gameObject.GetComponentsInChildren<Animator>();
         }
-
-        return result;
     }
     protected void UpdateParticleSystemSpeed(float speed)
     {

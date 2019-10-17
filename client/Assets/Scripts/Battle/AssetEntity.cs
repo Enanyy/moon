@@ -25,16 +25,17 @@ public class AssetEntity :IPoolObject
 
     protected void LoadAsset(string key)
     {      
-        AssetManager.Instance.LoadAsset<GameObject>(key,(obj) => {
-
-            this.gameObject = obj.assetObject;
-            this.asset = obj;
-            OnAssetLoad();
-        });
+        AssetManager.Instance.LoadAsset<GameObject>(key,OnAssetLoad);
     }
 
-    protected virtual bool OnAssetLoad()
+    protected virtual void OnAssetLoad(Asset<GameObject> asset)
     {   
+        if(asset!=null)
+        {
+            this.asset = asset;
+            this.gameObject = asset.assetObject;
+        }
+
         if (gameObject != null)
         {        
             gameObject.SetActive(true);
@@ -44,10 +45,8 @@ public class AssetEntity :IPoolObject
             gameObject.transform.localScale = Vector3.one;
             SetLayer();
 
-            return true;
         }
 
-        return false;
     }
 
     public void SetLayer()
@@ -55,12 +54,7 @@ public class AssetEntity :IPoolObject
         if (gameObject != null)
         {
             int layer = LayerMask.NameToLayer("Default");
-            gameObject.layer = layer;
-            Transform[] transforms = gameObject.GetComponentsInChildren<Transform>();
-            for (int i = 0; i < transforms.Length; ++i)
-            {
-                transforms[i].gameObject.layer = layer;
-            }
+            gameObject.SetLayer(layer, true);
         }
     }
 

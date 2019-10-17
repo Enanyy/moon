@@ -8,9 +8,9 @@ using UnityEngine;
 /// </summary>
 public static class StringEx
 {
-    public static bool ToBoolEx(this string text)
+    public static bool ToBoolEx(this string text,bool defaultValue = false)
     {
-        bool result = false;
+        bool result = defaultValue;
 
         if (string.IsNullOrEmpty(text))
         {
@@ -21,84 +21,88 @@ public static class StringEx
 
         return result;
     }
-    public static short ToInt16Ex(this string text)
+    public static short ToInt16Ex(this string text,short defaultValue = 0)
     {
+        short result = defaultValue;
+
         if (string.IsNullOrEmpty(text))
         {
-            return 0;
+            return result;
         }
 
-        short result = 0;
         short.TryParse(text, out result);
         return result;
 
     }
-    public static int ToInt32Ex(this string text)
+    public static int ToInt32Ex(this string text,int defaultValue = 0)
     {
+        int result = defaultValue;
+
         if (string.IsNullOrEmpty(text))
         {
-            return 0;
+            return result;
         }
 
-        int result = 0;
         int.TryParse(text, out result);
         return result;
 
     }
-    public static long ToInt64Ex(this string text)
+    public static long ToInt64Ex(this string text, long defaultValue = 0)
     {
+        long result = defaultValue;
         if (string.IsNullOrEmpty(text))
         {
-            return 0;
+            return result;
         }
-
-        long result = 0;
+        
         long.TryParse(text, out result);
         return result;
     }
-    public static ushort ToUInt16Ex(this string text)
+    public static ushort ToUInt16Ex(this string text,ushort defaultValue = 0)
     {
+        ushort result = defaultValue;
         if (string.IsNullOrEmpty(text))
         {
-            return 0;
+            return result;
         }
 
-        ushort result = 0;
         ushort.TryParse(text, out result);
         return result;
 
     }
-    public static uint ToUInt32Ex(this string text)
+    public static uint ToUInt32Ex(this string text,uint defaultValue = 0)
     {
+        uint result = defaultValue;
+
         if (string.IsNullOrEmpty(text))
         {
-            return 0;
+            return result;
         }
 
-        uint result = 0;
         uint.TryParse(text, out result);
         return result;
 
     }
-    public static ulong ToUInt64Ex(this string text)
+    public static ulong ToUInt64Ex(this string text,ulong defaultValue = 0)
     {
+        ulong result = defaultValue;
         if (string.IsNullOrEmpty(text))
         {
-            return 0;
+            return result;
         }
 
-        ulong result = 0;
         ulong.TryParse(text, out result);
         return result;
     }
-    public static float ToFloatEx(this string text)
+    public static float ToFloatEx(this string text,float defaultValue = 0)
     {
+        float result = defaultValue;
+
         if (string.IsNullOrEmpty(text))
         {
-            return 0f;
+            return result;
         }
 
-        float result = 0;
         float.TryParse(text, out result);
         return result;
     }

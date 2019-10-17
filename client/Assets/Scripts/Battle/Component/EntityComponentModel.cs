@@ -114,9 +114,9 @@ public class EntityComponentModel :
         }
     }
 
-    protected override bool OnAssetLoad()
+    protected override void OnAssetLoad(Asset<GameObject> asset)
     {
-        bool result = base.OnAssetLoad();
+        base.OnAssetLoad(asset);
 
         if (gameObject != null)
         {
@@ -129,7 +129,6 @@ public class EntityComponentModel :
 #endif
         }
 
-        return result;
     }
 
     public override void OnDestroy()

@@ -90,7 +90,9 @@ public class ConcurrentQueue<T>
                     result = next.Item;
                     //如果_head没有发生改变，则将_head指向next并退出
                     if (Interlocked.CompareExchange(ref mHead, next, curHead) == curHead)
+                    {
                         break;
+                    }
                 }
             }
         }
