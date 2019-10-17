@@ -123,6 +123,31 @@ public static class GeometryMath
         double w2 = (s4 - w1 * s3) / s1;
         return w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1;
     }
+    /// <summary>
+    /// 判断点是否在三角形内
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <param name="c"></param>
+    /// <param name="p"></param>
+    /// <returns></returns>
+    public static bool PointInTriangle(Vector3 a, Vector3 b, Vector3 c, Vector3 p)
+    {
+
+        Vector3 sa = a - p; 
+        Vector3 sb = b - p; 
+        Vector3 sc = c - p;
+
+        float angle1 = Mathf.Abs(Vector3.Angle(sa, sb));
+        float angle2 = Mathf.Abs(Vector3.Angle(sb, sc));
+        float angle3 = Mathf.Abs(Vector3.Angle(sc, sa));
+        if (angle1 + angle2 < 180 || angle2 + angle3 < 180 || angle3 + angle1 < 180)
+        {
+            return false;
+        }
+
+        return true;
+    }
 
     public static double determinant(double v1, double v2, double v3, double v4)  // 行列式
     {

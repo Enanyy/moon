@@ -170,34 +170,9 @@ public class Tile
         Vector3 worldA = grid.root.TransformPoint(a);
         Vector3 worldB = grid.root.TransformPoint(b);
         Vector3 worldC = grid.root.TransformPoint(c);
-        return PointInTriangle(worldA, worldB, worldC, worldPosition);
+        return GeometryMath.PointInTriangle(worldA, worldB, worldC, worldPosition);
     }
-    /// <summary>
-    /// 判断点是否在三角形内
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <param name="c"></param>
-    /// <param name="p"></param>
-    /// <returns></returns>
-    public static bool PointInTriangle(Vector3 a, Vector3 b, Vector3 c, Vector3 p)
-    {
-
-        Vector3 sa = a - p; //new Vector2(a.x - p.x, a.z - p.z);
-        Vector3 sb = b - p; //new Vector2(b.x - p.x, b.z - p.z);
-        Vector3 sc = c - p;// new Vector2(c.x - p.x, c.z - p.z);
-
-        float angle1 = Mathf.Abs(Vector3.Angle(sa, sb));
-        float angle2 = Mathf.Abs(Vector3.Angle(sb, sc));
-        float angle3 = Mathf.Abs(Vector3.Angle(sc, sa));
-        if (angle1 + angle2 < 180 || angle2 + angle3 < 180 || angle3 + angle1 < 180)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
+ 
     public XmlElement ToXml(XmlNode parent)
     {
         Dictionary<string, string> attributes = new Dictionary<string, string>();
@@ -869,7 +844,7 @@ public class SphereGrid
             if (plane.Raycast(ray, out distance))
             {
                 Vector3 point = ray.GetPoint(distance);
-                if (Tile.PointInTriangle(worldA, worldB, worldC, point))
+                if (GeometryMath.PointInTriangle(worldA, worldB, worldC, point))
                 {
                     if (tile.children.Count > 0)
                     {
