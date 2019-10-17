@@ -26,6 +26,7 @@ public class Main : MonoBehaviour
             if(asset!=null)
             {
                 DataTableManager.Instance.Init(asset.assetObject.bytes);
+                asset.Destroy();
 
             }
             else

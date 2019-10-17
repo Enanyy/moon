@@ -248,7 +248,16 @@ public class Bundle
         var it = references.GetEnumerator();
         while(it.MoveNext())
         {
-            referenceCount += it.Current.Value.Count;
+            var list = it.Current.Value;
+            for(int i = 0;i < list.Count; )
+            {
+                if(list[i] == null || list[i].destroyed)
+                {
+                    list.RemoveAt(i);continue;
+                }
+                referenceCount++;
+                ++i;
+            }
         }
 
         if(referenceCount==0)

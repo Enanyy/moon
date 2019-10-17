@@ -42,6 +42,8 @@ public class Chess : MonoBehaviour
                 {
                     BattleHexGrid.Instance.Init(transform, shape, lines, columns, Mathf.Max(tileWidth, tileHeight), orientation);
                 }
+
+                asset.Destroy();
             }
         });
         
