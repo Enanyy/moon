@@ -4,6 +4,7 @@ using UnityEngine;
 public enum DataTableID
 {
 //DATATABLE_ID_START	TB_Hero,
+	TB_Role,
 //DATATABLE_ID_END
 }
 
@@ -11,7 +12,7 @@ public interface IDataTable
 {
     DataTableID name { get; }
 
-    void Read(SQLiteDataTable table);
+    void Read(SQLiteTable table);
 }
 public class DataTableManager 
 {
@@ -41,6 +42,7 @@ public class DataTableManager
         if(SQLite.Instance.Open(bytes))
         {
 //DATATABLE_REGISTER_START			Register(new DTHero());
+			Register(new DTRole());
 //DATATABLE_REGISTER_END
             SQLite.Instance.Close();
 
@@ -65,7 +67,7 @@ public class DataTableManager
         {
             string sql = string.Format("select * from {0}", data.name.ToString());
 
-            SQLiteDataTable table = SQLite.Instance.GetDataTable(sql);
+            SQLiteTable table = SQLite.Instance.GetTable(sql);
             if(table!=null)
             {
                 mDataTables.Add(data.name, data);

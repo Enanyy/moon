@@ -3,20 +3,20 @@ using System.Collections;
 using UnityEngine;
 using Community.CsharpSqlite;
 
-public class SQLiteDataTable : IDisposable
+public class SQLiteTable : IDisposable
 {
 	private SQLiteQuery mLiteQuery;
 
 	private bool mIsDisposed = false;
 
 
-	public SQLiteDataTable(SQLiteQuery varLiteQuery)
+	public SQLiteTable(SQLiteQuery varLiteQuery)
 	{
 		mLiteQuery = varLiteQuery;
 	}
 
 
-	~SQLiteDataTable()
+	~SQLiteTable()
 	{
 		Dispose(false);
 	}

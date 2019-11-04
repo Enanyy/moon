@@ -66,13 +66,17 @@ CREATE TABLE TB_Role (
     )
 ); ";
 
-        SQLiteDataTable result = SQLite.Instance.Excute(create);
-        if (result != null)
-        {
-            int id = result.GetByIndex(0, 0);
-            Debug.Log(id);
-        }
+         SQLite.Instance.Excute(create);
+       
 
+        string insert = @"INSERT INTO TB_Role (id, name, type, config, hp, attack, defense, movedistance, movedirection, attackdistance, searchdistance, radius, height) VALUES ({0}, '炮手', 1, 'paoshou.txt', 900, 90, 10, 2, 2, 5, 10, 1, 2);";
+
+        for (int i = 0; i < 10; ++i)
+        {
+            
+            SQLite.Instance.Excute(string.Format(insert, i));
+            
+        }
 
         Instance = this;
 

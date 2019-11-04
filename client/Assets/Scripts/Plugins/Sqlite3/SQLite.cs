@@ -6,7 +6,7 @@ public class SQLite : IDisposable
 {
 	private static SQLite mInstance;
     private bool mIsDisposed = false;
-    private SQLiteDB mDbConnect = null;
+    private SQLiteConnection mDbConnect = null;
 
 	public static SQLite Instance
     {
@@ -92,7 +92,7 @@ public class SQLite : IDisposable
             try
             {
                 // initialize database
-                mDbConnect = new SQLiteDB();
+                mDbConnect = new SQLiteConnection();
                 mDbConnect.OpenStream("db", ms);
                 Debug.Log("gamedb open sucess");
 
@@ -119,7 +119,7 @@ public class SQLite : IDisposable
         }
         try
         {
-            mDbConnect = new SQLiteDB();
+            mDbConnect = new SQLiteConnection();
 
             mDbConnect.Open(fileName);
             Debug.Log("Open DB success!");
@@ -138,9 +138,9 @@ public class SQLite : IDisposable
     /// <returns><c>true</c>, if local item was gotten, <c>false</c> otherwise.</returns>
     /// <param name="sql">Variable sql.</param>
     /// <param name="varOutItems">Variable out items.</param>
-	public SQLiteDataTable GetDataTable(string sql)
+	public SQLiteTable GetTable(string sql)
     {
-        SQLiteDataTable table = null;
+        SQLiteTable table = null;
         if (sql == string.Empty)
         {
             return table;
@@ -149,7 +149,7 @@ public class SQLite : IDisposable
         SQLiteQuery query = new SQLiteQuery(mDbConnect, sql);
         if (query != null)
         {
-			table = new SQLiteDataTable(query);
+			table = new SQLiteTable(query);
             return table;
         }
         else
@@ -159,42 +159,41 @@ public class SQLite : IDisposable
         }
     }
 
-    public SQLiteDataTable Excute(string sql)
+    public bool Excute(string sql)
     {
-        SQLiteDataTable table = null;
+    
         if (string.IsNullOrEmpty(sql))
         {
-            return null;
+            return false;
         }
 
         SQLiteQuery query = new SQLiteQuery(mDbConnect, sql);
         if (query != null)
         {
-            table = new SQLiteDataTable(query);
             if (query.Step() == false)
             {
-                return table;
+                return true;
             }
             else
             {
                 query.Release();
             }
         }
-        return null;
+        return false;
     }
 
 
-    public SQLiteDataTable GetDataTables()
+    public SQLiteTable GetTables()
 	{
 		string sql = @"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
-		return GetDataTable (sql);
+		return GetTable (sql);
 	}
 
 
-	public SQLiteDataTable GetTableInfo(string tableName)
+	public SQLiteTable GetTableInfo(string tableName)
 	{
 		string sql = string.Format("pragma table_info([{0}]);", tableName);
-		return GetDataTable (sql);
+		return GetTable (sql);
 	}
 }
 /*

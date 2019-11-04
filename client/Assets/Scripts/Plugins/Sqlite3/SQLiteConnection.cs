@@ -5,7 +5,7 @@ using System.IO;
 using Community.CsharpSqlite;
 
 
-public class SQLiteDB 
+public class SQLiteConnection 
 {
 	
 	private Sqlite3.sqlite3        db;
@@ -35,7 +35,7 @@ public class SQLiteDB
     }
 #endregion
 	
-	public SQLiteDB()
+	public SQLiteConnection()
 	{
 		db = null;
 		stream = null;

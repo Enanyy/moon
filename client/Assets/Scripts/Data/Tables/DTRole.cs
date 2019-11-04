@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class TBHero
+public class TBRole
 {
 //DEFINITION_START
 	public int id;
@@ -19,21 +19,21 @@ public class TBHero
 //DEFINITION_END
 }
 
-public class DTHero : IDataTable
+public class DTRole : IDataTable
 {
     public DataTableID name
     {
-        get { return DataTableID.TB_Hero; }
+        get { return DataTableID.TB_Role; }
     }
 
-    public readonly Dictionary<int, TBHero> data = new Dictionary<int, TBHero>();
+    //public readonly Dictionary<int, TBRole> data = new Dictionary<int, TBRole>();
 
     public void Read(SQLiteTable table)
     {
         while (table.Read())
         {
 //READ_START
-           	TBHero o = new TBHero();
+           /*	TBRole o = new TBRole();
 			o.id = table.GetByColumnName("id",0);
 			o.name = table.GetByColumnName("name","");
 			o.type = table.GetByColumnName("type",0);
@@ -47,19 +47,19 @@ public class DTHero : IDataTable
 			o.searchdistance = table.GetByColumnName("searchdistance",0);
 			o.radius = table.GetByColumnName("radius",0);
 			o.height = table.GetByColumnName("height",0);
-			data.Add(o.id,o);
+			data.Add(o.id,o);*/
 //READ_END
         }          
     }
-    
-    public static TBHero Get(int id)
+    /*
+    public static TBRole Get(int id)
     {
-        var table = DataTableManager.Instance.Get<DTHero>(DataTableID.TB_Hero);
+        var table = DataTableManager.Instance.Get<DTRole>(DataTableID.TB_Role);
         if(table.data.ContainsKey(id))
         {
             return table.data[id];
         }
         return null;
     }
-    
+    */
 }

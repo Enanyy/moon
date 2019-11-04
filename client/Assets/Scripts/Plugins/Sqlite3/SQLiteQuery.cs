@@ -4,7 +4,7 @@ using Community.CsharpSqlite;
 
 public class SQLiteQuery {
 	
-	private SQLiteDB         sqlDb;
+	private SQLiteConnection         sqlDb;
 	private Sqlite3.sqlite3  db;
 	private Sqlite3.Vdbe     vm;
 	private string[]         columnNames;
@@ -14,7 +14,7 @@ public class SQLiteQuery {
 	public string[] Names { get {return columnNames;} }
 
 	public int[] Types{ get { return columnTypes; } }
-	public SQLiteQuery( SQLiteDB sqliteDb, string query )
+	public SQLiteQuery( SQLiteConnection sqliteDb, string query )
 	{
 		sqlDb = sqliteDb;
 		bindIndex = 1;
