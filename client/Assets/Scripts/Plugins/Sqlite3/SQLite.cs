@@ -107,6 +107,31 @@ public class SQLite : IDisposable
         return true;
     }
 
+    public bool Open(string fileName)
+    {
+        if (mDbConnect != null)
+        {
+            return true;
+        }
+        if (string.IsNullOrEmpty(fileName))
+        {
+            return false;
+        }
+        try
+        {
+            mDbConnect = new SQLiteDB();
+
+            mDbConnect.Open(fileName);
+            Debug.Log("Open DB success!");
+            return true;
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
+    }
+
     /// <summary>
     /// Gets the local item.
     /// </summary>
@@ -134,8 +159,32 @@ public class SQLite : IDisposable
         }
     }
 
+    public SQLiteDataTable Excute(string sql)
+    {
+        SQLiteDataTable table = null;
+        if (string.IsNullOrEmpty(sql))
+        {
+            return null;
+        }
 
-	public SQLiteDataTable GetDataTables()
+        SQLiteQuery query = new SQLiteQuery(mDbConnect, sql);
+        if (query != null)
+        {
+            table = new SQLiteDataTable(query);
+            if (query.Step() == false)
+            {
+                return table;
+            }
+            else
+            {
+                query.Release();
+            }
+        }
+        return null;
+    }
+
+
+    public SQLiteDataTable GetDataTables()
 	{
 		string sql = @"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
 		return GetDataTable (sql);

@@ -17,6 +17,62 @@ public class Test : MonoBehaviour {
         //});
 
         //return;
+        SQLite.Instance.Open("D:/WorkSpace/moon/client/Assets/R/database/data.bytes");
+
+        //string sql = "select * from TB_Hero";
+
+
+        //SQLiteDataTable table = SQLite.Instance.GetDataTable(sql);
+        //if (table != null)
+        //{
+
+        //    while (table.Read())
+        //    {
+        //        //READ_START
+
+        //       int id = table.GetByColumnName("id", 0);
+
+
+        //        Debug.Log(id);
+        //        //READ_END
+        //    }
+        //    table.Close();
+        //}
+        //else
+        //{
+        //   // Debug.LogError("Can't find table:" + data.name);
+        //}
+        string drop = @"DROP TABLE IF EXISTS 'TB_Role';";
+        SQLite.Instance.Excute(drop);
+        string create = @"
+CREATE TABLE TB_Role (
+    id             INT           PRIMARY KEY
+                                 NOT NULL
+                                 DEFAULT (0),
+    name           VARCHAR (256) NOT NULL,
+    type           INT           NOT NULL,
+    config         VARCHAR (256) NOT NULL,
+    hp             INT           NOT NULL,
+    attack         INT           NOT NULL,
+    defense        INT           NOT NULL,
+    movedistance   INT           NOT NULL,
+    movedirection  INT           NOT NULL,
+    attackdistance INT           NOT NULL,
+    searchdistance INT           NOT NULL,
+    radius         DECIMAL       NOT NULL,
+    height         DECIMAL       NOT NULL,
+    UNIQUE (
+        id
+    )
+); ";
+
+        SQLiteDataTable result = SQLite.Instance.Excute(create);
+        if (result != null)
+        {
+            int id = result.GetByIndex(0, 0);
+            Debug.Log(id);
+        }
+
 
         Instance = this;
 
