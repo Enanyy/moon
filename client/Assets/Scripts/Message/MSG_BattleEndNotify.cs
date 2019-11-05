@@ -10,7 +10,7 @@ public class MSG_BattleEndNotify : Message<BattleEndNotify>
     {
         return MessageManager.Instance.Get<MSG_BattleEndNotify>(MessageID.BATTLE_END_NOTIFY);
     }
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
         Debug.Log("Battle end:" + message.copy);
 

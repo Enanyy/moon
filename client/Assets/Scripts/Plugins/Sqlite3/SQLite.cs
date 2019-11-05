@@ -159,9 +159,8 @@ public class SQLite : IDisposable
         }
     }
 
-    public bool Excute(string sql)
-    {
-    
+    public bool Execute(string sql)
+    { 
         if (string.IsNullOrEmpty(sql))
         {
             return false;

@@ -43,7 +43,7 @@ public class Test : MonoBehaviour {
         //   // Debug.LogError("Can't find table:" + data.name);
         //}
         string drop = @"DROP TABLE IF EXISTS 'TB_Role';";
-        SQLite.Instance.Excute(drop);
+        SQLite.Instance.Execute(drop);
         string create = @"
 CREATE TABLE TB_Role (
     id             INT           PRIMARY KEY
@@ -66,7 +66,7 @@ CREATE TABLE TB_Role (
     )
 ); ";
 
-         SQLite.Instance.Excute(create);
+         SQLite.Instance.Execute(create);
        
 
         string insert = @"INSERT INTO TB_Role (id, name, type, config, hp, attack, defense, movedistance, movedirection, attackdistance, searchdistance, radius, height) VALUES ({0}, '炮手', 1, 'paoshou.txt', 900, 90, 10, 2, 2, 5, 10, 1, 2);";
@@ -74,7 +74,7 @@ CREATE TABLE TB_Role (
         for (int i = 0; i < 10; ++i)
         {
             
-            SQLite.Instance.Excute(string.Format(insert, i));
+            SQLite.Instance.Execute(string.Format(insert, i));
             
         }
 

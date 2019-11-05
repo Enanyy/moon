@@ -10,7 +10,7 @@ public class MSG_BattleEntityBloodNotify : Message<BattleEntityBloodNotify>
     {
         return MessageManager.Instance.Get<MSG_BattleEntityBloodNotify>(MessageID.BATTLE_ENTITY_BLOOD_NOTIFY);
     }
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
         var entity = BattleManager.Instance.GetEntity(message.id);
         if (entity != null)
