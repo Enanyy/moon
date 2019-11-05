@@ -9,22 +9,26 @@ using System;
 
 public class ExcelObject
 {
+    /// <summary>
+    /// 表格数据集合
+    /// </summary>
+    public DataSet dataSet { get; private set; }
 
-	/// <summary>
-	/// 表格数据集合
-	/// </summary>
-	private DataSet mDataSet;
-
-	/// <summary>
-	/// 构造函数
-	/// </summary>
-	/// <param name="excelFile">Excel file.</param>
-	public ExcelObject (string excelFile)
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="excelFile">Excel file.</param>
+    public ExcelObject (string excelFile)
 	{
-		FileStream mStream = File.Open (excelFile, FileMode.Open, FileAccess.Read);
-		IExcelDataReader mExcelReader = ExcelReaderFactory.CreateOpenXmlReader (mStream);
-		mDataSet = mExcelReader.AsDataSet ();
+		FileStream stream = File.Open (excelFile, FileMode.Open, FileAccess.Read);
+		IExcelDataReader reader = ExcelReaderFactory.CreateOpenXmlReader (stream);
+		dataSet = reader.AsDataSet ();
 	}
+    public ExcelObject(Stream stream)
+    {
+        IExcelDataReader reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+        dataSet = reader.AsDataSet();
+    }
 			
 	/// <summary>
 	/// 转换为实体类列表
@@ -32,10 +36,10 @@ public class ExcelObject
 	public List<T> ConvertToList<T> ()
 	{
 		//判断Excel文件中是否存在数据表
-		if (mDataSet.Tables.Count < 1)
+		if (dataSet.Tables.Count < 1)
 			return null;
 		//默认读取第一个数据表
-		DataTable mSheet = mDataSet.Tables [0];
+		DataTable mSheet = dataSet.Tables [0];
 			
 		//判断数据表内是否存在数据
 		if (mSheet.Rows.Count < 1)
@@ -79,11 +83,11 @@ public class ExcelObject
 	public void ConvertToJson (string JsonPath, Encoding encoding)
 	{
 		//判断Excel文件中是否存在数据表
-		if (mDataSet.Tables.Count < 1)
+		if (dataSet.Tables.Count < 1)
 			return;
 
 		//默认读取第一个数据表
-		DataTable mSheet = mDataSet.Tables [0];
+		DataTable mSheet = dataSet.Tables [0];
 
 		//判断数据表内是否存在数据
 		if (mSheet.Rows.Count < 1)
@@ -128,11 +132,11 @@ public class ExcelObject
 	public void ConvertToCSV (string CSVPath, Encoding encoding)
 	{
 		//判断Excel文件中是否存在数据表
-		if (mDataSet.Tables.Count < 1)
+		if (dataSet.Tables.Count < 1)
 			return;
 
 		//默认读取第一个数据表
-		DataTable mSheet = mDataSet.Tables [0];
+		DataTable mSheet = dataSet.Tables [0];
 
 		//判断数据表内是否存在数据
 		if (mSheet.Rows.Count < 1)
@@ -170,11 +174,11 @@ public class ExcelObject
 	public void ConvertToXml (string XmlFile)
 	{
 		//判断Excel文件中是否存在数据表
-		if (mDataSet.Tables.Count < 1)
+		if (dataSet.Tables.Count < 1)
 			return;
 
 		//默认读取第一个数据表
-		DataTable mSheet = mDataSet.Tables [0];
+		DataTable mSheet = dataSet.Tables [0];
 
 		//判断数据表内是否存在数据
 		if (mSheet.Rows.Count < 1)
