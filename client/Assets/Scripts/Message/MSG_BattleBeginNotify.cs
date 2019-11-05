@@ -12,7 +12,7 @@ public class MSG_BattleBeginNotify : Message<BattleBeginNotify>
         return MessageManager.Instance.Get<MSG_BattleBeginNotify>(MessageID.BATTLE_BEGIN_NOTIFY);
     }
 
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
         for (int i = 0; i < message.list.Count; ++i)
         {

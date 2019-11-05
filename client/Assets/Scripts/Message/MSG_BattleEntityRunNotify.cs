@@ -10,7 +10,7 @@ public class MSG_BattleEntityRunNotify : Message<BattleEntityRunNotify>
     {
         return MessageManager.Instance.Get<MSG_BattleEntityRunNotify>(MessageID.BATTLE_ENTITY_RUN_NOTIFY);
     }
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
         var entity = BattleManager.Instance.GetEntity(message.id);
         if (entity != null)

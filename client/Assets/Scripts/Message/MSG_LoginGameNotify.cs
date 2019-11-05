@@ -10,7 +10,7 @@ public class MSG_LoginGameNotify : Message<LoginGameNotify>
     {
         return MessageManager.Instance.Get<MSG_LoginGameNotify>(MessageID.LOGIN_GAME_NOTIFY);
     }
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
        
         Debug.Log(message.ip + ":" + message.port);
