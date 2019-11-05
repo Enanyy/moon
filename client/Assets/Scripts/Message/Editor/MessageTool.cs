@@ -14,6 +14,7 @@ public class MessageTool
     {
         string codeRegister = "";
         string codeID = "";
+        int id = MESSAGEID_BEGIN;
         for (int i = 0; i < 4; i++)
         {
             Assembly assembly = null;
@@ -60,7 +61,7 @@ public class MessageTool
                       || classname.EndsWith("Notify"))
                     {
                         string ID = GetID(classname);
-                        codeID += "\t" + ID + " = " + (MESSAGEID_BEGIN++) + ",\n";
+                        codeID += "\t" + ID + " = " + (id++) + ",\n";
                         codeRegister += "\t\tRegister(new " + "MSG_" + classname + "());\n";
 
                         WriteFile(classname, ID);
@@ -82,6 +83,8 @@ public class MessageTool
         string codeRegister = "";
         string codeID = "";
 
+        int id = MESSAGEID_BEGIN;
+
         for (int i = 0; i < protos.Length; ++i)
         {
             string[] lines = File.ReadAllLines(protos[i]);
@@ -99,7 +102,7 @@ public class MessageTool
                 {
 
                     string ID = GetID(classname);
-                    codeID += "\t" + ID +" = " + (MESSAGEID_BEGIN++)+",\n";
+                    codeID += "\t" + ID +" = " + (id++)+",\n";
                     codeRegister += "\t\tRegister(new " + "MSG_" + classname + "());\n";
 
                     WriteFile(classname, ID);
@@ -116,11 +119,10 @@ public class MessageTool
         string ID = "";
         for (int k = 0; k < classname.Length; k++)
         {
-
-            if (k > 0 && classname[k] >= 'A' && classname[k] <= 'Z')
+            if ((k > 0 && classname[k] >= 'a' && classname[k] <= 'z') && (k + 1 < classname.Length && classname[k + 1] >= 'A' && classname[k + 1] <= 'Z'))
             {
-                ID += "_";
                 ID += classname[k];
+                ID += "_";
             }
             else
             {
