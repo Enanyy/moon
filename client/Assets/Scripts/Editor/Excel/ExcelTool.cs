@@ -106,11 +106,12 @@ public class ExcelTool
 
         for (int i = 1; i < colCount; ++i)
         {
-            if (table.Rows[1][i].ToString().Trim() != "*")
+            string flag = table.Rows[1][i].ToString();
+            if (string.IsNullOrEmpty(flag) || flag.Trim() != "*")
             {
                 continue;
             }
-            string type = table.Rows[2][i].ToString();
+            string type = table.Rows[2][i].ToString().Trim();
             if (string.IsNullOrEmpty(type))
             {
                 continue;
@@ -184,7 +185,9 @@ public class ExcelTool
 
         for (int i = 7; i < rowCount; i++)
         {
-            if (table.Rows[i][0].ToString().Trim() != "*")
+            //这一行是否需要导出？
+            string flag = table.Rows[i][0].ToString();
+            if ( string.IsNullOrEmpty(flag) || flag.Trim() != "*")
             {
                 continue;
             }
@@ -193,6 +196,12 @@ public class ExcelTool
             insertBuilder.Append(" VALUES (");
             for (int j = 1; j < colCount; ++j)
             {
+                //这一列是否需要导出？
+                flag = table.Rows[1][j].ToString();
+                if (string.IsNullOrEmpty(flag) || flag.Trim() != "*")
+                {
+                    continue;
+                }
                 string type = table.Rows[2][j].ToString();
                 if (string.IsNullOrEmpty(type))
                 {
@@ -218,14 +227,14 @@ public class ExcelTool
         }
 
         createBuilder.Append(insertBuilder.ToString());
-
-        string create = createBuilder.ToString();
+        //添加事务语句，因为要执行多条语句
+        string create = string.Format("PRAGMA foreign_keys = off;\nBEGIN TRANSACTION;\n{0}COMMIT TRANSACTION;\nPRAGMA foreign_keys = on;\n", createBuilder.ToString()) ;
 
         try
         {
             if (SQLite.Instance.Open(database))
             {
-                if (SQLite.Instance.Execute(create) > 0)
+                if (SQLite.Instance.Execute(create))
                 {
                     Debug.Log("成功导出:" + table.TableName);
                 }

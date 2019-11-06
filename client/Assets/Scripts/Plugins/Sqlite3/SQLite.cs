@@ -159,33 +159,23 @@ public class SQLite : IDisposable
         }
     }
 
-    public int Execute(string sql)
-    { 
+    public bool Execute(string sql)
+    {
+        bool result = false;
         if (string.IsNullOrEmpty(sql))
         {
-            return 0;
+            return result;
         }
-        string[] array = sql.Split(new char[] { ';' });
 
-        int count = 0;
-
-        for (int i = 0; i < array.Length; ++i)
+        SQLiteQuery query = new SQLiteQuery(mDbConnect, sql);
+        if (query.Step() == false)
         {
-            string command = array[i].Trim();
-            if (string.IsNullOrEmpty(command))
-            {
-                continue;
-            }
-            command += ";";
-            SQLiteQuery query = new SQLiteQuery(mDbConnect, command);
-            if (query.Step() == false)
-            {
-                count++;
-            }
-            query.Release();
-
+            result = true;
         }
-        return count;
+        query.Release();
+
+
+        return result;
     }
 
 
