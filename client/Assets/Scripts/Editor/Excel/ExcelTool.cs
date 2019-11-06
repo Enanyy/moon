@@ -88,14 +88,17 @@ public class ExcelTool
         int rowCount = table.Rows.Count;
         int colCount = table.Columns.Count;
 
-        if (rowCount < 7 || colCount < 2)
+        ///文件头7行
+        const int HEADER_ROW_COUNT = 7;
+
+        if (rowCount < HEADER_ROW_COUNT || colCount < 2)
         {
             Debug.LogError("Excel表格式有错误:" + table.TableName);
             return;
         }
         //删除和新建表的SQL语句
         StringBuilder createBuilder = new StringBuilder();
-        createBuilder.AppendFormat("DROP TABLE IF EXISTS '{0}';\nCREATE TABLE {1} (", table.TableName, table.TableName);
+        createBuilder.AppendFormat("DROP TABLE IF EXISTS {0};\nCREATE TABLE {1} (", table.TableName, table.TableName);
         //插入数据的SQL语句
         StringBuilder insertBuilder = new StringBuilder();
         insertBuilder.AppendFormat("INSERT INTO {0} (", table.TableName);
@@ -112,7 +115,7 @@ public class ExcelTool
             {
                 continue;
             }
-            string type = table.Rows[2][i].ToString().Trim();
+            string type = table.Rows[3][i].ToString().Trim();
             if (string.IsNullOrEmpty(type))
             {
                 continue;
@@ -124,7 +127,7 @@ public class ExcelTool
                 return;
             }
 
-            string name = table.Rows[3][i].ToString();
+            string name = table.Rows[2][i].ToString();
             string isNull = table.Rows[4][i].ToString() == "1" ? "" : "NOT NULL";
 
             if (table.Rows[5][i].ToString() == "1")
@@ -184,7 +187,7 @@ public class ExcelTool
         insertBuilder.Clear();
 
 
-        for (int i = 7; i < rowCount; i++)
+        for (int i = HEADER_ROW_COUNT; i < rowCount; i++)
         {
             //这一行是否需要导出？
             string flag = table.Rows[i][0].ToString();
@@ -203,7 +206,7 @@ public class ExcelTool
                 {
                     continue;
                 }
-                string type = table.Rows[2][j].ToString();
+                string type = table.Rows[3][j].ToString();
                 if (string.IsNullOrEmpty(type))
                 {
                     continue;
