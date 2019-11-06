@@ -158,7 +158,7 @@ public class SQLite : IDisposable
         }
     }
     /// <summary>
-    /// 执行一条sql语句或者事务
+    /// 执行一条sql语句(只执行一条)
     /// </summary>
     /// <param name="sql"></param>
     /// <returns></returns>
@@ -176,7 +176,6 @@ public class SQLite : IDisposable
             result = true;
         }
         query.Release();
-
 
         return result;
     }
