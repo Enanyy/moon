@@ -1,57 +1,53 @@
 using System.Collections.Generic;
-
+/// <summary>
+/// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
+/// </summary>
 public class TBRole
 {
-//DEFINITION_START
+//TABLE_DEFINITION_BEGIN
 	public int id;
 	public string name;
 	public int type;
-	public string config;
-	public int hp;
-	public int attack;
-	public int defense;
-	public int movedistance;
-	public int movedirection;
-	public int attackdistance;
-	public int searchdistance;
-	public float radius;
 	public float height;
-//DEFINITION_END
+	public string desc;
+	public double weigth;
+	public int config;
+//TABLE_DEFINITION_END
+
+    public List<string> names = new List<string>();
 }
 
 public class DTRole : IDataTable
 {
     public DataTableID name
     {
-        get { return DataTableID.TB_Role; }
+        get {{ return DataTableID.TB_Role; }}
     }
 
-    //public readonly Dictionary<int, TBRole> data = new Dictionary<int, TBRole>();
+    public readonly Dictionary<int, TBRole> data = new Dictionary<int, TBRole>();
 
     public void Read(SQLiteTable table)
     {
         while (table.Read())
         {
-//READ_START
-           /*	TBRole o = new TBRole();
+//TABLE_READ_BEGIN			TBRole o = new TBRole();
 			o.id = table.GetByColumnName("id",0);
 			o.name = table.GetByColumnName("name","");
 			o.type = table.GetByColumnName("type",0);
-			o.config = table.GetByColumnName("config","");
-			o.hp = table.GetByColumnName("hp",0);
-			o.attack = table.GetByColumnName("attack",0);
-			o.defense = table.GetByColumnName("defense",0);
-			o.movedistance = table.GetByColumnName("movedistance",0);
-			o.movedirection = table.GetByColumnName("movedirection",0);
-			o.attackdistance = table.GetByColumnName("attackdistance",0);
-			o.searchdistance = table.GetByColumnName("searchdistance",0);
-			o.radius = table.GetByColumnName("radius",0);
 			o.height = table.GetByColumnName("height",0);
-			data.Add(o.id,o);*/
-//READ_END
-        }          
+			o.desc = table.GetByColumnName("desc","");
+			o.weigth = table.GetByColumnName("weigth",0);
+			o.config = table.GetByColumnName("config",0);
+			data.Add(o.id,o);
+//TABLE_READ_END
+
+            for (int i = 0; i < 10; ++i)
+            {
+                o.names.Add(o.name);
+            }
+        }        
     }
-    /*
+    
     public static TBRole Get(int id)
     {
         var table = DataTableManager.Instance.Get<DTRole>(DataTableID.TB_Role);
@@ -61,5 +57,5 @@ public class DTRole : IDataTable
         }
         return null;
     }
-    */
+    
 }

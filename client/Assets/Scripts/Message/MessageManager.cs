@@ -79,9 +79,12 @@ public class MessageManager
 
     private Dictionary<int,IMessage> mMessageDic = new Dictionary<int,IMessage>();
 
+    /// <summary>
+    /// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
+    /// </summary>
     public void Init()
     {
-//REGISTER_MESSAGE_START		Register(new MSG_LoginRequest());
+//REGISTER_MESSAGE_BEGIN		Register(new MSG_LoginRequest());
 		Register(new MSG_LoginReturn());
 		Register(new MSG_LoginGameNotify());
 		Register(new MSG_LoginGameRequest());

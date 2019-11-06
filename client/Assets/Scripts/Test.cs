@@ -28,13 +28,13 @@ public class Test : MonoBehaviour {
 
         //    while (table.Read())
         //    {
-        //        //READ_START
+        //        //TABLE_READ_BEGIN
 
         //       int id = table.GetByColumnName("id", 0);
 
 
         //        Debug.Log(id);
-        //        //READ_END
+        //        //TABLE_READ_END
         //    }
         //    table.Close();
         //}

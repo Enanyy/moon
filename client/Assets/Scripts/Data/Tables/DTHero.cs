@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class TBHero
 {
-//DEFINITION_START
+//TABLE_DEFINITION_BEGIN
 	public int id;
 	public string name;
 	public int type;
@@ -32,8 +32,7 @@ public class DTHero : IDataTable
     {
         while (table.Read())
         {
-//READ_START
-           	TBHero o = new TBHero();
+//TABLE_READ_BEGIN			TBHero o = new TBHero();
 			o.id = table.GetByColumnName("id",0);
 			o.name = table.GetByColumnName("name","");
 			o.type = table.GetByColumnName("type",0);
@@ -48,7 +47,7 @@ public class DTHero : IDataTable
 			o.radius = table.GetByColumnName("radius",0);
 			o.height = table.GetByColumnName("height",0);
 			data.Add(o.id,o);
-//READ_END
+//TABLE_READ_END
         }          
     }
     

@@ -56,9 +56,7 @@ public class MessageTool
                 {
                     string classname = types[j].ToString().Replace("PBMessage.", "");
 
-                    if (classname.EndsWith("Request")
-                      || classname.EndsWith("Return")
-                      || classname.EndsWith("Notify"))
+                    if (IsMessage(classname))
                     {
                         string ID = GetID(classname);
                         codeID += "\t" + ID + " = " + (id++) + ",\n";
@@ -71,8 +69,8 @@ public class MessageTool
 
             }
         }
-        ReplaceFile(Application.dataPath + "/Scripts/Message/MessageManager.cs", "//REGISTER_MESSAGE_START", "//REGISTER_MESSAGE_END", codeRegister);
-        ReplaceFile(Application.dataPath + "/Scripts/Message/MessageID.cs", "//MESSAGEID_START", "//MESSAGEID_END", codeID);
+        FileEx.ReplaceContent(Application.dataPath + "/Scripts/Message/MessageManager.cs", "//REGISTER_MESSAGE_BEGIN", "//REGISTER_MESSAGE_END", codeRegister);
+        FileEx.ReplaceContent(Application.dataPath + "/Scripts/Message/MessageID.cs", "//MESSAGEID_BEGIN", "//MESSAGEID_END", codeID);
     }
     [MenuItem("Tools/Message/生成协议代码(Proto)")]
     static void GenerateMessageFromProto()
@@ -96,9 +94,7 @@ public class MessageTool
                     continue;
                 }
                 string classname = lines[j].Replace("message", "").Trim();
-                if (classname.EndsWith("Request")
-                      || classname.EndsWith("Return")
-                      || classname.EndsWith("Notify"))
+                if (IsMessage(classname))
                 {
 
                     string ID = GetID(classname);
@@ -110,10 +106,16 @@ public class MessageTool
             }
         }
 
-        ReplaceFile(Application.dataPath + "/Scripts/Message/MessageManager.cs", "//REGISTER_MESSAGE_START", "//REGISTER_MESSAGE_END", codeRegister);
-        ReplaceFile(Application.dataPath + "/Scripts/Message/MessageID.cs", "//MESSAGEID_START", "//MESSAGEID_END", codeID);
+        FileEx.ReplaceContent(Application.dataPath + "/Scripts/Message/MessageManager.cs", "//REGISTER_MESSAGE_BEGIN", "//REGISTER_MESSAGE_END", codeRegister);
+        FileEx.ReplaceContent(Application.dataPath + "/Scripts/Message/MessageID.cs", "//MESSAGEID_BEGIN", "//MESSAGEID_END", codeID);
     }
-
+    static bool IsMessage(string classname)
+    {
+        return classname.EndsWith("Request")
+                     || classname.EndsWith("Return")
+                     || classname.EndsWith("Notify");
+    }
+        
     static string GetID(string classname)
     {
         string ID = "";
@@ -148,45 +150,29 @@ public class MessageTool
         {
             string fm = @"using UnityEngine;
 using PBMessage;
-public class {0} : Message<{1}>
-{{
-    public {2}() : base(MessageID.{3})
-    {{
-
-    }}
-
-    public static {4} Get()
-    {{
-        return MessageManager.Instance.Get<{5}>(MessageID.{6});
-    }}
-
-    protected override void OnRecv()
-    {{
-       
-    }}
-}}
-";
-            string code = string.Format(fm, filename, classname, filename, ID, filename, filename, ID);
-            File.WriteAllText(file, code);
-        }
+public class {filename} : Message<{classname}>
+{
+    public {filename}() : base(MessageID.{ID})
+    {
 
     }
 
-    static void ReplaceFile(string file, string beginFlag, string endFlag, string code)
-    {    
-        string content = File.ReadAllText(file);
+    public static {filename} Get()
+    {
+        return MessageManager.Instance.Get<{filename}>(MessageID.{ID});
+    }
 
-        int startIDIndex = content.IndexOf(beginFlag);
-        int endIDIndex = content.IndexOf(endFlag);
-
-        string part1 = content.Substring(0, startIDIndex + beginFlag.Length + 1);
-        string part2 = content.Substring(endIDIndex);
-
-        content = part1 + code + part2;
-        StreamWriter writer = new StreamWriter(file);
-        writer.Write(content);
-        writer.Close();
-        writer.Dispose();
+    protected override void OnRecv()
+    {
+       
+    }
+}
+";
+            string code = fm.Replace("{filename}", filename)
+                .Replace("{classname}", classname)
+                .Replace("{ID}", ID);
+            File.WriteAllText(file, code);
+        }
 
     }
 }

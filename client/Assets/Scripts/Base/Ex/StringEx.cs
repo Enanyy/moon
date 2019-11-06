@@ -200,6 +200,28 @@ public static class StringEx
         {
             return new Rect(Convert.ToSingle(values[0]), Convert.ToSingle(values[1]), Convert.ToSingle(values[2]), Convert.ToSingle(values[3]));
         }
+        
         return new Rect();
+    }
+
+    public static string ReplaceEx(this string text, string beginFlag, string endFlag, string replace)
+    {
+        if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(beginFlag) || string.IsNullOrEmpty(endFlag))
+        {
+            return text;
+        }
+        int beginIndex = text.IndexOf(beginFlag);
+        int endIndex = text.IndexOf(endFlag);
+        if (beginIndex >= 0 && endIndex >= 0)
+        {
+            string part1 = text.Substring(0, beginIndex + beginFlag.Length + 1);
+            string part2 = text.Substring(endIndex);
+
+            return string.Format("{0}{1}{2}", part1, replace, part2);;
+        }
+        else
+        {
+            return text;
+        }
     }
 }

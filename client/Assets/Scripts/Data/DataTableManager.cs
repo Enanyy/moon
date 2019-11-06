@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
+/// </summary>
 public enum DataTableID
 {
-//DATATABLE_ID_START	TB_Hero,
+//DATATABLE_ID_BEGIN	TB_Hero,
 	TB_Role,
 //DATATABLE_ID_END
 }
@@ -41,7 +43,7 @@ public class DataTableManager
 
         if(SQLite.Instance.Open(bytes))
         {
-//DATATABLE_REGISTER_START			Register(new DTHero());
+//DATATABLE_REGISTER_BEGIN			Register(new DTHero());
 			Register(new DTRole());
 //DATATABLE_REGISTER_END
             SQLite.Instance.Close();
