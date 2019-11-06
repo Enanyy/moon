@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class Test : MonoBehaviour {
@@ -17,7 +18,7 @@ public class Test : MonoBehaviour {
         //});
 
         //return;
- 
+
         Instance = this;
 
         CameraManager.Instance.Init();

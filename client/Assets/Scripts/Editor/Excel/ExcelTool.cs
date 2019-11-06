@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -119,7 +120,7 @@ public class ExcelTool
 
             if (IsValidDataType(type) == false)
             {
-                Debug.LogError("数据类型错误:" + type);
+                Debug.LogError("数据类型错误:" + type + " Sheet:" + table.TableName);
                 return;
             }
 
@@ -247,32 +248,51 @@ public class ExcelTool
         }
         finally
         {
-            dir += "/sql/";
-            if (Directory.Exists(dir) == false)
-            {
-                Directory.CreateDirectory(dir);
-            }
-            string file = string.Format("{0}{1}.sql", dir, table.TableName);
+            string file = string.Format("{0}/sql/{1}.sql", dir, table.TableName);
 
-            StreamWriter writer = new StreamWriter(file);
-            writer.Write(create);
-            writer.Close();
-            writer.Dispose();
+            FileEx.SaveFile(file, create);
         }
     }
 
     static bool IsValidDataType(string type)
     {
         type = type.ToUpper().Trim();
-        return type == "INT"
+        bool result = type == "INT"
             || type == "BIGINT"
             || type == "BOOLEAN"
             || type == "DECIMAL"
-            || type == "DOUBLE"
+            || type == "DOUBLE" //浮点型
             || type == "INTEGER"
             || type == "STRING"
             || type == "TEXT"
-            || type.Contains("VARCHAR");
+            || type == "DATE"
+            || type == "DATETIME"
+            || type == "TIME"
+            || type == "BLOB"; //二进制大数据
+
+        if (result == false)
+        {
+            //可边长字符串
+            if (type.Contains("VARCHAR"))
+            {
+                string s = type.Replace("VARCHAR", "");
+                if (s.Length >= 3 && s[0] =='(' && s[s.Length - 1] ==')')
+                {
+                    string n = s.Substring(1, s.Length - 2);
+                    if (int.TryParse(n, out int number))
+                    {
+                        result = number > 0 && number <= 1024; //限制长度
+                        if (result == false)
+                        {
+                            Debug.LogError("可变长字符串长度区间:(0,1024]");
+                        }
+                    }
+                    //return Regex.IsMatch(n, @"^[0-9]*[1-9][0-9]*$"); //可变长字符串
+                }
+            }
+        }
+        return result;
+           
     }
 
     /// <summary>
@@ -318,13 +338,8 @@ public class ExcelTool
         //生成Json字符串
         string json = JsonUtility.ToJson(table);
         //写入文件
-        using (FileStream fileStream = new FileStream(JsonPath, FileMode.Create, FileAccess.Write))
-        {
-            using (TextWriter textWriter = new StreamWriter(fileStream, Encoding.GetEncoding("utf-8")))
-            {
-                textWriter.Write(json);
-            }
-        }
+
+        FileEx.SaveFile(JsonPath, json);
     }
 
     /// <summary>
@@ -359,15 +374,7 @@ public class ExcelTool
             stringBuilder.Append("\r\n");
         }
 
-        //写入文件
-        using (FileStream fileStream = new FileStream(saveFile, FileMode.Create, FileAccess.Write))
-        {
-            using (TextWriter textWriter = new StreamWriter(fileStream, Encoding.GetEncoding("utf-8")))
-            {
-                textWriter.Write(stringBuilder.ToString());
-            }
-        }
-
+        FileEx.SaveFile(saveFile, stringBuilder.ToString());
     }
 
     /// <summary>
@@ -412,13 +419,7 @@ public class ExcelTool
         //闭合标签
         stringBuilder.Append("</Table>");
         //写入文件
-        using (FileStream fileStream = new FileStream(saveFile, FileMode.Create, FileAccess.Write))
-        {
-            using (TextWriter textWriter = new StreamWriter(fileStream, Encoding.GetEncoding("utf-8")))
-            {
-                textWriter.Write(stringBuilder.ToString());
-            }
-        }
+        FileEx.SaveFile(saveFile, stringBuilder.ToString());
     }
 
 }

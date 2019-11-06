@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+
 public static class FileEx
 {
     public static void ReplaceContent(string file, string beginFlag, string endFlag, string replace)
@@ -17,10 +19,18 @@ public static class FileEx
         {
             Directory.CreateDirectory(dir);
         }
-        StreamWriter writer = new StreamWriter(path);
-        writer.Write(content);
-        writer.Close();
-        writer.Dispose();
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+        //写入文件
+        using (FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
+        {
+            using (TextWriter writer = new StreamWriter(fileStream, Encoding.GetEncoding("utf-8")))
+            {
+                writer.Write(content);
+            }
+        }
     }
 }
 
