@@ -54,9 +54,10 @@ public class DTHero : IDataTable
     public static TBHero Get(int id)
     {
         var table = DataTableManager.Instance.Get<DTHero>(DataTableID.TB_Hero);
-        if(table.data.ContainsKey(id))
+        if (table != null && table.data != null)
         {
-            return table.data[id];
+            table.data.TryGetValue(id, out TBHero data);
+            return data;
         }
         return null;
     }

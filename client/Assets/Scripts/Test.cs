@@ -17,68 +17,7 @@ public class Test : MonoBehaviour {
         //});
 
         //return;
-        SQLite.Instance.Open("D:/WorkSpace/moon/client/Assets/R/database/data.bytes");
-
-        //string sql = "select * from TB_Hero";
-
-
-        //SQLiteDataTable table = SQLite.Instance.GetDataTable(sql);
-        //if (table != null)
-        //{
-
-        //    while (table.Read())
-        //    {
-        //        //TABLE_READ_BEGIN
-
-        //       int id = table.GetByColumnName("id", 0);
-
-
-        //        Debug.Log(id);
-        //        //TABLE_READ_END
-        //    }
-        //    table.Close();
-        //}
-        //else
-        //{
-        //   // Debug.LogError("Can't find table:" + data.name);
-        //}
-        //string drop = @"DROP TABLE IF EXISTS 'TB_Role';";
-        //SQLite.Instance.Execute(drop);
-        string create = @"DROP TABLE IF EXISTS 'TB_Role';
-CREATE TABLE TB_Role (
-    id             INT           PRIMARY KEY
-                                 NOT NULL
-                                 DEFAULT (0),
-    name           VARCHAR (256) NOT NULL,
-    type           INT           NOT NULL,
-    config         VARCHAR (256) NOT NULL,
-    hp             INT           NOT NULL,
-    attack         INT           NOT NULL,
-    defense        INT           NOT NULL,
-    movedistance   INT           NOT NULL,
-    movedirection  INT           NOT NULL,
-    attackdistance INT           NOT NULL,
-    searchdistance INT           NOT NULL,
-    radius         DECIMAL       NOT NULL,
-    height         DECIMAL       NOT NULL,
-    UNIQUE (
-        id
-    )
-); ";
-
-         SQLite.Instance.Execute(create);
-
-        string name = "怕是哦'";
-
-        string insert = @"INSERT INTO TB_Role (id, name, type, config, hp, attack, defense, movedistance, movedirection, attackdistance, searchdistance, radius, height) VALUES ({0}, '{1}', 1, 'paoshou.txt', 900, 90, 10, 2, 2, 5, 10, 1, 2);";
-
-        for (int i = 0; i < 10; ++i)
-        {
-            
-            SQLite.Instance.Execute(string.Format(insert, i,name.Replace("'","''")));
-            
-        }
-
+ 
         Instance = this;
 
         CameraManager.Instance.Init();

@@ -84,10 +84,7 @@ public class DataTableManager
     }
     public T Get<T>(DataTableID id) where T:class, IDataTable
     {
-        if(mDataTables.ContainsKey(id))
-        {
-            return mDataTables[id] as T;
-        }
-        return null;
+        mDataTables.TryGetValue(id, out IDataTable data);
+        return data as T;
     }
 }

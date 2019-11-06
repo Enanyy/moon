@@ -42,9 +42,10 @@ public class {filename} : IDataTable
     public static {classname} Get({key} id)
     {
         var table = DataTableManager.Instance.Get<{filename}>(DataTableID.{tablename});
-        if(table.data.ContainsKey(id))
+        if (table != null && table.data!= null)
         {
-            return table.data[id];
+            table.data.TryGetValue(id, out {classname} data);
+            return data;
         }
         return null;
     }

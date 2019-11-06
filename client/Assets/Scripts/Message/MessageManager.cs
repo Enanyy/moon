@@ -118,8 +118,7 @@ public class MessageManager
 
     public T Get<T>(MessageID id) where T :class, IMessage
     {
-        IMessage message = null;
-        mMessageDic.TryGetValue((int) id, out message);
+        mMessageDic.TryGetValue((int)id, out IMessage message);
         return message as T;
     }
 

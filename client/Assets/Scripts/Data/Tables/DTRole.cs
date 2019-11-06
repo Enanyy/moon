@@ -51,9 +51,10 @@ public class DTRole : IDataTable
     public static TBRole Get(int id)
     {
         var table = DataTableManager.Instance.Get<DTRole>(DataTableID.TB_Role);
-        if(table.data.ContainsKey(id))
+        if (table != null && table.data!= null)
         {
-            return table.data[id];
+            table.data.TryGetValue(id, out TBRole data);
+            return data;
         }
         return null;
     }
