@@ -1,4 +1,6 @@
-﻿DROP TABLE IF EXISTS 'TB_Role';
+﻿PRAGMA foreign_keys = off;
+BEGIN TRANSACTION;
+DROP TABLE IF EXISTS 'TB_Role';
 CREATE TABLE TB_Role (id INT NOT NULL DEFAULT (0),name VARCHAR(256) NOT NULL ,type INT NOT NULL DEFAULT (1),height DECIMAL NOT NULL DEFAULT (1),desc TEXT  ,weigth DOUBLE NOT NULL DEFAULT (0),config INT NOT NULL DEFAULT (0),y INT NOT NULL DEFAULT (0),UNIQUE(id));
 INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (200,'给我给我个196',198,198,'哈哈哈哈196',229,198,198);INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (1,'TestName1',1,1.8,'fqwfqwf''asd',5.44656566565656,7,7);
 INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (2,'TestName2',1,1.8,'中文''',5.44656566565656,5,5);
@@ -199,3 +201,5 @@ INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (197,'给�
 INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (198,'给我给我个194',196,196,'哈哈哈哈194',227,196,196);
 INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (199,'给我给我个195',197,197,'哈哈哈哈195',228,197,197);
 INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (200,'给我给我个196',198,198,'哈哈哈哈196',229,198,198);
+COMMIT TRANSACTION;
+PRAGMA foreign_keys = on; 

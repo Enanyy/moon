@@ -269,7 +269,7 @@ public class ExcelTool
         {
             string file = string.Format("{0}/sql/{1}.sql", dir, table.TableName);
 
-            create = string.Format("{0}\n{1}", drop, createBuilder.ToString());
+            create = string.Format("PRAGMA foreign_keys = off;\nBEGIN TRANSACTION;\n{0}\n{1}COMMIT TRANSACTION;\nPRAGMA foreign_keys = on; ", drop, createBuilder.ToString());
             FileEx.SaveFile(file, create);
         }
     }
