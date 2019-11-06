@@ -96,12 +96,10 @@ public class ExcelTool
             Debug.LogError("Excel表格式有错误:" + table.TableName);
             return;
         }
-        //删除表
-        string drop = string.Format("DROP TABLE IF EXISTS '{0}';", table.TableName);
-
+     
         //新建表的SQL语句
         StringBuilder createBuilder = new StringBuilder();
-        createBuilder.AppendFormat("CREATE TABLE {1} (", table.TableName, table.TableName);
+        createBuilder.AppendFormat("DROP TABLE IF EXISTS '{0}';\nCREATE TABLE {1} (", table.TableName, table.TableName);
         //插入数据的SQL语句
         StringBuilder insertBuilder = new StringBuilder();
         insertBuilder.AppendFormat("INSERT INTO {0} (", table.TableName);
@@ -189,8 +187,6 @@ public class ExcelTool
         string insert = insertBuilder.ToString();
         insertBuilder.Clear();
 
-        List<string> inserts = new List<string>();
-
         for (int i = HEADER_ROW_COUNT; i < rowCount; i++)
         {
             //这一行是否需要导出？
@@ -199,7 +195,7 @@ public class ExcelTool
             {
                 continue;
             }
-            insertBuilder.Clear();
+
             //插入数据语句
             insertBuilder.Append(insert);
             insertBuilder.Append(" VALUES (");
@@ -232,30 +228,18 @@ public class ExcelTool
             {
                 insertBuilder.Remove(insertBuilder.Length - 1, 1);
             }
-            insertBuilder.Append(");");
-
-            inserts.Add(insertBuilder.ToString());
+            insertBuilder.Append(");\n");
         }
 
         createBuilder.Append(insertBuilder.ToString());
 
-        string create = createBuilder.ToString() ;
-    
+        string create = string.Format("PRAGMA foreign_keys = off;\nBEGIN TRANSACTION;\n{0}COMMIT TRANSACTION;\nPRAGMA foreign_keys = on; ", createBuilder.ToString());
 
         try
         {
             if (SQLite.Instance.Open(database))
             {
-                SQLite.Instance.Execute(drop);
                 SQLite.Instance.Execute(create);
-
-                for (int i = 0; i < inserts.Count; ++i)
-                {
-                    SQLite.Instance.Execute(inserts[i]);
-                    createBuilder.Append(inserts[i]);
-                    createBuilder.Append('\n');
-                }
-
                 Debug.Log("成功导出:" + table.TableName);
                 
             }
@@ -269,7 +253,6 @@ public class ExcelTool
         {
             string file = string.Format("{0}/sql/{1}.sql", dir, table.TableName);
 
-            create = string.Format("PRAGMA foreign_keys = off;\nBEGIN TRANSACTION;\n{0}\n{1}COMMIT TRANSACTION;\nPRAGMA foreign_keys = on; ", drop, createBuilder.ToString());
             FileEx.SaveFile(file, create);
         }
     }

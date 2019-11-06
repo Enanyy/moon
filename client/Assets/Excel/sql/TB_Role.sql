@@ -2,7 +2,7 @@
 BEGIN TRANSACTION;
 DROP TABLE IF EXISTS 'TB_Role';
 CREATE TABLE TB_Role (id INT NOT NULL DEFAULT (0),name VARCHAR(256) NOT NULL ,type INT NOT NULL DEFAULT (1),height DECIMAL NOT NULL DEFAULT (1),desc TEXT  ,weigth DOUBLE NOT NULL DEFAULT (0),config INT NOT NULL DEFAULT (0),y INT NOT NULL DEFAULT (0),UNIQUE(id));
-INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (200,'给我给我个196',198,198,'哈哈哈哈196',229,198,198);INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (1,'TestName1',1,1.8,'fqwfqwf''asd',5.44656566565656,7,7);
+INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (1,'TestName1',1,1.8,'fqwfqwf''asd',5.44656566565656,7,7);
 INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (2,'TestName2',1,1.8,'中文''',5.44656566565656,5,5);
 INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (3,'TestName2',1,2,'特殊字符/ // \ \\ " "" . ,a',6,4,4);
 INSERT INTO TB_Role (id,name,type,height,desc,weigth,config,y) VALUES (5,'给我给我个1',3,3,'哈哈哈哈1',34,3,3);

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.IO;
+using Community.CsharpSqlite;
 
 public class SQLite : IDisposable
 {
@@ -158,25 +159,26 @@ public class SQLite : IDisposable
         }
     }
     /// <summary>
-    /// 执行一条sql语句(只执行一条)
+    /// 执行一条sql语句或事务
     /// </summary>
     /// <param name="sql"></param>
     /// <returns></returns>
-    public bool Execute(string sql)
+    public int Execute(string sql)
     {
-        bool result = false;
+        int result = 0;
         if (string.IsNullOrEmpty(sql) || IsOpen() == false)
         {
             return result;
         }
 
-        SQLiteQuery query = new SQLiteQuery(mDbConnect, sql);
-        if (query.Step() == false)
-        {
-            result = true;
-        }
-        query.Release();
+        string error = null;
 
+        result = Sqlite3.sqlite3_exec(mDbConnect.Connection(), sql, null ,null, ref error);
+
+        if (string.IsNullOrEmpty(error) == false)
+        {
+            Debug.LogError(error);
+        }
         return result;
     }
 
