@@ -162,7 +162,7 @@ public class SQLite : IDisposable
     /// 执行一条sql语句或事务
     /// </summary>
     /// <param name="sql"></param>
-    /// <returns></returns>
+    /// <returns>Sqlite3.SQLITE_XXX</returns>
     public int Execute(string sql)
     {
         int result = 0;
@@ -173,7 +173,7 @@ public class SQLite : IDisposable
 
         string error = null;
 
-        result = Sqlite3.sqlite3_exec(mDbConnect.Connection(), sql, null ,null, ref error);
+        result = Sqlite3.exec(mDbConnect.Connection(), sql, null ,null, ref error);
 
         if (string.IsNullOrEmpty(error) == false)
         {

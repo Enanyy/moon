@@ -13,7 +13,8 @@ using UnityEngine;
 /// </summary>
 public class ExcelTool
 {
-    static string database = Application.dataPath + "/r/database/data.bytes";
+    static string database { get { return Application.dataPath + "/r/database/data.bytes"; } }
+
     [MenuItem("Tools/Excel/导出Excel数据表")]
     static void ExportAllExcel()
     {
@@ -43,11 +44,14 @@ public class ExcelTool
         {
             return;
         }
-        string path = AssetDatabase.GetAssetPath(Selection.activeObject);
+        for (int i = 0; i < Selection.objects.Length; ++i)
+        {
+            string path = AssetDatabase.GetAssetPath(Selection.objects[i]);
 
-        string fullpath = Application.dataPath + path.Substring("Assets".Length);
+            string fullpath = Application.dataPath + path.Substring("Assets".Length);
 
-        ExportExcel(fullpath);
+            ExportExcel(fullpath);
+        }
 
     }
     static void ExportExcel(string path)
@@ -88,8 +92,8 @@ public class ExcelTool
         int rowCount = table.Rows.Count;
         int colCount = table.Columns.Count;
 
-        ///文件头7行
-        const int HEADER_ROW_COUNT = 7;
+        ///文件头8行
+        const int HEADER_ROW_COUNT = 8;
 
         if (rowCount < HEADER_ROW_COUNT || colCount < 2)
         {
@@ -116,7 +120,7 @@ public class ExcelTool
             {
                 continue;
             }
-            string type = table.Rows[3][i].ToString().Trim();
+            string type = table.Rows[4][i].ToString().Trim();
             if (string.IsNullOrEmpty(type))
             {
                 continue;
@@ -128,10 +132,10 @@ public class ExcelTool
                 return;
             }
 
-            string name = table.Rows[2][i].ToString();
-            string isNull = table.Rows[4][i].ToString() == "1" ? "" : "NOT NULL";
+            string name = table.Rows[3][i].ToString();
+            string isNull = table.Rows[5][i].ToString() == "1" ? "" : "NOT NULL";
 
-            if (table.Rows[5][i].ToString() == "1")
+            if (table.Rows[6][i].ToString() == "1")
             {
                 uniqueBuilder.Append(name);
                 uniqueBuilder.Append(",");
@@ -139,7 +143,7 @@ public class ExcelTool
                 hasUnique = true;
             }
 
-            string defaultValue = table.Rows[6][i].ToString();
+            string defaultValue = table.Rows[7][i].ToString();
 
             if (type.Contains("CHAR") || type.Contains("TEXT"))
             {
@@ -207,7 +211,7 @@ public class ExcelTool
                 {
                     continue;
                 }
-                string type = table.Rows[3][j].ToString();
+                string type = table.Rows[4][j].ToString();
                 if (string.IsNullOrEmpty(type))
                 {
                     continue;
@@ -232,7 +236,7 @@ public class ExcelTool
         }
 
         createBuilder.Append(insertBuilder.ToString());
-
+        //添加事务，因为要执行多条命令
         string create = string.Format("PRAGMA foreign_keys = off;\nBEGIN TRANSACTION;\n{0}COMMIT TRANSACTION;\nPRAGMA foreign_keys = on; ", createBuilder.ToString());
 
         try
@@ -275,7 +279,7 @@ public class ExcelTool
 
         if (result == false)
         {
-            //可边长字符串
+            //可变长字符串
             if (type.Contains("VARCHAR"))
             {
                 string s = type.Replace("VARCHAR", "");

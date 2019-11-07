@@ -1,12 +1,13 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
-/// ע��XXXX_BEGIN��XXXX_ENDΪ�滻������Щע�Ͳ���ɾ�������Զ����ɴ����ʧ�ܣ������Զ������ݲ���д��ע��֮�䣬�����´��Զ���������ʱ�Ḳ�ǵ���
+/// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
 /// </summary>
 public enum DataTableID
 {
 //DATATABLE_ID_BEGIN	TB_Hero,
 	TB_Role,
+	TB_Language,
 //DATATABLE_ID_END
 }
 
@@ -34,6 +35,9 @@ public class DataTableManager
 
     private readonly Dictionary<DataTableID, IDataTable> mDataTables = new Dictionary<DataTableID, IDataTable>();
 
+    /// <summary>
+    /// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
+    /// </summary>
     public bool Init(byte[] bytes)
     {
         if(bytes== null)
@@ -45,6 +49,7 @@ public class DataTableManager
         {
 //DATATABLE_REGISTER_BEGIN			Register(new DTHero());
 			Register(new DTRole());
+			//Register(new DTLanguage());
 //DATATABLE_REGISTER_END
             SQLite.Instance.Close();
 
