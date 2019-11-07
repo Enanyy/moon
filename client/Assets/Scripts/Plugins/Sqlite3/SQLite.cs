@@ -162,10 +162,10 @@ public class SQLite : IDisposable
     /// 执行一条sql语句或事务
     /// </summary>
     /// <param name="sql"></param>
-    /// <returns>Sqlite3.SQLITE_XXX</returns>
-    public int Execute(string sql)
+    /// <returns></returns>
+    public bool Execute(string sql)
     {
-        int result = 0;
+        bool result = false;
         if (string.IsNullOrEmpty(sql) || IsOpen() == false)
         {
             return result;
@@ -173,17 +173,18 @@ public class SQLite : IDisposable
 
         string error = null;
 
-        result = Sqlite3.exec(mDbConnect.Connection(), sql, null ,null, ref error);
+        result = Sqlite3.exec(mDbConnect.Connection(), sql, null ,null, ref error) == Sqlite3.SQLITE_OK;
 
         if (string.IsNullOrEmpty(error) == false)
         {
             Debug.LogError(error);
         }
+ 
         return result;
     }
 
     /// <summary>
-    /// 获取数据库所以数据表名字
+    /// 获取数据库所有数据表名字
     /// </summary>
     /// <returns></returns>
     public SQLiteTable GetTables()

@@ -104,6 +104,11 @@ public class {filename} : IDataTable
         EditorGUILayout.Space();
         EditorGUILayout.Space();
 
+        EditorGUILayout.LabelField("数据库:", database.Replace(Application.dataPath,"Assets"));
+
+        EditorGUILayout.Space();
+
+
         mSelectedIndex = EditorGUILayout.Popup("选择要导出的数据表:", mSelectedIndex, mTableNames.ToArray());
 
         EditorGUILayout.Space();

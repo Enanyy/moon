@@ -39,8 +39,7 @@ public class DTLanguage : IDataTable
         list.Clear();
         while (table.Read())
         {
-//TABLE_READ_BEGIN
-           	TBLanguage o = new TBLanguage();
+//TABLE_READ_BEGIN			TBLanguage o = new TBLanguage();
 			o.key = table.GetByColumnName("key","");
 			o.ch = table.GetByColumnName("ch","");
 			o.en = table.GetByColumnName("en","");

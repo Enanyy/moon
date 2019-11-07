@@ -6,8 +6,8 @@ using UnityEngine;
 public enum DataTableID
 {
 //DATATABLE_ID_BEGIN	TB_Hero,
-	TB_Role,
 	TB_Language,
+	TB_Role,
 //DATATABLE_ID_END
 }
 
@@ -48,8 +48,8 @@ public class DataTableManager
         if(SQLite.Instance.Open(bytes))
         {
 //DATATABLE_REGISTER_BEGIN			Register(new DTHero());
+			Register(new DTLanguage());
 			Register(new DTRole());
-			//Register(new DTLanguage());
 //DATATABLE_REGISTER_END
             SQLite.Instance.Close();
 
