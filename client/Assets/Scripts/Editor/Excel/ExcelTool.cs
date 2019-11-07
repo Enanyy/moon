@@ -26,6 +26,9 @@ public class ExcelTool
 
     const int ROW_HEADER_COUNT = 8; //文件头行数
 
+    const int MAX_VARCHAR_LENGTH = 1024; //可变长度字符串最大长度
+    const int MAX_CHAR_LENGTH = 1024;    //固定长度字符串最大长度
+
     [MenuItem("Tools/Excel/导出Excel数据表")]
     static void ExportAllExcel()
     {
@@ -155,7 +158,7 @@ public class ExcelTool
 
             string defaultValue = table.Rows[ROW_INDEX_DEFAULTVALUE][i].ToString();
 
-            if (type.Contains("CHAR") || type.Contains("TEXT"))
+            if (IsStringType(type))
             {
                 if (string.IsNullOrEmpty(defaultValue) == false)
                 {
@@ -229,7 +232,7 @@ public class ExcelTool
                 //替换单引号
                 string value = table.Rows[i][j].ToString().Replace("'", "''");
                 //字符串添加单引号
-                if (type.Contains("CHAR") || type.Contains("TEXT"))
+                if (IsStringType(type))
                 {
                     insertBuilder.AppendFormat("'{0}',", value);
                 }
@@ -270,7 +273,29 @@ public class ExcelTool
             FileEx.SaveFile(file, create);
         }
     }
-
+    /// <summary>
+    /// 是否是字符串类型
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    static bool IsStringType(string type)
+    {
+        bool result = type == "STRING" || type == "TEXT";
+        if (result == false)
+        {
+            result = IsVarChar(type);
+        }
+        if (result == false)
+        {
+            result = IsChar(type);
+        }
+        return result;
+    }
+    /// <summary>
+    /// 是否是合法类型
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
     static bool IsValidDataType(string type)
     {
         type = type.ToUpper().Trim();
@@ -289,27 +314,70 @@ public class ExcelTool
 
         if (result == false)
         {
-            //可变长字符串
-            if (type.Contains("VARCHAR"))
+            result = IsVarChar(type);
+        }
+        if (result == false)
+        {
+            result = IsChar(type);
+        }
+        return result;
+
+    }
+    /// <summary>
+    /// 是否是可变长度字符串
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    static bool IsVarChar(string type)
+    {
+        bool result = false;
+        //可变长字符串
+        if (type.Contains("VARCHAR"))
+        {
+            string s = type.Replace("VARCHAR", "");
+            if (s.Length >= 3 && s[0] == '(' && s[s.Length - 1] == ')')
             {
-                string s = type.Replace("VARCHAR", "");
-                if (s.Length >= 3 && s[0] =='(' && s[s.Length - 1] ==')')
+                string n = s.Substring(1, s.Length - 2);
+                if (int.TryParse(n, out int number))
                 {
-                    string n = s.Substring(1, s.Length - 2);
-                    if (int.TryParse(n, out int number))
+                    result = number > 0 && number <= MAX_VARCHAR_LENGTH; //限制长度
+                    if (result == false)
                     {
-                        result = number > 0 && number <= 1024; //限制长度
-                        if (result == false)
-                        {
-                            Debug.LogError("可变长字符串长度区间:(0,1024]");
-                        }
+                        Debug.LogError(string.Format( "可变长字符串长度区间:(0,{0}]",MAX_VARCHAR_LENGTH));
                     }
-                    //return Regex.IsMatch(n, @"^[0-9]*[1-9][0-9]*$"); //可变长字符串
                 }
+                //return Regex.IsMatch(n, @"^[0-9]*[1-9][0-9]*$"); //可变长字符串
             }
         }
         return result;
-           
+    }
+    /// <summary>
+    /// 是否固定长度字符串
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    static bool IsChar(string type)
+    {
+        bool result = false;
+
+        if (type.Contains("CHAR"))
+        {
+            string s = type.Replace("CHAR", "");
+            if (s.Length >= 3 && s[0] == '(' && s[s.Length - 1] == ')')
+            {
+                string n = s.Substring(1, s.Length - 2);
+                if (int.TryParse(n, out int number))
+                {
+                     result = number > 0 && number <= MAX_CHAR_LENGTH; //限制长度
+                    if (result == false)
+                    {
+                        Debug.LogError(string.Format("字符串长度区间:(0,{0}]",MAX_CHAR_LENGTH));
+                    }
+                }
+                //return Regex.IsMatch(n, @"^[0-9]*[1-9][0-9]*$"); //固定长度字符串
+            }
+        }
+        return result;
     }
 
     /// <summary>
