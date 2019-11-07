@@ -15,6 +15,17 @@ public class ExcelTool
 {
     static string database { get { return Application.dataPath + "/r/database/data.bytes"; } }
 
+    const int ROW_INDEX_SERVER          = 0; //服务器导出标志行
+    const int ROW_INDEX_CLIEANT         = 1; //客户端导出标志行   
+    const int ROW_INDEX_DECS            = 2; //描述行
+    const int ROW_INDEX_NAME            = 3; //变量名行
+    const int ROW_INDEX_TYPE            = 4; //变量类型行
+    const int ROW_INDEX_NULL            = 5; //是否可为空标志行
+    const int ROW_INDEX_UNIQUE          = 6; //是否唯一值标志行
+    const int ROW_INDEX_DEFAULTVALUE    = 7; //默认值行
+
+    const int ROW_HEADER_COUNT = 8; //文件头行数
+
     [MenuItem("Tools/Excel/导出Excel数据表")]
     static void ExportAllExcel()
     {
@@ -92,10 +103,9 @@ public class ExcelTool
         int rowCount = table.Rows.Count;
         int colCount = table.Columns.Count;
 
-        ///文件头8行
-        const int HEADER_ROW_COUNT = 8;
+     
 
-        if (rowCount < HEADER_ROW_COUNT || colCount < 2)
+        if (rowCount < ROW_HEADER_COUNT || colCount < 2)
         {
             Debug.LogError("Excel表格式有错误:" + table.TableName);
             return;
@@ -115,12 +125,12 @@ public class ExcelTool
 
         for (int i = 1; i < colCount; ++i)
         {
-            string flag = table.Rows[1][i].ToString();
+            string flag = table.Rows[ROW_INDEX_CLIEANT][i].ToString();
             if (string.IsNullOrEmpty(flag) || flag.Trim() != "*")
             {
                 continue;
             }
-            string type = table.Rows[4][i].ToString().Trim();
+            string type = table.Rows[ROW_INDEX_TYPE][i].ToString().Trim();
             if (string.IsNullOrEmpty(type))
             {
                 continue;
@@ -132,10 +142,10 @@ public class ExcelTool
                 return;
             }
 
-            string name = table.Rows[3][i].ToString();
-            string isNull = table.Rows[5][i].ToString() == "1" ? "" : "NOT NULL";
+            string name = table.Rows[ROW_INDEX_NAME][i].ToString();
+            string isNull = table.Rows[ROW_INDEX_NULL][i].ToString() == "1" ? "" : "NOT NULL";
 
-            if (table.Rows[6][i].ToString() == "1")
+            if (table.Rows[ROW_INDEX_UNIQUE][i].ToString() == "1")
             {
                 uniqueBuilder.Append(name);
                 uniqueBuilder.Append(",");
@@ -143,7 +153,7 @@ public class ExcelTool
                 hasUnique = true;
             }
 
-            string defaultValue = table.Rows[7][i].ToString();
+            string defaultValue = table.Rows[ROW_INDEX_DEFAULTVALUE][i].ToString();
 
             if (type.Contains("CHAR") || type.Contains("TEXT"))
             {
@@ -191,7 +201,7 @@ public class ExcelTool
         string insert = insertBuilder.ToString();
         insertBuilder.Clear();
 
-        for (int i = HEADER_ROW_COUNT; i < rowCount; i++)
+        for (int i = ROW_HEADER_COUNT; i < rowCount; i++)
         {
             //这一行是否需要导出？
             string flag = table.Rows[i][0].ToString();
@@ -206,12 +216,12 @@ public class ExcelTool
             for (int j = 1; j < colCount; ++j)
             {
                 //这一列是否需要导出？
-                flag = table.Rows[1][j].ToString();
+                flag = table.Rows[ROW_INDEX_CLIEANT][j].ToString();
                 if (string.IsNullOrEmpty(flag) || flag.Trim() != "*")
                 {
                     continue;
                 }
-                string type = table.Rows[4][j].ToString();
+                string type = table.Rows[ROW_INDEX_TYPE][j].ToString();
                 if (string.IsNullOrEmpty(type))
                 {
                     continue;
