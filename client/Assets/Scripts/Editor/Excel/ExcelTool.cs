@@ -34,9 +34,25 @@ public class ExcelTool
     {
         string dir = Application.dataPath + "/Excel/";
         string[] files = Directory.GetFiles(dir);
-        for (int i = 0; i < files.Length; ++i)
+        try
         {
-            ExportExcel(files[i]);
+            int count = files.Length;
+            for (int i = 0; i < files.Length; ++i)
+            {
+                string path = files[i];
+
+                EditorUtility.DisplayProgressBar("导出Excel", string.Format("开始导出:{0}", path.Replace(Application.dataPath,"Assets")), (i + 1) * 1f / count);
+
+                ExportExcel(path);
+            }
+        }
+        catch(Exception e)
+        {
+            throw e;
+        }
+        finally
+        {
+            EditorUtility.ClearProgressBar();
         }
     }
 
@@ -58,15 +74,29 @@ public class ExcelTool
         {
             return;
         }
-        for (int i = 0; i < Selection.objects.Length; ++i)
+        try
         {
-            string path = AssetDatabase.GetAssetPath(Selection.objects[i]);
+            int count = Selection.objects.Length;
+            for (int i = 0; i < count; ++i)
+            {
+                string path = AssetDatabase.GetAssetPath(Selection.objects[i]);
 
-            string fullpath = Application.dataPath + path.Substring("Assets".Length);
+                EditorUtility.DisplayProgressBar("导出Excel", string.Format("开始导出:{0}", path), (i + 1) * 1f / count);
 
-            ExportExcel(fullpath);
+                string fullpath = Application.dataPath + path.Substring("Assets".Length);
+
+                ExportExcel(fullpath);
+            }  
         }
-
+        catch (Exception e)
+        {
+            throw e;
+        }
+        finally
+        {
+            EditorUtility.ClearProgressBar();
+        }
+       
     }
     static void ExportExcel(string path)
     {
@@ -88,13 +118,22 @@ public class ExcelTool
                 return;
             }
             string dir = Path.GetDirectoryName(path);
-
-            for (int i = 0; i < dataSet.Tables.Count; ++i)
-            {
-                ExportTable(dir, dataSet.Tables[i]);
+            try 
+            { 
+                for (int i = 0; i < dataSet.Tables.Count; ++i)
+                {
+                    DataTable table = dataSet.Tables[i];
+                   
+                    ExportTable(dir, table);
+                }
             }
-
-            stream.Close();
+            catch(Exception e)
+            {
+                throw e;
+            }
+            finally{
+                stream.Close();
+            }
         }
     }
     static void ExportTable(string dir, DataTable table)
@@ -105,8 +144,6 @@ public class ExcelTool
         }
         int rowCount = table.Rows.Count;
         int colCount = table.Columns.Count;
-
-     
 
         if (rowCount < ROW_HEADER_COUNT || colCount < 2)
         {

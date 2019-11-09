@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
+using System;
 /// <summary>
 /// 根据数据表的字段属性导出相应到结构代码和读取数据代码
 /// </summary>
@@ -217,35 +218,50 @@ public class {filename} : IDataTable
         {
             string IDString = "";
             string registerString = "";
-            foreach (var tableName in tables)
+            try
             {
-                if (tableName == "All")
+                int count = tables.Count;
+
+                for(int i = 0; i < count; ++i)
                 {
-                    continue;
+                    string tableName = tables[i];
+                    if (tableName == "All")
+                    {
+                        continue;
+                    }
+
+                    EditorUtility.DisplayProgressBar("导出数据表代码", string.Format("正在导出:{0}", tableName), (i + 1) * 1f / count);
+
+                    string className = tableName.Replace("TB_", "TB");
+
+                    string fileName = tableName.Replace("TB_", "DT");
+
+                    IDString += "\t" + tableName + ",\n";
+
+                    registerString += string.Format("\t\t\tRegister(new {0}());\n", fileName);
+
+                    ExportDataTable(tableName, fileName, className);
+
                 }
 
-                string className = tableName.Replace("TB_", "TB");
+                string content = File.ReadAllText(manager);
 
-                string fileName = tableName.Replace("TB_", "DT");
+                content = content.ReplaceEx("//DATATABLE_ID_BEGIN", "//DATATABLE_ID_END", IDString);
 
-                IDString += "\t" + tableName + ",\n";
+                content = content.ReplaceEx("//DATATABLE_REGISTER_BEGIN", "//DATATABLE_REGISTER_END", registerString);
 
-                registerString += string.Format("\t\t\tRegister(new {0}());\n", fileName);
+                FileEx.SaveFile(manager, content);
 
-                ExportDataTable(tableName, fileName, className);
-
+                Debug.Log("成功替换全部注册代码！");
             }
-
-            string content = File.ReadAllText(manager);
-
-            content = content.ReplaceEx("//DATATABLE_ID_BEGIN", "//DATATABLE_ID_END", IDString);
-
-            content = content.ReplaceEx("//DATATABLE_REGISTER_BEGIN", "//DATATABLE_REGISTER_END", registerString);
-
-            FileEx.SaveFile(manager, content);
-
-            Debug.Log("成功替换全部注册代码！");
-
+            catch(Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
         }
     }
 
