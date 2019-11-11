@@ -10,7 +10,7 @@ public class MSG_LoginReturn : Message<LoginReturn>
     {
         return MessageManager.Instance.Get<MSG_LoginReturn>(MessageID.LOGIN_RETURN);
     }
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
       
         UnityEngine. Debug.Log("Login result:" + message.result);

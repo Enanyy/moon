@@ -11,7 +11,7 @@ public enum ConnectID
 public interface IMessage
 {
     MessageID id { get; set; }
-    void OnReceive(byte[] data, int index, int length);
+    void Receive(byte[] data, int index, int length);
 }
 
 public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensible, new()
@@ -25,7 +25,6 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
         this.message = new T();
     }
 
-    protected abstract void OnMessage();
 
 
     public void Send(ConnectID connectid)
@@ -49,12 +48,14 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
 
     }
 
-    public void OnReceive(byte[] data, int index, int length)
+    protected abstract void OnRecv();
+
+    public void Receive(byte[] data, int index, int length)
     {
         using (MemoryStream ms = new MemoryStream(data,index, length))
         {
             message = (T)ProtoBuf.Meta.RuntimeTypeModel.Default.Deserialize(ms, message, typeof(T));
-            OnMessage();
+            OnRecv();
         }
     }
 }
@@ -78,9 +79,12 @@ public class MessageManager
 
     private Dictionary<int,IMessage> mMessageDic = new Dictionary<int,IMessage>();
 
+    /// <summary>
+    /// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
+    /// </summary>
     public void Init()
     {
-//REGISTER_MESSAGE_START		Register(new MSG_LoginRequest());
+//REGISTER_MESSAGE_BEGIN		Register(new MSG_LoginRequest());
 		Register(new MSG_LoginReturn());
 		Register(new MSG_LoginGameNotify());
 		Register(new MSG_LoginGameRequest());
@@ -114,8 +118,7 @@ public class MessageManager
 
     public T Get<T>(MessageID id) where T :class, IMessage
     {
-        IMessage message = null;
-        mMessageDic.TryGetValue((int) id, out message);
+        mMessageDic.TryGetValue((int)id, out IMessage message);
         return message as T;
     }
 
@@ -131,7 +134,7 @@ public class MessageManager
             int id = BitConverter.ToInt32(packet, 0);
             if (mMessageDic.ContainsKey(id))
             {
-                mMessageDic[id].OnReceive(packet, 4, packet.Length - 4);
+                mMessageDic[id].Receive(packet, 4, packet.Length - 4);
             }
             else
             {

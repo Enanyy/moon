@@ -10,7 +10,7 @@ public class MSG_LoginRequest : Message<LoginRequest>
     {
         return MessageManager.Instance.Get<MSG_LoginRequest>(MessageID.LOGIN_REQUEST);
     }
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
        
     }

@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System;
 using System.IO;
+using Community.CsharpSqlite;
 
 public class SQLite : IDisposable
 {
 	private static SQLite mInstance;
     private bool mIsDisposed = false;
-    private SQLiteDB mDbConnect = null;
+    private SQLiteConnection mDbConnect = null;
 
 	public static SQLite Instance
     {
@@ -62,7 +63,6 @@ public class SQLite : IDisposable
    
     public bool IsOpen()
     {
-
         if (mDbConnect != null)
         {
             return true;
@@ -92,7 +92,7 @@ public class SQLite : IDisposable
             try
             {
                 // initialize database
-                mDbConnect = new SQLiteDB();
+                mDbConnect = new SQLiteConnection();
                 mDbConnect.OpenStream("db", ms);
                 Debug.Log("gamedb open sucess");
 
@@ -107,16 +107,41 @@ public class SQLite : IDisposable
         return true;
     }
 
+    public bool Open(string fileName)
+    {
+        if (mDbConnect != null)
+        {
+            return true;
+        }
+        if (string.IsNullOrEmpty(fileName))
+        {
+            return false;
+        }
+        try
+        {
+            mDbConnect = new SQLiteConnection();
+
+            mDbConnect.Open(fileName);
+
+            return true;
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
+    }
+
     /// <summary>
     /// Gets the local item.
     /// </summary>
     /// <returns><c>true</c>, if local item was gotten, <c>false</c> otherwise.</returns>
     /// <param name="sql">Variable sql.</param>
     /// <param name="varOutItems">Variable out items.</param>
-	public SQLiteDataTable GetDataTable(string sql)
+	public SQLiteTable GetTable(string sql)
     {
-        SQLiteDataTable table = null;
-        if (sql == string.Empty)
+        SQLiteTable table = null;
+        if (string.IsNullOrEmpty(sql) || IsOpen() == false)
         {
             return table;
         }
@@ -124,7 +149,7 @@ public class SQLite : IDisposable
         SQLiteQuery query = new SQLiteQuery(mDbConnect, sql);
         if (query != null)
         {
-			table = new SQLiteDataTable(query);
+			table = new SQLiteTable(query);
             return table;
         }
         else
@@ -133,75 +158,117 @@ public class SQLite : IDisposable
             return table;
         }
     }
+    /// <summary>
+    /// 执行一条sql语句或事务
+    /// </summary>
+    /// <param name="sql"></param>
+    /// <returns></returns>
+    public bool Execute(string sql)
+    {
+        bool result = false;
+        if (string.IsNullOrEmpty(sql) || IsOpen() == false)
+        {
+            return result;
+        }
 
+        string error = null;
 
-	public SQLiteDataTable GetDataTables()
+        result = Sqlite3.exec(mDbConnect.Connection(), sql, null ,null, ref error) == Sqlite3.SQLITE_OK;
+
+        if (string.IsNullOrEmpty(error) == false)
+        {
+            Debug.LogError(error);
+        }
+ 
+        return result;
+    }
+
+    /// <summary>
+    /// 获取数据库所有数据表名字
+    /// </summary>
+    /// <returns></returns>
+    public SQLiteTable GetTables()
 	{
 		string sql = @"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
-		return GetDataTable (sql);
+		return GetTable (sql);
 	}
 
-
-	public SQLiteDataTable GetTableInfo(string tableName)
+    /// <summary>
+    /// 获取某个数据表信息（字段名和字段类型）
+    /// </summary>
+    /// <param name="tableName"></param>
+    /// <returns></returns>
+	public SQLiteTable GetTableInfo(string tableName)
 	{
 		string sql = string.Format("pragma table_info([{0}]);", tableName);
-		return GetDataTable (sql);
+		return GetTable (sql);
 	}
 }
-/*
-LocalConfig tempLocalConfig = LocalConfig.GetSingleton();
 
+/*Example 
+ 
+   if(SQLite.Instance.Open(bytes)) //or SQLite.Instance.Open("D:/WorkSpace/moon/client/Assets/R/database/data.bytes");
+    {
+         string sql = string.Format("select * from {0}", "TableName");
 
-        bool b = tempLocalConfif(b == false)
-        {
-            Debuger.LogError("open local db failed");
-        }
-        else
-        {
-            Debuger.LogError("open local db success");
-        }
+         SQLiteTable table = SQLite.Instance.GetTable(sql);
 
-        LocalItem tempItem = null;
-//			m_LocalConfig.GetLocalItem("type_shop", 1001, out item);
-        string tempSql = "select * from {0} where id = {1} ;";
-        tempSql = Helper.Format(tempSql, "type_shop", 1001);
-        tempLocalConfig.GetLocalItem(tempSql, out tempItem);
-
-        if(b == false)
-        {
-            Debuger.Log("get table false");
-            return ;
-        }
-
-        if(tempItem != null)
-        {
-            if (tempItem.Read())
+         if(table!=null)
+         {
+            while(table.Read())
             {
-                string temname = tempItem.GetByColumnName("name", "unknow");
-
-                Debuger.Log("column count:" + tempItem.pColumnCount);
-                Debuger.Log(" pet name:" + temname);
+                int id = table.GetByColumnName("id",0);
+			    string name = table.GetByColumnName("name","");
             }
+            table.Close()
+         }
 
-            tempItem.Close();
-        }
+        string drop = @"DROP TABLE IF EXISTS 'TB_Role';";
+        SQLite.Instance.Execute(drop);
 
-        tempSql = "select * from type_shop ;";
-        b = tempLocalConfig.GetLocalItem(tempSql, out tempItem);
+        string create = @"
+PRAGMA foreign_keys = off;
+BEGIN TRANSACTION;
 
-        if(tempItem != null)
-        {
-            while(tempItem.Read())
-            {
-                int tempId = tempItem.GetByColumnName("id", -1);
-                string tempName = tempItem.GetByColumnName("name", "unknow");
+DROP TABLE IF EXISTS 'TB_Role';
 
-                Debuger.Log("id = " + tempId + " name = " + tempName);
-            }
+CREATE TABLE TB_Role (
+    id             INT           PRIMARY KEY
+                                 NOT NULL
+                                 DEFAULT (0),
+    name           VARCHAR (256) NOT NULL,
+    type           INT           NOT NULL,
+    config         VARCHAR (256) NOT NULL,
+    hp             INT           NOT NULL,
+    attack         INT           NOT NULL,
+    defense        INT           NOT NULL,
+    movedistance   INT           NOT NULL,
+    movedirection  INT           NOT NULL,
+    attackdistance INT           NOT NULL,
+    searchdistance INT           NOT NULL,
+    radius         DECIMAL       NOT NULL,
+    height         DECIMAL       NOT NULL,
+    UNIQUE (
+        id
+    )
+); 
 
-            tempItem.Close ();
-        }
+COMMIT TRANSACTION;
+PRAGMA foreign_keys = on;
 
+";
+
+         SQLite.Instance.Execute(create);
+            
+         string name = "Hello";
+
+         string insert = @"INSERT INTO TB_Role (id, name, type, config, hp, attack, defense, movedistance, movedirection, attackdistance, searchdistance, radius, height) VALUES ({0}, '{1}', 1, 'paoshou.txt', 900, 90, 10, 2, 2, 5, 10, 1, 2);";
+
+         for (int i = 0; i < 10; ++i)
+         {
+            SQLite.Instance.Execute(string.Format(insert, i,name.Replace("'","''")));
+         }
     }
-}
-*/
+
+ */
+

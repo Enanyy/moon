@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="components">
+      <UniqueIdentifier>{8BA12798-7759-69E5-E060-4241CC3704D6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="components\tcp">
+      <UniqueIdentifier>{812FFFBE-6DFD-F2C4-5691-63EB42FECE29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{4E40957C-3A77-960D-E363-7C10CF79120F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="luabind">
+      <UniqueIdentifier>{A4A34F95-1083-CE30-199B-590785F93492}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="services">
+      <UniqueIdentifier>{C98C7E0E-B559-D919-DE72-C7C1CA9E0EA8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\moon\components\const_buffers_holder.hpp">
+      <Filter>components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\components\handler_alloc.hpp">
+      <Filter>components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\components\tcp\base_connection.hpp">
+      <Filter>components\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\components\tcp\custom_connection.hpp">
+      <Filter>components\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\components\tcp\moon_connection.hpp">
+      <Filter>components\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\components\tcp\tcp.h">
+      <Filter>components\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\components\tcp\ws_connection.hpp">
+      <Filter>components\tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\core\component.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\core\config.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\core\message.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\core\router.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\core\server.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\core\service.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\core\worker.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\core\worker_timer.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\luabind\lua_bind.h">
+      <Filter>luabind</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\luabind\lua_buffer.hpp">
+      <Filter>luabind</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\luabind\lua_serialize.hpp">
+      <Filter>luabind</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\server_config.hpp" />
+    <ClInclude Include="..\..\moon\services\lua_service.h">
+      <Filter>services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\moon\services\service_config.hpp">
+      <Filter>services</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\moon\components\tcp\tcp.cpp">
+      <Filter>components\tcp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\moon\core\router.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\moon\core\server.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\moon\core\service.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\moon\core\worker.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\moon\luabind\lua_bind.cpp">
+      <Filter>luabind</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\moon\moon.cpp" />
+    <ClCompile Include="..\..\moon\services\lua_service.cpp">
+      <Filter>services</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

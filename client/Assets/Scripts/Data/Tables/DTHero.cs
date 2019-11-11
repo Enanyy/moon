@@ -1,8 +1,8 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class TBHero
 {
-//DEFINITION_START
+//TABLE_DEFINITION_BEGIN
 	public int id;
 	public string name;
 	public int type;
@@ -26,14 +26,30 @@ public class DTHero : IDataTable
         get { return DataTableID.TB_Hero; }
     }
 
-    public readonly Dictionary<int, TBHero> data = new Dictionary<int, TBHero>();
+    /// <summary>
+    /// 用于快速查找
+    /// </summary>
+    public readonly Dictionary<int, TBHero> dic = new Dictionary<int, TBHero>();
+    /// <summary>
+    /// 用于获取列表
+    /// </summary>
+    public readonly List<TBHero> list = new List<TBHero>();
 
-    public void Read(SQLiteDataTable table)
+    /// <summary>
+    /// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
+    /// </summary>
+
+    public void Read(SQLiteTable table)
     {
+        if (table == null)
+        {
+            return;
+        }
+        dic.Clear();
+        list.Clear();
         while (table.Read())
         {
-//READ_START
-           	TBHero o = new TBHero();
+//TABLE_READ_BEGIN			TBHero o = new TBHero();
 			o.id = table.GetByColumnName("id",0);
 			o.name = table.GetByColumnName("name","");
 			o.type = table.GetByColumnName("type",0);
@@ -47,19 +63,38 @@ public class DTHero : IDataTable
 			o.searchdistance = table.GetByColumnName("searchdistance",0);
 			o.radius = table.GetByColumnName("radius",0);
 			o.height = table.GetByColumnName("height",0);
-			data.Add(o.id,o);
-//READ_END
+			dic.Add(o.id,o);
+			list.Add(o);
+//TABLE_READ_END
         }          
     }
     
     public static TBHero Get(int id)
     {
         var table = DataTableManager.Instance.Get<DTHero>(DataTableID.TB_Hero);
-        if(table.data.ContainsKey(id))
+        if (table != null && table.dic != null)
         {
-            return table.data[id];
+            table.dic.TryGetValue(id, out TBHero data);
+            return data;
         }
         return null;
     }
-    
+
+    public static TBHero Get(string name)
+    {
+        var table = DataTableManager.Instance.Get<DTHero>(DataTableID.TB_Hero);
+        if (table != null && table.dic != null)
+        {
+            var it = table.dic.GetEnumerator();
+            while (it.MoveNext())
+            {
+                if (it.Current.Value.name == name)
+                {
+                    return it.Current.Value;
+                }
+            }
+        }
+        return null;
+    }
+
 }

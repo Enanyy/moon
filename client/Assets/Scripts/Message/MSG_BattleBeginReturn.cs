@@ -10,7 +10,7 @@ public class MSG_BattleBeginReturn : Message<BattleBeginReturn>
     {
         return MessageManager.Instance.Get<MSG_BattleBeginReturn>(MessageID.BATTLE_BEGIN_RETURN);
     }
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
        
     }

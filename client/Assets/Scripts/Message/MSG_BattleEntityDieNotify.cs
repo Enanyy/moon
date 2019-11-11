@@ -10,7 +10,7 @@ public class MSG_BattleEntityDieNotify : Message<BattleEntityDieNotify>
     {
         return MessageManager.Instance.Get<MSG_BattleEntityDieNotify>(MessageID.BATTLE_ENTITY_DIE_NOTIFY);
     }
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
         var entity = BattleManager.Instance.GetEntity(message.id);
         if (entity != null)

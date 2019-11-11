@@ -1,162 +1,361 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.IO;
-public static class DataTableTool 
+using System.Collections.Generic;
+using System;
+/// <summary>
+/// 根据数据表的字段属性导出相应到结构代码和读取数据代码
+/// </summary>
+public class DataTableTool : EditorWindow
 {
-    [MenuItem("Tools/导出数据表代码")]
-    static void GenDataTable()
-    {
-        
-        TextAsset text = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/Resources/r/database/data.bytes");
-        if(text)
-        {
-            if(SQLite.Instance.Open(text.bytes))
-            {
-                SQLiteDataTable table = SQLite.Instance.GetDataTables();
-                if(table!=null)
-                {
-                    string IDString = "";
-                    string registerString = "";
-                    while(table.Read())
-                    {
-                        string tableName = table.GetByColumnName("name", "");
-                        
-                        string className = tableName.Replace("TB_","TB");
-                        
-                        string fileName = tableName.Replace("TB_", "DT");
+    static string database { get { return Application.dataPath + "/r/database/data.bytes"; } }
+    static string manager { get { return Application.dataPath + "/Scripts/Data/DataTableManager.cs"; } }
 
-                        IDString += "\t" + tableName + ",\n";
+    static string template = @"using System.Collections.Generic;
+/// <summary>
+/// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
+/// </summary>
+public class {classname}
+{
+//TABLE_DEFINITION_BEGIN
+{definition}//TABLE_DEFINITION_END
+}
 
-                        registerString += string.Format("\t\t\tRegister(new {0}());\n", fileName);
-
-                        string path = string.Format("{0}/Scripts/Data/Tables/{1}.cs", Application.dataPath, fileName);
-                        if (File.Exists(path) == false)
-                        {
-                            SQLiteDataTable info = SQLite.Instance.GetTableInfo(tableName);
-
-                            string code = @"public class {0} : IDataTable
-{{
+public class {filename} : IDataTable
+{
     public DataTableID name
-    {{
-        get {{ return DataTableID.{1}; }}
-    }}
+    {
+        get { return DataTableID.{tablename}; }
+    }
+    /// <summary>
+    /// 用于快速查找
+    /// </summary>
+    public readonly Dictionary<{key}, {classname}> dic = new Dictionary<{key}, {classname}>();
+    /// <summary>
+    /// 用于获取列表
+    /// </summary>
+    public readonly List<{classname}> list = new List<{classname}>();
 
-    //public readonly Dictionary<int, {2}> data = new Dictionary<int, {3}>();
-
-    public void Read(SQLiteDataTable table)
-    {{
+    /// <summary>
+    /// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
+    /// </summary>
+    public void Read(SQLiteTable table)
+    {
+        if(table== null)
+        {
+            return;
+        }
+        dic.Clear();
+        list.Clear();
         while (table.Read())
-        {{
-//READ_START
-           {4}
-//READ_END
-        }}          
-    }}
-    /*
-    public static {5} Get(int id)
-    {{
-        var table = DataTableManager.Instance.Get<{6}>(DataTableID.{7});
-        if(table.data.ContainsKey(id))
-        {{
-            return table.data[id];
-        }}
+        {
+//TABLE_READ_BEGIN
+           {read}
+//TABLE_READ_END
+        }        
+    }
+    
+    public static {classname} Get({key} key)
+    {
+        var table = DataTableManager.Instance.Get<{filename}>(DataTableID.{tablename});
+        if (table != null && table.dic!= null)
+        {
+            table.dic.TryGetValue(key, out {classname} data);
+            return data;
+        }
         return null;
-    }}
-    */
-}}";
+    }
+    
+}";
 
-                            if (info != null)
-                            {
-                                string tb = "using System.Collections.Generic;\n\npublic class " + className + "\n{\n//DEFINITION_START\n";
-                                string read = "/*\t"+className+ " o = new "+className+"();\n";
-                                
-                                while (info.Read())
-                                {
-                                    string columnName = info.GetByColumnName("name", "");
-                                    string columnType = GetType( info.GetByColumnName("type", ""));
+    [MenuItem("Tools/Data/导出数据表代码(Single)")]
+    static void OpenWindow()
+    {
+        DataTableTool tool =  GetWindow<DataTableTool>();
+        tool.titleContent = new GUIContent("导出数据表代码");
+    }
 
-                                    tb += "\tpublic " + columnType + " " + columnName + ";\n";
-                                    read += "\t\t\to." + columnName + " = table.GetByColumnName(\"" + columnName + "\","+(columnType=="string"?"\"\"":"0")+");\n";
-                                }
+    private List<string> mTableNames = new List<string>();
+    private int mSelectedIndex = 0;
+    private void OnEnable()
+    {
+        mTableNames.Clear();
+        if (SQLite.Instance.Open(database))
+        {
+            SQLiteTable table = SQLite.Instance.GetTables();
+            mTableNames.Add("All");
+            if (table != null)
+            {
+                while (table.Read())
+                {
+                    string tableName = table.GetByColumnName("name", "");
+                    mTableNames.Add(tableName);
+                }
+                table.Close();
+            }
+        }
+    }
+    private void OnDisable()
+    {
+        SQLite.Instance.Close();
+    }
 
-                                tb += "//DEFINITION_END\n";
-                                read += "\t\t\tdata.Add(o.id,o);*/";
-                                tb += "}";
+    private void OnGUI()
+    {
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
 
-                                code = string.Format(code, 
-                                    fileName,
-                                    tableName,
-                                    className,
-                                    className,
-                                    read,
-                                    className,
-                                    fileName,
-                                    tableName
-                                    );
-                                code = tb +"\n\n"+ code;
-                                Debug.Log(code);
+        EditorGUILayout.LabelField("数据库:", database.Replace(Application.dataPath,"Assets"));
 
-                                File.WriteAllText(path, code);
-
-                                info.Close();
-                            }
-                        }
-                    }
-                    table.Close();
+        EditorGUILayout.Space();
 
 
-                    string pathFile = Application.dataPath + "/Scripts/Data/DataTableManager.cs";
+        mSelectedIndex = EditorGUILayout.Popup("选择要导出的数据表:", mSelectedIndex, mTableNames.ToArray());
 
-
-                    string content = File.ReadAllText(pathFile);
-
-                    int startIDIndex = content.IndexOf("//DATATABLE_ID_START");
-                    int endIDIndex = content.IndexOf("//DATATABLE_ID_END");
-
-                    string part1 = content.Substring(0, startIDIndex + "//DATATABLE_ID_START".Length + 1);
-                    string part2 = content.Substring(endIDIndex);
-
-                    content = part1 + IDString + part2;
-
-                    int startPathIndex = content.IndexOf("//DATATABLE_REGISTER_START");
-                    int endPathIndex = content.IndexOf("//DATATABLE_REGISTER_END");
-
-                    part1 = content.Substring(0, startPathIndex + "//DATATABLE_REGISTER_START".Length + 1);
-                    part2 = content.Substring(endPathIndex);
-
-                    content = part1 + registerString + part2;
-
-                    StreamWriter writer = new StreamWriter(pathFile);
-                    writer.Write(content);
-                    writer.Close();
-                    writer.Dispose();
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
+        if (mTableNames.Count > 0 && mSelectedIndex >= 0 && mSelectedIndex < mTableNames.Count)
+        {
+            if (GUILayout.Button("导出"))
+            {
+                if (mSelectedIndex == 0)
+                {
+                    ExportDataTables(mTableNames);
                 }
                 else
                 {
-
+                    ExportDataTable(mTableNames[mSelectedIndex]);
                 }
             }
-            else
-            {
-                Debug.LogError("Can't open database!");
+        }
+    }
+    static void ExportDataTable(string tableName)
+    {
+        string IDString = "";
+        string registerString = "";
 
+        string content = File.ReadAllText(manager);
+
+        int beginIndex = content.IndexOf("//DATATABLE_ID_BEGIN");
+        int endIndex = content.IndexOf("//DATATABLE_ID_END");
+
+        if (beginIndex >= 0 && endIndex >= 0)
+        {
+            int beginIndexLength = "//DATATABLE_ID_BEGIN".Length;
+            IDString = content.Substring(beginIndex + beginIndexLength, endIndex - beginIndex - beginIndexLength);
+            if (IDString.Length > 0 && IDString[0] == '\r')
+            {
+                IDString = IDString.Substring(1);
             }
+
+        }
+        beginIndex = content.IndexOf("//DATATABLE_REGISTER_BEGIN");
+        endIndex = content.IndexOf("//DATATABLE_REGISTER_END");
+        if (beginIndex >= 0 && endIndex >= 0)
+        {
+            int beginIndexLength = "//DATATABLE_REGISTER_BEGIN".Length;
+            registerString = content.Substring(beginIndex + beginIndexLength, endIndex - beginIndex - beginIndexLength);
+            if (registerString.Length > 0 && registerString[0] == '\r')
+            {
+                registerString = registerString.Substring(1);
+            }
+        }
+
+        string className = tableName.Replace("TB_", "TB");
+
+        string fileName = tableName.Replace("TB_", "DT");
+
+        ExportDataTable(tableName, fileName, className);
+
+        if (IDString.Contains(tableName) == false)
+        {
+            IDString += "\t" + tableName + ",\n";
+        }
+        if (registerString.Contains(fileName) == false)
+        {
+            registerString += string.Format("\t\t\tRegister(new {0}());\n", fileName);
+        }
+
+        content = content.ReplaceEx("//DATATABLE_ID_BEGIN", "//DATATABLE_ID_END", IDString);
+
+        content = content.ReplaceEx("//DATATABLE_REGISTER_BEGIN", "//DATATABLE_REGISTER_END", registerString);
+
+        FileEx.SaveFile(manager, content);
+
+        Debug.Log("成功替换注册代码！");
+    }
+
+    [MenuItem("Tools/Data/导出数据表代码(All)")]
+    static void ExportDataTables()
+    {
+        if (SQLite.Instance.Open(database))
+        {
+            SQLiteTable table = SQLite.Instance.GetTables();
+            if (table != null)
+            {
+                List<string> tableNames = new List<string>();
+                while (table.Read())
+                {
+                    string tableName = table.GetByColumnName("name", "");
+
+                    tableNames.Add(tableName);
+                }
+                table.Close();
+
+                ExportDataTables(tableNames);
+            }
+            SQLite.Instance.Close();
+        }
+
+        else
+        {
+            Debug.LogError("Can't open database:" + database);
+        }
+    }
+    static void ExportDataTables(List<string> tables)
+    {
+        if (tables != null)
+        {
+            string IDString = "";
+            string registerString = "";
+            try
+            {
+                int count = tables.Count;
+
+                for(int i = 0; i < count; ++i)
+                {
+                    string tableName = tables[i];
+                    if (tableName == "All")
+                    {
+                        continue;
+                    }
+
+                    EditorUtility.DisplayProgressBar("导出数据表代码", string.Format("正在导出:{0}", tableName), (i + 1) * 1f / count);
+
+                    string className = tableName.Replace("TB_", "TB");
+
+                    string fileName = tableName.Replace("TB_", "DT");
+
+                    IDString += "\t" + tableName + ",\n";
+
+                    registerString += string.Format("\t\t\tRegister(new {0}());\n", fileName);
+
+                    ExportDataTable(tableName, fileName, className);
+
+                }
+
+                string content = File.ReadAllText(manager);
+
+                content = content.ReplaceEx("//DATATABLE_ID_BEGIN", "//DATATABLE_ID_END", IDString);
+
+                content = content.ReplaceEx("//DATATABLE_REGISTER_BEGIN", "//DATATABLE_REGISTER_END", registerString);
+
+                FileEx.SaveFile(manager, content);
+
+                Debug.Log("成功替换全部注册代码！");
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
+        }
+    }
+
+    static void ExportDataTable(string tableName, string fileName, string className)
+    {
+        if (string.IsNullOrEmpty(tableName))
+        {
+            return;
+        }
+
+        if (SQLite.Instance.IsOpen() == false)
+        {
+            if (SQLite.Instance.Open(database) ==false)
+            {
+                Debug.LogError("无法打开数据库:" + database);
+                return;
+            }
+        }
+        SQLiteTable info  = SQLite.Instance.GetTableInfo(tableName);
+
+        if (info == null)
+        {
+            Debug.LogError("无法读取表" + tableName + "信息");
+            return;
+        }
+
+        string path = string.Format("{0}/Scripts/Data/Tables/{1}.cs", Application.dataPath, fileName);
+        string definition = "";
+        string read = string.Format("\t{0} o = new {1}();\n", className, className);
+        string keyName = null;
+        string keyType = null;
+
+        while (info.Read())
+        {
+            string columnName = info.GetByColumnName("name", "");
+            string columnType = GetType(info.GetByColumnName("type", ""));
+
+            if (string.IsNullOrEmpty(keyName))
+            {
+                keyName = columnName;
+            }
+            if (string.IsNullOrEmpty(keyType))
+            {
+                keyType = columnType;
+            }
+            
+            definition += string.Format("\tpublic {0} {1};\n", columnType, columnName);
+            read += string.Format("\t\t\to.{0} = table.GetByColumnName(\"{1}\",{2});\n", columnName, columnName, (columnType == "string" ? "\"\"" : "0"));
+
+        }
+
+        read += string.Format("\t\t\tdic.Add(o.{0},o);\n\t\t\tlist.Add(o);", keyName);
+
+        info.Close();
+
+
+        if (File.Exists(path) == false)
+        {
+            string code = template.Replace("{filename}", fileName)
+                                  .Replace("{definition}", definition)
+                                  .Replace("{classname}", className)
+                                  .Replace("{tablename}", tableName)
+                                  .Replace("{read}", read)
+                                  .Replace("{key}", keyType);
+
+            Debug.Log(code);
+
+            FileEx.SaveFile(path, code);
         }
         else
         {
-            Debug.LogError("Can't load database!");
+            string datatable = File.ReadAllText(path);
+            datatable = datatable.ReplaceEx("//TABLE_DEFINITION_BEGIN", "//TABLE_DEFINITION_END", definition);
+            datatable = datatable.ReplaceEx("//TABLE_READ_BEGIN", "//TABLE_READ_END", "\t\t" + read + "\n");
+
+            FileEx.SaveFile(path, datatable);
         }
+
+        Debug.Log("成功导出数据表:" + tableName);
     }
 
     static string GetType(string type)
     {
-        switch(type.ToUpper())
+        switch (type.ToUpper())
         {
-            case "INT":return "int";
-            case "DECIMAL":return "float";
+            case "INT":
+            case "INTEGER": return "int";
+            case "BIGINT":return "long";
+            case "DECIMAL": return "float";
+            case "DOUBLE":return "double";
 
-            default:return "string";
-                
+            default: return "string";
+
         }
     }
+    
 }

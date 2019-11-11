@@ -12,7 +12,7 @@ public class MSG_BattleEntityAttackChangeNotify : Message<BattleEntityAttackChan
         return MessageManager.Instance.Get<MSG_BattleEntityAttackChangeNotify>(MessageID.BATTLE_ENTITY_ATTACK_CHANGE_NOTIFY);
     }
 
-    protected override void OnMessage()
+    protected override void OnRecv()
     {
         BattleEntity entity = BattleManager.Instance.GetEntity(message.id);
         if(entity!= null)
