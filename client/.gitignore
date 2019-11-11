@@ -6,3 +6,4 @@ Library
 *.csproj
 *.sln
 *.userprefs
+Logs
