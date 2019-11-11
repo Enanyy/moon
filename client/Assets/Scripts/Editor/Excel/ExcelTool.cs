@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,8 +28,24 @@ public class ExcelTool
     const int MAX_VARCHAR_LENGTH = 1024; //可变长度字符串最大长度
     const int MAX_CHAR_LENGTH = 1024;    //固定长度字符串最大长度
 
-    [MenuItem("Tools/Excel/导出Excel数据表")]
-    static void ExportAllExcel()
+    enum ExportTo
+    {
+        Database,
+        Lua,
+    }
+
+    [MenuItem("Tools/Excel/导出Excel数据表(Database)")]
+    static void ExportAllToDatabase()
+    {
+        ExportAllExcel(ExportTo.Database);
+    }
+
+    [MenuItem("Tools/Excel/导出Excel数据表(Lua)")]
+    static void ExportAllToLua()
+    {
+        ExportAllExcel(ExportTo.Lua);
+    }
+    static void ExportAllExcel(ExportTo to)
     {
         string dir = Application.dataPath + "/Excel/";
         string[] files = Directory.GetFiles(dir);
@@ -42,8 +57,9 @@ public class ExcelTool
                 string path = files[i];
 
                 EditorUtility.DisplayProgressBar("导出Excel", string.Format("开始导出:{0}", path.Replace(Application.dataPath,"Assets")), (i + 1) * 1f / count);
-
-                ExportExcel(path);
+               
+                ExportExcel(path, to);
+               
             }
         }
         catch(Exception e)
@@ -56,7 +72,8 @@ public class ExcelTool
         }
     }
 
-    [MenuItem("Assets/Export Excel", true)]
+    [MenuItem("Assets/Export Excel To Database", true)]
+    [MenuItem("Assets/Export Excel To Lua", true)]
     static bool IsExcel()
     {
         if (Selection.activeObject == null)
@@ -67,8 +84,17 @@ public class ExcelTool
 
         return path.EndsWith(".xlsx") || path.EndsWith(".xls");
     }
-    [MenuItem("Assets/Export Excel")]
-    static void ExportExcel()
+    [MenuItem("Assets/Export Excel To Database")]
+    static void ExportToDatabase()
+    {
+        ExportExcel(ExportTo.Database);
+    }
+    [MenuItem("Assets/Export Excel To Lua")]
+    static void ExportToLua()
+    {
+        ExportExcel(ExportTo.Lua);
+    }
+    static void ExportExcel(ExportTo to)
     {
         if (Selection.activeObject == null)
         {
@@ -85,7 +111,7 @@ public class ExcelTool
 
                 string fullpath = Application.dataPath + path.Substring("Assets".Length);
 
-                ExportExcel(fullpath);
+                ExportExcel(fullpath,to);
             }  
         }
         catch (Exception e)
@@ -98,7 +124,7 @@ public class ExcelTool
         }
        
     }
-    static void ExportExcel(string path)
+    static void ExportExcel(string path,ExportTo to)
     {
         if (string.IsNullOrEmpty(path))
         {
@@ -124,7 +150,14 @@ public class ExcelTool
                 {
                     DataTable table = dataSet.Tables[i];
                    
-                    ExportTable(dir, table);
+                    if(to == ExportTo.Database)
+                    {
+                        ExportToDatabase(dir, table);
+                    }
+                    else
+                    {
+                        ExportToLua(dir, table);
+                    }
                 }
             }
             catch(Exception e)
@@ -136,7 +169,7 @@ public class ExcelTool
             }
         }
     }
-    static void ExportTable(string dir, DataTable table)
+    static void ExportToDatabase(string dir, DataTable table)
     {
         if (table == null)
         {
@@ -417,131 +450,146 @@ public class ExcelTool
         return result;
     }
 
-    /// <summary>
-	/// 转换为Json
-	/// </summary>
-	/// <param name="JsonPath">Json文件路径</param>
-	/// <param name="Header">表头行数</param>
-	public static void ConvertToJson(DataTable sheet, string JsonPath)
+    public static void ExportToLua(string dir, DataTable table)
     {
-        if (sheet == null)
+        if (table == null)
         {
             return;
         }
-        //判断数据表内是否存在数据
-        if (sheet.Rows.Count < 1)
-            return;
-
-        //读取数据表行数和列数
-        int rowCount = sheet.Rows.Count;
-        int colCount = sheet.Columns.Count;
-
-        //准备一个列表存储整个表的数据
-        List<Dictionary<string, object>> table = new List<Dictionary<string, object>>();
-
-        //读取数据
-        for (int i = 1; i < rowCount; i++)
+        int rowCount = table.Rows.Count;
+        int colCount = table.Columns.Count;
+        if (rowCount < ROW_HEADER_COUNT || colCount < 2)
         {
-            //准备一个字典存储每一行的数据
-            Dictionary<string, object> row = new Dictionary<string, object>();
-            for (int j = 0; j < colCount; j++)
+            return;
+        }
+        const string template = @"
+--FUNCTION_CODE_BRGIN
+{0}
+--FUNCTION_CODE_END
+local M =
+{{
+    Data=
+    {{
+--DATA_CODE_BEGIN
+{1}
+--DATA_CODE_END
+    }}
+}}
+
+function M.Get(id)
+    return M.Data[id]
+end
+
+return M";
+
+        string names = "";
+        string nameValues = "";
+        for (int i = 1; i < colCount; ++i)
+        {
+            string flag = table.Rows[ROW_INDEX_CLIEANT][i].ToString();
+            if (string.IsNullOrEmpty(flag) || flag.Trim() != "*")
             {
-                //读取第1行数据作为表头字段
-                string field = sheet.Rows[0][j].ToString();
-                //Key-Value对应
-                row[field] = sheet.Rows[i][j];
+                continue;
+            }
+            string type = table.Rows[ROW_INDEX_TYPE][i].ToString().Trim();
+            if (string.IsNullOrEmpty(type))
+            {
+                continue;
             }
 
-            //添加到表数据中
-            table.Add(row);
-        }
-
-
-        //生成Json字符串
-        string json = JsonUtility.ToJson(table);
-        //写入文件
-
-        FileEx.SaveFile(JsonPath, json);
-    }
-
-    /// <summary>
-    /// 转换为CSV
-    /// </summary>
-    public static void ConvertToCSV(DataTable sheet, string saveFile)
-    {
-        if (sheet == null)
-        {
-            return;
-        }
-        //判断数据表内是否存在数据
-        if (sheet.Rows.Count < 1)
-            return;
-
-        //读取数据表行数和列数
-        int rowCount = sheet.Rows.Count;
-        int colCount = sheet.Columns.Count;
-
-        //创建一个StringBuilder存储数据
-        StringBuilder stringBuilder = new StringBuilder();
-
-        //读取数据
-        for (int i = 0; i < rowCount; i++)
-        {
-            for (int j = 0; j < colCount; j++)
+            if (IsValidDataType(type) == false)
             {
-                //使用","分割每一个数值
-                stringBuilder.Append(sheet.Rows[i][j] + ",");
+                Debug.LogError("数据类型错误:" + type + " Sheet:" + table.TableName);
+                return;
             }
-            //使用换行符分割每一行
-            stringBuilder.Append("\r\n");
+            string name = table.Rows[ROW_INDEX_NAME][i].ToString();
+
+            names += name + ",";
+            nameValues += string.Format("{0} = {1},", name, name);
+        }
+        if (names.Length > 0 && names[names.Length - 1] == ',')
+        {
+            names = names.Substring(0, names.Length - 1);
+        }
+        if (nameValues.Length > 0 && nameValues[nameValues.Length - 1] == ',')
+        {
+            nameValues = nameValues.Substring(0, nameValues.Length - 1);
         }
 
-        FileEx.SaveFile(saveFile, stringBuilder.ToString());
-    }
+        StringBuilder insertBuilder = new StringBuilder();
 
-    /// <summary>
-    /// 导出为Xml
-    /// </summary>
-    public static void ConvertToXml(DataTable sheet, string saveFile)
-    {
-        if (sheet == null)
+        for (int i = ROW_HEADER_COUNT; i < rowCount; i++)
         {
-            return;
-        }
-
-        //读取数据表行数和列数
-        int rowCount = sheet.Rows.Count;
-        int colCount = sheet.Columns.Count;
-
-        //创建一个StringBuilder存储数据
-        StringBuilder stringBuilder = new StringBuilder();
-        //创建Xml文件头
-        stringBuilder.Append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-        stringBuilder.Append("\r\n");
-        //创建根节点
-        stringBuilder.Append("<Table>");
-        stringBuilder.Append("\r\n");
-        //读取数据
-        for (int i = 1; i < rowCount; i++)
-        {
-            //创建子节点
-            stringBuilder.Append("  <Row>");
-            stringBuilder.Append("\r\n");
-            for (int j = 0; j < colCount; j++)
+            //这一行是否需要导出？
+            string flag = table.Rows[i][0].ToString();
+            if (string.IsNullOrEmpty(flag) || flag.Trim() != "*")
             {
-                stringBuilder.Append("   <" + sheet.Rows[0][j].ToString() + ">");
-                stringBuilder.Append(sheet.Rows[i][j].ToString());
-                stringBuilder.Append("</" + sheet.Rows[0][j].ToString() + ">");
-                stringBuilder.Append("\r\n");
+                continue;
             }
-            //使用换行符分割每一行
-            stringBuilder.Append("  </Row>");
-            stringBuilder.Append("\r\n");
+            bool setkey = false;
+
+            for (int j = 1; j < colCount; ++j)
+            {
+                //这一列是否需要导出？
+                flag = table.Rows[ROW_INDEX_CLIEANT][j].ToString();
+                if (string.IsNullOrEmpty(flag) || flag.Trim() != "*")
+                {
+                    continue;
+                }
+                string type = table.Rows[ROW_INDEX_TYPE][j].ToString();
+                if (string.IsNullOrEmpty(type))
+                {
+                    continue;
+                }
+                //替换单引号
+                string value = table.Rows[i][j]
+                               .ToString()
+                               .Replace("\"", "/\"")
+                               .Replace("\'", "\\'");
+
+                //字符串添加单引号
+                if (IsStringType(type))
+                {
+                    if (setkey == false)
+                    {
+                        setkey = true;
+                        insertBuilder.AppendFormat("\t\t['{0}'] = f(", value);
+                    }
+                    insertBuilder.AppendFormat("'{0}',", value);
+
+                }
+                else
+                {
+                    if (setkey == false)
+                    {
+                        setkey = true;
+                        insertBuilder.AppendFormat("\t\t[{0}] = f(", value);
+                    }
+                    insertBuilder.AppendFormat("{0},", value);
+                }
+            }
+            if (insertBuilder[insertBuilder.Length - 1] == ',')
+            {
+                insertBuilder.Remove(insertBuilder.Length - 1, 1);
+            }
+            insertBuilder.Append("),\n");
         }
-        //闭合标签
-        stringBuilder.Append("</Table>");
-        //写入文件
-        FileEx.SaveFile(saveFile, stringBuilder.ToString());
+        string file = string.Format("{0}/lua/{1}.lua", dir, table.TableName);
+        string function = string.Format("local function f({0}) return {{{1}}} end ", names, nameValues);
+        if (File.Exists(file))
+        {
+            string content = File.ReadAllText(file);
+            content.ReplaceEx("--FUNCTION_CODE_BRGIN", "--FUNCTION_CODE_END", function);
+            content.ReplaceEx("--DATA_CODE_BEGIN", "--DATA_CODE_END", insertBuilder.ToString());
+
+            FileEx.SaveFile(file, content);
+        }
+        else
+        {
+            string content = string.Format(template, function, insertBuilder.ToString());
+
+            FileEx.SaveFile(file, content);
+        }
     }
 
 }
