@@ -8,12 +8,15 @@ public class Bundle
     public string bundleName { get; private set; }
     public AssetBundle bundle { get; private set; }
     public AssetType assetType { get; private set; }
-
-    public Dictionary<string, Bundle> dependences { get; private set; }
     public string[] dependenceNames { get; private set; }
 
-
-    //场景中实例化出来的,即引用
+    /// <summary>
+    /// 依赖哪些资源？
+    /// </summary>
+    public Dictionary<string, Bundle> dependences { get; private set; }
+    /// <summary>
+    /// 场景中实例化出来的,即引用
+    /// </summary>
     public Dictionary<string, List<IAsset>> references { get; private set; }
     //已经加载出来的asset
     private Dictionary<string, Object> mAssetDic = new Dictionary<string, Object>();
