@@ -30,15 +30,23 @@ public  class ThreadQueue :MonoBehaviour  {
     static int numThreads;
     public static void RunAsync<T>(Func<T> func, Action<T> callback = null,float delay = 0)
     {
-        Instance.threads.Add(new ThreadFunc<T>(func,callback,delay));
+        AddThread(new ThreadFunc<T>(func,callback,delay));
 	}
 
     public static void RunAsync(Action func, Action callback= null, float delay = 0)
     {
-        Instance.threads.Add(new ThreadAction(func, callback, delay));
+        AddThread(new ThreadAction(func, callback, delay));
     }
 
-    
+    private static void AddThread(ThreadBase thread)
+    {
+        //可以立即执行的时候尝试去执行，但不一定能立即执行成功
+        if(thread.isExecuteable)
+        {
+            thread.Execute();
+        }
+        Instance.threads.Add(thread);
+    }
 
     private void Update()
     {
@@ -85,15 +93,15 @@ public  class ThreadQueue :MonoBehaviour  {
         public bool isExecuted { get; protected set; }
         public bool isCompleted { get; protected set; }
 
-        protected float mDelay;
+        public  float delay { get; protected set; }
         private float mBeginTime;
         public ThreadBase()
         {
             mBeginTime = Time.time;
-            mDelay = 0;
+            delay = 0;
         }
 
-        public virtual bool isExecuteable { get { return Time.time >= mBeginTime + mDelay; } }
+        public virtual bool isExecuteable { get { return Time.time >= mBeginTime + delay; } }
         public void Execute()
         {
             if (numThreads < maxThreads)
@@ -140,9 +148,9 @@ public  class ThreadQueue :MonoBehaviour  {
         {
             this.callback = callback;
             this.func = func;
+            this.delay = delay;
             isCompleted = false;
             isExecuted = false;
-            mDelay = delay ;
         }
 
         protected override void OnExecute()
@@ -176,7 +184,7 @@ public  class ThreadQueue :MonoBehaviour  {
 		{
 			this.callback = callback;
             this.func = func;
-            mDelay = delay;
+            this.delay = delay;
         }
         protected override void OnExecute()
         {
