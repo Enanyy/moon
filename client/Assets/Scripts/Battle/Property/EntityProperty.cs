@@ -5,7 +5,7 @@ public interface IEntityProperty
     void Clear();
 }
 
-public class EntityProperty<T>:IEntityProperty
+public class EntityProperty<T>:IEntityProperty where T:IEquatable<T>
 {
     private T mValue;
 
@@ -15,8 +15,11 @@ public class EntityProperty<T>:IEntityProperty
         set
         {
             T from = mValue;
-            mValue = value; 
-            OnValueChanged(from, mValue);
+            mValue = value;
+            if (from.Equals(mValue))
+            {
+                OnValueChanged(from, mValue);
+            }
         }
     }
 

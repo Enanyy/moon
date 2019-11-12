@@ -200,7 +200,7 @@ public class BattleEntity:
         SetProperty(PropertyID.PRO_RADIUS, 1f);
     }
 
-    public void SetProperty<T>(PropertyID id,T value)
+    public void SetProperty<T>(PropertyID id,T value) where T:IEquatable<T>
     {
         uint key = (uint)id;
         if(properties.ContainsKey(key)==false)
@@ -215,7 +215,7 @@ public class BattleEntity:
         }
     }
 
-    public T GetProperty<T>(PropertyID id, T defaultValue = default(T))
+    public T GetProperty<T>(PropertyID id, T defaultValue = default(T)) where T:IEquatable<T>
     {
         uint key = (uint) id;
         if (properties.ContainsKey(key))
@@ -227,7 +227,7 @@ public class BattleEntity:
         return defaultValue;
     }
 
-    public T GetProperty<T, V>(PropertyID id, V defaultValue = default(V)) where T : EntityProperty<V>
+    public T GetProperty<T, V>(PropertyID id, V defaultValue = default(V)) where T : EntityProperty<V> where V:IEquatable<V>
     {
         uint key = (uint)id;
         if (properties.ContainsKey(key))
