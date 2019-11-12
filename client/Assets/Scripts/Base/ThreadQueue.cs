@@ -41,11 +41,25 @@ public  class ThreadQueue :MonoBehaviour  {
     private static void AddThread(ThreadBase thread)
     {
         //可以立即执行的时候尝试去执行，但不一定能立即执行成功
-        if(thread.isExecuteable)
+        if (thread.isExecuteable)
         {
             thread.Execute();
         }
-        Instance.threads.Add(thread);
+        if (thread.isCompleted)
+        {
+            if (thread.exception == null)
+            {
+                thread.OnCompleted();
+            }
+            else
+            {
+                Debug.LogError(thread.exception);
+            }
+        }
+        else
+        {
+            Instance.threads.Add(thread);
+        }
     }
 
     private void Update()
