@@ -25,7 +25,7 @@ public  class ThreadQueue :MonoBehaviour  {
         }
     }
 
-	List<IThread> threads = new List<IThread>();
+	List<ThreadBase> threads = new List<ThreadBase>();
     public static int maxThreads = 8;
     static int numThreads;
     public static void RunAsync<T>(Func<T> func, Action<T> callback = null,float delay = 0)
@@ -81,73 +81,65 @@ public  class ThreadQueue :MonoBehaviour  {
 
     private static bool RunAsync(Action action)
     {
-        if(numThreads>= maxThreads)
+        if (numThreads >= maxThreads)
         {
             return false;
         }
         else
         {
-            Interlocked.Increment(ref numThreads);
-
-            new Thread(delegate () 
+            ///加入到线程池
+            bool result = ThreadPool.QueueUserWorkItem(StartThread, action);
+            if (result)
             {
-                try
-                {
-                    if (action != null)
-                    {
-                        action();
-                    }
-                }
-                catch
-                {
-
-                }
-                finally
-                {
-                    Interlocked.Decrement(ref numThreads);
-                }
-
-            }).Start();
-
-            return true;
+                //线程数量加1
+                Interlocked.Increment(ref numThreads);
+            }
+            return result;
         }
 
     }
 
-
-
-    interface IThread
+    /// <summary>
+    /// 线程执行函数
+    /// </summary>
+    /// <param name="action"></param>
+    private static void StartThread(object action)
     {
-        Exception exception { get; }
-        bool isExecuted { get; }
-        bool isCompleted { get; }
-        bool isExecuteable { get; }
-        void Execute();
-        void OnCompleted();
+        try
+        {
+            if (action != null)
+            {
+                ((Action)action)();
+            }
+        }
+        catch
+        {
 
+        }
+        finally
+        {
+            //线程数量减1
+            Interlocked.Decrement(ref numThreads);
+        }
     }
-    class ThreadAction : IThread
+
+
+
+    abstract class ThreadBase
     {
-        public Exception exception { get; private set; }
-        public readonly Action callback;
-        public readonly Action func;
-        public bool isExecuted { get; private set; }
-        public bool isCompleted { get; private set; }
+        public Exception exception { get; protected set; }
+        public bool isExecuted { get; protected set; }
+        public bool isCompleted { get; protected set; }
 
-        private float mExecuteTime;
-        public bool isExecuteable
+        protected float mDelay;
+        private float mBeginTime;
+        public ThreadBase()
         {
-            get { return Time.time >= mExecuteTime; }
-        }
-        public ThreadAction(Action func, Action callback,float delay = 0)
-        {
-            this.callback = callback;
-            this.func = func;
-            isCompleted = false;
-            isExecuted = false;
-            mExecuteTime = Time.time + delay ;
+            mBeginTime = Time.time;
+            mDelay = 0;
         }
 
+        public virtual bool isExecuteable { get { return Time.time >= mBeginTime + mDelay; } }
         public void Execute()
         {
             isExecuted = RunAsync(TryExecute);
@@ -156,10 +148,7 @@ public  class ThreadQueue :MonoBehaviour  {
         {
             try
             {
-                if (func != null)
-                {
-                    func();
-                }
+                OnExecute();
             }
             catch (Exception e)
             {
@@ -170,9 +159,36 @@ public  class ThreadQueue :MonoBehaviour  {
                 isCompleted = true;
             }
         }
+        protected abstract void OnExecute();
+
+        public virtual void OnCompleted() {}
+
+    }
+    class ThreadAction : ThreadBase
+    {
+        
+        public readonly Action callback;
+        public readonly Action func;
+     
+        public ThreadAction(Action func, Action callback,float delay = 0)
+        {
+            this.callback = callback;
+            this.func = func;
+            isCompleted = false;
+            isExecuted = false;
+            mDelay = delay ;
+        }
+
+        protected override void OnExecute()
+        {
+            if(func!= null)
+            {
+                func();
+            }
+        }
 
 
-        public void OnCompleted()
+        public override void OnCompleted()
         {
             if(callback!=null)
             {
@@ -182,52 +198,30 @@ public  class ThreadQueue :MonoBehaviour  {
 
     }
    
-    class ThreadFunc<T>:IThread
+    class ThreadFunc<T>:ThreadBase
     {
-        public Exception exception { get; private set; }
-
+      
         public readonly Action<T> callback;
 		public T data { get; private set; }
         public readonly Func<T> func;
 
-        public bool isExecuted { get; private set; }
-        public bool isCompleted { get; private set; }
-
-        private float mExecuteTime;
-        public bool isExecuteable
-        {
-            get { return Time.time >= mExecuteTime; }
-        }
+      
         public ThreadFunc (Func<T> func, Action<T> callback, float delay = 0)
 		{
 			this.callback = callback;
             this.func = func;
-            mExecuteTime = Time.time + delay;
+            mDelay = delay;
         }
-        public void Execute()
+        protected override void OnExecute()
         {
-            isExecuted = RunAsync(TryExecute);
-        }
-        private void TryExecute()
-        {
-            try
+            if (func != null)
             {
-                if (func != null)
-                {
-                    data = func();
-                }
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
-            finally
-            {
-                isCompleted = true;
+                data = func();
             }
         }
+        
 
-        public void OnCompleted()
+        public override void OnCompleted()
         {
             if(callback!= null)
             {
