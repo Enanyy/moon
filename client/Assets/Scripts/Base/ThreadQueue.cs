@@ -79,52 +79,6 @@ public  class ThreadQueue :MonoBehaviour  {
         }
     }
 
-    private static bool RunAsync(Action action)
-    {
-        if (numThreads >= maxThreads)
-        {
-            return false;
-        }
-        else
-        {
-            ///加入到线程池
-            bool result = ThreadPool.QueueUserWorkItem(StartThread, action);
-            if (result)
-            {
-                //线程数量加1
-                Interlocked.Increment(ref numThreads);
-            }
-            return result;
-        }
-
-    }
-
-    /// <summary>
-    /// 线程执行函数
-    /// </summary>
-    /// <param name="action"></param>
-    private static void StartThread(object action)
-    {
-        try
-        {
-            if (action != null)
-            {
-                ((Action)action)();
-            }
-        }
-        catch
-        {
-
-        }
-        finally
-        {
-            //线程数量减1
-            Interlocked.Decrement(ref numThreads);
-        }
-    }
-
-
-
     abstract class ThreadBase
     {
         public Exception exception { get; protected set; }
@@ -142,9 +96,18 @@ public  class ThreadQueue :MonoBehaviour  {
         public virtual bool isExecuteable { get { return Time.time >= mBeginTime + mDelay; } }
         public void Execute()
         {
-            isExecuted = RunAsync(TryExecute);
+            if (numThreads < maxThreads)
+            {
+                ///加入到线程池
+                isExecuted = ThreadPool.QueueUserWorkItem(TryExecute);
+                if (isExecuted)
+                {
+                    //线程数量加1
+                    Interlocked.Increment(ref numThreads);
+                }
+            }
         }
-        private void TryExecute()
+        private void TryExecute(object obj)
         {
             try
             {
@@ -156,6 +119,9 @@ public  class ThreadQueue :MonoBehaviour  {
             }
             finally
             {
+                //线程数量减1
+                Interlocked.Decrement(ref numThreads);
+
                 isCompleted = true;
             }
         }
