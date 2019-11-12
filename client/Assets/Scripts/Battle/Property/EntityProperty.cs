@@ -16,7 +16,7 @@ public class EntityProperty<T>:IEntityProperty where T:IEquatable<T>
         {
             T from = mValue;
             mValue = value;
-            if (from.Equals(mValue))
+            if (from.Equals(mValue) ==false)
             {
                 OnValueChanged(from, mValue);
             }
