@@ -39,7 +39,8 @@ public class DTLanguage : IDataTable
         list.Clear();
         while (table.Read())
         {
-//TABLE_READ_BEGIN			TBLanguage o = new TBLanguage();
+//TABLE_READ_BEGIN
+           	TBLanguage o = new TBLanguage();
 			o.key = table.GetByColumnName("key","");
 			o.ch = table.GetByColumnName("ch","");
 			o.en = table.GetByColumnName("en","");
@@ -48,10 +49,21 @@ public class DTLanguage : IDataTable
 //TABLE_READ_END
         }        
     }
+    private static DTLanguage mTable;
+    private static DTLanguage table
+    {
+        get
+        {
+            if(mTable == null)
+            {
+                mTable = DataTableManager.Instance.Get<DTLanguage>(DataTableID.TB_Language);
+            }
+            return mTable;
+        }
+    }
     
     public static TBLanguage Get(string key)
     {
-        var table = DataTableManager.Instance.Get<DTLanguage>(DataTableID.TB_Language);
         if (table != null && table.dic!= null)
         {
             table.dic.TryGetValue(key, out TBLanguage data);

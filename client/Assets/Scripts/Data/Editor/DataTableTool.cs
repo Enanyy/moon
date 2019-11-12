@@ -54,10 +54,21 @@ public class {filename} : IDataTable
 //TABLE_READ_END
         }        
     }
+    private static {filename} mTable;
+    private static {filename} table
+    {
+        get
+        {
+            if(mTable == null)
+            {
+                mTable = DataTableManager.Instance.Get<{filename}>(DataTableID.{tablename});
+            }
+            return mTable;
+        }
+    }
     
     public static {classname} Get({key} key)
     {
-        var table = DataTableManager.Instance.Get<{filename}>(DataTableID.{tablename});
         if (table != null && table.dic!= null)
         {
             table.dic.TryGetValue(key, out {classname} data);

@@ -68,11 +68,21 @@ public class DTHero : IDataTable
 //TABLE_READ_END
         }          
     }
-    
+    private static DTHero mTable;
+    private static DTHero table
+    {
+        get
+        {
+            if (mTable == null)
+            {
+                mTable = DataTableManager.Instance.Get<DTHero>(DataTableID.TB_Hero);
+            }
+            return mTable;
+        }
+    }
     public static TBHero Get(int id)
     {
-        var table = DataTableManager.Instance.Get<DTHero>(DataTableID.TB_Hero);
-        if (table != null && table.dic != null)
+       if (table != null && table.dic != null)
         {
             table.dic.TryGetValue(id, out TBHero data);
             return data;
@@ -82,7 +92,6 @@ public class DTHero : IDataTable
 
     public static TBHero Get(string name)
     {
-        var table = DataTableManager.Instance.Get<DTHero>(DataTableID.TB_Hero);
         if (table != null && table.dic != null)
         {
             var it = table.dic.GetEnumerator();

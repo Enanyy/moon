@@ -44,7 +44,8 @@ public class DTRole : IDataTable
         list.Clear();
         while (table.Read())
         {
-//TABLE_READ_BEGIN			TBRole o = new TBRole();
+//TABLE_READ_BEGIN
+           	TBRole o = new TBRole();
 			o.id = table.GetByColumnName("id",0);
 			o.name = table.GetByColumnName("name","");
 			o.type = table.GetByColumnName("type",0);
@@ -58,13 +59,24 @@ public class DTRole : IDataTable
 //TABLE_READ_END
         }        
     }
-    
-    public static TBRole Get(int id)
+    private static DTRole mTable;
+    private static DTRole table
     {
-        var table = DataTableManager.Instance.Get<DTRole>(DataTableID.TB_Role);
+        get
+        {
+            if(mTable == null)
+            {
+                mTable = DataTableManager.Instance.Get<DTRole>(DataTableID.TB_Role);
+            }
+            return mTable;
+        }
+    }
+    
+    public static TBRole Get(int key)
+    {
         if (table != null && table.dic!= null)
         {
-            table.dic.TryGetValue(id, out TBRole data);
+            table.dic.TryGetValue(key, out TBRole data);
             return data;
         }
         return null;
