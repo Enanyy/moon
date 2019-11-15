@@ -34,6 +34,9 @@ public class EventDispatcher
     }
     #endregion
 
+    private static EventDispatcher mInstance;
+    public static EventDispatcher Instance { get { if (mInstance == null) mInstance = new EventDispatcher(); return mInstance; } }
+
 
     private Dictionary<int, Dictionary<Type, IEventListener>> mListeners = new Dictionary<int, Dictionary<Type, IEventListener>>();
 
