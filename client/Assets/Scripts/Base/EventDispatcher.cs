@@ -2,7 +2,10 @@
 using UnityEngine.Events;
 using System;
 
-public class EventSystem
+/// <summary>
+/// 事件派发器
+/// </summary>
+public class EventDispatcher
 {
     #region Listener
     interface IEventListener
@@ -32,9 +35,9 @@ public class EventSystem
     #endregion
 
 
-    private static Dictionary<int, Dictionary<Type, IEventListener>> mListeners = new Dictionary<int, Dictionary<Type, IEventListener>>();
+    private Dictionary<int, Dictionary<Type, IEventListener>> mListeners = new Dictionary<int, Dictionary<Type, IEventListener>>();
 
-    public static void AddListener(int id, UnityAction call)
+    public void AddListener(int id, UnityAction call)
     {
         if (call == null)
         {
@@ -55,7 +58,7 @@ public class EventSystem
         listener.RemoveListener(call);
         listener.AddListener(call);
     }
-    public static void AddListener<T0>(int id, UnityAction<T0> call)
+    public void AddListener<T0>(int id, UnityAction<T0> call)
     {
         if (call == null)
         {
@@ -76,7 +79,7 @@ public class EventSystem
         listener.RemoveListener(call);
         listener.AddListener(call);
     }
-    public static void AddListener<T0, T1>(int id, UnityAction<T0, T1> call)
+    public void AddListener<T0, T1>(int id, UnityAction<T0, T1> call)
     {
         if (call == null)
         {
@@ -97,7 +100,7 @@ public class EventSystem
         listener.RemoveListener(call);
         listener.AddListener(call);
     }
-    public static void AddListener<T0, T1, T2>(int id, UnityAction<T0, T1, T2> call)
+    public void AddListener<T0, T1, T2>(int id, UnityAction<T0, T1, T2> call)
     {
         if (call == null)
         {
@@ -118,7 +121,7 @@ public class EventSystem
         listener.RemoveListener(call);
         listener.AddListener(call);
     }
-    public static void AddListener<T0, T1, T2, T3>(int id, UnityAction<T0, T1, T2, T3> call)
+    public void AddListener<T0, T1, T2, T3>(int id, UnityAction<T0, T1, T2, T3> call)
     {
         if (call == null)
         {
@@ -139,7 +142,7 @@ public class EventSystem
         listener.RemoveListener(call);
         listener.AddListener(call);
     }
-    public static void RemoveListener(int id, UnityAction call)
+    public void RemoveListener(int id, UnityAction call)
     {
         if (call == null)
         {
@@ -155,7 +158,7 @@ public class EventSystem
             }
         }
     }
-    public static void RemoveListener<T0>(int id, UnityAction<T0> call)
+    public void RemoveListener<T0>(int id, UnityAction<T0> call)
     {
         if (call == null)
         {
@@ -171,7 +174,7 @@ public class EventSystem
             }
         }
     }
-    public static void RemoveListener<T0, T1>(int id, UnityAction<T0, T1> call)
+    public void RemoveListener<T0, T1>(int id, UnityAction<T0, T1> call)
     {
         if (call == null)
         {
@@ -187,7 +190,7 @@ public class EventSystem
             }
         }
     }
-    public static void RemoveListener<T0, T1, T2>(int id, UnityAction<T0, T1, T2> call)
+    public void RemoveListener<T0, T1, T2>(int id, UnityAction<T0, T1, T2> call)
     {
         if (call == null)
         {
@@ -203,7 +206,7 @@ public class EventSystem
             }
         }
     }
-    public static void RemoveListener<T0, T1, T2, T3>(int id, UnityAction<T0, T1, T2, T3> call)
+    public void RemoveListener<T0, T1, T2, T3>(int id, UnityAction<T0, T1, T2, T3> call)
     {
         if (call == null)
         {
@@ -220,7 +223,7 @@ public class EventSystem
         }
     }
 
-    public static void Invoke(int id)
+    public void Invoke(int id)
     {
         if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
         {
@@ -232,7 +235,7 @@ public class EventSystem
             }
         }
     }
-    public static void Invoke<T0>(int id, T0 arg0)
+    public void Invoke<T0>(int id, T0 arg0)
     {
         if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
         {
@@ -244,7 +247,7 @@ public class EventSystem
             }
         }
     }
-    public static void Invoke<T0, T1>(int id, T0 arg0, T1 arg1)
+    public void Invoke<T0, T1>(int id, T0 arg0, T1 arg1)
     {
         if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
         {
@@ -256,7 +259,7 @@ public class EventSystem
             }
         }
     }
-    public static void Invoke<T0, T1, T2>(int id, T0 arg0, T1 arg1, T2 arg2)
+    public void Invoke<T0, T1, T2>(int id, T0 arg0, T1 arg1, T2 arg2)
     {
         if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
         {
@@ -268,7 +271,7 @@ public class EventSystem
             }
         }
     }
-    public static void Invoke<T0, T1, T2, T3>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+    public void Invoke<T0, T1, T2, T3>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
     {
         if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
         {
@@ -281,7 +284,7 @@ public class EventSystem
         }
     }
 
-    public static void Clear(int id)
+    public void Clear(int id)
     {
         if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
         {
@@ -289,7 +292,7 @@ public class EventSystem
         }
         mListeners.Remove(id);
     }
-    public static void Clear()
+    public void Clear()
     {
         mListeners.Clear();
     }
