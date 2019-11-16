@@ -39,18 +39,18 @@ public class SphereGridTest : MonoBehaviour {
 
         grid.Init(SphereRadius,SphereDetail);
         grid.SetRoot(transform);
-
+#if UNITY_EDITOR
         for (int i = 0; i < grid.tiles.Count; ++i)
         {
             grid.tiles[i].SetDefaultColor();
         }
-
+#endif
 
     }
     private Tile mSelectTile;
     private GameObject click;
 
-
+#if UNITY_EDITOR
     public void OnRenderObject()
     {
         if (grid != null)
@@ -58,7 +58,7 @@ public class SphereGridTest : MonoBehaviour {
             grid.GLDraw();
         }
     }
-
+#endif
     void Update()
     {
         if (Input.GetMouseButtonUp(0))

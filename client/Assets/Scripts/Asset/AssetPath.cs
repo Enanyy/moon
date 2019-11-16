@@ -34,30 +34,22 @@ public class AssetPath
         XmlElement node = doc.CreateElement("asset");
         parent.AppendChild(node);
 
-        XmlAttribute name = doc.CreateAttribute("name");
-        name.Value = this.name;
-        node.Attributes.Append(name);
+        AddAttribute(doc, node, "name", name);      
         if (string.IsNullOrEmpty(group) == false)
         {
-            XmlAttribute group = doc.CreateAttribute("group");
-            group.Value = this.group;
-            node.Attributes.Append(group);
+            AddAttribute(doc, node, "group", group);
         }
 
-        XmlAttribute path = doc.CreateAttribute("path");
-        path.Value = this.path;
-        node.Attributes.Append(path);
+        AddAttribute(doc, node, "path", path);
+        AddAttribute(doc, node, "size", size.ToString());
+        AddAttribute(doc, node, "md5", md5);
+        AddAttribute(doc, node, "type", ((int)type).ToString());
 
-        XmlAttribute size = doc.CreateAttribute("size");
-        size.Value = this.size.ToString();
-        node.Attributes.Append(size);
-
-        XmlAttribute md5 = doc.CreateAttribute("md5");
-        md5.Value = this.md5;
-        node.Attributes.Append(md5);
-
-        XmlAttribute type = doc.CreateAttribute("type");
-        type.Value = ((int)this.type).ToString();
+    }
+    private void AddAttribute(XmlDocument doc,XmlElement node,string name, string value)
+    {
+        XmlAttribute type = doc.CreateAttribute(name);
+        type.Value = value;
         node.Attributes.Append(type);
     }
 
@@ -80,6 +72,80 @@ public class AssetPath
     public static AssetMode mode = AssetMode.AssetBundle;
     public const string ASSETS_FILE = "assets.txt";
 
+    public static void AddAsset(AssetPath asset)
+    {
+        if(asset == null)
+        {
+            return;
+        }
+        if(assets.ContainsKey(asset.name) == false)
+        {
+            assets.Add(asset.name, asset);
+        }
+        else
+        {
+            assets[asset.name]= asset;
+        }
+#if UNITY_EDITOR
+        if (assets.ContainsKey(asset.path) == false)
+        {
+            assets.Add(asset.path, asset);
+        }
+        else
+        {
+            assets[asset.path] = asset;
+        }
+        if (assets.ContainsKey(asset.md5) == false)
+        {
+            assets.Add(asset.md5, asset);
+        }
+        else
+        {
+            assets[asset.md5] = asset;
+        }
+#endif
+
+    }
+    public static void RemoveAsset(AssetPath asset)
+    {
+        if(asset== null)
+        {
+            return;
+        }
+        assets.Remove(asset.name);
+#if UNITY_EDITOR
+        assets.Remove(asset.path);
+        assets.Remove(asset.md5);
+#endif
+    }
+
+    private static string FormatPath(string path)
+    {
+#if UNITY_EDITOR || UNITY_EDITOR_OSX
+        if (mode != AssetMode.AssetBundle)
+        {
+            return  Application.dataPath + "/";
+        }
+        else
+#endif
+        {
+#if UNITY_ANDROID
+            return string.Format("{0}/r/", path);
+
+#elif UNITY_IOS
+            return string.Format("{0}/r/", path);
+#elif UNITY_EDITOR_OSX
+            return string.Format("file://{0}/../r/{1}/", Application.dataPath,
+                    UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+#elif UNITY_EDITOR
+            return string.Format("{0}/../r/{1}/", Application.dataPath,
+            UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+#else
+            return path;
+#endif
+        }
+    }
+
     /// <summary>
     /// ½áÎ²´ø/
     /// </summary>
@@ -87,21 +153,7 @@ public class AssetPath
     {
         get
         {
-#if UNITY_ANDROID
-            return string.Format("{0}/r/", Application.streamingAssetsPath);
-
-#elif UNITY_IOS
-            return string.Format("{0}/r/", Application.streamingAssetsPath);
-#elif UNITY_EDITOR_OSX
-            return string.Format("file://{0}/../r/{1}/", Application.dataPath,
-                    UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#elif UNITY_EDITOR
-            return string.Format("{0}/../r/{1}/", Application.dataPath,
-                UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#else
-            return Application.streamingAssetsPath;
-#endif
-
+            return FormatPath(Application.streamingAssetsPath);
         }
     }
 
@@ -112,20 +164,7 @@ public class AssetPath
     {
         get
         {
-#if UNITY_ANDROID
-                return string.Format("{0}/r/", Application.persistentDataPath);
-
-#elif UNITY_IOS
-                return string.Format("{0}/r/", Application.persistentDataPath);
-#elif UNITY_EDITOR_OSX
-                return string.Format("file://{0}/../r/{1}/", Application.dataPath,
-                    UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#elif UNITY_EDITOR
-            return string.Format("{0}/../r/{1}/", Application.dataPath,
-                UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#else
-            return Application.persistentDataPath;
-#endif
+            return FormatPath(Application.persistentDataPath);
         }
     }
     public static void FromXml(string xml)
@@ -148,11 +187,7 @@ public class AssetPath
                 XmlElement child = root.ChildNodes[i] as XmlElement;
                 AssetPath asset = new AssetPath();
                 asset.FromXml(child);
-                assets.Add(asset.name, asset);
-                if (assets.ContainsKey(asset.path) == false)
-                {
-                    assets.Add(asset.path, asset);
-                }
+                AddAsset(asset);
             }
         }
         catch (Exception ex)
@@ -208,6 +243,7 @@ public class AssetPath
         assets.TryGetValue(name, out asset);
         return asset;
     }
+
     public static string GetPath(string name)
     {
         string path = name;
@@ -217,34 +253,15 @@ public class AssetPath
             switch (asset.type)
             {
                 case AssetType.StreamingAsset:
-                {
-#if UNITY_EDITOR || UNITY_EDITOR_OSX
-                    if (mode != AssetMode.AssetBundle)
                     {
-                         path = Application.dataPath + "/" + asset.path;
+                        path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
                     }
-                    else
-#endif
-					{
-						 path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
-                    }
-                }
-                break;
+                    break;
                 case AssetType.PersistentAsset:
-                {
-#if UNITY_EDITOR || UNITY_EDITOR_OSX
-                    if (mode != AssetMode.AssetBundle)
                     {
-                        path = Application.dataPath + "/" + asset.path;
+                        path = string.Format("{0}{1}", persistentDataPath, asset.path);
                     }
-                    else
-#endif
-					{
-						path = string.Format("{0}{1}", persistentDataPath, asset.path);
-                    }
-
-                }
-                break;
+                    break;
             }
         }
 

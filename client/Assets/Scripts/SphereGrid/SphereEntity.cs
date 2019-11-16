@@ -35,20 +35,22 @@ public class SphereEntity : MonoBehaviour
         }
         else
         {
-
+#if UNITY_EDITOR
             var it = paths.GetEnumerator();
             while (it.MoveNext())
             {
                 it.Current.SetDefaultColor();
             }
-
+#endif
             paths = grid.FindPath(current, tile, (t) => { return grid.tilesType.ContainsKey(t.index) && grid.tilesType[t.index] == TileType.Free; });
+#if UNITY_EDITOR
 
             it = paths.GetEnumerator();
             while(it.MoveNext())
             { 
                 it.Current.SetColor(Color.blue);
             }
+#endif
         }
     }
 
@@ -108,7 +110,9 @@ public class SphereEntity : MonoBehaviour
                 else
                 {
                     transform.position = worldPosition;
+#if UNITY_EDITOR
                     current.SetDefaultColor();
+#endif
                     paths.Pop();
                 }
             }
