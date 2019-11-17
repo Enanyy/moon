@@ -62,7 +62,18 @@ public class AssetPath
     public static int version;
     public static Dictionary<string, AssetPath> assets = new Dictionary<string, AssetPath>();
 
-    public static AssetMode mode = AssetMode.AssetBundle;
+    public static AssetMode mode 
+    {
+        get
+        {
+#if UNITY_EDITOR
+             return (AssetMode)PlayerPrefs.GetInt("assetMode");
+
+#else
+             return AssetMode.AssetBundle;
+#endif
+        }
+    } 
     public const string ASSETS_FILE = "assets.txt";
 
     public static void AddAsset(AssetPath asset)

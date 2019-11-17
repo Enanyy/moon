@@ -99,7 +99,6 @@ public class AssetManager : MonoBehaviour
     private AssetBundleManifest mManifest;
     private Dictionary<string, Bundle> mAssetBundleDic = new Dictionary<string, Bundle>();
 
-    public AssetMode assetMode { get; private set; }
     public bool initialized { get; private set; }
 
     private AsyncOperation mAsyncOperation;
@@ -125,8 +124,7 @@ public class AssetManager : MonoBehaviour
 #if UNITY_EDITOR
         string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
 
-        AssetPath.mode = (AssetMode) PlayerPrefs.GetInt("assetMode");
-        
+       
         Debug.Log("AssetMode:" + AssetPath.mode.ToString());
 
         if (AssetPath.mode == AssetMode.Editor)
@@ -142,7 +140,7 @@ public class AssetManager : MonoBehaviour
         AssetPath.mode = AssetMode.AssetBundle;
 
 #endif
-        assetMode = AssetPath.mode;
+    
         if (mAsyncOperation != null)
         {
             yield return new WaitUntil(() => mAsyncOperation.isDone);
@@ -157,7 +155,7 @@ public class AssetManager : MonoBehaviour
                 if (string.IsNullOrEmpty(request.downloadHandler.text) == false)
                 {
                     AssetPath.FromXml(request.downloadHandler.text);
-                    if (assetMode == AssetMode.AssetBundle)
+                    if (AssetPath.mode == AssetMode.AssetBundle)
                     {
                         string manifest = AssetPath.GetPath(AssetPath.manifest);
 
@@ -263,7 +261,7 @@ public class AssetManager : MonoBehaviour
         }
         string sceneName = Path.GetFileNameWithoutExtension(task.assetName);
   
-        if (assetMode == AssetMode.AssetBundle)
+        if (AssetPath.mode == AssetMode.AssetBundle)
         {
             Bundle bundle = CreateBundle(task.assetName);
             yield return bundle.LoadBundleAsync();

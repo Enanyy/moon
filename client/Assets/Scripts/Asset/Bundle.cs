@@ -41,7 +41,7 @@ public class Bundle
     public IEnumerator LoadBundleAsync()
     {
 #if UNITY_EDITOR
-        if (AssetManager.Instance.assetMode == AssetMode.Editor)
+        if (AssetPath.mode == AssetMode.Editor)
         {
             yield break;
         }
@@ -120,7 +120,7 @@ public class Bundle
         {
 
 #if UNITY_EDITOR
-            if (AssetManager.Instance.assetMode == AssetMode.Editor)
+            if (AssetPath.mode == AssetMode.Editor)
             {
                 mAssetDic.TryGetValue(assetName, out asset);
 
