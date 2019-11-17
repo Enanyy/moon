@@ -112,7 +112,7 @@ public class AssetPath
 #endif
     }
 
-    private static string FormatPath(string path)
+    private static string FormatRootPath(string path)
     {
 #if UNITY_EDITOR || UNITY_EDITOR_OSX
         if (mode != AssetMode.AssetBundle)
@@ -124,21 +124,30 @@ public class AssetPath
         {
 #if UNITY_ANDROID
             return string.Format("{0}/r/", path);
-
 #elif UNITY_IOS
             return string.Format("{0}/r/", path);
 #elif UNITY_EDITOR_OSX
-            return string.Format("file://{0}/../r/{1}/", Application.dataPath,
-                    UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#elif UNITY_EDITOR
-            return string.Format("{0}/../r/{1}/", Application.dataPath,
-            UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+            return string.Format("file://{0}/../r/{1}/", Application.dataPath,UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+#elif UNITY_STANDALONE_OSX
+            return string.Format("file://{0}/../r/StandaloneOSX/", Application.dataPath);
+#elif UNITY_EDITOR_WIN
+            return string.Format("{0}/../r/{1}/", Application.dataPath,UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+#elif UNITY_STANDALONE_WIN
+            if (IntPtr.Size == 8) //64 bit
+            {
+                return string.Format("{0}/../r/StandaloneWindows64/", Application.dataPath);
+            }
+            else if (IntPtr.Size == 4) //32 bit
+            {
+                return string.Format("{0}/../r/StandaloneWindows/", Application.dataPath);
+            }
 #else
             return path;
 #endif
         }
     }
 
+    private static string mStreamingAssetsPath;
     /// <summary>
     /// 结尾带/
     /// </summary>
@@ -146,9 +155,16 @@ public class AssetPath
     {
         get
         {
-            return FormatPath(Application.streamingAssetsPath);
+            if(string.IsNullOrEmpty(mStreamingAssetsPath))
+            {
+                mStreamingAssetsPath= FormatRootPath(Application.streamingAssetsPath);
+            }
+
+            return mStreamingAssetsPath;
         }
     }
+
+    private static string mPersistentDataPath;
 
     /// <summary>
     /// 结尾带/
@@ -157,7 +173,11 @@ public class AssetPath
     {
         get
         {
-            return FormatPath(Application.persistentDataPath);
+            if (string.IsNullOrEmpty(mPersistentDataPath))
+            {
+                mPersistentDataPath = FormatRootPath(Application.persistentDataPath);
+            }
+            return mPersistentDataPath;
         }
     }
     public static void FromXml(string xml)
