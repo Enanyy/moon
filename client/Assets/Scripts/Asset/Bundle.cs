@@ -54,7 +54,7 @@ public class Bundle
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    Bundle bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
+                    Bundle bundleObject = AssetManager.Instance.GetOrCreateBundle(dependenceName);
 
                     dependences[dependenceName] = bundleObject;
 
@@ -92,8 +92,7 @@ public class Bundle
         Asset<T> assetObject = null;
         Object asset = null;
         
-        const string resources = "resources/";
-
+       
         string assetName = task.assetName;
         
         if (mCacheAssetDic.ContainsKey(assetName))
@@ -137,7 +136,7 @@ public class Bundle
             {
 #endif
                 //不是Resources资源
-                if (assetName.Contains(resources) == false)
+                if (task.isResource == false)
                 {
                     if (bundle == null)
                     {
@@ -173,17 +172,10 @@ public class Bundle
 
             if (mAssetDic.ContainsKey(assetName) == false)
             {
+                ///尝试从Resources加载
                 if (mAsyncOperation == null)
                 {
-                    string path = assetName;
-                    if (path.Contains(resources))
-                    {
-                        path = path.Substring(path.LastIndexOf(resources) + resources.Length);
-                    }
-                    if(path.Contains("."))
-                    {
-                        path = path.Substring(0, path.LastIndexOf('.'));
-                    }
+                    string path = AssetPath.GetPath(assetName);
 
                     mAsyncOperation = Resources.LoadAsync(path);
                 }
@@ -390,7 +382,8 @@ public class Bundle
             }
             dependences.Clear();
 
-            if (bundleName.Contains("resources"))
+            AssetPath assetPath = AssetPath.Get(bundleName);
+            if (assetPath!= null && assetPath.isRecource)
             {
                 var asset = mAssetDic.GetEnumerator();
                 while (asset.MoveNext())

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-
 using UnityEngine;
 
 
@@ -13,6 +12,11 @@ public class AssetPath
     public string path;
     public long size;
     public string md5;
+
+    /// <summary>
+    /// 是否为Resources资源
+    /// </summary>
+    public bool isRecource { get { return path.Contains("resources/"); } }
    
     public void ToXml(XmlNode parent)
     {
@@ -74,7 +78,7 @@ public class AssetPath
 #endif
         }
     } 
-    public const string ASSETS_FILE = "assets.txt";
+    public const string ASSETSFILE = "assets.txt";
 
     public static void AddAsset(AssetPath asset)
     {
@@ -273,16 +277,33 @@ public class AssetPath
         AssetPath assetPath = Get(key);
         if (assetPath != null)
         {
-            string path = string.Format("{0}{1}", persistentDataPath, assetPath.path);
-            if (File.Exists(path) == false)
+            if (assetPath.isRecource)
             {
-                path = string.Format("{0}{1}", streamingAssetsPath, assetPath.path);
+                const string resources = "resources/";
+                string path = assetPath.path;
+                if (path.Contains(resources))
+                {
+                    path = path.Substring(path.LastIndexOf(resources) + resources.Length);
+                }
+                if (path.Contains("."))
+                {
+                    path = path.Substring(0, path.LastIndexOf('.'));
+                }
+                return path;
             }
-            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            else
             {
-                path = Uri.EscapeUriString(path);
+                string path = string.Format("{0}{1}", persistentDataPath, assetPath.path);
+                if (File.Exists(path) == false)
+                {
+                    path = string.Format("{0}{1}", streamingAssetsPath, assetPath.path);
+                }
+                if (Application.platform == RuntimePlatform.IPhonePlayer)
+                {
+                    path = Uri.EscapeUriString(path);
+                }
+                return path;
             }
-            return path;
         }
         else
         {
@@ -292,10 +313,10 @@ public class AssetPath
     }
     public static string GetAssetFile()
     {
-        string path = string.Format("{0}{1}", persistentDataPath, ASSETS_FILE);
+        string path = string.Format("{0}{1}", persistentDataPath, ASSETSFILE);
         if (File.Exists(path) == false)
         {
-            path = string.Format("{0}{1}", streamingAssetsPath, ASSETS_FILE);
+            path = string.Format("{0}{1}", streamingAssetsPath, ASSETSFILE);
         }
         if (Application.platform == RuntimePlatform.IPhonePlayer)
         {

@@ -46,7 +46,7 @@ public static class AssetTool
     {
         Debug.Log("AssetPath Init");
 
-        string path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);
+        string path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETSFILE);
         string xml = File.ReadAllText(path);
         AssetPath.FromXml(xml);
     }
@@ -423,7 +423,7 @@ public static class AssetTool
     [MenuItem("Tools/Asset/保存资源配置")]
     static void SaveAsset()
     {
-        string assetXmlFile = Application.dataPath + "/"+ AssetPath.ASSETS_FILE;
+        string assetXmlFile = Application.dataPath + "/"+ AssetPath.ASSETSFILE;
 
         StreamWriter writerXml = new StreamWriter(assetXmlFile);
         writerXml.Write(AssetPath.ToXml());
@@ -537,10 +537,8 @@ public static class AssetTool
         {
             Directory.CreateDirectory(outputPath);
         }
-        //打包资源
-        BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
-
        
+        //打包场景
         for (int i = 0; i < scenes.Count; i++)
         {
             string path = outputPath + scenes[i].ToLower();
@@ -555,6 +553,8 @@ public static class AssetTool
 
             EditorUtility.DisplayProgressBar("BuildScene", "Building Scene:"+ scenes[i], i * 1.0f / scenes.Count);
         }
+        //打包资源
+        BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
 
         EditorUtility.ClearProgressBar();
 
@@ -564,7 +564,7 @@ public static class AssetTool
 
         AssetPath.manifest = EditorUserBuildSettings.activeBuildTarget.ToString();
 
-        string assetXmlFile = outputPath + "/" + AssetPath.ASSETS_FILE;
+        string assetXmlFile = outputPath + "/" + AssetPath.ASSETSFILE;
 
         StreamWriter writerXml = new StreamWriter(assetXmlFile);
         writerXml.Write(AssetPath.ToXml());

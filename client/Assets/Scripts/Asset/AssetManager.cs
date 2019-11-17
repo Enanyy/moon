@@ -55,6 +55,16 @@ public class LoadTask<T>
         }
     }
 
+    public bool isResource { 
+        get 
+        {
+            if (path != null)
+            {
+                return path.isRecource;
+            }
+            return false;
+        } 
+    }
     public LoadTask(string key, Action<T> callback)
     {
         this.key = key;
@@ -110,16 +120,16 @@ public class AssetManager : MonoBehaviour
     /// </summary>
     public float unloadInterval = 60;
 
-    public void Init()
+    public void Initialize()
     {
         if (initialized )
         {
             return;
         }
-        StartCoroutine(InitAssetPath());
+        StartCoroutine(BeginInitialize());
     }
 
-    private IEnumerator InitAssetPath()
+    private IEnumerator BeginInitialize()
     {     
         if (mAsyncOperation != null)
         {
@@ -149,7 +159,7 @@ public class AssetManager : MonoBehaviour
 
                         if (manifestRequest.isDone && manifestRequest.assetBundle)
                         {
-                            FinishAssetPath(manifestRequest.assetBundle);
+                            FinishInitialize(manifestRequest.assetBundle);
                         }
                         else
                         {
@@ -158,7 +168,7 @@ public class AssetManager : MonoBehaviour
                     }
                     else
                     {
-                        FinishAssetPath(null);
+                        FinishInitialize(null);
                     }
                 }
                 else
@@ -169,7 +179,7 @@ public class AssetManager : MonoBehaviour
         }
     }
 
-    private void FinishAssetPath(AssetBundle assetBundle)
+    private void FinishInitialize(AssetBundle assetBundle)
     {
         if (assetBundle != null)
         {
@@ -217,11 +227,11 @@ public class AssetManager : MonoBehaviour
     {
         if (initialized == false)
         {
-            Init();
-            yield return new WaitUntil(() => initialized == true);
+            Initialize();
+            yield return new WaitUntil(() => initialized);
         }
 
-        Bundle bundle = CreateBundle(task.bundleName);
+        Bundle bundle = GetOrCreateBundle(task.bundleName);
 
         if (bundle.isLoading)
         {
@@ -240,14 +250,14 @@ public class AssetManager : MonoBehaviour
     {
         if(initialized== false)
         {
-            Init();
-            yield return new WaitUntil(() => initialized == true);
+            Initialize();
+            yield return new WaitUntil(() => initialized);
         }
         string sceneName = Path.GetFileNameWithoutExtension(task.assetName);
   
         if (AssetPath.mode == AssetMode.AssetBundle)
         {
-            Bundle bundle = CreateBundle(task.assetName);
+            Bundle bundle = GetOrCreateBundle(task.assetName);
             yield return bundle.LoadBundleAsync();
 
             var request = SceneManager.LoadSceneAsync(sceneName, mode);
@@ -281,14 +291,12 @@ public class AssetManager : MonoBehaviour
 
     public Bundle GetBundle(string bundleName)
     {
-        Bundle bundle = null;
-
-        mAssetBundleDic.TryGetValue(bundleName, out bundle);
+        mAssetBundleDic.TryGetValue(bundleName, out Bundle bundle);
 
         return bundle;
     }
 
-    public Bundle CreateBundle(string bundleName)
+    public Bundle GetOrCreateBundle(string bundleName)
     {
         Bundle bundle = GetBundle(bundleName);
 
@@ -306,11 +314,9 @@ public class AssetManager : MonoBehaviour
         {
             return;
         }
-        string bundleName = bundle.bundleName;
-        if(mAssetBundleDic.ContainsKey(bundleName))
-        {
-            mAssetBundleDic.Remove(bundleName);
-        }
+       
+         mAssetBundleDic.Remove(bundle.bundleName);
+        
     }
 
    
