@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -10,6 +12,8 @@ public class Test : MonoBehaviour {
     public BattleEntity mEntity1;
 
     public static Test Instance { get; private set; }
+
+    private string file = DateTime.Now.ToString();
     void Start ()
     {
         //AssetManager.Instance.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Single, (scene) => {
@@ -18,6 +22,8 @@ public class Test : MonoBehaviour {
         //});
 
         //return;
+
+        Application.logMessageReceived+=Log;
 
         AssetManager.Instance.LoadAsset<Material>("diban.mat", (asset) => { 
             
@@ -32,6 +38,7 @@ public class Test : MonoBehaviour {
             }
 
         });
+
 
         Instance = this;
 
@@ -53,6 +60,26 @@ public class Test : MonoBehaviour {
         BattleManager.Instance.AddEntity(mEntity1);
         mEntity1.active = true;
 
+    }
+
+    void Log(string condition, string stackTrace, LogType type)
+    {
+        //string path = Application.dataPath + "/" + file + ".txt";
+        //string content = "";
+        //if(File.Exists(path))
+        //{
+        //    content = File.ReadAllText(path);
+        //}
+        log += string.Format("[0]{1},{2}\n", type, condition, stackTrace);
+        //FileEx.SaveFile(path,content);
+    }
+
+    string log = "";
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(10, 10, 1000, 20), AssetPath.persistentDataPath);
+        GUI.Label(new Rect(10, 30, 1000, 20), AssetPath.streamingAssetsPath);
+        GUI.Label(new Rect(10, 100, 1000, 300), log);
     }
 
     // Update is called once per frame

@@ -130,7 +130,7 @@ public class AssetPath
     private static string FormatRootPath(string path)
     {
 #if UNITY_EDITOR
-        if (mode != AssetMode.AssetBundle)
+        if (mode == AssetMode.Editor)
         {
             return  Application.dataPath + "/";
         }
@@ -152,7 +152,7 @@ public class AssetPath
             {
                 return string.Format("{0}/../r/StandaloneWindows64/", Application.dataPath);
             }
-            else if (IntPtr.Size == 4) //32 bit
+            else  //32 bit
             {
                 return string.Format("{0}/../r/StandaloneWindows/", Application.dataPath);
             }
@@ -218,9 +218,10 @@ public class AssetPath
                 AddAsset(asset);
             }
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            throw ex;
+            Debug.LogError(e.Message);
+            throw e;
         }
     } 
 
@@ -272,44 +273,33 @@ public class AssetPath
         return asset;
     }
 
-    public static string GetPath(string key)
+    public static string GetFullPath(string path)
     {
-        AssetPath assetPath = Get(key);
-        if (assetPath != null)
+        const string resources = "resources/";
+
+        if (path.Contains(resources))
         {
-            if (assetPath.isRecource)
+            path = path.Substring(path.LastIndexOf(resources) + resources.Length);
+
+            if (path.Contains("."))
             {
-                const string resources = "resources/";
-                string path = assetPath.path;
-                if (path.Contains(resources))
-                {
-                    path = path.Substring(path.LastIndexOf(resources) + resources.Length);
-                }
-                if (path.Contains("."))
-                {
-                    path = path.Substring(0, path.LastIndexOf('.'));
-                }
-                return path;
+                path = path.Substring(0, path.LastIndexOf('.'));
             }
-            else
-            {
-                string path = string.Format("{0}{1}", persistentDataPath, assetPath.path);
-                if (File.Exists(path) == false)
-                {
-                    path = string.Format("{0}{1}", streamingAssetsPath, assetPath.path);
-                }
-                if (Application.platform == RuntimePlatform.IPhonePlayer)
-                {
-                    path = Uri.EscapeUriString(path);
-                }
-                return path;
-            }
+            return path;
         }
         else
         {
-            Debug.LogError("Can't find AssetPath:" + key);
+            path = string.Format("{0}{1}", persistentDataPath, path);
+            if (File.Exists(path) == false)
+            {
+                path = string.Format("{0}{1}", streamingAssetsPath, path);
+            }
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                path = Uri.EscapeUriString(path);
+            }
+            return path;
         }
-        return key;
     }
     public static string GetAssetFile()
     {

@@ -151,7 +151,7 @@ public class AssetManager : MonoBehaviour
                     AssetPath.FromXml(request.downloadHandler.text);
                     if (AssetPath.mode == AssetMode.AssetBundle)
                     {
-                        string manifest = AssetPath.GetPath(AssetPath.manifest);
+                        string manifest = AssetPath.GetFullPath(AssetPath.manifest);
 
                         var manifestRequest = AssetBundle.LoadFromFileAsync(manifest);
 
@@ -191,7 +191,7 @@ public class AssetManager : MonoBehaviour
         }
 
         initialized = true;
-       
+        Debug.Log("Initialize AssetManager Finish!");
     }
 
     private void Update()

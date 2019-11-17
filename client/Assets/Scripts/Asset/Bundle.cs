@@ -68,7 +68,7 @@ public class Bundle
 
         if (mAsyncOperation == null)
         {
-            string path = AssetPath.GetPath(bundleName);
+            string path = AssetPath.GetFullPath(bundleName);
 
             mAsyncOperation = AssetBundle.LoadFromFileAsync(path);
         }
@@ -175,7 +175,7 @@ public class Bundle
                 ///尝试从Resources加载
                 if (mAsyncOperation == null)
                 {
-                    string path = AssetPath.GetPath(assetName);
+                    string path = AssetPath.GetFullPath(assetName);
 
                     mAsyncOperation = Resources.LoadAsync(path);
                 }
