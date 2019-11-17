@@ -125,7 +125,7 @@ public class AssetPath
 
     private static string FormatRootPath(string path)
     {
-#if UNITY_EDITOR || UNITY_EDITOR_OSX
+#if UNITY_EDITOR
         if (mode != AssetMode.AssetBundle)
         {
             return  Application.dataPath + "/";
@@ -286,9 +286,22 @@ public class AssetPath
         }
         else
         {
-            Debug.LogError("Can't find assetpath:" + key);
+            Debug.LogError("Can't find AssetPath:" + key);
         }
         return key;
+    }
+    public static string GetAssetFile()
+    {
+        string path = string.Format("{0}{1}", persistentDataPath, ASSETS_FILE);
+        if (File.Exists(path) == false)
+        {
+            path = string.Format("{0}{1}", streamingAssetsPath, ASSETS_FILE);
+        }
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            path = Uri.EscapeUriString(path);
+        }
+        return path;
     }
    
     public static void Clear()

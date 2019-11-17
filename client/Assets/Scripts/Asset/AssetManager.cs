@@ -49,7 +49,7 @@ public class LoadTask<T>
             if (mPath == null)
             {
                 mPath= AssetPath.Get(key);
-                Debug.Log(mPath.path);
+                //Debug.Log(mPath.path);
             }
             return mPath;
         }
@@ -116,38 +116,22 @@ public class AssetManager : MonoBehaviour
         {
             return;
         }
-        StartCoroutine(InitManifest());
+        StartCoroutine(InitAssetPath());
     }
 
-    private IEnumerator InitManifest()
-    {
-#if UNITY_EDITOR
-        string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
-
-       
-        Debug.Log("AssetMode:" + AssetPath.mode.ToString());
-
-        if (AssetPath.mode == AssetMode.Editor)
-        {
-            path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);
-        }
-#else
-		string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
-        if (File.Exists(path) == false)
-        {
-            path = string.Format("{0}{1}", AssetPath.streamingAssetsPath, AssetPath.ASSETS_FILE);
-        }
-        AssetPath.mode = AssetMode.AssetBundle;
-
-#endif
-    
+    private IEnumerator InitAssetPath()
+    {     
         if (mAsyncOperation != null)
         {
             yield return new WaitUntil(() => mAsyncOperation.isDone);
         }
         else
         {
-            using (UnityWebRequest request = UnityWebRequest.Get(path))
+            string assetFile = AssetPath.GetAssetFile();
+
+            Debug.Log("AssetMode:" + AssetPath.mode.ToString());
+
+            using (UnityWebRequest request = UnityWebRequest.Get(assetFile))
             {
                 mAsyncOperation = request.SendWebRequest();
                 yield return mAsyncOperation;
@@ -165,7 +149,7 @@ public class AssetManager : MonoBehaviour
 
                         if (manifestRequest.isDone && manifestRequest.assetBundle)
                         {
-                            InitFinish(manifestRequest.assetBundle);
+                            FinishAssetPath(manifestRequest.assetBundle);
                         }
                         else
                         {
@@ -174,7 +158,7 @@ public class AssetManager : MonoBehaviour
                     }
                     else
                     {
-                        InitFinish(null);
+                        FinishAssetPath(null);
                     }
                 }
                 else
@@ -185,7 +169,7 @@ public class AssetManager : MonoBehaviour
         }
     }
 
-    private void InitFinish(AssetBundle assetBundle)
+    private void FinishAssetPath(AssetBundle assetBundle)
     {
         if (assetBundle != null)
         {
