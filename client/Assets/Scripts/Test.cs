@@ -19,6 +19,20 @@ public class Test : MonoBehaviour {
 
         //return;
 
+        AssetManager.Instance.LoadAsset<Material>("diban.mat", (asset) => { 
+            
+            if(asset!= null)
+            {
+                Debug.Log("Load Success!");
+            }
+            else
+            {
+                Debug.Log("Load Failed!");
+
+            }
+
+        });
+
         Instance = this;
 
         CameraManager.Instance.Init();

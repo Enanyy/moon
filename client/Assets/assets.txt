@@ -1,43 +1,45 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Assets manifest="StandaloneWindows64" version="0">
-  <asset name="arrow.mat" path="r/material/arrow.mat" size="2081" md5="f2fdbc11c4128f2a64b352c29e073abd" type="0" />
-  <asset name="diban.mat" path="r/material/diban.mat" size="2346" md5="0b847a95107e1a0f202433209079e46d" type="0" />
-  <asset name="line.mat" path="r/material/line.mat" size="2080" md5="6f43a9424d57328323442675fb90b45f" type="0" />
-  <asset name="tile.mat" path="r/material/tile.mat" size="2286" md5="e44eee88f6dfdf42036286aba43afb14" type="0" />
-  <asset name="dimain.shader" path="r/shader/dimain.shader" size="1262" md5="e9581f5ebc55471e4482ca843307a197" type="0" />
-  <asset name="floor.png" path="r/texture/floor.png" size="44429" md5="363bc544d184051b332f09227d98288d" type="0" />
-  <asset name="test.mat" path="assets/r/test.mat" size="39131" md5="b2d77b936a45c41d1bb4dee9bcc6fd67" type="1" />
-  <asset name="airenbubing.txt" group="config" path="assets/r/config/airenbubing.txt" size="1794" md5="42ebef4a4d2310f6879ccaa5a7f32f80" type="1" />
-  <asset name="airenbubing01.txt" group="config" path="assets/r/config/airenbubing01.txt" size="1807" md5="f935b206574cc75262274861f2bf33d1" type="1" />
-  <asset name="dafu.txt" group="config" path="assets/r/config/dafu.txt" size="1706" md5="c743148a83ea3260f22d10a8186050cd" type="1" />
-  <asset name="m_airenhuojianpao.txt" group="config" path="assets/r/config/m_airenhuojianpao.txt" size="1738" md5="86e13c2214ec72d8b89d10fd42b06fd3" type="1" />
-  <asset name="m_airenzhanshi.txt" group="config" path="assets/r/config/m_airenzhanshi.txt" size="1844" md5="79337f5135f2405966c53338417a6cd5" type="1" />
-  <asset name="nvjiangjun.txt" group="config" path="assets/r/config/nvjiangjun.txt" size="4348" md5="78006acf8ce164f43156ba3eef3848ae" type="1" />
-  <asset name="paoshou.txt" group="config" path="assets/r/config/paoshou.txt" size="1730" md5="c8d756f24e55545d884d91088b3db36e" type="1" />
-  <asset name="trollgiant.txt" group="config" path="assets/r/config/trollgiant.txt" size="2106" md5="34c84353464d5ff91a03babd6bc3ff4d" type="1" />
-  <asset name="yingxiong_kulouqishi.txt" group="config" path="assets/r/config/yingxiong_kulouqishi.txt" size="2227" md5="df8a46e285fb44774917e201bacb75c5" type="1" />
-  <asset name="data.bytes" path="assets/r/database/data.bytes" size="1994" md5="c794c78ecdecd75ee0195267da126850" type="1" />
-  <asset name="airenbubing.prefab" path="assets/r/model/airenbubing.prefab" size="880209" md5="17c29517bfb39806adb839f519b53ad7" type="1" />
-  <asset name="airenbubing01.prefab" path="assets/r/model/airenbubing01.prefab" size="1195546" md5="27bc9e500f8b14c69a1505f5d161c7b4" type="1" />
-  <asset name="dafu.prefab" path="assets/r/model/dafu.prefab" size="256816" md5="0d406bb479f5f160526aa74297a57728" type="1" />
-  <asset name="m_airenhuojianpao.prefab" path="assets/r/model/m_airenhuojianpao.prefab" size="1196296" md5="30cccb5ae41fe67882204a523766448c" type="1" />
-  <asset name="m_airenzhanshi.prefab" path="assets/r/model/m_airenzhanshi.prefab" size="2178412" md5="01684197df1cc5662be96f045e6f2b36" type="1" />
-  <asset name="nvjiangjun.prefab" path="assets/r/model/nvjiangjun.prefab" size="3511032" md5="5250f4bfda40916ef1e2532da732618b" type="1" />
-  <asset name="paoshou.prefab" path="assets/r/model/paoshou.prefab" size="375316" md5="c12d8084231420fddfeaa10e5f6d8075" type="1" />
-  <asset name="trollgiant.prefab" path="assets/r/model/trollgiant.prefab" size="573137" md5="757d84018abc72a04834d6f2020aa352" type="1" />
-  <asset name="yingxiong_kulouqishi.prefab" path="assets/r/model/yingxiong_kulouqishi.prefab" size="1467929" md5="cb69e3b25d7d6c693536c80cc454296d" type="1" />
-  <asset name="testscene.unity" path="assets/r/scene/testscene.unity" size="64593" md5="5954ecc2c86cdf5c8a21c2e5cdd6144f" type="1" />
-  <asset name="fx_kuloufashi_attack_hit.prefab" path="assets/r/spell_fx/fx_kuloufashi_attack_hit.prefab" size="461493" md5="fabce16b8c6ed13da7abbed85a24c342" type="1" />
-  <asset name="fx_kuloufashi_attack_xuli.prefab" path="assets/r/spell_fx/fx_kuloufashi_attack_xuli.prefab" size="119765" md5="a5d0171fce4e13f3c76a62a3c3a4f124" type="1" />
-  <asset name="fx_nvjiangjun_attack_01.prefab" path="assets/r/spell_fx/fx_nvjiangjun_attack_01.prefab" size="139652" md5="d3d0520f1b7f401bef9fea4bb9af52da" type="1" />
-  <asset name="fx_nvjiangjun_attack_02.prefab" path="assets/r/spell_fx/fx_nvjiangjun_attack_02.prefab" size="399406" md5="8603bc11cb82eb69d4453632e0a51a8b" type="1" />
-  <asset name="fx_nvjiangjun_attack_03.prefab" path="assets/r/spell_fx/fx_nvjiangjun_attack_03.prefab" size="140171" md5="26e04bcef93d6567aa85b5c28d81aa2c" type="1" />
-  <asset name="fx_pao01_attack.prefab" path="assets/r/spell_fx/fx_pao01_attack.prefab" size="293597" md5="fde3850c261c5987f8ffc6ec729577ac" type="1" />
-  <asset name="fx_pao01_hit.prefab" path="assets/r/spell_fx/fx_pao01_hit.prefab" size="193474" md5="6bd29abab7fd5a5a4c6d3c4ce8738e84" type="1" />
-  <asset name="fx_pao_pandan.prefab" path="assets/r/spell_fx/fx_pao_pandan.prefab" size="174445" md5="f88a0cc0251a45cfca478bc767001d7c" type="1" />
-  <asset name="fx_siwang.prefab" path="assets/r/spell_fx/fx_siwang.prefab" size="412706" md5="cff74ca3581e5f0115dd73fac984337d" type="1" />
-  <asset name="fx_xiaopaobing_hit.prefab" path="assets/r/spell_fx/fx_xiaopaobing_hit.prefab" size="464950" md5="6d652956e581c7fca0c9438584251b7a" type="1" />
-  <asset name="fx_xiaopaobing_paodan.prefab" path="assets/r/spell_fx/fx_xiaopaobing_paodan.prefab" size="178943" md5="34a891f8002457c31d2f1506927334de" type="1" />
-  <asset name="config" path="config" size="4082" md5="978f282e9af7d74e3314f81730124844" type="1" />
-  <asset name="StandaloneWindows64" path="StandaloneWindows64" size="2387" md5="cd5e587bdb55ede4777336aa1a25b2e4" type="1" />
+  <asset name="arrow.mat" path="assets/resources/r/material/arrow.mat" size="2081" md5="f2fdbc11c4128f2a64b352c29e073abd" />
+  <asset name="diban.mat" path="assets/resources/r/material/diban.mat" size="2322" md5="e783920d51357b3d6f389d168e27ee85" />
+  <asset name="line.mat" path="assets/resources/r/material/line.mat" size="2080" md5="6f43a9424d57328323442675fb90b45f" />
+  <asset name="tile.mat" path="assets/resources/r/material/tile.mat" size="2286" md5="e44eee88f6dfdf42036286aba43afb14" />
+  <asset name="dimain.shader" path="assets/resources/r/shader/dimain.shader" size="1262" md5="e9581f5ebc55471e4482ca843307a197" />
+  <asset name="floor.png" path="assets/resources/r/texture/floor.png" size="44429" md5="363bc544d184051b332f09227d98288d" />
+  <asset name="test.mat" path="assets/r/test.mat" size="38240" md5="f02ebce28719d15a9fbb3adc63d32bf6" />
+  <asset name="airenbubing.txt" group="config" path="assets/r/config/airenbubing.txt" size="1709" md5="056e6b9b037559b749ed1016d39f72f5" />
+  <asset name="airenbubing01.txt" group="config" path="assets/r/config/airenbubing01.txt" size="1718" md5="66d75d815aa5072068ff116e2f1865e4" />
+  <asset name="dafu.txt" group="config" path="assets/r/config/dafu.txt" size="1694" md5="b674df9e53ecba32031e9ea4e859ddf4" />
+  <asset name="m_airenhuojianpao.txt" group="config" path="assets/r/config/m_airenhuojianpao.txt" size="2055" md5="ebfc6493ba16440e7928640bb9e0dc9b" />
+  <asset name="m_airenzhanshi.txt" group="config" path="assets/r/config/m_airenzhanshi.txt" size="1726" md5="f2c9298f0c611c13e095876034ee15cc" />
+  <asset name="nvjiangjun.txt" group="config" path="assets/r/config/nvjiangjun.txt" size="2282" md5="cbd09490315d845c9e9cf3e3aa3c71be" />
+  <asset name="paoshou.txt" group="config" path="assets/r/config/paoshou.txt" size="1686" md5="8f5657aaf9538848c6de85566bfa71d4" />
+  <asset name="trollgiant.txt" group="config" path="assets/r/config/trollgiant.txt" size="1759" md5="ea74ade06fac55a87881cca2eaf84ec3" />
+  <asset name="yingxiong_kulouqishi.txt" group="config" path="assets/r/config/yingxiong_kulouqishi.txt" size="2072" md5="d47402482ce8de7e1da8cd566ca60463" />
+  <asset name="data.bytes" path="assets/r/database/data.bytes" size="12818" md5="87feb6b6d6d0fc9d94d467cfd1acad23" />
+  <asset name="airenbubing.prefab" group="model" path="assets/r/model/airenbubing.prefab" size="67075" md5="282effe0b89ce8573dcab0316f520ae8" />
+  <asset name="airenbubing01.prefab" group="model" path="assets/r/model/airenbubing01.prefab" size="67000" md5="b180c4450733e885a110749d10d39e60" />
+  <asset name="dafu.prefab" group="model" path="assets/r/model/dafu.prefab" size="39959" md5="1c408e403017e127af2b827e65129787" />
+  <asset name="m_airenhuojianpao.prefab" group="model" path="assets/r/model/m_airenhuojianpao.prefab" size="59486" md5="a3b91bd1a12e30c993f59e54b9f7649f" />
+  <asset name="m_airenzhanshi.prefab" group="model" path="assets/r/model/m_airenzhanshi.prefab" size="72562" md5="d53cf8cf7b55fe99a6d75aec8b95c9ce" />
+  <asset name="nvjiangjun.prefab" group="model" path="assets/r/model/nvjiangjun.prefab" size="100963" md5="e68270def65c9e5a5e124d25163aaa51" />
+  <asset name="paoshou.prefab" group="model" path="assets/r/model/paoshou.prefab" size="50129" md5="ccf03c542b4a5e8c6e9433f6fd951065" />
+  <asset name="trollgiant.prefab" group="model" path="assets/r/model/trollgiant.prefab" size="50657" md5="10ad5a25b7b7e42f1de3789b3b6241a3" />
+  <asset name="yingxiong_kulouqishi.prefab" group="model" path="assets/r/model/yingxiong_kulouqishi.prefab" size="109637" md5="6798bfdc65dce81194329a2689968618" />
+  <asset name="testscene.unity" path="assets/r/scene/testscene.unity" size="65195" md5="11bd3e17fb47c1ecec7e286eb3e9f281" />
+  <asset name="fx_kuloufashi_attack_hit.prefab" group="spell_fx" path="assets/r/spell_fx/fx_kuloufashi_attack_hit.prefab" size="1188681" md5="5f40e0913f2abcde5026025f90f74d17" />
+  <asset name="fx_kuloufashi_attack_xuli.prefab" group="spell_fx" path="assets/r/spell_fx/fx_kuloufashi_attack_xuli.prefab" size="355284" md5="070b2b5e66085e99fdc91a2f9b97f72c" />
+  <asset name="fx_nvjiangjun_attack_01.prefab" group="spell_fx" path="assets/r/spell_fx/fx_nvjiangjun_attack_01.prefab" size="237763" md5="e69266781e1231d0ff6e8e12b54fbf6f" />
+  <asset name="fx_nvjiangjun_attack_02.prefab" group="spell_fx" path="assets/r/spell_fx/fx_nvjiangjun_attack_02.prefab" size="1065062" md5="69f3a66d7d3d8a6831b625293b207c99" />
+  <asset name="fx_nvjiangjun_attack_03.prefab" group="spell_fx" path="assets/r/spell_fx/fx_nvjiangjun_attack_03.prefab" size="237778" md5="6de011c1f7fa738275a19287d99f6441" />
+  <asset name="fx_pao01_attack.prefab" group="spell_fx" path="assets/r/spell_fx/fx_pao01_attack.prefab" size="826738" md5="a74c52032bd45ce6695749692130be3c" />
+  <asset name="fx_pao01_hit.prefab" group="spell_fx" path="assets/r/spell_fx/fx_pao01_hit.prefab" size="827226" md5="fddbdd9ce9f32f8a773e903c60ff9f11" />
+  <asset name="fx_pao_pandan.prefab" group="spell_fx" path="assets/r/spell_fx/fx_pao_pandan.prefab" size="468561" md5="3849c8791056eb63bb611b5bd1a1d8db" />
+  <asset name="fx_siwang.prefab" group="spell_fx" path="assets/r/spell_fx/fx_siwang.prefab" size="826375" md5="90871ab93e24c2809848f650e3b57b23" />
+  <asset name="fx_xiaopaobing_hit.prefab" group="spell_fx" path="assets/r/spell_fx/fx_xiaopaobing_hit.prefab" size="1300181" md5="365751d7c91a35b35127b8c676233d62" />
+  <asset name="fx_xiaopaobing_paodan.prefab" group="spell_fx" path="assets/r/spell_fx/fx_xiaopaobing_paodan.prefab" size="468951" md5="b742e3d5b22ae38830e950b43e357fd2" />
+  <asset name="model" path="model" size="11441864" md5="741a0ba7f0c3f400fd6e271103c8fa81" />
+  <asset name="spell_fx" path="spell_fx" size="1387495" md5="e028bba0f77804b4951ef6beb18c75b0" />
+  <asset name="StandaloneWindows64" path="StandaloneWindows64" size="1702" md5="f0a350249b56c04280e9f11fdfb5c1fd" />
+  <asset name="config" path="config" size="4156" md5="1e9ccead0db8c685f3ccf8623d41fb86" />
 </Assets>

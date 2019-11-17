@@ -1,8 +1,7 @@
 fileFormatVersion: 2
 guid: 58e45b3cff7b0984a8d0a42b408e261b
-NativeFormatImporter:
+PrefabImporter:
   externalObjects: {}
-  mainObjectFileID: 100100000
   userData: 
-  assetBundleName: assets/r/model/m_airenzhanshi.prefab
+  assetBundleName: model
   assetBundleVariant: 

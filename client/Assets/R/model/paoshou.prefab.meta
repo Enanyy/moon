@@ -1,8 +1,7 @@
 fileFormatVersion: 2
 guid: c3bafe7aab0583d42b75f242757bc468
-NativeFormatImporter:
+PrefabImporter:
   externalObjects: {}
-  mainObjectFileID: 100100000
   userData: 
-  assetBundleName: assets/r/model/paoshou.prefab
+  assetBundleName: model
   assetBundleVariant: 

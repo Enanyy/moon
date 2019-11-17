@@ -1,8 +1,7 @@
 fileFormatVersion: 2
 guid: dd30785731601854a9f780775babed6a
-NativeFormatImporter:
+PrefabImporter:
   externalObjects: {}
-  mainObjectFileID: 100100000
   userData: 
-  assetBundleName: assets/r/model/nvjiangjun.prefab
+  assetBundleName: model
   assetBundleVariant: 

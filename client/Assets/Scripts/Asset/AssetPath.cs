@@ -4,12 +4,7 @@ using System.IO;
 using System.Xml;
 
 using UnityEngine;
-public enum AssetType
-{
-    Resource,
-    StreamingAsset,
-    PersistentAsset,
-}
+
 
 public class AssetPath
 {
@@ -18,8 +13,7 @@ public class AssetPath
     public string path;
     public long size;
     public string md5;
-    public AssetType type = AssetType.Resource;
-
+   
     public void ToXml(XmlNode parent)
     {
         XmlDocument doc;
@@ -43,8 +37,7 @@ public class AssetPath
         AddAttribute(doc, node, "path", path);
         AddAttribute(doc, node, "size", size.ToString());
         AddAttribute(doc, node, "md5", md5);
-        AddAttribute(doc, node, "type", ((int)type).ToString());
-
+      
     }
     private void AddAttribute(XmlDocument doc,XmlElement node,string name, string value)
     {
@@ -60,7 +53,7 @@ public class AssetPath
         path = element.GetAttribute("path");
         size = element.GetAttribute("size").ToInt64Ex();
         md5 = element.GetAttribute("md5");
-        type = (AssetType)element.GetAttribute("type").ToInt32Ex();
+     
     }
 
     #region Static
@@ -237,37 +230,36 @@ public class AssetPath
 
         return xml;
     }
-    public static AssetPath Get(string name)
+    public static AssetPath Get(string key)
     {
         AssetPath asset;
-        assets.TryGetValue(name, out asset);
+        assets.TryGetValue(key, out asset);
         return asset;
     }
 
-    public static string GetPath(string name)
+    public static string GetPath(string key)
     {
-        string path = name;
-        AssetPath asset = Get(name);
-        if (asset != null)
+        AssetPath assetPath = Get(key);
+        if (assetPath != null)
         {
-            switch (asset.type)
+            string path = string.Format("{0}{1}", persistentDataPath, assetPath.path);
+            if (File.Exists(path) == false)
             {
-                case AssetType.StreamingAsset:
-                    {
-                        path = string.Format("{0}{1}", streamingAssetsPath, asset.path);
-                    }
-                    break;
-                case AssetType.PersistentAsset:
-                    {
-                        path = string.Format("{0}{1}", persistentDataPath, asset.path);
-                    }
-                    break;
+                path = string.Format("{0}{1}", streamingAssetsPath, assetPath.path);
             }
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                path = Uri.EscapeUriString(path);
+            }
+            return path;
         }
-
-        return path;
+        else
+        {
+            Debug.LogError("Can't find assetpath:" + key);
+        }
+        return key;
     }
-
+   
     public static void Clear()
     {
         assets.Clear();

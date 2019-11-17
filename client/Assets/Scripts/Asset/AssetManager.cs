@@ -34,13 +34,6 @@ public class LoadTask<T>
         {
             if (path != null)
             {
-                if (path.type == AssetType.Resource)
-                {
-                    if (path.path.Contains("."))
-                    {
-                        return path.path.Substring(0, path.path.LastIndexOf('.'));
-                    }
-                }
                 return path.path;
             }
             return key;
@@ -56,14 +49,10 @@ public class LoadTask<T>
             if (mPath == null)
             {
                 mPath= AssetPath.Get(key);
+                Debug.Log(mPath.path);
             }
             return mPath;
         }
-    }
-
-    public AssetType type
-    {
-        get { return path != null ? path.type : AssetType.Resource; }
     }
 
     public LoadTask(string key, Action<T> callback)
@@ -137,6 +126,9 @@ public class AssetManager : MonoBehaviour
         string path = string.Format("{0}{1}", AssetPath.persistentDataPath, AssetPath.ASSETS_FILE);
 
         AssetPath.mode = (AssetMode) PlayerPrefs.GetInt("assetMode");
+        
+        Debug.Log("AssetMode:" + AssetPath.mode.ToString());
+
         if (AssetPath.mode == AssetMode.Editor)
         {
             path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETS_FILE);
@@ -167,7 +159,7 @@ public class AssetManager : MonoBehaviour
                     AssetPath.FromXml(request.downloadHandler.text);
                     if (assetMode == AssetMode.AssetBundle)
                     {
-                        string manifest = GetPath(AssetPath.manifest);
+                        string manifest = AssetPath.GetPath(AssetPath.manifest);
 
                         var manifestRequest = AssetBundle.LoadFromFileAsync(manifest);
 
@@ -247,7 +239,7 @@ public class AssetManager : MonoBehaviour
             yield return new WaitUntil(() => initialized == true);
         }
 
-        Bundle bundle = CreateBundle(task.bundleName,task.type);
+        Bundle bundle = CreateBundle(task.bundleName);
 
         if (bundle.isLoading)
         {
@@ -273,7 +265,7 @@ public class AssetManager : MonoBehaviour
   
         if (assetMode == AssetMode.AssetBundle)
         {
-            Bundle bundle = CreateBundle(task.assetName, task.type);
+            Bundle bundle = CreateBundle(task.assetName);
             yield return bundle.LoadBundleAsync();
 
             var request = SceneManager.LoadSceneAsync(sceneName, mode);
@@ -314,13 +306,13 @@ public class AssetManager : MonoBehaviour
         return bundle;
     }
 
-    public Bundle CreateBundle(string bundleName,AssetType assetType)
+    public Bundle CreateBundle(string bundleName)
     {
         Bundle bundle = GetBundle(bundleName);
 
         if(bundle == null)
         {
-            bundle = new Bundle(bundleName, GetAllDependencies(bundleName),assetType);
+            bundle = new Bundle(bundleName, GetAllDependencies(bundleName));
             mAssetBundleDic.Add(bundleName, bundle);
         }
         return bundle;
@@ -339,23 +331,7 @@ public class AssetManager : MonoBehaviour
         }
     }
 
-    public string GetPath(string bundleName)
-    {
-        //string fullpath = GetRoot() + bundleName;
-        //if (Application.platform == RuntimePlatform.IPhonePlayer)
-        //{
-        //    fullpath = Uri.EscapeUriString(fullpath);
-        //}
-        //return fullpath;
-        string path = AssetPath.GetPath(bundleName);
-        if(Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            path = Uri.EscapeUriString(path);
-        }
-       
-        return path;
-    }
-
+   
     public string[] GetAllDependencies(string bundleName)
     {
         if (string.IsNullOrEmpty(bundleName) || mManifest == null)

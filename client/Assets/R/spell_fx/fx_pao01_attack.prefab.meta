@@ -1,8 +1,7 @@
 fileFormatVersion: 2
 guid: 960992a5f38413449a87f99ff20ca1af
-NativeFormatImporter:
+PrefabImporter:
   externalObjects: {}
-  mainObjectFileID: 100100000
   userData: 
-  assetBundleName: assets/r/spell_fx/fx_pao01_attack.prefab
+  assetBundleName: spell_fx
   assetBundleVariant: 

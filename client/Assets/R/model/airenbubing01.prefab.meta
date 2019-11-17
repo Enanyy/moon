@@ -1,8 +1,7 @@
 fileFormatVersion: 2
 guid: 45e2f58105293c64c9eef680b3317718
-NativeFormatImporter:
+PrefabImporter:
   externalObjects: {}
-  mainObjectFileID: 100100000
   userData: 
-  assetBundleName: assets/r/model/airenbubing01.prefab
+  assetBundleName: model
   assetBundleVariant: 

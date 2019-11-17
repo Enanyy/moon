@@ -1,8 +1,7 @@
 fileFormatVersion: 2
 guid: 49b34c1b5b64c6c46926dc8c9162b7e5
-NativeFormatImporter:
+PrefabImporter:
   externalObjects: {}
-  mainObjectFileID: 100100000
   userData: 
-  assetBundleName: assets/r/spell_fx/fx_xiaopaobing_hit.prefab
+  assetBundleName: spell_fx
   assetBundleVariant: 

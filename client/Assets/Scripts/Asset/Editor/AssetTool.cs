@@ -91,10 +91,10 @@ public static class AssetTool
     static GUIStyle s_ToggleMixed;
   
     
-    static  Dictionary<string,AssetType> s_AssetDirs = new Dictionary<string, AssetType>
+    static  List<string> s_AssetDirs = new List<string>
     {
-        { "Assets/Resources/",AssetType.Resource },
-        { "Assets/R/",AssetType.StreamingAsset },
+        { "assets/resources/"},
+        { "assets/r/" },
     };
 
     static bool IsValid(string assetPath)
@@ -110,7 +110,7 @@ public static class AssetTool
         var it = s_AssetDirs.GetEnumerator();
         while (it.MoveNext())
         {
-            if (assetPath.StartsWith(it.Current.Key))
+            if (assetPath.StartsWith(it.Current))
             {
                 isValid = true; break;
             }
@@ -124,7 +124,7 @@ public static class AssetTool
         {
             return;
         }
-        string assetPath = AssetDatabase.GetAssetPath(editor.target);
+        string assetPath = AssetDatabase.GetAssetPath(editor.target).ToLower();
 
         if (IsValid(assetPath) == false)
         {
@@ -170,8 +170,8 @@ public static class AssetTool
 
         if (asset != null && select && editor.targets.Length == 1)
         {
-            asset.type = GetAssetType(assetPath);
-            asset.path = GetAssetPath(assetPath);
+
+            asset.path = assetPath;
 
             var assetName = EditorGUILayout.DelayedTextField(asset.name, GUILayout.ExpandWidth(true));
             if (assetName != asset.name)
@@ -259,31 +259,9 @@ public static class AssetTool
         }
     }
 
-    static AssetType GetAssetType(string assetPath)
-    {
-        var it = s_AssetDirs.GetEnumerator();
-        while (it.MoveNext())
-        {
-            if (assetPath.StartsWith(it.Current.Key))
-            {
-                return it.Current.Value;
-            }
-        }
+ 
 
-        return AssetType.Resource;
-    }
 
-    static string GetAssetPath(string assetPath)
-    {
-        var type = GetAssetType(assetPath);
-        string path = assetPath.ToLower();
-        if (type == AssetType.Resource)
-        {
-            path = assetPath.ToLower().Replace("assets/resources/", "");
-        }
-
-        return path;
-    }
 
     static bool IsMixedSelect(Object[] targets)
     {
@@ -344,7 +322,7 @@ public static class AssetTool
 
     static AssetPath GetAsset(Object target)
     {
-        string assetPath = AssetDatabase.GetAssetPath(target);
+        string assetPath = AssetDatabase.GetAssetPath(target).ToLower();
 
         if (IsValid(assetPath) == false)
         {
@@ -355,10 +333,9 @@ public static class AssetTool
         byte[] bytes = File.Exists(fullpath) ? File.ReadAllBytes(fullpath) : null;
 
         string name = Path.GetFileName(assetPath);
-        string path = GetAssetPath(assetPath);
-        string md5 = bytes != null ? MD5Hash.Get(bytes) : "";
-        AssetType type = GetAssetType(assetPath);
 
+        string md5 = bytes != null ? MD5Hash.Get(bytes) : "";
+     
         AssetPath asset = AssetPath.Get(name);
         if (asset == null)
         {
@@ -366,16 +343,15 @@ public static class AssetTool
         }
         if(asset!= null)
         {
-            asset.path = path;
+            asset.path = assetPath;
         }
 
         if (asset == null && bytes != null)
         {
             asset = new AssetPath();
             asset.name = name;
-            asset.path = path;
+            asset.path = assetPath;
             asset.md5 = md5;
-            asset.type = type;
             asset.size = bytes.Length;
         }
 
@@ -390,13 +366,13 @@ public static class AssetTool
         var it = s_AssetDirs.GetEnumerator();
         while (it.MoveNext())
         {
-            UpdateAsset(string.Format("{0}/{1}",Application.dataPath.Replace("Assets",""),it.Current.Key), it.Current.Value);
+            UpdateAsset(string.Format("{0}/{1}",Application.dataPath.Replace("Assets",""),it.Current));
         }
         
         SaveAsset();
     }
 
-    static void UpdateAsset(string dir,AssetType type)
+    static void UpdateAsset(string dir)
     {
         DirectoryInfo dirInfo = new DirectoryInfo(dir);
         if (dirInfo.Exists == false)
@@ -418,21 +394,16 @@ public static class AssetTool
 
             string name = files[i].Name;
             string path = name;
-            if (type == AssetType.Resource)
-            {
-                path = fullPath.Substring(fullPath.IndexOf("assets/resources/") + "assets/resources/".Length).ToLower(); ;
-            }
-            else
-            {
-                if (fullPath.Contains("assets/"))
-                {
-                    path = fullPath.Substring(fullPath.IndexOf("assets/")).ToLower();
-                }
-            }
+            string md5 = MD5Hash.Get(File.ReadAllBytes(fullPath));
 
-
+            if (fullPath.Contains("assets/"))
+            {
+                path = fullPath.Substring(fullPath.IndexOf("assets/")).ToLower();
+            }
+            
             AssetPath asset = AssetPath.Get(name);
             if (asset == null) asset = AssetPath.Get(path);
+            if (asset == null) asset = AssetPath.Get(md5);
             if (asset == null)
             {
                 asset = new AssetPath();
@@ -442,9 +413,8 @@ public static class AssetTool
 
             asset.size = files[i].Length;
 
-            asset.md5 = MD5Hash.Get(File.ReadAllBytes(fullPath));
+            asset.md5 = md5;
 
-            asset.type = type;
             AssetPath.AddAsset(asset);
 
         }
@@ -459,6 +429,7 @@ public static class AssetTool
         writerXml.Write(AssetPath.ToXml());
         writerXml.Close();
         writerXml.Dispose();
+        Debug.Log("保存成功:" + assetXmlFile);
     }
 
     static void AssetChange()
@@ -466,10 +437,15 @@ public static class AssetTool
         
     }
 
-    [MenuItem("Tools/Asset/Clear AssetBundleName")]
+    [MenuItem("Tools/Asset/Clear All AssetBundleName")]
     static void ClearAssetBundleName()
     {
-        string[] files = Directory.GetFiles(Application.dataPath + "/", "*.*", SearchOption.AllDirectories);
+        ClearAssetBundleName(Application.dataPath);
+    }
+
+    static void ClearAssetBundleName(string dic)
+    {
+        string[] files = Directory.GetFiles(dic, "*.*", SearchOption.AllDirectories);
 
         for (int i = 0; i < files.Length; i++)
         {
@@ -484,7 +460,7 @@ public static class AssetTool
 
             path = path.Replace("\\", "/").Replace(Application.dataPath + "/", "");
             path = "Assets/" + path;
-            Debug.Log(path);
+
             AssetImporter importer = AssetImporter.GetAtPath(path);
 
             if (importer == null) continue;
@@ -497,18 +473,21 @@ public static class AssetTool
         AssetDatabase.SaveAssets();
     }
 
-    [MenuItem("Tools/Asset/Build AssetBundle")]
+    [MenuItem("Tools/Asset/Build")]
     static void Build()
     {
-        ClearAssetBundleName();
-        EditorUtility.DisplayProgressBar("Set AssetbundleName", "Setting AssetBundleName", 0f);
-
+        foreach(var dir in s_AssetDirs)
+        {
+            ClearAssetBundleName(Application.dataPath.Replace("Assets","")+ dir);
+        }
+        
         List<string> scenes = new List<string>();
         var it = AssetPath.assets.GetEnumerator();
         int count = 0;
         while (it.MoveNext())
         {
-            if (it.Current.Value.type == AssetType.StreamingAsset)
+            //Resources目录不打Bundle
+            if (it.Current.Value.path.Contains("resources/") == false)
             {
                 if (it.Current.Value.path.EndsWith(".unity"))
                 {
@@ -527,7 +506,7 @@ public static class AssetTool
                 }
             }
 
-            EditorUtility.DisplayProgressBar("Set AssetbundleName", "Setting AssetBundleName", count * 1f/ AssetPath.assets.Count);
+            EditorUtility.DisplayProgressBar("Set AssetbundleName", "Setting:"+ it.Current.Value.path, count * 1f/ AssetPath.assets.Count);
             count++;
         }
         EditorUtility.ClearProgressBar();
@@ -561,7 +540,7 @@ public static class AssetTool
         //打包资源
         BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
 
-        EditorUtility.DisplayProgressBar("BuildScene", "BuildSceneAssetBundle", 0f);
+       
         for (int i = 0; i < scenes.Count; i++)
         {
             string path = outputPath + scenes[i].ToLower();
@@ -574,12 +553,12 @@ public static class AssetTool
             string[] scene = { scenes[i] };
             BuildPipeline.BuildPlayer(scene, path, EditorUserBuildSettings.activeBuildTarget, BuildOptions.BuildAdditionalStreamedScenes);
 
-            EditorUtility.DisplayProgressBar("BuildScene", "BuildSceneAssetBundle", i * 1.0f / scenes.Count);
+            EditorUtility.DisplayProgressBar("BuildScene", "Building Scene:"+ scenes[i], i * 1.0f / scenes.Count);
         }
 
         EditorUtility.ClearProgressBar();
 
-        UpdateAsset(outputPath,AssetType.StreamingAsset);
+        UpdateAsset(outputPath);
         
         RemoveSameAsset();
 
@@ -613,12 +592,12 @@ public static class AssetTool
         }
     }
 
-    [MenuItem("Tools/Asset/Editor Mode")]
+    [MenuItem("Tools/Asset/Mode/Editor")]
     static void SetEditorMode()
     {
         PlayerPrefs.SetInt("assetMode", (int)AssetMode.Editor);
     }
-    [MenuItem("Tools/Asset/AssetBundle Mode")]
+    [MenuItem("Tools/Asset/Mode/AssetBundle")]
     static void SetAssetBundleMode()
     {
         PlayerPrefs.SetInt("assetMode", (int)AssetMode.AssetBundle);

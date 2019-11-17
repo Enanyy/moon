@@ -1,8 +1,7 @@
 fileFormatVersion: 2
 guid: 192c38433509b9e49bc4e942a3ebe6f7
-NativeFormatImporter:
+PrefabImporter:
   externalObjects: {}
-  mainObjectFileID: 100100000
   userData: 
-  assetBundleName: assets/r/spell_fx/fx_nvjiangjun_attack_03.prefab
+  assetBundleName: spell_fx
   assetBundleVariant: 

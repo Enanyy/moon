@@ -1,8 +1,7 @@
 fileFormatVersion: 2
 guid: be6d8179d729b4d4cb061372b9057bc0
-NativeFormatImporter:
+PrefabImporter:
   externalObjects: {}
-  mainObjectFileID: 100100000
   userData: 
-  assetBundleName: assets/r/model/yingxiong_kulouqishi.prefab
+  assetBundleName: model
   assetBundleVariant: 

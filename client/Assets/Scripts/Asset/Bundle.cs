@@ -7,7 +7,6 @@ public class Bundle
 {
     public string bundleName { get; private set; }
     public AssetBundle bundle { get; private set; }
-    public AssetType assetType { get; private set; }
     public string[] dependenceNames { get; private set; }
 
     /// <summary>
@@ -31,14 +30,13 @@ public class Bundle
     }
     public bool isLoading { get { return mAsyncOperation != null && mAsyncOperation.isDone == false; } }
 
-    public Bundle(string bundleName,string[] dependenceNames,AssetType assetType)
+    public Bundle(string bundleName,string[] dependenceNames)
     {
         dependences = new Dictionary<string, Bundle>();
         references = new Dictionary<string, List<IAsset>>();
 
         this.bundleName = bundleName;
         this.dependenceNames = dependenceNames;
-        this.assetType = assetType;
     }
     public IEnumerator LoadBundleAsync()
     {
@@ -56,7 +54,7 @@ public class Bundle
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    Bundle bundleObject = AssetManager.Instance.CreateBundle(dependenceName,assetType);
+                    Bundle bundleObject = AssetManager.Instance.CreateBundle(dependenceName);
 
                     dependences[dependenceName] = bundleObject;
 
@@ -70,7 +68,7 @@ public class Bundle
 
         if (mAsyncOperation == null)
         {
-            string path = AssetManager.Instance.GetPath(bundleName);
+            string path = AssetPath.GetPath(bundleName);
 
             mAsyncOperation = AssetBundle.LoadFromFileAsync(path);
         }
@@ -88,14 +86,17 @@ public class Bundle
             Debug.LogError("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
         }
     }
-    
+
     public IEnumerator LoadAsset<T>(LoadTask<Asset<T>> task) where T : UnityEngine.Object
     {
         Asset<T> assetObject = null;
         Object asset = null;
+        
+        const string resources = "resources/";
 
         string assetName = task.assetName;
-        if (mCacheAssetDic.ContainsKey(assetName) )
+        
+        if (mCacheAssetDic.ContainsKey(assetName))
         {
             var list = mCacheAssetDic[assetName];
             if (list.Count > 0)
@@ -105,37 +106,39 @@ public class Bundle
                     assetObject = list[i] as Asset<T>;
                     if (assetObject != null)
                     {
-                        list.RemoveAt(i);break;
+                        list.RemoveAt(i); break;
                     }
-                }    
+                }
             }
         }
 
         if (assetObject != null)
         {
-            task.OnComplete(assetObject);             
+            task.OnComplete(assetObject);
         }
         else
         {
-            if (task.type != AssetType.Resource)
-            {
-#if UNITY_EDITOR
-                if (AssetManager.Instance.assetMode == AssetMode.Editor)
-                {
-                    mAssetDic.TryGetValue(assetName, out asset);
 
-                    if (asset == null)
+#if UNITY_EDITOR
+            if (AssetManager.Instance.assetMode == AssetMode.Editor)
+            {
+                mAssetDic.TryGetValue(assetName, out asset);
+
+                if (asset == null)
+                {
+                    asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetName);
+                    if (asset)
                     {
-                        asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetName);
-                        if (asset)
-                        {
-                            mAssetDic.Add(assetName, asset);
-                        }
+                        mAssetDic.Add(assetName, asset);
                     }
                 }
-                else
-                {
+            }
+            else
+            {
 #endif
+                //不是Resources资源
+                if (assetName.Contains(resources) == false)
+                {
                     if (bundle == null)
                     {
                         if (mAsyncOperation == null)
@@ -155,39 +158,48 @@ public class Bundle
                             var request = bundle.LoadAssetAsync(assetName);
 
                             yield return request;
-                            if (request.asset!=null && mAssetDic.ContainsKey(assetName) == false)
+                            if (request.asset != null && mAssetDic.ContainsKey(assetName) == false)
                             {
                                 asset = request.asset;
                                 mAssetDic.Add(assetName, asset);
                             }
                         }
                     }
-#if UNITY_EDITOR
                 }
+#if UNITY_EDITOR
+            }
 #endif
 
-            }
-            else
+
+            if (mAssetDic.ContainsKey(assetName) == false)
             {
-                if (mAssetDic.ContainsKey(assetName) == false)
+                if (mAsyncOperation == null)
                 {
-                    if (mAsyncOperation == null)
+                    string path = assetName;
+                    if (path.Contains(resources))
                     {
-                        mAsyncOperation = Resources.LoadAsync(assetName);
+                        path = path.Substring(path.LastIndexOf(resources) + resources.Length);
+                    }
+                    if(path.Contains("."))
+                    {
+                        path = path.Substring(0, path.LastIndexOf('.'));
                     }
 
-                    yield return mAsyncOperation;
+                    mAsyncOperation = Resources.LoadAsync(path);
+                }
 
-                    var request = mAsyncOperation as ResourceRequest;
+                yield return mAsyncOperation;
 
-                    if (request.asset != null && mAssetDic.ContainsKey(assetName) == false)
-                    {
-                        asset = request.asset;
+                var request = mAsyncOperation as ResourceRequest;
 
-                        mAssetDic.Add(assetName, asset);
-                    }
+                if (request.asset != null && mAssetDic.ContainsKey(assetName) == false)
+                {
+                    asset = request.asset;
+
+                    mAssetDic.Add(assetName, asset);
                 }
             }
+
 
             if (asset == null)
             {
@@ -378,7 +390,7 @@ public class Bundle
             }
             dependences.Clear();
 
-            if (assetType == AssetType.Resource)
+            if (bundleName.Contains("resources"))
             {
                 var asset = mAssetDic.GetEnumerator();
                 while (asset.MoveNext())
