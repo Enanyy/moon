@@ -320,7 +320,7 @@ public class {filename} : IDataTable
             }
             
             definition += string.Format("\tpublic {0} {1};\n", columnType, columnName);
-            read += string.Format("\t\t\to.{0} = table.GetByColumnName(\"{1}\",{2});\n", columnName, columnName, (columnType == "string" ? "\"\"" : "0"));
+            read += string.Format("\t\t\to.{0} = table.GetByColumnName(\"{1}\", {2});\n", columnName, columnName, GetDefaultValue(columnType));
 
         }
 
@@ -363,10 +363,24 @@ public class {filename} : IDataTable
             case "BIGINT":return "long";
             case "DECIMAL": return "float";
             case "DOUBLE":return "double";
+            case "BLOB":return "byte[]";
 
             default: return "string";
 
         }
+    }
+    static string GetDefaultValue(string type)
+    {
+        switch(type)
+        {
+            case "int":return "0";
+            case "float":return "0f";
+            case "double":return "0f";
+            case "long":return "0L";
+            case "string":return "\"\"";
+            case "byte[]":return "NULL";
+        }
+        return "0";
     }
     
 }

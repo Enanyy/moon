@@ -255,12 +255,12 @@ public class SQLiteTable : IDisposable
 		}
 	}
 	/// <summary>
-	/// 通过列名查找对应的值，返回整型.
+	/// 通过列名查找对应的值，返回Long.
 	/// </summary>
 	/// <returns>The by column name.</returns>
 	/// <param name="varColumnName">Variable column name.</param>
 	/// <param name="varDefaultValue">Variable default value.</param>
-	public long GetByColumnNameLong(string varColumnName, long varDefaultValue)
+	public long GetByColumnName(string varColumnName, long varDefaultValue)
 	{
 		try
 		{
@@ -278,12 +278,36 @@ public class SQLiteTable : IDisposable
 			return varDefaultValue;
 		}
 	}
+    /// <summary>
+    /// 通过列名查找对应的值，返回byte[].
+    /// </summary>
+    /// <returns>The by column name.</returns>
+    /// <param name="varColumnName">Variable column name.</param>
+    /// <param name="varDefaultValue">Variable default value.</param>
+    public byte[] GetByColumnName(string varColumnName, byte[] varDefaultValue)
+    {
+        try
+        {
+            int tempFileldIndex = mLiteQuery.GetFieldIndex(varColumnName);
+            if (tempFileldIndex < 0)
+            {
+                return null;
+            }
 
-	/// <summary>
-	/// go to next row .if this row is end return false 
-	/// </summary>
-	/// <returns></returns>
-	public bool Read()
+            return mLiteQuery.GetBlob(tempFileldIndex);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogException(e);
+            return varDefaultValue;
+        }
+    }
+
+    /// <summary>
+    /// go to next row .if this row is end return false 
+    /// </summary>
+    /// <returns></returns>
+    public bool Read()
 	{
 		if (mLiteQuery == null)
 		{

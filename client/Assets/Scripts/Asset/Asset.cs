@@ -13,6 +13,10 @@ public interface IAsset
     void Destroy(bool removeReference = true);
 
 }
+/// <summary>
+/// 当非实例化资源（非GameObject，如Material，Texture，TextAsset等）使用完毕后,需要主动调用Destroy去释放资源
+/// </summary>
+/// <typeparam name="T">资源类型</typeparam>
 public class Asset<T>: IAsset where T:Object
 {
     public Bundle bundle { get; private set; }
@@ -37,6 +41,10 @@ public class Asset<T>: IAsset where T:Object
             bundle.AddReference(this);
         }
     }
+    /// <summary>
+    /// 主动释放资源
+    /// </summary>
+    /// <param name="removeReference">是否移除引用</param>
     public virtual void Destroy(bool removeReference = true)
     { 
         if (typeof(T) == typeof(GameObject))

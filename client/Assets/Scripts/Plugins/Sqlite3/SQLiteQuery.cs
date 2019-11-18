@@ -227,7 +227,22 @@ public class SQLiteQuery {
 		return string.Empty;
 
 	}
+    public long GetLongeger(string field)
+    {
+        int i = GetFieldIndex(field);
+        if (i < 0 || i >= Names.Length)
+        {
+            throw new Exception("SQLite wrong field type (expecting Longeger) : " + i);
+        }
 
+        if (Sqlite3.SQLITE_INTEGER == columnTypes[i])
+        {
+            return Sqlite3.sqlite3_column_int64(vm, i);
+        }
+
+
+        throw new Exception("SQLite wrong field type (expecting Longeger) : " + i);
+    }
 
     public long GetLongeger(int index)
     {
@@ -318,28 +333,36 @@ public class SQLiteQuery {
 	}
 
 
+    public byte[] GetBlob(string field)
+    {
+        int i = GetFieldIndex(field);
+        if (i < 0)
+        {
+            return null;
+        }
+        if (Sqlite3.SQLITE_BLOB == columnTypes[i])
+        {
+            return Sqlite3.sqlite3_column_blob(vm, i);
+        }
+
+        return null;
+
+        //	throw new Exception( "SQLite wrong field type (expecting byte[]) : " + field);
+    }
+    public byte[] GetBlob(int fieldindex)
+    {
+
+        if (fieldindex < 0 || fieldindex >= Names.Length)
+        {
+            throw new Exception("SQLite wrong field type (expecting FLOAT) : " + fieldindex);
+        }
+        if (Sqlite3.SQLITE_BLOB == columnTypes [fieldindex])
+        {
+            return Sqlite3.sqlite3_column_blob(vm, fieldindex);
+        }
+        return null;
+        //		throw new Exception( "SQLite wrong field type (expecting FLOAT) : " + fieldindex);
+    }
 
 
-
-
-
-
-	public byte[] GetBlob( string field )
-	{
-		int i = GetFieldIndex( field );
-		if (i < 0) {
-			return null;
-				}
-		if( Sqlite3.SQLITE_BLOB == columnTypes[i])
-		{
-			return Sqlite3.sqlite3_column_blob( vm, i );
-		}
-
-		return null;
-		
-	//	throw new Exception( "SQLite wrong field type (expecting byte[]) : " + field);
-	}
-
-	
-	
 }

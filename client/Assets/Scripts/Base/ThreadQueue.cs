@@ -28,11 +28,22 @@ public  class ThreadQueue :MonoBehaviour  {
 	List<ThreadBase> threads = new List<ThreadBase>();
     public static int maxThreads = 8;
     static int numThreads;
+    /// <summary>
+    /// 启动线程执行
+    /// </summary>
+    /// <param name="func">子线程执行</param>
+    /// <param name="callback">住线程执行</param>
+    /// <param name="delay">延迟</param>
     public static void RunAsync<T>(Func<T> func, Action<T> callback = null,float delay = 0)
     {
         AddThread(new ThreadFunc<T>(func,callback,delay));
 	}
-
+    /// <summary>
+    /// 启动线程执行
+    /// </summary>
+    /// <param name="func">子线程执行</param>
+    /// <param name="callback">住线程执行</param>
+    /// <param name="delay">延迟</param>
     public static void RunAsync(Action func, Action callback= null, float delay = 0)
     {
         AddThread(new ThreadAction(func, callback, delay));

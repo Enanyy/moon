@@ -32,18 +32,22 @@ public class Chess : MonoBehaviour
         {
             if (asset != null)
             {
-                DataTableManager.Instance.Init(asset.assetObject.bytes);
+                byte[] bytes = asset.assetObject.bytes;
+   
+                //启动线程加载
+                ThreadQueue.RunAsync(() => DataTableManager.Instance.Init(bytes), 
+                    () => {
+                    if (grid == BattleGrid.Rect)
+                    {
+                        BattleRectGrid.Instance.Init(transform, lines, columns, tileWidth, tileHeight);
+                    }
+                    else
+                    {
+                        BattleHexGrid.Instance.Init(transform, shape, lines, columns, Mathf.Max(tileWidth, tileHeight), orientation);
+                    }
 
-                if (grid == BattleGrid.Rect)
-                {
-                    BattleRectGrid.Instance.Init(transform, lines, columns, tileWidth, tileHeight);
-                }
-                else
-                {
-                    BattleHexGrid.Instance.Init(transform, shape, lines, columns, Mathf.Max(tileWidth, tileHeight), orientation);
-                }
-
-                asset.Destroy();
+                    asset.Destroy();
+                });
             }
         });
         

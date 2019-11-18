@@ -4,8 +4,7 @@
 /// </summary>
 public class TBLanguage
 {
-//TABLE_DEFINITION_BEGIN
-	public string key;
+//TABLE_DEFINITION_BEGIN	public string key;
 	public string ch;
 	public string en;
 //TABLE_DEFINITION_END
@@ -39,11 +38,10 @@ public class DTLanguage : IDataTable
         list.Clear();
         while (table.Read())
         {
-//TABLE_READ_BEGIN
-           	TBLanguage o = new TBLanguage();
-			o.key = table.GetByColumnName("key","");
-			o.ch = table.GetByColumnName("ch","");
-			o.en = table.GetByColumnName("en","");
+//TABLE_READ_BEGIN			TBLanguage o = new TBLanguage();
+			o.key = table.GetByColumnName("key", "");
+			o.ch = table.GetByColumnName("ch", "");
+			o.en = table.GetByColumnName("en", "");
 			dic.Add(o.key,o);
 			list.Add(o);
 //TABLE_READ_END

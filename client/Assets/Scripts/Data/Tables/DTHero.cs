@@ -50,19 +50,19 @@ public class DTHero : IDataTable
         while (table.Read())
         {
 //TABLE_READ_BEGIN			TBHero o = new TBHero();
-			o.id = table.GetByColumnName("id",0);
-			o.name = table.GetByColumnName("name","");
-			o.type = table.GetByColumnName("type",0);
-			o.config = table.GetByColumnName("config","");
-			o.hp = table.GetByColumnName("hp",0);
-			o.attack = table.GetByColumnName("attack",0);
-			o.defense = table.GetByColumnName("defense",0);
-			o.movedistance = table.GetByColumnName("movedistance",0);
-			o.movedirection = table.GetByColumnName("movedirection",0);
-			o.attackdistance = table.GetByColumnName("attackdistance",0);
-			o.searchdistance = table.GetByColumnName("searchdistance",0);
-			o.radius = table.GetByColumnName("radius",0);
-			o.height = table.GetByColumnName("height",0);
+			o.id = table.GetByColumnName("id", 0);
+			o.name = table.GetByColumnName("name", "");
+			o.type = table.GetByColumnName("type", 0);
+			o.config = table.GetByColumnName("config", "");
+			o.hp = table.GetByColumnName("hp", 0);
+			o.attack = table.GetByColumnName("attack", 0);
+			o.defense = table.GetByColumnName("defense", 0);
+			o.movedistance = table.GetByColumnName("movedistance", 0);
+			o.movedirection = table.GetByColumnName("movedirection", 0);
+			o.attackdistance = table.GetByColumnName("attackdistance", 0);
+			o.searchdistance = table.GetByColumnName("searchdistance", 0);
+			o.radius = table.GetByColumnName("radius", 0f);
+			o.height = table.GetByColumnName("height", 0f);
 			dic.Add(o.id,o);
 			list.Add(o);
 //TABLE_READ_END

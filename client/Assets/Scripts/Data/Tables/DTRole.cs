@@ -4,8 +4,7 @@
 /// </summary>
 public class TBRole
 {
-//TABLE_DEFINITION_BEGIN
-	public int id;
+//TABLE_DEFINITION_BEGIN	public int id;
 	public string name;
 	public int type;
 	public float height;
@@ -44,16 +43,15 @@ public class DTRole : IDataTable
         list.Clear();
         while (table.Read())
         {
-//TABLE_READ_BEGIN
-           	TBRole o = new TBRole();
-			o.id = table.GetByColumnName("id",0);
-			o.name = table.GetByColumnName("name","");
-			o.type = table.GetByColumnName("type",0);
-			o.height = table.GetByColumnName("height",0);
-			o.desc = table.GetByColumnName("desc","");
-			o.weigth = table.GetByColumnName("weigth",0);
-			o.config = table.GetByColumnName("config",0);
-			o.y = table.GetByColumnName("y",0);
+//TABLE_READ_BEGIN			TBRole o = new TBRole();
+			o.id = table.GetByColumnName("id", 0);
+			o.name = table.GetByColumnName("name", "");
+			o.type = table.GetByColumnName("type", 0);
+			o.height = table.GetByColumnName("height", 0f);
+			o.desc = table.GetByColumnName("desc", "");
+			o.weigth = table.GetByColumnName("weigth", 0f);
+			o.config = table.GetByColumnName("config", 0);
+			o.y = table.GetByColumnName("y", 0);
 			dic.Add(o.id,o);
 			list.Add(o);
 //TABLE_READ_END
