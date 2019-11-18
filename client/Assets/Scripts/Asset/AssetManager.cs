@@ -62,7 +62,7 @@ public class LoadTask<T>
             {
                 return path.isRecource;
             }
-            return false;
+            return string.IsNullOrEmpty(key)? false: key.Contains("resources/");
         } 
     }
     public LoadTask(string key, Action<T> callback)
