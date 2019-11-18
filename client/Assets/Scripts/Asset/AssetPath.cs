@@ -138,17 +138,20 @@ public class AssetPath
         else
 #endif
         {
-#if UNITY_ANDROID
-            return string.Format("{0}/r/", path);
-#elif UNITY_IOS
-            return string.Format("{0}/r/", path);
-#elif UNITY_EDITOR_OSX
+#if UNITY_EDITOR
+    #if UNITY_EDITOR_WIN
+            return string.Format("{0}/../r/{1}/", Application.dataPath, UnityEditor.EditorUserBuildSettings.activeBuildTarget);
+    #elif UNITY_EDITOR_OSX
             return string.Format("file://{0}/../r/{1}/", Application.dataPath,UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#elif UNITY_STANDALONE_OSX
-            return string.Format("file://{0}/../r/StandaloneOSX/", Application.dataPath);
-#elif UNITY_EDITOR_WIN
-            return string.Format("{0}/../r/{1}/", Application.dataPath,UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-#elif UNITY_STANDALONE_WIN
+    #else
+            return path;
+    #endif
+#else
+    #if UNITY_ANDROID
+            return string.Format("{0}/r/", path);
+    #elif UNITY_IOS
+            return string.Format("{0}/r/", path);
+    #elif UNITY_STANDALONE_WIN
             if (IntPtr.Size == 8) //64 bit
             {
                 return string.Format("{0}/../r/StandaloneWindows64/", Application.dataPath);
@@ -157,8 +160,11 @@ public class AssetPath
             {
                 return string.Format("{0}/../r/StandaloneWindows/", Application.dataPath);
             }
-#else
+    #elif UNITY_STANDALONE_OSX
+            return string.Format("file://{0}/../r/StandaloneOSX/", Application.dataPath);
+    #else
             return path;
+    #endif
 #endif
         }
     }

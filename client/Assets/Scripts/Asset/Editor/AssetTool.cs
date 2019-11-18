@@ -7,12 +7,6 @@ using Object = UnityEngine.Object;
 
 public static class AssetTool
 {
-
-    /// <summary>
-    /// 打包AssetBundle生成目录
-    /// </summary>
-    public static string outputPath { get { return string.Format("{0}/../r/{1}/", Application.dataPath, UnityEditor.EditorUserBuildSettings.activeBuildTarget); } }
-
     [InitializeOnLoadMethod]
     private static void InitEditor()
     {
@@ -523,7 +517,8 @@ public static class AssetTool
         AssetDatabase.Refresh();
         AssetDatabase.SaveAssets();
 
-       
+        string outputPath = AssetPath.streamingAssetsPath;
+
         if (Directory.Exists(outputPath))
         {
             DirectoryInfo dirInfo = new DirectoryInfo(outputPath);
