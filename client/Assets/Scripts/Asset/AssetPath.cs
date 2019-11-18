@@ -196,6 +196,13 @@ public class AssetPath
             return mPersistentDataPath;
         }
     }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// 打包AssetBundle生成目录
+    /// </summary>
+    public static string buildPath { get { return string.Format("{0}/../r/{1}/", Application.dataPath, UnityEditor.EditorUserBuildSettings.activeBuildTarget); } }
+#endif
     public static void FromXml(string xml)
     {
         try
