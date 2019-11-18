@@ -197,23 +197,28 @@ public static class AssetTool
             {
                 check = GUILayout.Toggle(select, "Group", GUILayout.ExpandWidth(false));
             }
-            if (check == false)
+            if (check == false && select)
             {
                 SetAssetsGroup(editor.targets, "");
+                SaveAsset();
             }
             else
             {
-                if (select == false)
+                if (check)
                 {
-                    string dir = Path.GetDirectoryName(asset.path);
-                    asset.group = dir.Substring(dir.LastIndexOf("\\") + 1);
-                }
+                    if (select == false)
+                    {
+                        string dir = Path.GetDirectoryName(asset.path);
+                        asset.group = dir.Substring(dir.LastIndexOf("\\") + 1);
+                    }
 
-                var group = EditorGUILayout.DelayedTextField(asset.group, GUILayout.ExpandWidth(true));
-                if (group != asset.group || select == false)
-                {
-                    SetAssetsGroup(editor.targets, group);
-                    SaveAsset();
+                    var group = EditorGUILayout.DelayedTextField(asset.group, GUILayout.ExpandWidth(true));
+                    if ( select == false ||  group != asset.group)
+                    {
+                        Debug.Log(check + "," + select + "," + asset.group + "," + group);
+                        SetAssetsGroup(editor.targets, group);
+                        SaveAsset();
+                    }
                 }
 
             }
