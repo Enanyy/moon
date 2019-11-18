@@ -213,7 +213,13 @@ public class AssetManager : MonoBehaviour
             mBundleNameList.Clear();
         }
     }
-
+    /// <summary>
+    /// key可以是文件名(带后缀)或者文件路径(Assets/...)
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="key"></param>
+    /// <param name="callback"></param>
+    /// <returns></returns>
     public LoadTask<Asset<T>> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T:Object
     {
         LoadTask<Asset<T> > task = new LoadTask<Asset<T>>(key,callback);

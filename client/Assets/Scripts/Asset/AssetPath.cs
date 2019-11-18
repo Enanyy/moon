@@ -94,7 +94,7 @@ public class AssetPath
         {
             assets[asset.name]= asset;
         }
-#if UNITY_EDITOR
+
         if (assets.ContainsKey(asset.path) == false)
         {
             assets.Add(asset.path, asset);
@@ -103,6 +103,7 @@ public class AssetPath
         {
             assets[asset.path] = asset;
         }
+#if UNITY_EDITOR
         if (assets.ContainsKey(asset.md5) == false)
         {
             assets.Add(asset.md5, asset);
@@ -121,8 +122,8 @@ public class AssetPath
             return;
         }
         assets.Remove(asset.name);
-#if UNITY_EDITOR
         assets.Remove(asset.path);
+#if UNITY_EDITOR
         assets.Remove(asset.md5);
 #endif
     }
