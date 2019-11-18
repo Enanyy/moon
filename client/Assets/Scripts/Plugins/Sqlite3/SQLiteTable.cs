@@ -119,11 +119,42 @@ public class SQLiteTable : IDisposable
 			return varDefaultValue;
 		}
 	}
+    public long GetByIndex(int varIndex, long varDefaultValue)
+    {
+        if (mLiteQuery == null || varIndex >= columnCount || varIndex < 0)
+        {
+            return varDefaultValue;
+        }
 
-	// 读取浮点型数据;
-	public float GetByIndex(int varIndex, float varDefaultValue)
+        if (mLiteQuery.GetFieldType(varIndex) != Sqlite3.SQLITE_INTEGER)
+        {
+            return varDefaultValue;
+        }
+
+        try
+        {
+            return mLiteQuery.GetLongeger(varIndex);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogException(e);
+            return varDefaultValue;
+        }
+    }
+
+
+    // 读取浮点型数据;
+    public float GetByIndex(int varIndex, float varDefaultValue)
 	{
-		try
+        if (mLiteQuery == null || varIndex >= columnCount || varIndex < 0)
+        {
+            return varDefaultValue;
+        }
+        if (mLiteQuery.GetFieldType(varIndex) != Sqlite3.SQLITE_FLOAT)
+        {
+            return varDefaultValue;
+        }
+        try
 		{
 			return mLiteQuery.GetFloat(varIndex);
 		}
@@ -134,12 +165,34 @@ public class SQLiteTable : IDisposable
 		}
 	}
 
-	/// <summary>
-	/// 通过索引查找列名.
-	/// </summary>
-	/// <returns>The column name by index.</returns>
-	/// <param name="varIndex">Variable index.</param>
-	public string GetColumnNameByIndex(int varIndex)
+
+    public byte[] GetByIndex(int varIndex, byte[] varDefaultValue)
+    {
+        if (mLiteQuery == null || varIndex >= columnCount || varIndex < 0)
+        {
+            return varDefaultValue;
+        }
+        if (mLiteQuery.GetFieldType(varIndex) != Sqlite3.SQLITE_BLOB)
+        {
+            return varDefaultValue;
+        }
+        try
+        {
+            return mLiteQuery.GetBlob(varIndex);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogException(e);
+            return varDefaultValue;
+        }
+    }
+
+    /// <summary>
+    /// 通过索引查找列名.
+    /// </summary>
+    /// <returns>The column name by index.</returns>
+    /// <param name="varIndex">Variable index.</param>
+    public string GetColumnNameByIndex(int varIndex)
 	{
 		if (mLiteQuery == null || varIndex < 0 || varIndex >= columnCount || mLiteQuery.Names == null)
 		{
