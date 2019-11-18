@@ -478,7 +478,7 @@ public static class AssetTool
         AssetDatabase.SaveAssets();
     }
 
-    [MenuItem("Tools/Asset/Build")]
+    [MenuItem("Tools/Asset/Build(只会Build勾选的资源)")]
     static void Build()
     {
         foreach(var dir in s_AssetDirs)

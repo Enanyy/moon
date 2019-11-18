@@ -378,7 +378,7 @@ public class {filename} : IDataTable
             case "double":return "0f";
             case "long":return "0L";
             case "string":return "\"\"";
-            case "byte[]":return "NULL";
+            case "byte[]":return "null";
         }
         return "0";
     }
