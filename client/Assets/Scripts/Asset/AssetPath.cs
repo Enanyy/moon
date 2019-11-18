@@ -130,15 +130,14 @@ public class AssetPath
 
     private static string FormatRootPath(string path)
     {
+
 #if UNITY_EDITOR
         if (mode == AssetMode.Editor)
         {
-            return  Application.dataPath + "/";
+            return Application.dataPath + "/";
         }
         else
-#endif
         {
-#if UNITY_EDITOR
     #if UNITY_EDITOR_WIN
             return string.Format("{0}/../r/{1}/", Application.dataPath, UnityEditor.EditorUserBuildSettings.activeBuildTarget);
     #elif UNITY_EDITOR_OSX
@@ -146,27 +145,28 @@ public class AssetPath
     #else
             return path;
     #endif
+        }
 #else
     #if UNITY_ANDROID
-            return string.Format("{0}/r/", path);
+        return string.Format("{0}/r/", path);
     #elif UNITY_IOS
-            return string.Format("{0}/r/", path);
+        return string.Format("{0}/r/", path);
     #elif UNITY_STANDALONE_WIN
-            if (IntPtr.Size == 8) //64 bit
-            {
-                return string.Format("{0}/../r/StandaloneWindows64/", Application.dataPath);
-            }
-            else  //32 bit
-            {
-                return string.Format("{0}/../r/StandaloneWindows/", Application.dataPath);
-            }
+        if (IntPtr.Size == 8) //64 bit
+        {
+            return string.Format("{0}/../r/StandaloneWindows64/", Application.dataPath);
+        }
+        else  //32 bit
+        {
+            return string.Format("{0}/../r/StandaloneWindows/", Application.dataPath);
+        }
     #elif UNITY_STANDALONE_OSX
-            return string.Format("file://{0}/../r/StandaloneOSX/", Application.dataPath);
+        return string.Format("file://{0}/../r/StandaloneOSX/", Application.dataPath);
     #else
-            return path;
+        return path;
     #endif
 #endif
-        }
+
     }
 
     private static string mStreamingAssetsPath;
