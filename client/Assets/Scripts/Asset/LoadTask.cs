@@ -62,9 +62,16 @@ public abstract class LoadTask : ILoadTask
     }
 }
 
-public class SceneLoadTask : LoadTask
+public interface ISceneLoadTask:ILoadTask
 {
-    public LoadSceneMode mode { get; set; }
+    LoadSceneMode mode { get; }
+    string sceneName { get; }
+    void OnCompleted(Scene scene, LoadSceneMode mode);
+}
+
+public class SceneLoadTask : LoadTask, ISceneLoadTask
+{
+    public LoadSceneMode mode { get; private set; }
     public Action<Scene, LoadSceneMode> callback { get; private set; }
 
     public virtual string sceneName { get { return Path.GetFileNameWithoutExtension(assetName); } }

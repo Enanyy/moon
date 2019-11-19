@@ -46,7 +46,7 @@ public class AssetManager : MonoBehaviour
     /// </summary>
     public float unloadInterval = 60;
 
-    private List<SceneLoadTask> mSceneLoadTasks = new List<SceneLoadTask>();
+    private List<ISceneLoadTask> mSceneLoadTasks = new List<ISceneLoadTask>();
 
     public void Initialize()
     {
@@ -185,14 +185,33 @@ public class AssetManager : MonoBehaviour
         StartCoroutine(bundle.LoadAsset(task));
     }
 
+    /// <summary>
+    /// 加载场景
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="mode"></param>
+    /// <param name="callback"></param>
+    /// <returns></returns>
     public SceneLoadTask LoadScene(string key, LoadSceneMode mode, Action<Scene,LoadSceneMode> callback)
     {
         SceneLoadTask task = new SceneLoadTask(key.ToLower(), mode, callback);
-        StartCoroutine(LoadSceneAsync(task));
+        LoadScene(task);
         return task;
     }
+    /// <summary>
+    /// 自定义LoadTask
+    /// </summary>
+    /// <param name="task"></param>
+    public void LoadScene(ISceneLoadTask task)
+    {
+        if(task == null)
+        {
+            return;
+        }
+        StartCoroutine(LoadSceneAsync(task));
+    }
 
-    private IEnumerator LoadSceneAsync(SceneLoadTask task)
+    private IEnumerator LoadSceneAsync(ISceneLoadTask task)
     {
         if(initialized== false)
         {
