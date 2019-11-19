@@ -11,6 +11,7 @@ public class ScreenLogger : MonoBehaviour
         public string message;
         public string stackTrace;
         public LogType type;
+        public string time;
     }
 
     #region Inspector Settings
@@ -70,8 +71,7 @@ public class ScreenLogger : MonoBehaviour
     static readonly GUIContent closeLabel = new GUIContent("Close", "Hide the console.");
 
     readonly Rect titleBarRect = new Rect(0, 0, 10000, 20);
-    Rect windowRect = new Rect(margin, margin, Screen.width - (margin * 2), Screen.height - (margin * 2));
-
+   
     void Awake()
     {
         //Debug.LogError("test 1");
@@ -103,7 +103,7 @@ public class ScreenLogger : MonoBehaviour
     {
         if (visible)
         {
-            windowRect = GUILayout.Window(123456, windowRect, DrawConsoleWindow, windowTitle);
+            GUILayout.Window(123456, new Rect(margin, margin, Screen.width - (margin * 2), Screen.height - (margin * 2)), DrawConsoleWindow, windowTitle);
         }
         else
         {
@@ -158,11 +158,11 @@ public class ScreenLogger : MonoBehaviour
             GUI.skin.label.normal.textColor = logTypeColors[log.type];
             if (showStackTrace)
             {
-                GUILayout.Label(string.Format("[{0}] {1}\n{2}", log.type.ToString(), log.message, log.stackTrace));
+                GUILayout.Label(string.Format("[{0} {1}] {2}\n{3}", log.type.ToString(), log.time, log.message, log.stackTrace));
             }
             else
             {
-                GUILayout.Label(string.Format("[{0}] {1}", log.type.ToString(), log.message));
+                GUILayout.Label(string.Format("[{0} {1}] {2}", log.type.ToString(), log.time, log.message));
             }
             // Ensure GUI colour is reset before drawing other components.
             GUI.skin.label.normal.textColor = color;
@@ -183,15 +183,13 @@ public class ScreenLogger : MonoBehaviour
         {
             logs.Clear();
         }
-        if(GUILayout.Button(stackTraceLabel))
-        {
-            showStackTrace = !showStackTrace;
-        }
+        
         if (GUILayout.Button(closeLabel))
         {
             visible = false;
         }
 
+        showStackTrace = GUILayout.Toggle(showStackTrace, stackTraceLabel, GUILayout.ExpandWidth(false));
         collapse = GUILayout.Toggle(collapse, collapseLabel, GUILayout.ExpandWidth(false));
 
         GUILayout.EndHorizontal();
@@ -210,7 +208,8 @@ public class ScreenLogger : MonoBehaviour
             message = message,
             stackTrace = stackTrace,
             type = type,
-        }); ; ;
+            time = System.DateTime.Now.ToString("HH:mm:ss"),
+        }); ; ; ;
 
         TrimExcessLogs();
     }

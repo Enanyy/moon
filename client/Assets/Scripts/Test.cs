@@ -57,6 +57,11 @@ public class Test : MonoBehaviour {
         BattleManager.Instance.AddEntity(mEntity1);
         mEntity1.active = true;
 
+        for(int i = 0; i < 10; i++)
+        {
+            Debug.LogError("Error!!!!");
+        }
+
     }
 
     
