@@ -1,6 +1,7 @@
 ﻿#define ENABLE_SCREEN_LOG
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
 
 public class ScreenLogger : MonoBehaviour
 {
@@ -94,6 +95,7 @@ public class ScreenLogger : MonoBehaviour
     static readonly GUIContent stackTraceLabel = new GUIContent("Show Stack Trace", " Show stack trace of logs.");
     static readonly GUIContent collapseLabel = new GUIContent("Collapse", "Hide repeated messages.");
     static readonly GUIContent closeLabel = new GUIContent("Close", "Hide the console.");
+    static readonly GUIContent saveLabel = new GUIContent("Save", "Save logs to file.");
 
     readonly Rect titleBarRect = new Rect(0, 0, 10000, 20);
    
@@ -205,6 +207,11 @@ public class ScreenLogger : MonoBehaviour
     {
         GUILayout.BeginHorizontal();
 
+        if(GUILayout.Button(saveLabel))
+        {
+            Save();
+        }
+
         if (GUILayout.Button(clearLabel))
         {
             logs.Clear();
@@ -235,7 +242,7 @@ public class ScreenLogger : MonoBehaviour
             stackTrace = stackTrace,
             type = type,
             time = System.DateTime.Now.ToString("HH:mm:ss"),
-        }); ; ; ;
+        }); 
 
         TrimExcessLogs();
     }
@@ -258,6 +265,25 @@ public class ScreenLogger : MonoBehaviour
         }
 
         logs.RemoveRange(0, amountToRemove);
+    }
+
+    void Save()
+    {
+#if UNITY_EDITOR
+        string file = string.Format("{0}/log/log_{1}.txt", Application.dataPath, System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss"));
+#else
+        string file = string.Format("{0}/log/log_{1}.txt", Application.persistentDataPath, System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss"));
+#endif
+
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < logs.Count; ++i)
+        {
+            var log = logs[i];
+            builder.AppendFormat("[{0} {1}] {2}\n{3}\n\n", log.type.ToString(), log.time, log.message, log.stackTrace);
+        }
+
+        FileEx.SaveFile(file, builder.ToString());
+
     }
 #endif
 }
