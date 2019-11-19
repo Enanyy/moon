@@ -234,8 +234,6 @@ public class AssetManager : MonoBehaviour
         {
             var request = SceneManager.LoadSceneAsync(task.sceneName);
             yield return request;
-
-            yield break;
         }
     }
 
