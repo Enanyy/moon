@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Object = UnityEngine.Object;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using System.IO;
@@ -151,16 +150,29 @@ public class AssetManager : MonoBehaviour
     /// <param name="key"></param>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public AssetLoadTask<Asset<T>> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T:Object
+    public AssetLoadTask<T> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T: UnityEngine.Object
     {
-        AssetLoadTask<Asset<T> > task = new AssetLoadTask<Asset<T>>(key.ToLower(),callback);
-
-        StartCoroutine(LoadAssetAsync(task));
+        AssetLoadTask<T > task = new AssetLoadTask<T>(key.ToLower(),callback);
+        
+        LoadAsset(task);
 
         return task;
     }
+    /// <summary>
+    /// 自定义LoadTask
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="task"></param>
+    public void LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
+    {
+        if(task== null)
+        {
+            return;
+        }
+        StartCoroutine(LoadAssetAsync(task));
+    }
 
-    private IEnumerator LoadAssetAsync<T>(AssetLoadTask<Asset<T>> task) where T : UnityEngine.Object
+    private IEnumerator LoadAssetAsync<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
     {
         if (initialized == false)
         {

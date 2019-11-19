@@ -4,7 +4,13 @@ using System;
 using UnityEngine.SceneManagement;
 using System.IO;
 
-public class LoadTask 
+public interface ILoadTask
+{
+    string bundleName { get; }
+    string assetName { get; }
+    bool isCancel { get; }
+}
+public abstract class LoadTask : ILoadTask
 {
     public string key { get; private set; }
 
@@ -61,13 +67,13 @@ public class SceneLoadTask : LoadTask
     public LoadSceneMode mode { get; set; }
     public Action<Scene, LoadSceneMode> callback { get; private set; }
 
-    public string sceneName { get { return Path.GetFileNameWithoutExtension(assetName); } }
+    public virtual string sceneName { get { return Path.GetFileNameWithoutExtension(assetName); } }
     public SceneLoadTask(string key, LoadSceneMode mode, Action<Scene, LoadSceneMode> callback) : base(key)
     {
         this.mode = mode;
         this.callback = callback;
     }
-    public void OnCompleted(Scene scene, LoadSceneMode mode)
+    public virtual void OnCompleted(Scene scene, LoadSceneMode mode)
     {
         if (callback != null)
         {
@@ -76,14 +82,19 @@ public class SceneLoadTask : LoadTask
     }
 }
 
-public class AssetLoadTask<T> : LoadTask
+public interface IAssetLoadTask<T>: ILoadTask where T: UnityEngine.Object
 {
-    public Action<T> callback { get; private set; }
-    public AssetLoadTask(string key, Action<T> callback) : base(key)
+    void OnCompleted(Asset<T> t);
+}
+
+public class AssetLoadTask<T> : LoadTask, IAssetLoadTask<T> where T : UnityEngine.Object
+{
+    public Action<Asset<T>> callback { get; private set; }
+    public AssetLoadTask(string key, Action<Asset<T>> callback) : base(key)
     {
         this.callback = callback;
     }
-    public void OnCompleted(T t)
+    public virtual void OnCompleted(Asset<T> t)
     {
         if (callback != null)
         {
