@@ -221,7 +221,7 @@ public class AssetManager : MonoBehaviour
     /// <returns></returns>
     public LoadTask<Asset<T>> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T:Object
     {
-        LoadTask<Asset<T> > task = new LoadTask<Asset<T>>(key,callback);
+        LoadTask<Asset<T> > task = new LoadTask<Asset<T>>(key.ToLower(),callback);
 
         StartCoroutine(LoadAssetAsync(task));
 
@@ -243,7 +243,7 @@ public class AssetManager : MonoBehaviour
 
     public void LoadScene(string key, LoadSceneMode mode, Action<Scene> callback)
     {
-        LoadTask<Scene> task = new LoadTask<Scene>(key, callback);
+        LoadTask<Scene> task = new LoadTask<Scene>(key.ToLower(), callback);
         StartCoroutine(LoadSceneAsync(task,mode));
     }
 
