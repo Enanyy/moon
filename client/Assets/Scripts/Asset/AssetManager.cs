@@ -215,6 +215,10 @@ public class AssetManager : MonoBehaviour
             var task = mSceneLoadTasks[i];
             if(task.isCancel)
             {
+                if(task.sceneName == scene.name && mode == LoadSceneMode.Additive)
+                {
+                    UnLoadScene(scene, null);
+                }
                 mSceneLoadTasks.RemoveAt(i);
                 continue;
             }

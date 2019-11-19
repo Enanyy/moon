@@ -14,10 +14,11 @@ public class Test : MonoBehaviour {
     public static Test Instance { get; private set; }
     void Start ()
     {
-        //AssetManager.Instance.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Single, (scene,mode) => {
+        //var task =  AssetManager.Instance.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Additive, (scene,mode) => {
 
 
         //});
+        //task.Cancel();
 
         //return;
 
