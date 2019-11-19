@@ -63,9 +63,11 @@ public class ScreenLogger : MonoBehaviour
     };
 
     const string windowTitle = "Console";
-    const int margin = 20;
+    const int margin = 0;
     static readonly GUIContent clearLabel = new GUIContent("Clear", "Clear the contents of the console.");
+    static readonly GUIContent stackTraceLabel = new GUIContent("Show Stack Trace", " Show stack trace of logs.");
     static readonly GUIContent collapseLabel = new GUIContent("Collapse", "Hide repeated messages.");
+    static readonly GUIContent closeLabel = new GUIContent("Close", "Hide the console.");
 
     readonly Rect titleBarRect = new Rect(0, 0, 10000, 20);
     Rect windowRect = new Rect(margin, margin, Screen.width - (margin * 2), Screen.height - (margin * 2));
@@ -99,15 +101,20 @@ public class ScreenLogger : MonoBehaviour
 
     void OnGUI()
     {
-        //if (!visible) return;
-        if (visible) windowRect = GUILayout.Window(123456, windowRect, DrawConsoleWindow, windowTitle);
-        int w = Screen.width / 5;
-        GUILayout.BeginArea(new Rect(Screen.width / 2 - w / 2, 0, w, Screen.height / 10));
-        GUILayoutOption o1 = GUILayout.Height(40);
-        GUILayoutOption o2 = GUILayout.Width(100);
-        GUILayoutOption[] oo = { o1, o2 };
-        if (GUILayout.Button(visible? "Hide":"Show", oo)) visible = !visible;
-        GUILayout.EndArea();
+        if (visible)
+        {
+            windowRect = GUILayout.Window(123456, windowRect, DrawConsoleWindow, windowTitle);
+        }
+        else
+        {
+            int w = Screen.width / 5;
+            GUILayout.BeginArea(new Rect(Screen.width / 2 - w / 2, 0, w, Screen.height / 10));
+            GUILayoutOption o1 = GUILayout.Height(40);
+            GUILayoutOption o2 = GUILayout.Width(100);
+            GUILayoutOption[] oo = { o1, o2 };
+            if (GUILayout.Button("Show", oo)) visible = true;
+            GUILayout.EndArea();
+        }
     }
 
     /// <summary>
@@ -175,6 +182,14 @@ public class ScreenLogger : MonoBehaviour
         if (GUILayout.Button(clearLabel))
         {
             logs.Clear();
+        }
+        if(GUILayout.Button(stackTraceLabel))
+        {
+            showStackTrace = !showStackTrace;
+        }
+        if (GUILayout.Button(closeLabel))
+        {
+            visible = false;
         }
 
         collapse = GUILayout.Toggle(collapse, collapseLabel, GUILayout.ExpandWidth(false));
