@@ -239,10 +239,10 @@ public class Bundle
                     assetObject = new Asset<T>(assetName, this, asset, asset as T);
                 }
             }
+            mLoadTasks.Remove(task);
 
             task.OnCompleted(assetObject);
 
-            mLoadTasks.Remove(task);
         }
     }
 
