@@ -270,21 +270,22 @@ public class Bundle
             return;
         }
         string name = reference.assetName;
-        if (references.ContainsKey(name))
+        List<IAsset> list;
+        if (references.TryGetValue(name, out list))
         {
-            references[name].Remove(reference);
+            list.Remove(reference);
         }
 
-        if (mCacheAssetDic.ContainsKey(name))
+        if (mCacheAssetDic.TryGetValue(name, out list))
         {
-            mCacheAssetDic[name].Remove(reference);
+            list.Remove(reference);
         }
 
         int referenceCount = 0;
         var it = references.GetEnumerator();
         while(it.MoveNext())
         {
-            var list = it.Current.Value;
+            list = it.Current.Value;
             for(int i = 0;i < list.Count; )
             {
                 if(list[i] == null || list[i].destroyed)
@@ -378,12 +379,13 @@ public class Bundle
             return;
         }
 
-        if (mCacheAssetDic.ContainsKey(assetObject.assetName) == false)
+        List<IAsset> list;
+        if (mCacheAssetDic.TryGetValue(assetObject.assetName, out list) == false)
         {
-            mCacheAssetDic.Add(assetObject.assetName,new List<IAsset>());
+            list = new List<IAsset>();
+            mCacheAssetDic.Add(assetObject.assetName, list);
         }
 
-        var list = mCacheAssetDic[assetObject.assetName];
         if (list.Contains(assetObject) == false)
         {
             list.Add(assetObject);
