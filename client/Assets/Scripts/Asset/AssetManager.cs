@@ -238,10 +238,10 @@ public class AssetManager : MonoBehaviour
 
         Bundle bundle = GetOrCreateBundle(task.bundleName);
 
-        if (bundle.isLoading)
-        {
-            yield return new WaitUntil(() => bundle.isDone);
-        }
+        //if (bundle.isLoading)
+        //{
+        //    yield return new WaitUntil(() => bundle.isDone);
+        //}
         StartCoroutine(bundle.LoadAsset(task));
     }
 
