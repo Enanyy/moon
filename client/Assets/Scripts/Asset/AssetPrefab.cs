@@ -7,23 +7,23 @@ using Object = UnityEngine.Object;
 /// 通用预设管理
 /// </summary>
 
-public enum AssetPrefabID
+public enum PrefabID
 {
     Item = 0,
 }
 [Serializable]
-public class AssetPrefab
+public class Prefab
 {
-    public AssetPrefabID id;
+    public PrefabID id;
     public Object obj;
 
     [HideInInspector]
     public List<Object> caches = new List<Object>();
 }
 
-public class AssetCache : MonoBehaviour
+public class AssetPrefab : MonoBehaviour
 {
-    private static AssetCache mInstance;
+    private static AssetPrefab mInstance;
 
     private static Asset<GameObject> mAsset;
 
@@ -45,7 +45,7 @@ public class AssetCache : MonoBehaviour
             if(asset!= null)
             {
                 mAsset = asset;
-                mInstance = mAsset.assetObject.GetComponent<AssetCache>();
+                mInstance = mAsset.assetObject.GetComponent<AssetPrefab>();
                 DontDestroyOnLoad(mAsset.assetObject);
             }
             mInitializing = false;
@@ -69,9 +69,9 @@ public class AssetCache : MonoBehaviour
     }
 
     [SerializeField]
-    private List<AssetPrefab> Prefabs = new List<AssetPrefab>();
+    private List<Prefab> Prefabs = new List<Prefab>();
 
-    public static AssetPrefab Get(AssetPrefabID id)
+    public static Prefab Get(PrefabID id)
     {
         if(mInstance == null)
         {
@@ -87,13 +87,12 @@ public class AssetCache : MonoBehaviour
         return null;
     }
 
-    public static GameObject Create(AssetPrefabID id, Transform parent)
+    public static GameObject Create(PrefabID id, Transform parent)
     {
-        AssetPrefab prefab = Get(id);
+        Prefab prefab = Get(id);
         if(prefab!= null)
         {
-
-            GameObject go = null;
+            GameObject go;
             if (prefab.caches.Count > 0)
             {
                 go = prefab.caches[0] as GameObject;
@@ -113,13 +112,13 @@ public class AssetCache : MonoBehaviour
         return null;
     }
 
-    public void Return(AssetPrefabID id, GameObject go)
+    public void Return(PrefabID id, GameObject go)
     {
         if(go == null)
         {
             return;
         }
-        AssetPrefab prefab = Get(id);
+        Prefab prefab = Get(id);
         if(prefab!= null)
         {
             go.transform.SetParent(mInstance.transform);
