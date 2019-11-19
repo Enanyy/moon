@@ -160,8 +160,9 @@ public class Bundle
                 }
             }
             else
-            {
 #endif
+            {
+
                 mLoadTasks.Add(task);
 
                 //不是Resources资源
@@ -192,11 +193,7 @@ public class Bundle
                         }
                     }
                 }
-
-#if UNITY_EDITOR
             }
-#endif
-
 
             if (task.isCancel ==false && mAssetDic.ContainsKey(assetName) == false)
             {
