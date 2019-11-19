@@ -517,6 +517,8 @@ public static class AssetTool
         AssetDatabase.Refresh();
         AssetDatabase.SaveAssets();
 
+        SetAssetBundleMode();
+
         string outputPath = AssetPath.streamingAssetsPath;
 
         if (Directory.Exists(outputPath))

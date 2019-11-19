@@ -12,11 +12,6 @@ public class AssetPath
     public string path;
     public long size;
     public string md5;
-
-    /// <summary>
-    /// 是否为Resources资源
-    /// </summary>
-    public bool isRecource { get { return path.Contains("resources/"); } }
    
     public void ToXml(XmlNode parent)
     {
@@ -284,6 +279,20 @@ public class AssetPath
 
     public static string GetFullPath(string path)
     {
+        path = string.Format("{0}{1}", persistentDataPath, path);
+        if (File.Exists(path) == false)
+        {
+            path = string.Format("{0}{1}", streamingAssetsPath, path);
+        }
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            path = Uri.EscapeUriString(path);
+        }
+        return path;
+
+    }
+    public static string GetResourcePath(string path)
+    {
         const string resources = "resources/";
 
         if (path.Contains(resources))
@@ -296,19 +305,7 @@ public class AssetPath
             }
             return path;
         }
-        else
-        {
-            path = string.Format("{0}{1}", persistentDataPath, path);
-            if (File.Exists(path) == false)
-            {
-                path = string.Format("{0}{1}", streamingAssetsPath, path);
-            }
-            if (Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                path = Uri.EscapeUriString(path);
-            }
-            return path;
-        }
+        return path;
     }
     public static string GetAssetFile()
     {

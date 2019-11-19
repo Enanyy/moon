@@ -23,12 +23,39 @@ public class Bundle
     //缓存的场景资源
     private Dictionary<string,List<IAsset>> mCacheAssetDic = new Dictionary<string, List<IAsset>>();
 
+    /// <summary>
+    /// Resource资源名
+    /// </summary>
+    private HashSet<string> mResourceAssets = new HashSet<string>();
+
     private AsyncOperation mAsyncOperation;
     public bool isDone
     {
         get { return mAsyncOperation != null && mAsyncOperation.isDone; }
     }
     public bool isLoading { get { return mAsyncOperation != null && mAsyncOperation.isDone == false; } }
+
+
+    private int mAssetCount = 0;
+    /// <summary>
+    /// 该Bundle所有资源数
+    /// </summary>
+    public int assetCount
+    {
+        get
+        {
+            if (mAssetCount == 0)
+            {
+                if (bundle != null)
+                {
+                    mAssetCount = bundle.GetAllAssetNames().Length;
+                }
+            }
+            return mAssetCount;
+        }
+    }
+
+    private HashSet<ILoadTask> mLoadTasks = new HashSet<ILoadTask>();
 
     public Bundle(string bundleName,string[] dependenceNames)
     {
@@ -83,7 +110,8 @@ public class Bundle
         }
         else
         {
-            Debug.LogError("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
+            mAsyncOperation = null;
+            //Debug.Log("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
         }
     }
 
@@ -135,36 +163,37 @@ public class Bundle
             else
             {
 #endif
+                mLoadTasks.Add(task);
+
                 //不是Resources资源
-                if (task.isResource == false)
+
+                if (bundle == null)
                 {
-                    if (bundle == null)
+                    if (mAsyncOperation == null)
                     {
-                        if (mAsyncOperation == null)
-                        {
-                            yield return LoadBundleAsync();
-                        }
-                        else
-                        {
-                            yield return new WaitUntil(() => mAsyncOperation.isDone);
-                        }
+                        yield return LoadBundleAsync();
                     }
-
-                    if (mAssetDic.ContainsKey(assetName) == false)
+                    else
                     {
-                        if (bundle != null)
-                        {
-                            var request = bundle.LoadAssetAsync(assetName);
+                        yield return new WaitUntil(() => mAsyncOperation.isDone);
+                    }
+                }
 
-                            yield return request;
-                            if (request.asset != null && mAssetDic.ContainsKey(assetName) == false)
-                            {
-                                asset = request.asset;
-                                mAssetDic.Add(assetName, asset);
-                            }
+                if (mAssetDic.ContainsKey(assetName) == false)
+                {
+                    if (bundle != null)
+                    {
+                        var request = bundle.LoadAssetAsync(assetName);
+
+                        yield return request;
+                        if (request.asset != null && mAssetDic.ContainsKey(assetName) == false)
+                        {
+                            asset = request.asset;
+                            mAssetDic.Add(assetName, asset);
                         }
                     }
                 }
+
 #if UNITY_EDITOR
             }
 #endif
@@ -173,12 +202,11 @@ public class Bundle
             if (mAssetDic.ContainsKey(assetName) == false)
             {
                 ///尝试从Resources加载
-                if (mAsyncOperation == null)
-                {
-                    string path = AssetPath.GetFullPath(assetName);
 
-                    mAsyncOperation = Resources.LoadAsync(path);
-                }
+                string path = AssetPath.GetResourcePath(assetName);
+
+                mAsyncOperation = Resources.LoadAsync(path);
+
 
                 yield return mAsyncOperation;
 
@@ -189,6 +217,7 @@ public class Bundle
                     asset = request.asset;
 
                     mAssetDic.Add(assetName, asset);
+                    mResourceAssets.Add(assetName);
                 }
             }
 
@@ -214,6 +243,7 @@ public class Bundle
 
             task.OnComplete(assetObject);
 
+            mLoadTasks.Remove(task);
         }
     }
 
@@ -266,8 +296,17 @@ public class Bundle
                 ++i;
             }
         }
+        int loadtaskCount = 0;
+        var loadtask = mLoadTasks.GetEnumerator();
+        while(loadtask.MoveNext())
+        {
+            if(loadtask.Current.isCancel == false)
+            {
+                loadtaskCount++;
+            }
+        }
 
-        if(referenceCount==0)
+        if(referenceCount==0 && loadtaskCount == 0)
         {
             UnLoad();
         }
@@ -356,6 +395,8 @@ public class Bundle
     {
         if (AssetManager.Instance.OtherDependence(this, bundleName) == false)
         {
+            Debug.Log("卸载Bundle:" + bundleName);
+
             AssetManager.Instance.RemoveBundle(this);
 
             if (bundle != null)
@@ -376,23 +417,30 @@ public class Bundle
             references.Clear();
 
             var dependence = dependences.GetEnumerator();
-            while(dependence.MoveNext())
+            while (dependence.MoveNext())
             {
                 dependence.Current.Value.UnLoad();
             }
             dependences.Clear();
 
-            AssetPath assetPath = AssetPath.Get(bundleName);
-            if (assetPath!= null && assetPath.isRecource)
+
+            var asset = mAssetDic.GetEnumerator();
+            while (asset.MoveNext())
             {
-                var asset = mAssetDic.GetEnumerator();
-                while (asset.MoveNext())
+                if (mResourceAssets.Contains(asset.Current.Key))
                 {
                     Resources.UnloadAsset(asset.Current.Value);
                 }
             }
 
+
             mAssetDic.Clear();
+            mCacheAssetDic.Clear();
+            mResourceAssets.Clear();
+
+            mAsyncOperation = null;
+            bundleName = null;
+            dependenceNames = null;
         }
     }
 }

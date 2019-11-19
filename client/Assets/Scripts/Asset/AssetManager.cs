@@ -12,7 +12,15 @@ public enum AssetMode
     AssetBundle,
 }
 
-public class LoadTask<T> 
+public interface ILoadTask
+{
+    string bundleName { get; }
+    string assetName { get; }
+
+    bool isCancel { get; }
+}
+
+public class LoadTask<T> : ILoadTask
 {
     public string key { get; private set; }
 
@@ -42,6 +50,8 @@ public class LoadTask<T>
 
     public Action<T> callback { get; private set; }
 
+    public bool isCancel { get { return callback == null; } }
+
     private AssetPath mPath;
     public AssetPath path {
         get
@@ -53,17 +63,6 @@ public class LoadTask<T>
             }
             return mPath;
         }
-    }
-
-    public bool isResource { 
-        get 
-        {
-            if (path != null)
-            {
-                return path.isRecource;
-            }
-            return string.IsNullOrEmpty(key)? false: key.Contains("resources/");
-        } 
     }
     public LoadTask(string key, Action<T> callback)
     {
