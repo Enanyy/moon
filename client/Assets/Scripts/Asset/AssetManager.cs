@@ -223,12 +223,12 @@ public class AssetManager : MonoBehaviour
     {
         LoadTask<Asset<T> > task = new LoadTask<Asset<T>>(key,callback);
 
-        StartCoroutine(LoadAsset(task));
+        StartCoroutine(LoadAssetAsync(task));
 
         return task;
     }
 
-    private IEnumerator LoadAsset<T>(LoadTask<Asset<T>> task) where T : UnityEngine.Object
+    private IEnumerator LoadAssetAsync<T>(LoadTask<Asset<T>> task) where T : UnityEngine.Object
     {
         if (initialized == false)
         {
@@ -238,10 +238,6 @@ public class AssetManager : MonoBehaviour
 
         Bundle bundle = GetOrCreateBundle(task.bundleName);
 
-        //if (bundle.isLoading)
-        //{
-        //    yield return new WaitUntil(() => bundle.isDone);
-        //}
         StartCoroutine(bundle.LoadAsset(task));
     }
 
