@@ -123,9 +123,8 @@ public class Bundle
        
         string assetName = task.assetName;
         
-        if (mCacheAssetDic.ContainsKey(assetName))
+        if (task.isCancel == false && mCacheAssetDic.TryGetValue(assetName,out List<IAsset> list))
         {
-            var list = mCacheAssetDic[assetName];
             if (list.Count > 0)
             {
                 for (int i = 0; i < list.Count; i++)
@@ -139,7 +138,7 @@ public class Bundle
             }
         }
 
-        if (assetObject != null)
+        if (assetObject != null || task.isCancel)
         {
             task.OnCompleted(assetObject);
         }
@@ -179,7 +178,7 @@ public class Bundle
                     }
                 }
 
-                if (mAssetDic.ContainsKey(assetName) == false)
+                if (task.isCancel == false && mAssetDic.ContainsKey(assetName) == false)
                 {
                     if (bundle != null)
                     {
@@ -199,7 +198,7 @@ public class Bundle
 #endif
 
 
-            if (mAssetDic.ContainsKey(assetName) == false)
+            if (task.isCancel ==false && mAssetDic.ContainsKey(assetName) == false)
             {
                 ///尝试从Resources加载
 
@@ -227,7 +226,7 @@ public class Bundle
                 mAssetDic.TryGetValue(assetName, out asset);
             }
 
-            if (asset)
+            if (asset && task.isCancel == false)
             {
                 if (typeof(T) == typeof(GameObject))
                 {
