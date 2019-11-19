@@ -55,7 +55,7 @@ public class Bundle
         }
     }
 
-    private HashSet<ILoadTask> mLoadTasks = new HashSet<ILoadTask>();
+    private HashSet<LoadTask> mLoadTasks = new HashSet<LoadTask>();
 
     public Bundle(string bundleName,string[] dependenceNames)
     {
@@ -115,7 +115,7 @@ public class Bundle
         }
     }
 
-    public IEnumerator LoadAsset<T>(LoadTask<Asset<T>> task) where T : UnityEngine.Object
+    public IEnumerator LoadAsset<T>(AssetLoadTask<Asset<T>> task) where T : UnityEngine.Object
     {
         Asset<T> assetObject = null;
         Object asset = null;
@@ -141,7 +141,7 @@ public class Bundle
 
         if (assetObject != null)
         {
-            task.OnComplete(assetObject);
+            task.OnCompleted(assetObject);
         }
         else
         {
@@ -241,7 +241,7 @@ public class Bundle
                 }
             }
 
-            task.OnComplete(assetObject);
+            task.OnCompleted(assetObject);
 
             mLoadTasks.Remove(task);
         }

@@ -12,11 +12,9 @@ public class Test : MonoBehaviour {
     public BattleEntity mEntity1;
 
     public static Test Instance { get; private set; }
-
-    private string file = DateTime.Now.ToString();
     void Start ()
     {
-        //AssetManager.Instance.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Single, (scene) => {
+        //AssetManager.Instance.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Single, (scene,mode) => {
 
 
         //});

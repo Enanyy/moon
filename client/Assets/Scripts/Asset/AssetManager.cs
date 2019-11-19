@@ -12,78 +12,6 @@ public enum AssetMode
     AssetBundle,
 }
 
-public interface ILoadTask
-{
-    string bundleName { get; }
-    string assetName { get; }
-
-    bool isCancel { get; }
-}
-
-public class LoadTask<T> : ILoadTask
-{
-    public string key { get; private set; }
-
-    public string bundleName
-    {
-        get
-        {
-            if (path != null)
-            {
-                return string.IsNullOrEmpty(path.group) ? path.path : path.group;
-            }
-            return key;
-        }
-    }
-
-    public string assetName
-    {
-        get
-        {
-            if (path != null)
-            {
-                return path.path;
-            }
-            return key;
-        }
-    }
-
-    public Action<T> callback { get; private set; }
-
-    public bool isCancel { get { return callback == null; } }
-
-    private AssetPath mPath;
-    public AssetPath path {
-        get
-        {
-            if (mPath == null)
-            {
-                mPath= AssetPath.Get(key);
-                //Debug.Log(mPath.path);
-            }
-            return mPath;
-        }
-    }
-    public LoadTask(string key, Action<T> callback)
-    {
-        this.key = key;
-        this.callback = callback;
-    }
-
-    public void Cancel()
-    {
-        callback = null;
-    }
-
-    public void OnComplete(T t)
-    {
-        if (callback != null)
-        {
-            callback(t);
-        }
-    }
-}
-
 public class AssetManager : MonoBehaviour
 {
 
@@ -118,6 +46,8 @@ public class AssetManager : MonoBehaviour
     /// 60s自动检测已经销毁的资源，并释放对应的Bundle
     /// </summary>
     public float unloadInterval = 60;
+
+    private List<SceneLoadTask> mSceneLoadTasks = new List<SceneLoadTask>();
 
     public void Initialize()
     {
@@ -189,6 +119,8 @@ public class AssetManager : MonoBehaviour
             DontDestroyOnLoad(mManifest);
         }
 
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
         initialized = true;
         Debug.Log("Initialize AssetManager Finish!");
     }
@@ -219,16 +151,16 @@ public class AssetManager : MonoBehaviour
     /// <param name="key"></param>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public LoadTask<Asset<T>> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T:Object
+    public AssetLoadTask<Asset<T>> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T:Object
     {
-        LoadTask<Asset<T> > task = new LoadTask<Asset<T>>(key.ToLower(),callback);
+        AssetLoadTask<Asset<T> > task = new AssetLoadTask<Asset<T>>(key.ToLower(),callback);
 
         StartCoroutine(LoadAssetAsync(task));
 
         return task;
     }
 
-    private IEnumerator LoadAssetAsync<T>(LoadTask<Asset<T>> task) where T : UnityEngine.Object
+    private IEnumerator LoadAssetAsync<T>(AssetLoadTask<Asset<T>> task) where T : UnityEngine.Object
     {
         if (initialized == false)
         {
@@ -241,40 +173,61 @@ public class AssetManager : MonoBehaviour
         StartCoroutine(bundle.LoadAsset(task));
     }
 
-    public void LoadScene(string key, LoadSceneMode mode, Action<Scene> callback)
+    public SceneLoadTask LoadScene(string key, LoadSceneMode mode, Action<Scene,LoadSceneMode> callback)
     {
-        LoadTask<Scene> task = new LoadTask<Scene>(key.ToLower(), callback);
-        StartCoroutine(LoadSceneAsync(task,mode));
+        SceneLoadTask task = new SceneLoadTask(key.ToLower(), mode, callback);
+        StartCoroutine(LoadSceneAsync(task));
+        return task;
     }
 
-    private IEnumerator LoadSceneAsync(LoadTask<Scene> task, LoadSceneMode mode)
+    private IEnumerator LoadSceneAsync(SceneLoadTask task)
     {
         if(initialized== false)
         {
             Initialize();
             yield return new WaitUntil(() => initialized);
         }
-        string sceneName = Path.GetFileNameWithoutExtension(task.assetName);
-  
+
+        mSceneLoadTasks.Add(task);
+
         if (AssetPath.mode == AssetMode.AssetBundle)
         {
             Bundle bundle = GetOrCreateBundle(task.assetName);
             yield return bundle.LoadBundleAsync();
 
-            var request = SceneManager.LoadSceneAsync(sceneName, mode);
+            var request = SceneManager.LoadSceneAsync(task.sceneName, task.mode);
             yield return request;
 
-            task.OnComplete(SceneManager.GetActiveScene());
         }
         else
         {
-            var request = SceneManager.LoadSceneAsync(sceneName);
+            var request = SceneManager.LoadSceneAsync(task.sceneName);
             yield return request;
-            task.OnComplete(SceneManager.GetActiveScene());
 
             yield break;
         }
     }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        for(int i =0; i < mSceneLoadTasks.Count;)
+        {
+            var task = mSceneLoadTasks[i];
+            if(task.isCancel)
+            {
+                mSceneLoadTasks.RemoveAt(i);
+                continue;
+            }
+            if(task.sceneName == scene.name)
+            {
+                task.OnCompleted(scene, mode);
+                mSceneLoadTasks.RemoveAt(i);
+                continue;
+            }
+            i++;
+        }
+    }
+
     public void UnLoadScene(Scene scene,Action callback)
     {
         StartCoroutine(UnloadSceneAsync(scene,callback));
