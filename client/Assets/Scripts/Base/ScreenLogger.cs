@@ -4,6 +4,31 @@ using System.Collections.Generic;
 
 public class ScreenLogger : MonoBehaviour
 {
+    private static ScreenLogger mInstance;
+    
+    public static void SetActive(bool active)
+    {
+        if(active)
+        {
+            if (mInstance == null)
+            {
+                mInstance = FindObjectOfType<ScreenLogger>();
+                if (mInstance == null)
+                {
+                    GameObject go = new GameObject(typeof(ScreenLogger).Name);
+                    mInstance = go.AddComponent<ScreenLogger>();
+                }
+            }
+            mInstance.gameObject.SetActive(active);
+        }
+        else
+        {
+            if(mInstance)
+            {
+                mInstance.gameObject.SetActive(active);
+            }
+        }
+    }
 
 #if ENABLE_SCREEN_LOG
     struct Log
@@ -78,6 +103,7 @@ public class ScreenLogger : MonoBehaviour
         //Debug.Log("test 2");
         //visible = true;
         DontDestroyOnLoad(gameObject);
+        mInstance = this;
     }
 
     void OnEnable()
