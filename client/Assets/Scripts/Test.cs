@@ -22,8 +22,6 @@ public class Test : MonoBehaviour {
 
         //return;
 
-        Application.logMessageReceived+=Log;
-
         AssetManager.Instance.LoadAsset<Material>("diban.mat", (asset) => { 
             
             if(asset!= null)
@@ -61,25 +59,7 @@ public class Test : MonoBehaviour {
 
     }
 
-    void Log(string condition, string stackTrace, LogType type)
-    {
-        //string path = Application.dataPath + "/" + file + ".txt";
-        //string content = "";
-        //if(File.Exists(path))
-        //{
-        //    content = File.ReadAllText(path);
-        //}
-        log += string.Format("[0]{1},{2}\n", type, condition, stackTrace);
-        //FileEx.SaveFile(path,content);
-    }
-
-    string log = "";
-    private void OnGUI()
-    {
-        GUI.Label(new Rect(10, 10, 1000, 20), AssetPath.persistentDataPath);
-        GUI.Label(new Rect(10, 30, 1000, 20), AssetPath.streamingAssetsPath);
-        GUI.Label(new Rect(10, 100, 1000, 300), log);
-    }
+    
 
     // Update is called once per frame
     void Update () {

@@ -42,12 +42,15 @@ public class ScreenLogger : MonoBehaviour
     /// </summary>
     public int maxLogs = 1000;
 
+    public bool showStackTrace = false;
+
     #endregion
 
     private readonly List<Log> logs = new List<Log>();
     private Vector2 scrollPosition;
     private bool visible;
     private bool collapse;
+
 
     // Visual elements:
     static readonly Dictionary<LogType, Color> logTypeColors = new Dictionary<LogType, Color>
@@ -103,7 +106,7 @@ public class ScreenLogger : MonoBehaviour
         GUILayoutOption o1 = GUILayout.Height(40);
         GUILayoutOption o2 = GUILayout.Width(100);
         GUILayoutOption[] oo = { o1, o2 };
-        if (GUILayout.Button("Show/Hide", oo)) visible = !visible;
+        if (GUILayout.Button(visible? "Hide":"Show", oo)) visible = !visible;
         GUILayout.EndArea();
     }
 
@@ -142,15 +145,24 @@ public class ScreenLogger : MonoBehaviour
                     continue;
                 }
             }
+            // Save GUI colour before change it.
 
-            GUI.contentColor = logTypeColors[log.type];
-            GUILayout.Label(log.message);
+            Color color = GUI.skin.label.normal.textColor;
+            GUI.skin.label.normal.textColor = logTypeColors[log.type];
+            if (showStackTrace)
+            {
+                GUILayout.Label(string.Format("[{0}] {1}\n{2}", log.type.ToString(), log.message, log.stackTrace));
+            }
+            else
+            {
+                GUILayout.Label(string.Format("[{0}] {1}", log.type.ToString(), log.message));
+            }
+            // Ensure GUI colour is reset before drawing other components.
+            GUI.skin.label.normal.textColor = color;
         }
 
         GUILayout.EndScrollView();
 
-        // Ensure GUI colour is reset before drawing other components.
-        GUI.contentColor = Color.white;
     }
 
     /// <summary>
@@ -183,7 +195,7 @@ public class ScreenLogger : MonoBehaviour
             message = message,
             stackTrace = stackTrace,
             type = type,
-        });
+        }); ; ;
 
         TrimExcessLogs();
     }
