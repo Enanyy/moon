@@ -26,22 +26,16 @@ public class EntityComponentModel :
 
         }
 
-        public void OnCreate()
-        {
-            mDelay = 0;
-            mCallback = null;
-        }
-
-        public void OnDestroy()
+        public void OnConstruct()
         {
             Clear();
         }
 
-        public void OnReturn()
+        public void OnDestruct()
         {
-            mDelay = 0;
-            mCallback = null;
+            Clear();      
         }
+
 
         public bool DoTask(float deltaTime)
         {
@@ -131,12 +125,12 @@ public class EntityComponentModel :
 
     }
 
-    public override void OnDestroy()
+    public override void OnDestruct()
     {
         mCurrentAnimationClip = null;
         mAnimator = null;
         mDelayTasks.Clear();
-        base.OnDestroy();
+        base.OnDestruct();
     }
     public void OnUpdate(float deltaTime)
     {
@@ -213,6 +207,11 @@ public class EntityComponentModel :
     {
 
     }
+    public void OnDestroy()
+    {
+
+    }
+
 
 
     public void PlayAnimation(EntityAction action, EntityParamPluginAnimationClip clip)

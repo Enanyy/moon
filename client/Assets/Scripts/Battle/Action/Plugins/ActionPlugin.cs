@@ -58,19 +58,18 @@ public class ActionPlugin : IState<BattleEntity>,IPoolObject
 
     }
 
-    public virtual void OnDestroy()
+    public virtual void OnDestruct()
     {
 
     }
 
-    public void OnCreate()
+    public virtual void OnConstruct()
     {
        
     }
-
-    public void OnReturn()
+    public virtual void OnDestroy() 
     {
-        
+
     }
 }
 

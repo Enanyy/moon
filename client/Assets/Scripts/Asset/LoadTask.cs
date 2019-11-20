@@ -74,7 +74,16 @@ public class SceneLoadTask : LoadTask, ISceneLoadTask
     public LoadSceneMode mode { get; private set; }
     public Action<Scene, LoadSceneMode> callback { get; private set; }
 
-    public virtual string sceneName { get { return Path.GetFileNameWithoutExtension(assetName); } }
+    public virtual string sceneName
+    {
+        get
+        {
+            if (assetName.Contains("."))
+                return assetName.Substring(0, assetName.LastIndexOf('.'));
+            return assetName;
+
+        }
+    }
     public SceneLoadTask(string key, LoadSceneMode mode, Action<Scene, LoadSceneMode> callback) : base(key)
     {
         this.mode = mode;

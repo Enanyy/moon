@@ -8,12 +8,15 @@ public interface IPoolObject
     /// </summary>
     bool isPool { get; set; }
 
-    void OnCreate();
+    /// <summary>
+    /// 构造
+    /// </summary>
+    void OnConstruct();
 
-    void OnReturn();
-
-    //真正销毁的时候调用
-    void OnDestroy(); 
+    /// <summary>
+    /// 析构
+    /// </summary>
+    void OnDestruct(); 
 }
 /// <summary>
 /// 对象池,用于保存经常用并可重复用的对象
@@ -22,7 +25,7 @@ public class ObjectPool
 {
     public static int maxNum = 8196;
 
-    static private Dictionary<Type, Queue<IPoolObject>> _pool = new Dictionary<Type, Queue<IPoolObject>>();
+    static private Dictionary<Type, List<IPoolObject>> mPool = new Dictionary<Type, List<IPoolObject>>();
     /// <summary>
     /// 归还对象到对象池
     /// </summary>
@@ -33,28 +36,28 @@ public class ObjectPool
             return;
         if (type == null)
             type = typeof(T);
-        o.OnReturn();
-        Queue<IPoolObject> l = null;
-        if (!_pool.TryGetValue(type, out l))
-            l = AddType(type);
-        if (l.Count > maxNum)
-        {
-            UnityEngine.Debug.LogError(string.Format("ReturnInstance maxNum:type={0}", type));
-            return;
-        }
-        if (l.Contains(o))
+        List<IPoolObject> queue;
+        if (!mPool.TryGetValue(type, out queue))
+            queue = AddType(type);
+        if (queue.Contains(o))
         {
             UnityEngine.Debug.LogError(string.Format("ReturnInstance Exists:type={0}", type));
             return;
         }
+        if (queue.Count > maxNum)
+        {
+            UnityEngine.Debug.LogError(string.Format("ReturnInstance maxNum:type={0}", type));
+            return;
+        }
+        o.OnDestruct();
         o.isPool = true;
-        l.Enqueue(o);
+        queue.Add(o);
     }
-    static private Queue<IPoolObject> AddType(Type type)
+    static private List<IPoolObject> AddType(Type type)
     {
-        Queue<IPoolObject> l = new Queue<IPoolObject>();
-        _pool.Add(type, l);
-        return l;
+        List<IPoolObject> list = new List<IPoolObject>();
+        mPool.Add(type, list);
+        return list;
     }
 
     /// <summary>
@@ -66,22 +69,23 @@ public class ObjectPool
     {
         if (type == null)
             type = typeof(T);
-        Queue<IPoolObject> l = null;
-        if (!_pool.TryGetValue(type, out l))
+        List<IPoolObject> list;
+        if (!mPool.TryGetValue(type, out list))
         {
-            l = AddType(type);
+            list = AddType(type);
         }
-        int len = l.Count;
+        int len = list.Count;
         T obj;
         if (len > 0)
         {
-            obj = (T)l.Dequeue();
+            obj = (T)list[0];
+            list.RemoveAt(0);
         }
         else
         {
             obj = (T)Activator.CreateInstance(type);// type.Assembly.CreateInstance(type.FullName);
         }
-        obj.OnCreate();
+        obj.OnConstruct();
         obj.isPool = false;
         return obj;
     }
@@ -92,26 +96,27 @@ public class ObjectPool
     /// <param name="service">类型</param>
     static public void Clear(Type type,bool includeSubClass = false)
     {
-        Queue<IPoolObject> l = null;
-        if (_pool.TryGetValue(type, out l))
+        List<IPoolObject> l = null;
+        if (mPool.TryGetValue(type, out l))
         {
             var it = l.GetEnumerator();
             while(it.MoveNext())
             {
-                IPoolObject o = it.Current as IPoolObject;
+                IPoolObject o = it.Current;
                 if(o!=null)
                 {
-                    o.OnDestroy();
+                    o.OnDestruct();
+                    o.isPool = false;
                 }
             }
 
             l.Clear();
-            _pool.Remove(type);
+            mPool.Remove(type);
         }
 
         if (includeSubClass)
         {
-            var it = _pool.GetEnumerator();
+            var it = mPool.GetEnumerator();
             List<Type> list = new List<Type>();
             while (it.MoveNext())
             {
@@ -119,17 +124,16 @@ public class ObjectPool
                 {
                     list.Add(it.Current.Key);
 
-                    var queue = it.Current.Value;
-                    while(queue.Count> 0)
+                    for(int i = 0; i < it.Current.Value.Count; ++i)
                     {
-                        IPoolObject o = queue.Dequeue() as IPoolObject;
-                        o.OnDestroy();
+                        it.Current.Value[i].OnDestruct();
                     }
+                    it.Current.Value.Clear();
                 }
             }
             for (int i = 0; i < list.Count; ++i)
             {
-                _pool.Remove(list[i]);
+                mPool.Remove(list[i]);
             }
         }
     }
@@ -142,19 +146,18 @@ public class ObjectPool
     /// </summary>
     static public void Clear()
     {
-        _pool.Clear();
+        mPool.Clear();
 
-        var it = _pool.GetEnumerator();
+        var it = mPool.GetEnumerator();
         while (it.MoveNext())
         {
-            var queue = it.Current.Value;
-            while (queue.Count > 0)
+            for (int i = 0; i < it.Current.Value.Count; ++i)
             {
-                IPoolObject o = queue.Dequeue() as IPoolObject;
-                o.isPool = false;
-                o.OnDestroy();
+                it.Current.Value[i].OnDestruct();
+                it.Current.Value[i].isPool = false;
             }
+            it.Current.Value.Clear();
         }
-        _pool.Clear();
+        mPool.Clear();
     }
 }

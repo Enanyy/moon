@@ -59,12 +59,12 @@ public class AssetEntity :IPoolObject
     }
 
 
-    public virtual void OnCreate()
+    public virtual void OnConstruct()
     {
        
     }
 
-    public virtual void OnDestroy()
+    public virtual void OnDestruct()
     {
         if (gameObject != null)
         {
@@ -78,18 +78,6 @@ public class AssetEntity :IPoolObject
         asset = null;
     }
 
-    public virtual void OnReturn()
-    {
-        if (gameObject != null)
-        { 
-            gameObject.SetActive(false);
-        }
-        if (asset != null)
-        {
-            asset.ReturnAsset();
-        }
-        asset = null;
-    }
     public virtual void Recycle()
     {
         ObjectPool.ReturnInstance(this, GetType());

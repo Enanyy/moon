@@ -220,25 +220,20 @@ public abstract class EffectEntity :
         return childCount;
     }
 
-    public override void OnCreate()
+    public override void OnConstruct()
     {
-        base.OnCreate();
+        base.OnConstruct();
     }
 
-    public override void OnReturn()
+    public override void OnDestruct()
     {
-        base.OnReturn();
+        base.OnDestruct();
         mAnimators = null;
         mParticleSystems = null;
         mEffectSpeed = 1;
         parentEffect = null;
         agent = null;
         mTarget = 0;
-    }
-
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
     }
     #region State
     public virtual void OnEnter()
@@ -274,6 +269,11 @@ public abstract class EffectEntity :
     public virtual void Clear()
     {
        
+    }
+
+    public virtual void OnDestroy()
+    {
+
     }
     #endregion
 }

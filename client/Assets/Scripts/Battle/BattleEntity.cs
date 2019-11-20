@@ -347,19 +347,14 @@ public class BattleEntity:
     }
 
     
-    public void OnCreate()
-    {
-        Clear();
-    }
-  
-    public void OnReturn()
+    public void OnConstruct()
     {
         Clear();
     }
     
-    public void OnDestroy()
+    public void OnDestruct()
     {
-       
+        Clear();
     }
 
     public void OnEnter(State<BattleEntity> state)

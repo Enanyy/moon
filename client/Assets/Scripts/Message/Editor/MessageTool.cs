@@ -60,7 +60,7 @@ public class MessageTool
                     {
                         string ID = GetID(classname);
                         codeID += "\t" + ID + " = " + (id++) + ",\n";
-                        codeRegister += "\t\tRegister(new " + "MSG_" + classname + "());\n";
+                        codeRegister += "\t\t\tRegister(new " + "MSG_" + classname + "());\n";
 
                         WriteFile(classname, ID);
                     }

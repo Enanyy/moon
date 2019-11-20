@@ -45,17 +45,13 @@ public class PathPoint:IPoolObject
         }
     }
 
-    public void OnCreate()
+    public void OnConstruct()
     {
-
+        
     }
-    public void OnReturn()
+    public void OnDestruct()
     {
-        Init(Vector3.zero, Vector3.zero, false);
-    }
-    public void OnDestroy()
-    {
-
+        
     }
 }
 
@@ -87,9 +83,7 @@ public class EntityAction : State<BattleEntity>,IPoolObject
     {
         var point = ObjectPool.GetInstance<PathPoint>();
         point.Init(destination, velocity, done,onArrive,failedAction);
-        paths.AddLast(point);
-
-       
+        paths.AddLast(point);    
     }
 
     public override void SetAgent(BattleEntity entity)
@@ -171,12 +165,11 @@ public class EntityAction : State<BattleEntity>,IPoolObject
         return base.IsValid();
     }
 
-    public void OnCreate()
+    public void OnConstruct()
     {
         Clear();
     }
-
-    public void OnReturn()
+    public void OnDestruct()
     {
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
