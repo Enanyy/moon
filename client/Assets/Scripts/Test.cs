@@ -40,7 +40,7 @@ public class Test : MonoBehaviour {
             }
 
         });
-        task.Cancel();
+        //task.Cancel();
 
         Instance = this;
 
@@ -62,14 +62,14 @@ public class Test : MonoBehaviour {
         BattleManager.Instance.AddEntity(mEntity1);
         mEntity1.active = true;
 
-        for(int i = 0; i < 10; i++)
-        {
-            Debug.LogError("Error!!!!");
-        }
-
+        EventNotify.Instance.AddListener(1, OnListen);
+        EventNotify.Instance.Invoke(1);
     }
 
-    
+    void OnListen()
+    {
+        Debug.Log("EventNotify test");
+    }    
 
     // Update is called once per frame
     void Update () {

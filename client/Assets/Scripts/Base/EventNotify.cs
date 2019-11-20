@@ -5,7 +5,7 @@ using System;
 /// <summary>
 /// 事件派发器
 /// </summary>
-public class EventDispatcher
+public class EventNotify
 {
     #region Listener
     interface IEventListener
@@ -34,8 +34,8 @@ public class EventDispatcher
     }
     #endregion
 
-    private static EventDispatcher mInstance;
-    public static EventDispatcher Instance { get { if (mInstance == null) mInstance = new EventDispatcher(); return mInstance; } }
+    private static EventNotify mInstance;
+    public static EventNotify Instance { get { if (mInstance == null) mInstance = new EventNotify(); return mInstance; } }
 
 
     private Dictionary<int, Dictionary<Type, IEventListener>> mListeners = new Dictionary<int, Dictionary<Type, IEventListener>>();

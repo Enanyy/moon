@@ -18,7 +18,7 @@ public class Prefab
     public Object obj;
 
     [HideInInspector]
-    public List<Object> caches = new List<Object>();
+    public List<GameObject> caches = new List<GameObject>();
 }
 
 public class AssetPrefab : MonoBehaviour
@@ -70,6 +70,18 @@ public class AssetPrefab : MonoBehaviour
 
     [SerializeField]
     private List<Prefab> Prefabs = new List<Prefab>();
+
+    private void OnDestroy()
+    {
+        for(int i = 0; i < Prefabs.Count; ++i)
+        {
+            for(int j = 0; j < Prefabs[i].caches.Count; ++j)
+            {
+                Destroy(Prefabs[i].caches[j]);
+            }
+        }
+        Prefabs.Clear();
+    }
 
     public static Prefab Get(PrefabID id)
     {
