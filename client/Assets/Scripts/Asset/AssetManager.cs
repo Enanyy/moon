@@ -144,7 +144,8 @@ public class AssetManager : MonoBehaviour
         }
     }
     /// <summary>
-    /// key可以是文件名(带后缀)或者文件路径(Assets/...)
+    /// key可以是文件名(带后缀)或者文件路径(Assets/...)。
+    /// 注意，当非实例化资源（非GameObject，如Material，Texture，TextAsset等）使用完毕后,需要主动调用Destroy去释放资源
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="key"></param>
@@ -159,7 +160,7 @@ public class AssetManager : MonoBehaviour
         return task;
     }
     /// <summary>
-    /// 自定义LoadTask
+    /// 自定义LoadTask。当非实例化资源（非GameObject，如Material，Texture，TextAsset等）使用完毕后,需要主动调用Destroy去释放资源
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="task"></param>
@@ -360,5 +361,6 @@ public class AssetManager : MonoBehaviour
             mManifestBundle.Unload(true);
         }
         mManifest = null;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }
