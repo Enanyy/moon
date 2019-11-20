@@ -9,12 +9,12 @@ public interface IPoolObject
     bool isPool { get; set; }
 
     /// <summary>
-    /// 构造
+    /// 构造（创建）
     /// </summary>
     void OnConstruct();
 
     /// <summary>
-    /// 析构
+    /// 析构(返回对象池)
     /// </summary>
     void OnDestruct(); 
 }
@@ -99,17 +99,6 @@ public class ObjectPool
         List<IPoolObject> l = null;
         if (mPool.TryGetValue(type, out l))
         {
-            var it = l.GetEnumerator();
-            while(it.MoveNext())
-            {
-                IPoolObject o = it.Current;
-                if(o!=null)
-                {
-                    o.OnDestruct();
-                    o.isPool = false;
-                }
-            }
-
             l.Clear();
             mPool.Remove(type);
         }
@@ -123,11 +112,6 @@ public class ObjectPool
                 if(it.Current.Key.IsSubclassOf(type))
                 {
                     list.Add(it.Current.Key);
-
-                    for(int i = 0; i < it.Current.Value.Count; ++i)
-                    {
-                        it.Current.Value[i].OnDestruct();
-                    }
                     it.Current.Value.Clear();
                 }
             }
@@ -153,7 +137,6 @@ public class ObjectPool
         {
             for (int i = 0; i < it.Current.Value.Count; ++i)
             {
-                it.Current.Value[i].OnDestruct();
                 it.Current.Value[i].isPool = false;
             }
             it.Current.Value.Clear();
