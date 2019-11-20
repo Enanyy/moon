@@ -36,22 +36,22 @@ public class ObjectPool
             return;
         if (type == null)
             type = typeof(T);
-        List<IPoolObject> queue;
-        if (!mPool.TryGetValue(type, out queue))
-            queue = AddType(type);
-        if (queue.Contains(o))
+        List<IPoolObject> list;
+        if (!mPool.TryGetValue(type, out list))
+            list = AddType(type);
+        if (list.Contains(o))
         {
             UnityEngine.Debug.LogError(string.Format("ReturnInstance Exists:type={0}", type));
             return;
         }
-        if (queue.Count > maxNum)
+        if (list.Count > maxNum)
         {
             UnityEngine.Debug.LogError(string.Format("ReturnInstance maxNum:type={0}", type));
             return;
         }
         o.OnDestruct();
         o.isPool = true;
-        queue.Add(o);
+        list.Add(o);
     }
     static private List<IPoolObject> AddType(Type type)
     {
@@ -74,9 +74,8 @@ public class ObjectPool
         {
             list = AddType(type);
         }
-        int len = list.Count;
         T obj;
-        if (len > 0)
+        if (list.Count > 0)
         {
             obj = (T)list[0];
             list.RemoveAt(0);
@@ -96,28 +95,28 @@ public class ObjectPool
     /// <param name="service">类型</param>
     static public void Clear(Type type,bool includeSubClass = false)
     {
-        List<IPoolObject> l = null;
-        if (mPool.TryGetValue(type, out l))
+        List<IPoolObject> list;
+        if (mPool.TryGetValue(type, out list))
         {
-            l.Clear();
+            list.Clear();
             mPool.Remove(type);
         }
 
         if (includeSubClass)
         {
             var it = mPool.GetEnumerator();
-            List<Type> list = new List<Type>();
+            List<Type> removes = new List<Type>();
             while (it.MoveNext())
             {
                 if(it.Current.Key.IsSubclassOf(type))
                 {
-                    list.Add(it.Current.Key);
+                    removes.Add(it.Current.Key);
                     it.Current.Value.Clear();
                 }
             }
-            for (int i = 0; i < list.Count; ++i)
+            for (int i = 0; i < removes.Count; ++i)
             {
-                mPool.Remove(list[i]);
+                mPool.Remove(removes[i]);
             }
         }
     }
@@ -130,17 +129,6 @@ public class ObjectPool
     /// </summary>
     static public void Clear()
     {
-        mPool.Clear();
-
-        var it = mPool.GetEnumerator();
-        while (it.MoveNext())
-        {
-            for (int i = 0; i < it.Current.Value.Count; ++i)
-            {
-                it.Current.Value[i].isPool = false;
-            }
-            it.Current.Value.Clear();
-        }
         mPool.Clear();
     }
 }
