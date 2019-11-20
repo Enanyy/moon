@@ -248,6 +248,10 @@ public class Bundle
             {
                 task.OnCompleted(assetObject);
             }
+            else
+            {
+                RemoveReference();
+            }
         }
     }
 
@@ -286,35 +290,7 @@ public class Bundle
             list.Remove(reference);
         }
 
-        int referenceCount = 0;
-        var it = references.GetEnumerator();
-        while(it.MoveNext())
-        {
-            list = it.Current.Value;
-            for(int i = 0;i < list.Count; )
-            {
-                if(list[i] == null || list[i].destroyed)
-                {
-                    list.RemoveAt(i);continue;
-                }
-                referenceCount++;
-                ++i;
-            }
-        }
-        int loadtaskCount = 0;
-        var loadtask = mLoadTasks.GetEnumerator();
-        while(loadtask.MoveNext())
-        {
-            if(loadtask.Current.isCancel == false)
-            {
-                loadtaskCount++;
-            }
-        }
-
-        if(referenceCount==0 && loadtaskCount == 0)
-        {
-            UnLoad();
-        }
+        RemoveReference();
     }
     /// <summary>
     /// 移除已经destroy的资源引用
@@ -326,18 +302,26 @@ public class Bundle
         while (it.MoveNext())
         {
             var list = it.Current.Value;
-            for (int i = list.Count - 1; i >= 0; --i)
+            for (int i = 0; i < list.Count;)
             {
-                if (list[i].destroyed)
+                if (list[i] == null || list[i].destroyed)
                 {
-                    list.RemoveAt(i);
+                    list.RemoveAt(i); continue;
                 }
+                referenceCount++;
+                ++i;
             }
-
-            referenceCount += list.Count;
         }
-
-        if (referenceCount == 0)
+        int loadtaskCount = 0;
+        var loadtask = mLoadTasks.GetEnumerator();
+        while (loadtask.MoveNext())
+        {
+            if (loadtask.Current.isCancel == false)
+            {
+                loadtaskCount++;
+            }
+        }
+        if (referenceCount == 0 && loadtaskCount ==0)
         {
             UnLoad();
         }
