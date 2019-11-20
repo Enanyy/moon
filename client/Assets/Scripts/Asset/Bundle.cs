@@ -117,13 +117,17 @@ public class Bundle
 
     public IEnumerator LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
     {
+        if (task == null || task.isCancel)
+        {
+            yield break;
+        }
+
         Asset<T> assetObject = null;
         Object asset = null;
-        
-       
+      
         string assetName = task.assetName;
         
-        if (task.isCancel == false && mCacheAssetDic.TryGetValue(assetName,out List<IAsset> list))
+        if (mCacheAssetDic.TryGetValue(assetName,out List<IAsset> list))
         {
             if (list.Count > 0)
             {
@@ -137,8 +141,9 @@ public class Bundle
                 }
             }
         }
+        
 
-        if (assetObject != null || task.isCancel)
+        if (assetObject != null)
         {
             task.OnCompleted(assetObject);
         }
@@ -169,19 +174,19 @@ public class Bundle
 
                 if (bundle == null)
                 {
-                    if (mAsyncOperation == null)
+                    if (mAsyncOperation == null && task.isCancel == false)
                     {
                         yield return LoadBundleAsync();
                     }
                     else
                     {
-                        yield return new WaitUntil(() => mAsyncOperation.isDone);
+                        yield return new WaitUntil(() => mAsyncOperation.isDone || task.isCancel);
                     }
                 }
 
-                if (task.isCancel == false && mAssetDic.ContainsKey(assetName) == false)
+                if (mAssetDic.ContainsKey(assetName) == false)
                 {
-                    if (bundle != null)
+                    if (bundle != null && task.isCancel == false)
                     {
                         var request = bundle.LoadAssetAsync(assetName);
 
@@ -195,7 +200,7 @@ public class Bundle
                 }
             }
 
-            if (task.isCancel ==false && mAssetDic.ContainsKey(assetName) == false)
+            if (mAssetDic.ContainsKey(assetName) == false && task.isCancel == false)
             {
                 ///尝试从Resources加载
 
@@ -236,10 +241,13 @@ public class Bundle
                     assetObject = new Asset<T>(assetName, this, asset, asset as T);
                 }
             }
+
             mLoadTasks.Remove(task);
 
-            task.OnCompleted(assetObject);
-
+            if (task.isCancel == false)
+            {
+                task.OnCompleted(assetObject);
+            }
         }
     }
 
