@@ -10,7 +10,7 @@ public class MSG_BattleEntityIdleNotify : Message<BattleEntityIdleNotify>
     {
         return MessageManager.Instance.Get<MSG_BattleEntityIdleNotify>(MessageID.BATTLE_ENTITY_IDLE_NOTIFY);
     }
-    protected override void OnRecv()
+    protected override void OnRecv(Connection connection)
     {
         
         //Debug.Log(ret.id+" idle");

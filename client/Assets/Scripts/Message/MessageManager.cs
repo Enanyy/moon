@@ -11,7 +11,7 @@ public enum ConnectID
 public interface IMessage
 {
     MessageID id { get; set; }
-    void Receive(byte[] data, int index, int length);
+    void Receive(Connection connection, byte[] data, int index, int length);
 }
 
 public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensible, new()
@@ -48,14 +48,14 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
 
     }
 
-    protected abstract void OnRecv();
+    protected abstract void OnRecv(Connection connection);
 
-    public void Receive(byte[] data, int index, int length)
+    public void Receive(Connection connection, byte[] data, int index, int length)
     {
         using (MemoryStream ms = new MemoryStream(data,index, length))
         {
             message = (T)ProtoBuf.Meta.RuntimeTypeModel.Default.Deserialize(ms, message, typeof(T));
-            OnRecv();
+            OnRecv(connection);
         }
     }
 }
@@ -134,7 +134,7 @@ public class MessageManager
             int id = BitConverter.ToInt32(packet, 0);
             if (mMessageDic.ContainsKey(id))
             {
-                mMessageDic[id].Receive(packet, 4, packet.Length - 4);
+                mMessageDic[id].Receive(connection, packet, 4, packet.Length - 4);
             }
             else
             {

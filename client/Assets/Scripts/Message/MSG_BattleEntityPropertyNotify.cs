@@ -12,7 +12,7 @@ public class MSG_BattleEntityPropertyNotify : Message<BattleEntityPropertyNotify
         return MessageManager.Instance.Get<MSG_BattleEntityPropertyNotify>(MessageID.BATTLE_ENTITY_PROPERTY_NOTIFY);
     }
 
-    protected override void OnRecv()
+    protected override void OnRecv(Connection connection)
     {
        
     }

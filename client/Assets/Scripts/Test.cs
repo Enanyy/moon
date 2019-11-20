@@ -12,6 +12,11 @@ public class Test : MonoBehaviour {
     public BattleEntity mEntity1;
 
     public static Test Instance { get; private set; }
+
+    private void Awake()
+    {
+        ScreenLogger.SetActive(true);
+    }
     void Start ()
     {
         //var task =  AssetManager.Instance.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Additive, (scene,mode) => {
@@ -22,7 +27,7 @@ public class Test : MonoBehaviour {
 
         //return;
 
-        AssetManager.Instance.LoadAsset<Material>("diban.mat", (asset) => { 
+        var task = AssetManager.Instance.LoadAsset<Material>("diban.mat", (asset) => { 
             
             if(asset!= null)
             {
@@ -35,7 +40,7 @@ public class Test : MonoBehaviour {
             }
 
         });
-
+        task.Cancel();
 
         Instance = this;
 

@@ -12,7 +12,7 @@ public class MSG_BattleBeginRequest : Message<BattleBeginRequest>
         return MessageManager.Instance.Get<MSG_BattleBeginRequest>(MessageID.BATTLE_BEGIN_REQUEST);
     }
 
-    protected override void OnRecv()
+    protected override void OnRecv(Connection connection)
     {
        
     }

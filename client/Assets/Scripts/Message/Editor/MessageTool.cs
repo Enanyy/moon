@@ -162,7 +162,7 @@ public class {filename} : Message<{classname}>
         return MessageManager.Instance.Get<{filename}>(MessageID.{ID});
     }
 
-    protected override void OnRecv()
+    protected override void OnRecv(Connection connection)
     {
        
     }

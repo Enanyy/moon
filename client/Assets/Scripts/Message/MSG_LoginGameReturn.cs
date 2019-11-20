@@ -10,7 +10,7 @@ public class MSG_LoginGameReturn : Message<LoginGameReturn>
     {
         return MessageManager.Instance.Get<MSG_LoginGameReturn>(MessageID.LOGIN_GAME_RETURN);
     }
-    protected override void OnRecv()
+    protected override void OnRecv(Connection connection)
     {
        
     }
