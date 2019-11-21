@@ -27,15 +27,31 @@ public class Test : MonoBehaviour {
 
         //return;
 
-        var task = AssetManager.Instance.LoadAsset<Material>("diban.mat", (asset) => { 
+        var task = AssetManager.Instance.LoadAsset<GameObject>("cube.prefab", (asset) => { 
             
             if(asset!= null)
             {
-                Debug.Log("Load Success!");
+                Debug.Log("Load Success:cube.prefab!");
+                //asset.Destroy();
             }
             else
             {
-                Debug.Log("Load Failed!");
+                Debug.Log("Load Failed:cube.prefab!");
+
+            }
+
+        });
+
+        AssetManager.Instance.LoadAsset<GameObject>("cube1.prefab", (asset) =>
+        {
+
+            if (asset != null)
+            {
+                Debug.Log("Load Success:cube1.prefab!");
+            }
+            else
+            {
+                Debug.Log("Load Failed:cube1.prefab!");
 
             }
 
@@ -56,7 +72,7 @@ public class Test : MonoBehaviour {
 
         mEntity1 = ObjectPool.GetInstance<BattleEntity>();
         mEntity1.id = 2;
-        mEntity1.position = new Vector3(10,0,0);
+        mEntity1.position = new Vector3(10, 0, 0);
         mEntity1.config = "nvjiangjun.txt";
 
         BattleManager.Instance.AddEntity(mEntity1);

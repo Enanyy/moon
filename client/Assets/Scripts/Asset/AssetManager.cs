@@ -170,6 +170,7 @@ public class AssetManager : MonoBehaviour
         {
             return;
         }
+        
         StartCoroutine(LoadAssetAsync(task));
     }
 
@@ -183,7 +184,7 @@ public class AssetManager : MonoBehaviour
 
         Bundle bundle = GetOrCreateBundle(task.bundleName);
 
-        StartCoroutine(bundle.LoadAsset(task));
+        yield return bundle.LoadAsset(task);
     }
 
     /// <summary>
@@ -225,8 +226,9 @@ public class AssetManager : MonoBehaviour
         if (AssetPath.mode == AssetMode.AssetBundle)
         {
             Bundle bundle = GetOrCreateBundle(task.assetName);
-            yield return bundle.LoadBundleAsync();
 
+            yield return bundle.LoadBundleAsync();
+            
             var request = SceneManager.LoadSceneAsync(task.sceneName, task.mode);
             yield return request;
 
@@ -298,13 +300,12 @@ public class AssetManager : MonoBehaviour
 
     public void RemoveBundle(Bundle bundle)
     {
-        if(bundle == null)
+        if (bundle == null || string.IsNullOrEmpty(bundle.bundleName))
         {
             return;
         }
-       
-         mAssetBundleDic.Remove(bundle.bundleName);
-        
+
+        mAssetBundleDic.Remove(bundle.bundleName);
     }
 
    

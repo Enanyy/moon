@@ -79,17 +79,27 @@ public class Bundle
             {
                 string dependenceName = dependenceNames[i];
 
-                if (dependences.ContainsKey(dependenceName) == false)
+                Bundle bundleObject;
+                if (dependences.TryGetValue(dependenceName, out bundleObject) == false)
                 {
-                    Bundle bundleObject = AssetManager.Instance.GetOrCreateBundle(dependenceName);
+                    bundleObject = AssetManager.Instance.GetOrCreateBundle(dependenceName);
 
-                    dependences[dependenceName] = bundleObject;
-
-                    if (bundleObject.bundle == null)
-                    {
-                        yield return bundleObject.LoadBundleAsync();
-                    }
+                    dependences.Add(dependenceName, bundleObject);
                 }
+            }
+        }
+
+        var it = dependences.GetEnumerator();
+        while (it.MoveNext())
+        {
+            Bundle bundleObject = it.Current.Value;
+            if (bundleObject.bundle == null)
+            {
+                yield return bundleObject.LoadBundleAsync();
+            }
+            else if(bundleObject.isLoading)
+            {
+                yield return new WaitUntil(() => bundleObject.isDone);
             }
         }
 
@@ -409,7 +419,11 @@ public class Bundle
             var dependence = dependences.GetEnumerator();
             while (dependence.MoveNext())
             {
-                dependence.Current.Value.UnLoad();
+                var dependenceBundle = dependence.Current.Value;
+                if (string.IsNullOrEmpty(dependenceBundle.bundleName) == false)
+                {
+                    dependenceBundle.UnLoad();
+                }
             }
             dependences.Clear();
 
@@ -428,8 +442,8 @@ public class Bundle
             mCacheAssetDic.Clear();
             mResourceAssets.Clear();
 
-            mAsyncOperation = null;
             bundleName = null;
+            mAsyncOperation = null;
             dependenceNames = null;
         }
     }
