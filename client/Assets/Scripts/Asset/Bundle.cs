@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using System.Collections;
 
+public enum BundleStatus
+{
+    None,
+    Loading,
+    Done,
+}
 
 public class Bundle
 {
@@ -29,14 +35,11 @@ public class Bundle
     private HashSet<string> mResourceAssets = new HashSet<string>();
 
     private AsyncOperation mAsyncOperation;
-    public bool isDone
-    {
-        get { return mAsyncOperation != null && mAsyncOperation.isDone; }
-    }
-    public bool isLoading { get { return mAsyncOperation != null && mAsyncOperation.isDone == false; } }
-
+  
+    public BundleStatus status { get; private set; }
 
     private int mAssetCount = 0;
+
     /// <summary>
     /// 该Bundle所有资源数
     /// </summary>
@@ -64,6 +67,8 @@ public class Bundle
 
         this.bundleName = bundleName;
         this.dependenceNames = dependenceNames;
+
+        status = BundleStatus.None;
     }
     public IEnumerator LoadBundleAsync()
     {
@@ -93,39 +98,41 @@ public class Bundle
         while (it.MoveNext())
         {
             Bundle bundleObject = it.Current.Value;
-            if (bundleObject.bundle == null)
+            if (bundleObject.status ==  BundleStatus.None)
             {
                 yield return bundleObject.LoadBundleAsync();
-            }
-            else if(bundleObject.isLoading)
-            {
-                yield return new WaitUntil(() => bundleObject.isDone);
             }
         }
 
         if (mAsyncOperation == null)
         {
             string path = AssetPath.GetFullPath(bundleName);
-
             mAsyncOperation = AssetBundle.LoadFromFileAsync(path);
+
+            status = BundleStatus.Loading;
         }
-        
+
         yield return mAsyncOperation;
 
-        var request = mAsyncOperation as AssetBundleCreateRequest;
+        status = BundleStatus.Done;
 
-        if (request.isDone && request.assetBundle)
+        if (bundle == null)
         {
-            bundle = request.assetBundle;
-        }
-        else
-        {
-            mAsyncOperation = null;
-            //Debug.Log("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
-        }
-    }
+            var request = mAsyncOperation as AssetBundleCreateRequest;
 
-    public IEnumerator LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
+            if (request.isDone && request.assetBundle)
+            {
+                bundle = request.assetBundle;
+            }
+            else
+            {
+                mAsyncOperation = null;
+                //Debug.Log("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
+            }
+        }
+  }
+
+  public IEnumerator LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
     {
         if (task == null || task.isCancel)
         {
