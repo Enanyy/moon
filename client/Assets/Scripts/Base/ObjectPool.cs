@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public interface IPoolObject
 {
     /// <summary>
-    /// 构造（创建）
+    /// 构造（创建或从对象池取出）
     /// </summary>
     void OnConstruct();
 
@@ -27,7 +27,8 @@ public class ObjectPool
     /// <summary>
     /// 归还对象到对象池
     /// </summary>
-    /// <param name="o">对象</param>
+    /// <param name="obj">对象</param>
+    /// <param name="type">指定类型</param>
 	static public void ReturnInstance<T>(T obj, Type type = null) where T : IPoolObject
     {
         if (obj == null)
@@ -60,7 +61,7 @@ public class ObjectPool
     /// <summary>
     /// 获取指定类型的对象
     /// </summary>
-    /// <param name="service">指定类型</param>
+    /// <param name="type">指定类型</param>
     /// <returns></returns>
 	static public T GetInstance<T>(Type type = null) where T : IPoolObject
     {
@@ -74,8 +75,8 @@ public class ObjectPool
         T obj;
         if (list.Count > 0)
         {
-            obj = (T)list[0];
-            list.RemoveAt(0);
+            obj = (T)list[list.Count - 1];
+            list.RemoveAt(list.Count - 1);
         }
         else
         {
