@@ -3,7 +3,12 @@ using System.Collections;
 using System;
 using UnityEngine.SceneManagement;
 using System.IO;
-
+public enum LoadStatus
+{
+    None,
+    Loading,
+    Done,
+}
 public interface ILoadTask
 {
     string bundleName { get; }

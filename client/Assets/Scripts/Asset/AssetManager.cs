@@ -35,9 +35,7 @@ public class AssetManager : MonoBehaviour
     private AssetBundleManifest mManifest;
     private Dictionary<string, Bundle> mAssetBundleDic = new Dictionary<string, Bundle>();
 
-    public bool initialized { get; private set; }
-
-    private AsyncOperation mAsyncOperation;
+    public LoadStatus status { get; private set; } = LoadStatus.None;
 
     private List<string> mBundleNameList = new List<string>();
     private float mLastUnloadTime;
@@ -50,7 +48,7 @@ public class AssetManager : MonoBehaviour
 
     public void Initialize()
     {
-        if (initialized )
+        if (status == LoadStatus.Done )
         {
             return;
         }
@@ -59,9 +57,9 @@ public class AssetManager : MonoBehaviour
 
     private IEnumerator BeginInitialize()
     {     
-        if (mAsyncOperation != null)
+        if (status == LoadStatus.Loading)
         {
-            yield return new WaitUntil(() => mAsyncOperation.isDone);
+            yield return new WaitUntil(() => status == LoadStatus.Done);
         }
         else
         {
@@ -71,8 +69,10 @@ public class AssetManager : MonoBehaviour
 
             using (UnityWebRequest request = UnityWebRequest.Get(assetFile))
             {
-                mAsyncOperation = request.SendWebRequest();
-                yield return mAsyncOperation;
+                status = LoadStatus.Loading;
+
+                UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+                yield return operation;
 
                 if (string.IsNullOrEmpty(request.downloadHandler.text) == false)
                 {
@@ -120,7 +120,8 @@ public class AssetManager : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        initialized = true;
+        status = LoadStatus.Done;
+
         Debug.Log("Initialize AssetManager Finish!");
     }
 
@@ -176,10 +177,10 @@ public class AssetManager : MonoBehaviour
 
     private IEnumerator LoadAssetAsync<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
     {
-        if (initialized == false)
+        if (status != LoadStatus.Done)
         {
             Initialize();
-            yield return new WaitUntil(() => initialized);
+            yield return new WaitUntil(() => status == LoadStatus.Done);
         }
 
         Bundle bundle = GetOrCreateBundle(task.bundleName);
@@ -215,10 +216,10 @@ public class AssetManager : MonoBehaviour
 
     private IEnumerator LoadSceneAsync(ISceneLoadTask task)
     {
-        if(initialized== false)
+        if(status !=  LoadStatus.Done)
         {
             Initialize();
-            yield return new WaitUntil(() => initialized);
+            yield return new WaitUntil(() => status == LoadStatus.Done);
         }
 
         mSceneLoadTasks.Add(task);

@@ -29,12 +29,7 @@ public class Bundle
     /// </summary>
     private HashSet<string> mResourceAssets = new HashSet<string>();
 
-    public enum LoadStatus
-    {
-        None,
-        Loading,
-        Done,
-    }
+   
     public LoadStatus status { get; private set; }
 
     private int mAssetCount = 0;
