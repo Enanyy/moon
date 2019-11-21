@@ -11,11 +11,6 @@ public class ActionPlugin : IState<BattleEntity>,IPoolObject
     public EntityParamPlugin param { get; private set; }
 
 
-    public bool isPool
-    {
-        get;set;
-    }
-
     public virtual void Init(EntityParamPlugin param)
     {
         this.param = param;

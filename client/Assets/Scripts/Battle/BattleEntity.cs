@@ -129,9 +129,6 @@ public class BattleEntity:
         }
     }
    
-
-    public bool isPool { get; set; }
-
     public BattleEntity()
     {
         machine = new StateMachine<BattleEntity>(this);

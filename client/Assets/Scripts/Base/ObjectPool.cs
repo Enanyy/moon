@@ -4,11 +4,6 @@ using System.Collections.Generic;
 public interface IPoolObject
 {
     /// <summary>
-    /// 是否是已经回收的
-    /// </summary>
-    bool isPool { get; set; }
-
-    /// <summary>
     /// 构造（创建）
     /// </summary>
     void OnConstruct();
@@ -23,23 +18,26 @@ public interface IPoolObject
 /// </summary>
 public class ObjectPool
 {
-    public static int maxNum = 8196;
+    /// <summary>
+    /// 每个类型的对象池最大容量
+    /// </summary>
+    public const int maxNum = 256; 
 
     static private Dictionary<Type, List<IPoolObject>> mPool = new Dictionary<Type, List<IPoolObject>>();
     /// <summary>
     /// 归还对象到对象池
     /// </summary>
     /// <param name="o">对象</param>
-	static public void ReturnInstance<T>(T o, Type type = null) where T : IPoolObject
+	static public void ReturnInstance<T>(T obj, Type type = null) where T : IPoolObject
     {
-        if (o == null)
+        if (obj == null)
             return;
         if (type == null)
             type = typeof(T);
         List<IPoolObject> list;
         if (!mPool.TryGetValue(type, out list))
             list = AddType(type);
-        if (list.Contains(o))
+        if (list.Contains(obj))
         {
             UnityEngine.Debug.LogError(string.Format("ReturnInstance Exists:type={0}", type));
             return;
@@ -49,9 +47,8 @@ public class ObjectPool
             UnityEngine.Debug.LogError(string.Format("ReturnInstance maxNum:type={0}", type));
             return;
         }
-        o.OnDestruct();
-        o.isPool = true;
-        list.Add(o);
+        obj.OnDestruct();
+        list.Add(obj);
     }
     static private List<IPoolObject> AddType(Type type)
     {
@@ -85,8 +82,22 @@ public class ObjectPool
             obj = (T)Activator.CreateInstance(type);// type.Assembly.CreateInstance(type.FullName);
         }
         obj.OnConstruct();
-        obj.isPool = false;
         return obj;
+    }
+    /// <summary>
+    /// 是否在对象池内
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    static public bool IsInPool(IPoolObject obj)
+    {
+        Type type = obj.GetType();
+        List<IPoolObject> list;
+        if (mPool.TryGetValue(type, out list))
+        {
+            return list.Contains(obj);
+        }
+        return false;
     }
 
     /// <summary>

@@ -15,9 +15,6 @@ public class EntityComponentModel :
     {
         private float mDelay;
         private Action mCallback;
-
-        public bool isPool { get; set; }
-
         public void Init(float delay, Action callback)
         {
             mDelay = delay;

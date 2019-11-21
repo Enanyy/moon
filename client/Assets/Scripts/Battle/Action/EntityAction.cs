@@ -9,8 +9,6 @@ public class PathPoint:IPoolObject
     public bool done ;
     public bool arrive;
 
-    public bool isPool { get; set; }
-
     private Action<BattleEntity, Vector3> mArriveAction;
     private Action<BattleEntity, Vector3> mFailedAction;
 
@@ -69,12 +67,6 @@ public class EntityAction : State<BattleEntity>,IPoolObject
         get { return (ActionType)base.type; }
         set { base.type = (int)value; }
     }
-
-    public bool isPool
-    {
-        get;set;
-    }
-
     public EntityAction()
     {
        paths = new LinkedList<PathPoint>();

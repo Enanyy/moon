@@ -13,8 +13,6 @@ using System.Collections.Generic;
 using UnityEngine;
 public class AssetEntity :IPoolObject
 {
-    public bool isPool { get ; set ; }
-
     public GameObject gameObject { get; private set; }
 
     public Asset<GameObject> asset { get; private set; }
