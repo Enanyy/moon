@@ -2,12 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 
-public enum BundleStatus
-{
-    None,
-    Loading,
-    Done,
-}
+
 
 public class Bundle
 {
@@ -34,9 +29,13 @@ public class Bundle
     /// </summary>
     private HashSet<string> mResourceAssets = new HashSet<string>();
 
-    private AsyncOperation mAsyncOperation;
-  
-    public BundleStatus status { get; private set; }
+    public enum LoadStatus
+    {
+        None,
+        Loading,
+        Done,
+    }
+    public LoadStatus status { get; private set; }
 
     private int mAssetCount = 0;
 
@@ -68,7 +67,7 @@ public class Bundle
         this.bundleName = bundleName;
         this.dependenceNames = dependenceNames;
 
-        status = BundleStatus.None;
+        status = LoadStatus.None;
     }
     public IEnumerator LoadBundleAsync()
     {
@@ -98,27 +97,25 @@ public class Bundle
         while (it.MoveNext())
         {
             Bundle bundleObject = it.Current.Value;
-            if (bundleObject.status ==  BundleStatus.None)
+            if (bundleObject.status == LoadStatus.None)
             {
                 yield return bundleObject.LoadBundleAsync();
             }
         }
 
-        if (mAsyncOperation == null)
-        {
-            string path = AssetPath.GetFullPath(bundleName);
-            mAsyncOperation = AssetBundle.LoadFromFileAsync(path);
 
-            status = BundleStatus.Loading;
-        }
+        string path = AssetPath.GetFullPath(bundleName);
+        AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
 
-        yield return mAsyncOperation;
+        status = LoadStatus.Loading;
 
-        status = BundleStatus.Done;
+
+        yield return request;
+
+        status = LoadStatus.Done;
 
         if (bundle == null)
         {
-            var request = mAsyncOperation as AssetBundleCreateRequest;
 
             if (request.isDone && request.assetBundle)
             {
@@ -126,13 +123,12 @@ public class Bundle
             }
             else
             {
-                mAsyncOperation = null;
                 //Debug.Log("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
             }
         }
-  }
+    }
 
-  public IEnumerator LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
+    public IEnumerator LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
     {
         if (task == null || task.isCancel)
         {
@@ -191,13 +187,13 @@ public class Bundle
 
                 if (bundle == null)
                 {
-                    if (mAsyncOperation == null && task.isCancel == false)
+                    if (status == LoadStatus.None && task.isCancel == false)
                     {
                         yield return LoadBundleAsync();
                     }
                     else
                     {
-                        yield return new WaitUntil(() => mAsyncOperation.isDone || task.isCancel);
+                        yield return new WaitUntil(() => status == LoadStatus.Done || task.isCancel);
                     }
                 }
 
@@ -223,12 +219,9 @@ public class Bundle
 
                 string path = AssetPath.GetResourcePath(assetName);
 
-                mAsyncOperation = Resources.LoadAsync(path);
+                ResourceRequest request = Resources.LoadAsync(path);
 
-
-                yield return mAsyncOperation;
-
-                var request = mAsyncOperation as ResourceRequest;
+                yield return request;
 
                 if (request.asset != null && mAssetDic.ContainsKey(assetName) == false)
                 {
@@ -450,8 +443,8 @@ public class Bundle
             mResourceAssets.Clear();
 
             bundleName = null;
-            mAsyncOperation = null;
             dependenceNames = null;
+            status = LoadStatus.None;
         }
     }
 }
