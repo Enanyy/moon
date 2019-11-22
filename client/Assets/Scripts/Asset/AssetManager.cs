@@ -46,15 +46,7 @@ public class AssetManager : MonoBehaviour
 
     private List<ISceneLoadTask> mSceneLoadTasks = new List<ISceneLoadTask>();
 
-    public void Initialize()
-    {
-        if (status == LoadStatus.Done )
-        {
-            return;
-        }
-        StartCoroutine(BeginInitialize());
-    }
-
+    
     private IEnumerator BeginInitialize()
     {     
         if (status == LoadStatus.Loading)
@@ -179,8 +171,7 @@ public class AssetManager : MonoBehaviour
     {
         if (status != LoadStatus.Done)
         {
-            Initialize();
-            yield return new WaitUntil(() => status == LoadStatus.Done);
+            yield return BeginInitialize();
         }
 
         Bundle bundle = GetOrCreateBundle(task.bundleName);
@@ -216,10 +207,9 @@ public class AssetManager : MonoBehaviour
 
     private IEnumerator LoadSceneAsync(ISceneLoadTask task)
     {
-        if(status !=  LoadStatus.Done)
+        if (status != LoadStatus.Done)
         {
-            Initialize();
-            yield return new WaitUntil(() => status == LoadStatus.Done);
+            yield return BeginInitialize();
         }
 
         mSceneLoadTasks.Add(task);
@@ -229,7 +219,7 @@ public class AssetManager : MonoBehaviour
             Bundle bundle = GetOrCreateBundle(task.assetName);
 
             yield return bundle.LoadBundleAsync();
-            
+
             var request = SceneManager.LoadSceneAsync(task.sceneName, task.mode);
             yield return request;
 
@@ -293,7 +283,7 @@ public class AssetManager : MonoBehaviour
 
         if(bundle == null)
         {
-            bundle = new Bundle(bundleName, GetAllDependencies(bundleName));
+            bundle = new Bundle(bundleName);
             mAssetBundleDic.Add(bundleName, bundle);
         }
         return bundle;
@@ -310,28 +300,19 @@ public class AssetManager : MonoBehaviour
     }
 
    
-    public string[] GetAllDependencies(string bundleName)
+    /// <summary>
+    /// 获取直接依赖
+    /// </summary>
+    /// <param name="bundleName"></param>
+    /// <returns></returns>
+    public string[] GetDirectDependencies(string bundleName)
     {
         if (string.IsNullOrEmpty(bundleName) || mManifest == null)
         {
             return null;
         }
 
-        return mManifest.GetAllDependencies(bundleName);
-    }
-
-    public bool OtherDependence(Bundle entity ,string bundleName)
-    {    
-        var it = mAssetBundleDic.GetEnumerator();
-        while (it.MoveNext())
-        {
-            if (it.Current.Value != entity 
-                && it.Current.Value.Dependence(bundleName))
-            {
-                return true;
-            }
-        }
-        return false;
+        return mManifest.GetDirectDependencies(bundleName);
     }
 
     public void UnLoad(string bundleName)

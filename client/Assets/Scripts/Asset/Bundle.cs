@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Collections;
 
-
-
 public class Bundle
 {
     public string bundleName { get; private set; }
     public AssetBundle bundle { get; private set; }
-    public string[] dependenceNames { get; private set; }
-
+   
     /// <summary>
     /// 依赖哪些资源？
     /// </summary>
     public Dictionary<string, Bundle> dependences { get; private set; }
+    /// <summary>
+    /// 被哪些父级资源依赖
+    /// </summary>
+    public Dictionary<string, Bundle> dependencesby { get; private set; }
     /// <summary>
     /// 场景中实例化出来的,即引用
     /// </summary>
@@ -54,13 +55,14 @@ public class Bundle
 
     private HashSet<ILoadTask> mLoadTasks = new HashSet<ILoadTask>();
 
-    public Bundle(string bundleName,string[] dependenceNames)
+    public Bundle(string bundleName)
     {
         dependences = new Dictionary<string, Bundle>();
+        dependencesby = new Dictionary<string, Bundle>();
         references = new Dictionary<string, List<IAsset>>();
 
         this.bundleName = bundleName;
-        this.dependenceNames = dependenceNames;
+
 
         status = LoadStatus.None;
     }
@@ -72,6 +74,7 @@ public class Bundle
             yield break;
         }
 #endif
+        string[] dependenceNames = AssetManager.Instance.GetDirectDependencies(bundleName);
         if (dependenceNames != null)
         {
             for (int i = 0; i < dependenceNames.Length; ++i)
@@ -82,8 +85,9 @@ public class Bundle
                 if (dependences.TryGetValue(dependenceName, out bundleObject) == false)
                 {
                     bundleObject = AssetManager.Instance.GetOrCreateBundle(dependenceName);
+                    bundleObject.AddDependenceBy(this);
 
-                    dependences.Add(dependenceName, bundleObject);
+                    dependences.Add(dependenceName, bundleObject);              
                 }
             }
         }
@@ -98,12 +102,10 @@ public class Bundle
             }
         }
 
-
         string path = AssetPath.GetFullPath(bundleName);
         AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
 
         status = LoadStatus.Loading;
-
 
         yield return request;
 
@@ -111,7 +113,6 @@ public class Bundle
 
         if (bundle == null)
         {
-
             if (request.isDone && request.assetBundle)
             {
                 bundle = request.assetBundle;
@@ -309,6 +310,7 @@ public class Bundle
             var list = it.Current.Value;
             for (int i = 0; i < list.Count;)
             {
+                //移除已经被Destroy的引用
                 if (list[i] == null || list[i].destroyed)
                 {
                     list.RemoveAt(i); continue;
@@ -317,22 +319,76 @@ public class Bundle
                 ++i;
             }
         }
-        int loadtaskCount = 0;
-        var loadtask = mLoadTasks.GetEnumerator();
-        while (loadtask.MoveNext())
+        //没有引用了
+        if (referenceCount == 0)
         {
-            if (loadtask.Current.isCancel == false)
+            int loadtaskCount = 0;
+            var loadtask = mLoadTasks.GetEnumerator();
+            while (loadtask.MoveNext())
             {
-                loadtaskCount++;
+                if (loadtask.Current.isCancel == false)
+                {
+                    loadtaskCount++;
+                }
+            }
+            //也没有正在加载的请求了
+            if (loadtaskCount == 0)
+            {
+                //尝试卸载
+                UnLoad();
             }
         }
-        if (referenceCount == 0 && loadtaskCount ==0)
+    }
+    
+
+    private void AddDependenceBy(Bundle parent)
+    {
+        if(parent == null)
         {
-            UnLoad();
+            return;
+        }
+        if(dependencesby.ContainsKey(parent.bundleName)==false)
+        {
+            dependencesby.Add(parent.bundleName, parent);
+        }
+    }
+
+    private void RemoveDependenceBy(Bundle parent)
+    {
+        if (parent == null)
+        {
+            return;
+        }
+
+        dependencesby.Remove(parent.bundleName);
+
+        if (dependencesby.Count == 0)
+        {
+            //检查是否可以被卸载
+            RemoveReference();
         }
 
     }
 
+    /// <summary>
+    /// 该Bundle是否被bundleName的资源依赖
+    /// </summary>
+    /// <param name="bundleName"></param>
+    /// <returns></returns>
+    public bool DependenceBy(string bundleName)
+    {
+        if(string.IsNullOrEmpty(bundleName))
+        {
+            return false;
+        }
+
+        return dependencesby.ContainsKey(bundleName);
+    }
+    /// <summary>
+    /// 该Bundle是否依赖了bundleName的资源
+    /// </summary>
+    /// <param name="bundleName"></param>
+    /// <returns></returns>
     public bool Dependence(string bundleName)
     {
         if (string.IsNullOrEmpty(bundleName))
@@ -340,32 +396,28 @@ public class Bundle
             return false;
         }
 
-        if(dependenceNames!=null)
+        var it = dependences.GetEnumerator();
+
+        while(it.MoveNext())
         {
-            for (int i = 0; i < dependenceNames.Length; ++i)
+            if (it.Current.Key == bundleName)
             {
-                string dependenceName = dependenceNames[i];
-                if(dependenceName == bundleName)
+                return true;
+            }
+            else
+            {
+                if (it.Current.Value.Dependence(bundleName))
                 {
                     return true;
                 }
             }
         }
-
-        var it = dependences.GetEnumerator();
-
-        while(it.MoveNext())
-        {
-            if(it.Current.Value.Dependence(bundleName))
-            {
-                return true;
-            }
-        }
-  
-
         return false;
     }
-
+    /// <summary>
+    /// 回收一个资源
+    /// </summary>
+    /// <param name="assetObject"></param>
     public void ReturnAsset(IAsset assetObject)
     {
         if (assetObject == null)
@@ -386,9 +438,10 @@ public class Bundle
         }
     }
 
-    public void UnLoad()
+    public bool UnLoad()
     {
-        if (AssetManager.Instance.OtherDependence(this, bundleName) == false)
+        //没有被别的资源依赖，可以卸载
+        if (dependencesby.Count <= 0)
         {
             Debug.Log("卸载Bundle:" + bundleName);
 
@@ -400,35 +453,33 @@ public class Bundle
                 bundle = null;
             }
 
-            var reference = references.GetEnumerator();
-            while (reference.MoveNext())
+            var referenceIter = references.GetEnumerator();
+            while (referenceIter.MoveNext())
             {
-                for (int i = 0; i < reference.Current.Value.Count; i++)
+                var list = referenceIter.Current.Value;
+                for (int i = 0; i < list.Count; i++)
                 {
-                    reference.Current.Value[i].Destroy(false);
+                    list[i].Destroy(false);
                 }
-                reference.Current.Value.Clear();
+                list.Clear();
             }
             references.Clear();
 
-            var dependence = dependences.GetEnumerator();
-            while (dependence.MoveNext())
+            var dependenceIter = dependences.GetEnumerator();
+            while (dependenceIter.MoveNext())
             {
-                var dependenceBundle = dependence.Current.Value;
-                if (string.IsNullOrEmpty(dependenceBundle.bundleName) == false)
-                {
-                    dependenceBundle.UnLoad();
-                }
+                var dependence = dependenceIter.Current.Value;
+                dependence.RemoveDependenceBy(this);
             }
             dependences.Clear();
 
 
-            var asset = mAssetDic.GetEnumerator();
-            while (asset.MoveNext())
+            var assetIter = mAssetDic.GetEnumerator();
+            while (assetIter.MoveNext())
             {
-                if (mResourceAssets.Contains(asset.Current.Key))
+                if (mResourceAssets.Contains(assetIter.Current.Key))
                 {
-                    Resources.UnloadAsset(asset.Current.Value);
+                    Resources.UnloadAsset(assetIter.Current.Value);
                 }
             }
 
@@ -438,9 +489,11 @@ public class Bundle
             mResourceAssets.Clear();
 
             bundleName = null;
-            dependenceNames = null;
             status = LoadStatus.None;
+
+            return true;
         }
+        return false;
     }
 }
 
