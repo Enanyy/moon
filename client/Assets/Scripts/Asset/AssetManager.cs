@@ -6,41 +6,12 @@ using UnityEngine.SceneManagement;
 
 public class AssetManager : MonoBehaviour
 {
-
-    #region Instance
-    private static AssetManager mInstance;
-    private static AssetManager Instance
-    {
-        get
-        {
-            if (mInstance == null)
-            {
-                GameObject go = new GameObject(typeof(AssetManager).Name);
-                mInstance = go.AddComponent<AssetManager>();
-                DontDestroyOnLoad(go);
-            }
-            return mInstance;
-        }
-    }
-    #endregion
-
-    private Asset<AssetBundleManifest> mAssetManifest;
-
-    private Dictionary<string, Bundle> mAssetBundleDic = new Dictionary<string, Bundle>();
-
-    public LoadStatus status { get; private set; } = LoadStatus.None;
-
-    private List<string> mBundleNameList = new List<string>();
-    private float mLastUnloadTime;
+    #region 静态公有方法
     /// <summary>
     /// 60s自动检测已经销毁的资源，并释放对应的Bundle
     /// </summary>
-    public float unloadInterval = 60;
+    public static float unloadInterval = 60;
 
-    private List<ISceneLoadTask> mSceneLoadTasks = new List<ISceneLoadTask>();
-
- 
-    #region 静态公有方法
     /// <summary>
     /// key可以是文件名(带后缀)或者文件路径(Assets/...)。
     /// 注意，当非实例化资源（非GameObject，如Material，Texture，TextAsset等）使用完毕后,需要主动调用Destroy去释放资源
@@ -74,7 +45,7 @@ public class AssetManager : MonoBehaviour
 
     private IEnumerator LoadAssetAsync<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
     {
-        if (status != LoadStatus.Done)
+        if (mStatus != LoadStatus.Done)
         {
             yield return BeginInitialize();
         }
@@ -190,16 +161,44 @@ public class AssetManager : MonoBehaviour
     #endregion
 
     #region 私有方法
+    #region Instance
+    private static AssetManager mInstance;
+    private static AssetManager Instance
+    {
+        get
+        {
+            if (mInstance == null)
+            {
+                GameObject go = new GameObject(typeof(AssetManager).Name);
+                mInstance = go.AddComponent<AssetManager>();
+                DontDestroyOnLoad(go);
+            }
+            return mInstance;
+        }
+    }
+    #endregion
+    private Asset<AssetBundleManifest> mAssetManifest;
+
+    private Dictionary<string, Bundle> mAssetBundleDic = new Dictionary<string, Bundle>();
+
+    private LoadStatus mStatus = LoadStatus.None;
+
+    private List<string> mBundleNameList = new List<string>();
+    private float mLastUnloadTime;
+
+
+    private List<ISceneLoadTask> mSceneLoadTasks = new List<ISceneLoadTask>();
+
 
     private IEnumerator BeginInitialize()
     {
-        if (status == LoadStatus.Done)
+        if (mStatus == LoadStatus.Done)
         {
             yield break;
         }
-        else if (status == LoadStatus.Loading)
+        else if (mStatus == LoadStatus.Loading)
         {
-            yield return new WaitUntil(() => status == LoadStatus.Done);
+            yield return new WaitUntil(() => mStatus == LoadStatus.Done);
         }
         else
         {
@@ -233,7 +232,7 @@ public class AssetManager : MonoBehaviour
         }
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        status = LoadStatus.Done;
+        mStatus = LoadStatus.Done;
 
         Debug.Log("Initialize AssetManager Finish!");
     }
@@ -263,7 +262,7 @@ public class AssetManager : MonoBehaviour
 
     private IEnumerator LoadSceneAsync(ISceneLoadTask task)
     {
-        if (status != LoadStatus.Done)
+        if (mStatus != LoadStatus.Done)
         {
             yield return BeginInitialize();
         }
@@ -326,7 +325,7 @@ public class AssetManager : MonoBehaviour
         mAssetBundleDic.Clear();
         mAssetManifest = null;
         SceneManager.sceneLoaded -= OnSceneLoaded;
-        status = LoadStatus.None;
+        mStatus = LoadStatus.None;
     }
     #endregion
 }
