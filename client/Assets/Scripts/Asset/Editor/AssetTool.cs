@@ -139,7 +139,7 @@ public static class AssetTool
 
         GUILayout.BeginHorizontal();
 
-        bool select = asset != null && AssetPath.list.assets.ContainsKey(asset.name);
+        bool select = asset != null && AssetPath.list.Contains(asset.name);
         bool mixed = IsMixedSelect(editor.targets);
 
         if (mixed)
@@ -184,7 +184,7 @@ public static class AssetTool
 
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
-        if (asset != null && AssetPath.list.assets.ContainsKey(asset.name))
+        if (asset != null && AssetPath.list.Contains(asset.name))
         {
             select = string.IsNullOrEmpty(asset.group) == false;
             mixed = IsMixedGroup(editor.targets);
@@ -277,7 +277,7 @@ public static class AssetTool
             var asset = GetAsset(targets[i]);
             if (asset != null)
             {
-                bool select = AssetPath.list.assets.ContainsKey(asset.name);
+                bool select = AssetPath.list.Contains(asset.name);
                 if (firstSet == false)
                 {
                     firstSelected = select;

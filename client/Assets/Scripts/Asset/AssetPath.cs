@@ -114,6 +114,11 @@ public class AssetList
 #endif
     }
 
+    public bool Contains(string key)
+    {
+        return assets.ContainsKey(key);
+    }
+
     public void FromXml(string xml)
     {
         try
