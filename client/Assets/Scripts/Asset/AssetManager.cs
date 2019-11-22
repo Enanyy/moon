@@ -79,7 +79,9 @@ public class AssetManager : MonoBehaviour
                     {
                         Bundle bundle = GetOrCreateBundle(AssetPath.manifest);
 
-                        AssetCustomLoadTask<AssetBundleManifest> task = new AssetCustomLoadTask<AssetBundleManifest>(AssetPath.manifest, "AssetBundleManifest", FinishInitialize);
+                        AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.manifest, FinishInitialize);
+
+                        task.assetName = "AssetBundleManifest";
 
                         yield return bundle.LoadAsset(task);
  
