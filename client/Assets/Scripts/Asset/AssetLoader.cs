@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-public class AssetManager : MonoBehaviour
+public class AssetLoader : MonoBehaviour
 {
     #region 静态公有方法
     /// <summary>
@@ -43,19 +43,6 @@ public class AssetManager : MonoBehaviour
         Instance.StartCoroutine(Instance.LoadAssetAsync(task));
     }
 
-    private IEnumerator LoadAssetAsync<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
-    {
-        if (mStatus != LoadStatus.Done)
-        {
-            yield return BeginInitialize();
-        }
-
-
-        Bundle bundle = GetOrCreateBundle(task.bundleName);
-
-        yield return bundle.LoadAsset(task);
-    }
-
     /// <summary>
     /// 加载场景
     /// </summary>
@@ -81,15 +68,7 @@ public class AssetManager : MonoBehaviour
         }
         Instance.StartCoroutine(Instance.LoadSceneAsync(task));
     }
-    private IEnumerator UnloadSceneAsync(Scene scene,Action callback)
-    {
-        var request = SceneManager.UnloadSceneAsync(scene);
-        yield return request;
-        if (callback != null)
-        {
-            callback();
-        }
-    }
+  
 
     /// <summary>
     /// 卸载一个Additive场景
@@ -162,15 +141,15 @@ public class AssetManager : MonoBehaviour
 
     #region 私有方法
     #region Instance
-    private static AssetManager mInstance;
-    private static AssetManager Instance
+    private static AssetLoader mInstance;
+    private static AssetLoader Instance
     {
         get
         {
             if (mInstance == null)
             {
-                GameObject go = new GameObject(typeof(AssetManager).Name);
-                mInstance = go.AddComponent<AssetManager>();
+                GameObject go = new GameObject(typeof(AssetLoader).Name);
+                mInstance = go.AddComponent<AssetLoader>();
                 DontDestroyOnLoad(go);
             }
             return mInstance;
@@ -237,28 +216,18 @@ public class AssetManager : MonoBehaviour
         Debug.Log("Initialize AssetManager Finish!");
     }
 
-
-
-    private void Update()
+    private IEnumerator LoadAssetAsync<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
     {
-        if (Time.time - mLastUnloadTime > unloadInterval)
+        if (mStatus != LoadStatus.Done)
         {
-            mLastUnloadTime = Time.time;
-
-            mBundleNameList.AddRange(mAssetBundleDic.Keys);
-
-            for (int i = 0; i < mBundleNameList.Count; i++)
-            {
-                Bundle bundle;
-                if (mAssetBundleDic.TryGetValue(mBundleNameList[i], out bundle))
-                {
-                    bundle.RemoveReference();
-                }
-            }
-            mBundleNameList.Clear();
+            yield return BeginInitialize();
         }
-    }
 
+
+        Bundle bundle = GetOrCreateBundle(task.bundleName);
+
+        yield return bundle.LoadAsset(task);
+    }
 
     private IEnumerator LoadSceneAsync(ISceneLoadTask task)
     {
@@ -283,6 +252,37 @@ public class AssetManager : MonoBehaviour
             yield return SceneManager.LoadSceneAsync(task.sceneName);
         }
     }
+
+    private IEnumerator UnloadSceneAsync(Scene scene, Action callback)
+    {
+        var request = SceneManager.UnloadSceneAsync(scene);
+        yield return request;
+        if (callback != null)
+        {
+            callback();
+        }
+    }
+
+    private void Update()
+    {
+        if (Time.time - mLastUnloadTime > unloadInterval)
+        {
+            mLastUnloadTime = Time.time;
+
+            mBundleNameList.AddRange(mAssetBundleDic.Keys);
+
+            for (int i = 0; i < mBundleNameList.Count; i++)
+            {
+                Bundle bundle;
+                if (mAssetBundleDic.TryGetValue(mBundleNameList[i], out bundle))
+                {
+                    bundle.RemoveReference();
+                }
+            }
+            mBundleNameList.Clear();
+        }
+    }
+
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
