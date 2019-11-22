@@ -131,30 +131,36 @@ public class Bundle
             yield break;
         }
 
-        Asset<T> assetObject = null;
+        Asset<T> assetT = null;
         Object asset = null;
       
         string assetName = task.assetName;
         
         if (mCacheAssetDic.TryGetValue(assetName,out List<IAsset> list))
         {
-            if (list.Count > 0)
+            for (int i = 0; i < list.Count; i++)
             {
-                for (int i = 0; i < list.Count; i++)
+                if (list[i] == null || list[i].destroyed)
                 {
-                    assetObject = list[i] as Asset<T>;
-                    if (assetObject != null)
-                    {
-                        list.RemoveAt(i); break;
-                    }
+                    list.RemoveAt(i);continue;
                 }
-            }
+                assetT = list[i] as Asset<T>;
+                if(assetT.assetObject != null)
+                {
+                    assetT = null;
+                    list.RemoveAt(i); continue;
+                }
+                else
+                {
+                    break;
+                }
+            }       
         }
         
 
-        if (assetObject != null)
+        if (assetT != null)
         {
-            task.OnCompleted(assetObject);
+            task.OnCompleted(assetT);
         }
         else
         {
@@ -238,13 +244,13 @@ public class Bundle
             {
                 if (typeof(T) == typeof(GameObject))
                 {
-                    var go = UnityEngine.Object.Instantiate(asset) as GameObject;
+                    var go = Object.Instantiate(asset) as GameObject;
 
-                    assetObject = new Asset<T>(assetName, this, asset, go as T);
+                    assetT = new Asset<T>(assetName, this, asset, go as T);
                 }
                 else
                 {
-                    assetObject = new Asset<T>(assetName, this, asset, asset as T);
+                    assetT = new Asset<T>(assetName, this, asset, asset as T);
                 }
             }
 
@@ -252,7 +258,7 @@ public class Bundle
 
             if (task.isCancel == false)
             {
-                task.OnCompleted(assetObject);
+                task.OnCompleted(assetT);
             }
             else
             {

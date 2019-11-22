@@ -9,7 +9,6 @@ public interface IAsset
     /// </summary>
     bool destroyed { get; }
 
-
     void Destroy(bool removeReference = true);
 
 }
@@ -17,7 +16,7 @@ public interface IAsset
 /// 当非实例化资源（非GameObject，如Material，Texture，TextAsset等）使用完毕后,需要主动调用Destroy去释放资源
 /// </summary>
 /// <typeparam name="T">资源类型</typeparam>
-public class Asset<T>: IAsset where T:Object
+public class Asset<T> : IAsset where T : Object
 {
     public Bundle bundle { get; private set; }
 
@@ -27,7 +26,7 @@ public class Asset<T>: IAsset where T:Object
 
     public T assetObject { get; private set; }
 
-    public bool destroyed{ get { return assetObject == null; } }
+    public bool destroyed { get { return assetObject == null; } }
 
     public Asset(string assetName, Bundle bundle, Object asset, T assetObject)
     {
@@ -36,7 +35,7 @@ public class Asset<T>: IAsset where T:Object
         this.asset = asset;
         this.assetObject = assetObject;
 
-        if(bundle!= null)
+        if (bundle != null)
         {
             bundle.AddReference(this);
         }
@@ -46,7 +45,7 @@ public class Asset<T>: IAsset where T:Object
     /// </summary>
     /// <param name="removeReference">是否移除引用</param>
     public virtual void Destroy(bool removeReference = true)
-    { 
+    {
         if (typeof(T) == typeof(GameObject))
         {
             Object.Destroy(assetObject as GameObject);
@@ -71,5 +70,6 @@ public class Asset<T>: IAsset where T:Object
             Destroy();
         }
     }
+  
 }
 
