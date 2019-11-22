@@ -1,8 +1,16 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using UnityEngine;
+using UnityEngine.Networking;
+
+public enum AssetMode
+{
+    Editor,     //开发模式
+    AssetBundle,//AssetBunlde模式
+}
 
 /// <summary>
 /// 资源文件
@@ -218,10 +226,45 @@ public static class AssetPath
              return AssetMode.AssetBundle;
 #endif
         }
-    } 
+    }
+    public static LoadStatus status { get; private set; } = LoadStatus.None;
+
     public const string ASSETSFILE = "assets.txt";
 
-    
+    public static IEnumerator Initialize()
+    {
+        if (status == LoadStatus.Done)
+        {
+            yield break;
+        }
+        else if (status == LoadStatus.Loading)
+        {
+            yield return new WaitUntil(() => status == LoadStatus.Done);
+        }
+        else
+        {
+            string assetFile = GetAssetFile();
+
+            Debug.Log("AssetMode:" + mode.ToString());
+
+            using (UnityWebRequest request = UnityWebRequest.Get(assetFile))
+            {
+                status = LoadStatus.Loading;
+
+                UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+                yield return operation;
+
+                if (string.IsNullOrEmpty(request.downloadHandler.text) == false)
+                {
+                    list.FromXml(request.downloadHandler.text);
+
+                    status = LoadStatus.Done;
+                }
+            }
+        }
+    }
+
+
 
     private static string FormatRootPath(string path)
     {

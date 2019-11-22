@@ -2,14 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
-using System.IO;
-public enum AssetMode
-{
-    Editor,
-    AssetBundle,
-}
 
 public class AssetManager : MonoBehaviour
 {
@@ -48,8 +41,8 @@ public class AssetManager : MonoBehaviour
 
     
     private IEnumerator BeginInitialize()
-    {     
-        if(status == LoadStatus.Done)
+    {
+        if (status == LoadStatus.Done)
         {
             yield break;
         }
@@ -59,42 +52,23 @@ public class AssetManager : MonoBehaviour
         }
         else
         {
-            string assetFile = AssetPath.GetAssetFile();
+            //初始化资源列表
+            yield return AssetPath.Initialize();
 
-            Debug.Log("AssetMode:" + AssetPath.mode.ToString());
-
-            using (UnityWebRequest request = UnityWebRequest.Get(assetFile))
+            if (AssetPath.mode == AssetMode.AssetBundle)
             {
-                status = LoadStatus.Loading;
+                Bundle bundle = GetOrCreateBundle(AssetPath.list.manifest);
 
-                UnityWebRequestAsyncOperation operation = request.SendWebRequest();
-                yield return operation;
+                AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.list.manifest, FinishInitialize);
 
-                if (string.IsNullOrEmpty(request.downloadHandler.text) == false)
-                {
-                    //解析资源列表
-                    AssetPath.list.FromXml(request.downloadHandler.text);
+                task.assetName = "AssetBundleManifest";
 
-                    if (AssetPath.mode == AssetMode.AssetBundle)
-                    {
-                        Bundle bundle = GetOrCreateBundle(AssetPath.list.manifest);
+                yield return bundle.LoadAsset(task);
 
-                        AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.list.manifest, FinishInitialize);
-
-                        task.assetName = "AssetBundleManifest";
-
-                        yield return bundle.LoadAsset(task);
- 
-                    }
-                    else
-                    {
-                       FinishInitialize(null);
-                    }
-                }
-                else
-                {
-                    Debug.LogError(request.error + ":" + request.url);
-                }
+            }
+            else
+            {
+                FinishInitialize(null);
             }
         }
     }
