@@ -32,7 +32,7 @@ public class Test : MonoBehaviour {
             if(asset!= null)
             {
                 Debug.Log("Load Success:cube.prefab!");
-                //asset.Destroy();
+                asset.Destroy();
             }
             else
             {
@@ -41,6 +41,7 @@ public class Test : MonoBehaviour {
             }
 
         });
+     
 
         AssetManager.Instance.LoadAsset<GameObject>("cube1.prefab", (asset) =>
         {

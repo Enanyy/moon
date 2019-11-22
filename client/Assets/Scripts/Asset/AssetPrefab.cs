@@ -27,20 +27,20 @@ public class AssetPrefab : MonoBehaviour
 
     private static Asset<GameObject> mAsset;
 
-    private static bool mInitializing = false;
+    private static LoadStatus mStatus = LoadStatus.None;
     public static void Initialize()
     {
         if(mInstance!=null)
         {
             return;
         }
-        if(mInitializing)
+        if(mStatus == LoadStatus.Loading)
         {
             return;
         }
-        mInitializing = true;
+        mStatus = LoadStatus.Loading;
 
-        AssetManager.Instance.LoadAsset<GameObject>("assetcache.prefab", (asset) => { 
+        AssetManager.Instance.LoadAsset<GameObject>("assetprefab.prefab", (asset) => { 
         
             if(asset!= null)
             {
@@ -48,7 +48,7 @@ public class AssetPrefab : MonoBehaviour
                 mInstance = mAsset.assetObject.GetComponent<AssetPrefab>();
                 DontDestroyOnLoad(mAsset.assetObject);
             }
-            mInitializing = false;
+            mStatus =  LoadStatus.Done;
         
         });
     }
@@ -65,7 +65,7 @@ public class AssetPrefab : MonoBehaviour
         }
         mInstance = null;
         mAsset = null;
-        mInitializing = false;
+        mStatus =  LoadStatus.None;
     }
 
     [SerializeField]

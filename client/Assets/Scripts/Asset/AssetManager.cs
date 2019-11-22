@@ -31,8 +31,8 @@ public class AssetManager : MonoBehaviour
     }
     #endregion
 
-    private AssetBundle mManifestBundle;
-    private AssetBundleManifest mManifest;
+    private Asset<AssetBundleManifest> mAssetManifest;
+
     private Dictionary<string, Bundle> mAssetBundleDic = new Dictionary<string, Bundle>();
 
     public LoadStatus status { get; private set; } = LoadStatus.None;
@@ -68,27 +68,21 @@ public class AssetManager : MonoBehaviour
 
                 if (string.IsNullOrEmpty(request.downloadHandler.text) == false)
                 {
+                    //解析资源列表
                     AssetPath.FromXml(request.downloadHandler.text);
+
                     if (AssetPath.mode == AssetMode.AssetBundle)
                     {
-                        string manifest = AssetPath.GetFullPath(AssetPath.manifest);
+                        Bundle bundle = GetOrCreateBundle(AssetPath.manifest);
 
-                        var manifestRequest = AssetBundle.LoadFromFileAsync(manifest);
+                        AssetCustomLoadTask<AssetBundleManifest> task = new AssetCustomLoadTask<AssetBundleManifest>(AssetPath.manifest, "AssetBundleManifest", FinishInitialize);
 
-                        yield return manifestRequest;
-
-                        if (manifestRequest.isDone && manifestRequest.assetBundle)
-                        {
-                            FinishInitialize(manifestRequest.assetBundle);
-                        }
-                        else
-                        {
-                            Debug.LogError("Load assetbundle:" + manifest + " failed!!");
-                        }
+                        yield return bundle.LoadAsset(task);
+ 
                     }
                     else
                     {
-                        FinishInitialize(null);
+                       FinishInitialize(null);
                     }
                 }
                 else
@@ -98,24 +92,22 @@ public class AssetManager : MonoBehaviour
             }
         }
     }
-
-    private void FinishInitialize(AssetBundle assetBundle)
+    private void FinishInitialize(Asset<AssetBundleManifest> asset)
     {
-        if (assetBundle != null)
+        mAssetManifest = asset;
+
+        if(mAssetManifest!= null && mAssetManifest.assetObject!= null)
         {
-            mManifestBundle = assetBundle;
-
-            mManifest = mManifestBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
-
-            DontDestroyOnLoad(mManifest);
+            DontDestroyOnLoad(mAssetManifest.assetObject);
         }
-
         SceneManager.sceneLoaded += OnSceneLoaded;
 
         status = LoadStatus.Done;
 
         Debug.Log("Initialize AssetManager Finish!");
     }
+
+  
 
     private void Update()
     {
@@ -173,6 +165,7 @@ public class AssetManager : MonoBehaviour
         {
             yield return BeginInitialize();
         }
+       
 
         Bundle bundle = GetOrCreateBundle(task.bundleName);
 
@@ -220,14 +213,12 @@ public class AssetManager : MonoBehaviour
 
             yield return bundle.LoadBundleAsync();
 
-            var request = SceneManager.LoadSceneAsync(task.sceneName, task.mode);
-            yield return request;
+            yield return SceneManager.LoadSceneAsync(task.sceneName, task.mode);
 
         }
         else
         {
-            var request = SceneManager.LoadSceneAsync(task.sceneName);
-            yield return request;
+            yield return SceneManager.LoadSceneAsync(task.sceneName);
         }
     }
 
@@ -307,12 +298,12 @@ public class AssetManager : MonoBehaviour
     /// <returns></returns>
     public string[] GetDirectDependencies(string bundleName)
     {
-        if (string.IsNullOrEmpty(bundleName) || mManifest == null)
+        if (string.IsNullOrEmpty(bundleName) || mAssetManifest == null || mAssetManifest.assetObject == null)
         {
             return null;
         }
 
-        return mManifest.GetDirectDependencies(bundleName);
+        return mAssetManifest.assetObject.GetDirectDependencies(bundleName);
     }
 
     public void UnLoad(string bundleName)
@@ -337,13 +328,8 @@ public class AssetManager : MonoBehaviour
             it.Current.Value.dependences.Clear();
         }
 
-        mAssetBundleDic.Clear();
-
-        if (mManifestBundle)
-        {
-            mManifestBundle.Unload(true);
-        }
-        mManifest = null;
+        mAssetBundleDic.Clear(); 
+        mAssetManifest = null;
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

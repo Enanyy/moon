@@ -63,7 +63,6 @@ public class Bundle
 
         this.bundleName = bundleName;
 
-
         status = LoadStatus.None;
     }
     public IEnumerator LoadBundleAsync()
@@ -119,7 +118,7 @@ public class Bundle
             }
             else
             {
-                //Debug.Log("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
+                Debug.Log("Can't Load AssetBundle:" + bundleName + "  from :" + path + "!!");
             }
         }
     }
@@ -138,20 +137,17 @@ public class Bundle
         
         if (mCacheAssetDic.TryGetValue(assetName,out List<IAsset> list))
         {
-            for (int i = 0; i < list.Count; i++)
+            for (int i = list.Count -1; i>=0; --i)
             {
                 if (list[i] == null || list[i].destroyed)
                 {
                     list.RemoveAt(i);continue;
                 }
-                assetT = list[i] as Asset<T>;
-                if(assetT.assetObject != null)
+                var t = list[i] as Asset<T>;
+                if(t != null)
                 {
-                    assetT = null;
-                    list.RemoveAt(i); continue;
-                }
-                else
-                {
+                    list.RemoveAt(i);
+                    assetT = t;
                     break;
                 }
             }       

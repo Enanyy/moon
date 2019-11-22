@@ -123,3 +123,32 @@ public class AssetLoadTask<T> : LoadTask, IAssetLoadTask<T> where T : UnityEngin
         }
     }
 }
+
+public class AssetCustomLoadTask<T> : IAssetLoadTask<T> where T : UnityEngine.Object
+{
+    public string bundleName { get; private set; }
+
+    public string assetName { get; private set; }
+
+    public bool isCancel { get; private set; }
+
+    public Action<Asset<T>> callback { get; private set; }
+
+    public AssetCustomLoadTask(string bundleName, string assetName, Action<Asset<T>> callback)
+    {
+        this.bundleName = bundleName;
+        this.assetName = assetName;
+        this.callback = callback;
+        this.isCancel = false;
+    }
+
+    public void OnCompleted(Asset<T> t)
+    {
+        if (callback != null)
+        {
+            callback(t);
+        }
+    }
+
+    public void Cancel() { isCancel = true; }
+}
