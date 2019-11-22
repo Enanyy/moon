@@ -29,7 +29,7 @@ public class Chess : MonoBehaviour
 
         CameraManager.Instance.Init();
         
-        AssetManager.LoadAsset<TextAsset>("data.bytes", (asset) =>
+        AssetLoader.LoadAsset<TextAsset>("data.bytes", (asset) =>
         {
             if (asset != null)
             {

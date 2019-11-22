@@ -55,7 +55,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
                     if (mMaterial == null)
                     {
-                        AssetManager.LoadAsset<Material>("tile.mat", (asset) =>
+                        AssetLoader.LoadAsset<Material>("tile.mat", (asset) =>
                         {
 
 
@@ -139,7 +139,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
             }
             if(mMaterial == null)
             {
-                AssetManager.LoadAsset<Material>("tile.mat", (asset) => {
+                AssetLoader.LoadAsset<Material>("tile.mat", (asset) => {
 
                     mMaterial = asset.assetObject;
                     t.Show(root.transform, mTileMesh, mMaterial);
@@ -335,7 +335,7 @@ public class BattleRectGrid :RectGrid<BattleRectTile>
 
                     }
 
-                    AssetManager.LoadAsset<Material>("arrow.mat", (asset) => {
+                    AssetLoader.LoadAsset<Material>("arrow.mat", (asset) => {
 
                         mPathRenderer.material = asset.assetObject;
                     });

@@ -73,7 +73,7 @@ public class Bundle
             yield break;
         }
 #endif
-        string[] dependenceNames = AssetManager.GetDirectDependencies(bundleName);
+        string[] dependenceNames = AssetLoader.GetDirectDependencies(bundleName);
         if (dependenceNames != null)
         {
             for (int i = 0; i < dependenceNames.Length; ++i)
@@ -83,7 +83,7 @@ public class Bundle
                 Bundle bundleObject;
                 if (dependences.TryGetValue(dependenceName, out bundleObject) == false)
                 {
-                    bundleObject = AssetManager.GetOrCreateBundle(dependenceName);
+                    bundleObject = AssetLoader.GetOrCreateBundle(dependenceName);
                     bundleObject.AddDependenceBy(this);
 
                     dependences.Add(dependenceName, bundleObject);              
@@ -447,7 +447,7 @@ public class Bundle
         {
             Debug.Log("卸载Bundle:" + bundleName);
 
-            AssetManager.RemoveBundle(this);
+            AssetLoader.RemoveBundle(this);
 
             if (bundle != null)
             {

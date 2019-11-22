@@ -28,7 +28,7 @@ public class Test : MonoBehaviour {
 
         //return;
 
-         AssetManager.LoadAsset<GameObject>("cube.prefab", (asset) => { 
+         AssetLoader.LoadAsset<GameObject>("cube.prefab", (asset) => { 
             
             if(asset!= null)
             {
@@ -44,7 +44,7 @@ public class Test : MonoBehaviour {
         });
      
 
-        AssetManager.LoadAsset<GameObject>("cube1.prefab", (asset) =>
+        AssetLoader.LoadAsset<GameObject>("cube1.prefab", (asset) =>
         {
 
             if (asset != null)
