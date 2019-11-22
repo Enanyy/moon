@@ -2,7 +2,7 @@
 public interface IAsset
 {
     string assetName { get; }
-    Bundle bundle { get; }
+    BundleAsset bundle { get; }
     Object asset { get; }
     /// <summary>
     /// 已经被销毁
@@ -18,7 +18,7 @@ public interface IAsset
 /// <typeparam name="T">资源类型</typeparam>
 public class Asset<T> : IAsset where T : Object
 {
-    public Bundle bundle { get; private set; }
+    public BundleAsset bundle { get; private set; }
 
     public string assetName { get; private set; }
 
@@ -28,7 +28,7 @@ public class Asset<T> : IAsset where T : Object
 
     public bool destroyed { get { return assetObject == null; } }
 
-    public Asset(string assetName, Bundle bundle, Object asset, T assetObject)
+    public Asset(string assetName, BundleAsset bundle, Object asset, T assetObject)
     {
         this.assetName = assetName;
         this.bundle = bundle;

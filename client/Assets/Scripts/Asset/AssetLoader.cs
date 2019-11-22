@@ -80,15 +80,22 @@ public class AssetLoader : MonoBehaviour
         Instance.StartCoroutine(Instance.UnloadSceneAsync(scene, callback));
     }
 
-
-    public static Bundle GetOrCreateBundle(string bundleName)
+    public static T GetBundle<T>(string bundleName) where T:Bundle
     {
         Bundle bundle;
         Instance.mAssetBundleDic.TryGetValue(bundleName, out bundle);
 
+        return bundle as T;
+    }
+
+    public static T GetOrCreateBundle<T>(string bundleName) where T:Bundle,new ()
+    {
+        T bundle = GetBundle<T>(bundleName);
+       
         if(bundle == null)
         {
-            bundle = new Bundle(bundleName);
+            bundle = new T();
+            bundle.bundleName = bundleName;
             Instance.mAssetBundleDic.Add(bundleName, bundle);
         }
         return bundle;
@@ -120,12 +127,12 @@ public class AssetLoader : MonoBehaviour
         return Instance.mAssetManifest.assetObject.GetDirectDependencies(bundleName);
     }
 
-    public static void UnLoad(string bundleName)
+    public static void Unload(string bundleName)
     {
         Bundle bundle;
         if(Instance.mAssetBundleDic.TryGetValue(bundleName, out bundle))
         {
-            bundle.UnLoad();
+            bundle.Unload();
         }
     }
 
@@ -165,9 +172,7 @@ public class AssetLoader : MonoBehaviour
     private List<string> mBundleNameList = new List<string>();
     private float mLastUnloadTime;
 
-
     private List<ISceneLoadTask> mSceneLoadTasks = new List<ISceneLoadTask>();
-
 
     private IEnumerator BeginInitialize()
     {
@@ -181,12 +186,13 @@ public class AssetLoader : MonoBehaviour
         }
         else
         {
+            mStatus = LoadStatus.Loading;
             //初始化资源列表
             yield return AssetPath.Initialize();
 
             if (AssetPath.mode == AssetMode.AssetBundle)
             {
-                Bundle bundle = GetOrCreateBundle(AssetPath.list.manifest);
+                BundleAsset bundle = GetOrCreateBundle<BundleAsset>(AssetPath.list.manifest);
 
                 AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.list.manifest, FinishInitialize);
 
@@ -209,11 +215,13 @@ public class AssetLoader : MonoBehaviour
         {
             DontDestroyOnLoad(mAssetManifest.assetObject);
         }
+        SceneManager.sceneLoaded -= OnSceneLoaded;
         SceneManager.sceneLoaded += OnSceneLoaded;
 
         mStatus = LoadStatus.Done;
 
         Debug.Log("Initialize AssetManager Finish!");
+
     }
 
     private IEnumerator LoadAssetAsync<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
@@ -224,7 +232,7 @@ public class AssetLoader : MonoBehaviour
         }
 
 
-        Bundle bundle = GetOrCreateBundle(task.bundleName);
+        BundleAsset bundle = GetOrCreateBundle<BundleAsset>(task.bundleName);
 
         yield return bundle.LoadAsset(task);
     }
@@ -240,7 +248,7 @@ public class AssetLoader : MonoBehaviour
 
         if (AssetPath.mode == AssetMode.AssetBundle)
         {
-            Bundle bundle = GetOrCreateBundle(task.assetName);
+            BundleScene bundle = GetOrCreateBundle<BundleScene>(task.assetName);
 
             yield return bundle.LoadBundleAsync();
 
@@ -276,7 +284,11 @@ public class AssetLoader : MonoBehaviour
                 Bundle bundle;
                 if (mAssetBundleDic.TryGetValue(mBundleNameList[i], out bundle))
                 {
-                    bundle.RemoveReference();
+                    var bundleAsset = bundle as BundleAsset;
+                    if (bundleAsset != null)
+                    {
+                        bundleAsset.RemoveReference();
+                    }
                 }
             }
             mBundleNameList.Clear();
@@ -289,39 +301,45 @@ public class AssetLoader : MonoBehaviour
         for (int i = 0; i < mSceneLoadTasks.Count;)
         {
             var task = mSceneLoadTasks[i];
-            if (task.isCancel)
-            {
-                if (task.sceneName == scene.name && mode == LoadSceneMode.Additive)
-                {
-                    UnLoadScene(scene, null);
-                }
-                mSceneLoadTasks.RemoveAt(i);
-                continue;
-            }
+         
             if (task.sceneName == scene.name)
             {
-                task.OnCompleted(scene, mode);
+                BundleScene bundle = GetBundle<BundleScene>(task.assetName);
+                if (bundle != null)
+                {
+                    if (task.isCancel)
+                    {
+                        UnLoadScene(scene, null);
+                        bundle.Unload(true);
+                    }
+                    else
+                    {
+                        bundle.scene = scene;
+                        bundle.mode = mode;
+
+                        task.OnCompleted(scene, mode);
+                    }
+                }
                 mSceneLoadTasks.RemoveAt(i);
                 continue;
             }
             i++;
         }
     }
+    
     private void OnDestroy()
     {
-        var it = mAssetBundleDic.GetEnumerator();
-        while (it.MoveNext())
+        mBundleNameList.Clear();
+        mBundleNameList.AddRange(mAssetBundleDic.Keys);
+        for(int i = 0; i < mBundleNameList.Count; ++i)
         {
-            var bunlde = it.Current.Value;
-            if (bunlde.bundle != null)
+            var bundleName = mBundleNameList[i];
+            if(mAssetBundleDic.TryGetValue(bundleName,out Bundle bundle))
             {
-                bunlde.bundle.Unload(true);
+                bundle.Unload(true);
             }
-            bunlde.references.Clear();
-            bunlde.dependences.Clear();
-            bunlde.dependencesby.Clear();
         }
-
+        mBundleNameList.Clear();
         mAssetBundleDic.Clear();
         mAssetManifest = null;
         SceneManager.sceneLoaded -= OnSceneLoaded;

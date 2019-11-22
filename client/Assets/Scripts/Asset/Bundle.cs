@@ -1,20 +1,74 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
-public class Bundle
+public abstract class Bundle
 {
-    public string bundleName { get; private set; }
-    public AssetBundle bundle { get; private set; }
-   
+    public string bundleName { get; set; }
+    public AssetBundle bundle { get; protected set; }
+
+    public LoadStatus status { get; private set; }
+    public Bundle()
+    {
+        this.bundleName = bundleName;
+        status = LoadStatus.None;
+    }
+
+    public virtual IEnumerator LoadBundleAsync()
+    {
+        string path = AssetPath.GetFullPath(bundleName);
+        AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
+
+        status = LoadStatus.Loading;
+
+        yield return request;
+
+        status = LoadStatus.Done;
+
+        if (bundle == null)
+        {
+            if (request.isDone && request.assetBundle)
+            {
+                bundle = request.assetBundle;
+            }
+            else
+            {
+                Debug.Log("Can't Load AssetBundle:" + bundleName + "  from :" + path + "!!");
+            }
+        }
+    }
+
+    public virtual bool Unload(bool force = false)
+    {
+        if (force == false)
+        {
+            Debug.Log("卸载Bundle:" + bundleName);
+        }
+        AssetLoader.RemoveBundle(this);
+
+        if (bundle != null)
+        {
+            bundle.Unload(true);
+            bundle = null;
+        }
+        status = LoadStatus.None;
+
+        return true;
+    }
+
+}
+
+public class BundleAsset:Bundle
+{
     /// <summary>
     /// 依赖哪些资源？
     /// </summary>
-    public Dictionary<string, Bundle> dependences { get; private set; }
+    public Dictionary<string, BundleAsset> dependences { get; private set; }
     /// <summary>
     /// 被哪些父级资源依赖
     /// </summary>
-    public Dictionary<string, Bundle> dependencesby { get; private set; }
+    public Dictionary<string, BundleAsset> dependencesby { get; private set; }
     /// <summary>
     /// 场景中实例化出来的,即引用
     /// </summary>
@@ -29,9 +83,6 @@ public class Bundle
     /// Resource资源名
     /// </summary>
     private HashSet<string> mResourceAssets = new HashSet<string>();
-
-   
-    public LoadStatus status { get; private set; }
 
     private int mAssetCount = 0;
 
@@ -55,17 +106,13 @@ public class Bundle
 
     private HashSet<ILoadTask> mLoadTasks = new HashSet<ILoadTask>();
 
-    public Bundle(string bundleName)
+    public BundleAsset()
     {
-        dependences = new Dictionary<string, Bundle>();
-        dependencesby = new Dictionary<string, Bundle>();
+        dependences = new Dictionary<string, BundleAsset>();
+        dependencesby = new Dictionary<string, BundleAsset>();
         references = new Dictionary<string, List<IAsset>>();
-
-        this.bundleName = bundleName;
-
-        status = LoadStatus.None;
     }
-    public IEnumerator LoadBundleAsync()
+    public override IEnumerator LoadBundleAsync()
     {
 #if UNITY_EDITOR
         if (AssetPath.mode == AssetMode.Editor)
@@ -80,13 +127,13 @@ public class Bundle
             {
                 string dependenceName = dependenceNames[i];
 
-                Bundle bundleObject;
+                BundleAsset bundleObject;
                 if (dependences.TryGetValue(dependenceName, out bundleObject) == false)
                 {
-                    bundleObject = AssetLoader.GetOrCreateBundle(dependenceName);
+                    bundleObject = AssetLoader.GetOrCreateBundle<BundleAsset>(dependenceName);
                     bundleObject.AddDependenceBy(this);
 
-                    dependences.Add(dependenceName, bundleObject);              
+                    dependences.Add(dependenceName, bundleObject);
                 }
             }
         }
@@ -94,33 +141,14 @@ public class Bundle
         var it = dependences.GetEnumerator();
         while (it.MoveNext())
         {
-            Bundle bundleObject = it.Current.Value;
+            BundleAsset bundleObject = it.Current.Value;
             if (bundleObject.status == LoadStatus.None)
             {
                 yield return bundleObject.LoadBundleAsync();
             }
         }
 
-        string path = AssetPath.GetFullPath(bundleName);
-        AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
-
-        status = LoadStatus.Loading;
-
-        yield return request;
-
-        status = LoadStatus.Done;
-
-        if (bundle == null)
-        {
-            if (request.isDone && request.assetBundle)
-            {
-                bundle = request.assetBundle;
-            }
-            else
-            {
-                Debug.Log("Can't Load AssetBundle:" + bundleName + "  from :" + path + "!!");
-            }
-        }
+        yield return base.LoadBundleAsync();
     }
 
     public IEnumerator LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
@@ -337,13 +365,13 @@ public class Bundle
             if (loadtaskCount == 0)
             {
                 //尝试卸载
-                UnLoad();
+                Unload();
             }
         }
     }
     
 
-    private void AddDependenceBy(Bundle parent)
+    private void AddDependenceBy(BundleAsset parent)
     {
         if(parent == null)
         {
@@ -355,7 +383,7 @@ public class Bundle
         }
     }
 
-    private void RemoveDependenceBy(Bundle parent)
+    private void RemoveDependenceBy(BundleAsset parent)
     {
         if (parent == null)
         {
@@ -440,21 +468,11 @@ public class Bundle
         }
     }
 
-    public bool UnLoad()
+    public override bool Unload(bool force =false)
     {
         //没有被别的资源依赖，可以卸载
-        if (dependencesby.Count <= 0)
+        if (dependencesby.Count <= 0 || force)
         {
-            Debug.Log("卸载Bundle:" + bundleName);
-
-            AssetLoader.RemoveBundle(this);
-
-            if (bundle != null)
-            {
-                bundle.Unload(true);
-                bundle = null;
-            }
-
             var referenceIter = references.GetEnumerator();
             while (referenceIter.MoveNext())
             {
@@ -475,7 +493,6 @@ public class Bundle
             }
             dependences.Clear();
 
-
             var assetIter = mAssetDic.GetEnumerator();
             while (assetIter.MoveNext())
             {
@@ -485,17 +502,44 @@ public class Bundle
                 }
             }
 
+            base.Unload(force);
 
             mAssetDic.Clear();
             mCacheAssetDic.Clear();
             mResourceAssets.Clear();
 
-            bundleName = null;
-            status = LoadStatus.None;
-
             return true;
         }
         return false;
     }
+}
+
+public class BundleScene : Bundle
+{
+    public Scene scene { get; set; }
+    public LoadSceneMode mode { get; set; }
+    public BundleScene()
+    {
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+
+    }
+
+    private void OnSceneUnloaded(Scene scene)
+    {
+        if(this.scene == scene)
+        {
+            Unload(true);
+        }
+    }
+
+    public override bool Unload(bool force = false)
+    {
+        SceneManager.sceneUnloaded -= OnSceneUnloaded;
+
+        Debug.Log("Unload scene bundle:" + bundleName);
+
+        return base.Unload(force);
+    }
+
 }
 

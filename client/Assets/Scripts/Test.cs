@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Test : MonoBehaviour {
 
@@ -17,14 +18,17 @@ public class Test : MonoBehaviour {
     {
         ScreenLogger.SetActive(true);
     }
+
+    private Scene mScene;
+
     void Start ()
     {
-        var task = AssetLoader.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Additive, (scene, mode) =>
+        var task = AssetLoader.LoadScene("testscene.unity", LoadSceneMode.Additive, (scene, mode) =>
         {
-
+            mScene = scene;
 
         });
-        task.Cancel();
+        //task.Cancel();
 
         //return;
 
@@ -42,7 +46,8 @@ public class Test : MonoBehaviour {
             }
 
         });
-     
+
+       
 
         AssetLoader.LoadAsset<GameObject>("cube1.prefab", (asset) =>
         {
@@ -110,6 +115,12 @@ public class Test : MonoBehaviour {
                 run.AddPathPoint(CameraManager.Instance.GetWorldMousePosition(), Vector3.zero, true);
                 mEntity.PlayAction(ActionType.Run,run);
             }
+        }
+        if(Input.GetKeyDown(KeyCode.U))
+        {
+            AssetLoader.UnLoadScene(mScene, () => {
+                Debug.Log("Unload scene success!");
+            });
         }
 	}
 }
