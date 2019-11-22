@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
+﻿using System;
 using UnityEngine.SceneManagement;
 using System.IO;
 public enum LoadStatus
@@ -93,10 +91,7 @@ public class SceneLoadTask : LoadTask, ISceneLoadTask
     {
         get
         {
-            if (assetName.Contains("."))
-                return assetName.Substring(0, assetName.LastIndexOf('.'));
-            return assetName;
-
+            return Path.GetFileNameWithoutExtension(assetName);
         }
     }
     public SceneLoadTask(string key, LoadSceneMode mode, Action<Scene, LoadSceneMode> callback) : base(key)

@@ -19,12 +19,12 @@ public class Test : MonoBehaviour {
     }
     void Start ()
     {
-        //var task = AssetManager.Instance.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Additive, (scene, mode) =>
-        //{
+        var task = AssetLoader.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Additive, (scene, mode) =>
+        {
 
 
-        //});
-        //task.Cancel();
+        });
+        task.Cancel();
 
         //return;
 
