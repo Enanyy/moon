@@ -23,7 +23,7 @@ public class AssetEntity :IPoolObject
 
     protected void LoadAsset(string key)
     {      
-        AssetManager.Instance.LoadAsset<GameObject>(key,OnAssetLoad);
+        AssetManager.LoadAsset<GameObject>(key,OnAssetLoad);
     }
 
     protected virtual void OnAssetLoad(Asset<GameObject> asset)

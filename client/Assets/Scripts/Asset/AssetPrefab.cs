@@ -39,8 +39,8 @@ public class AssetPrefab : MonoBehaviour
             return;
         }
         mStatus = LoadStatus.Loading;
-
-        AssetManager.Instance.LoadAsset<GameObject>("assetprefab.prefab", (asset) => { 
+        
+        AssetManager.LoadAsset<GameObject>("assetprefab.prefab", (asset) => { 
         
             if(asset!= null)
             {

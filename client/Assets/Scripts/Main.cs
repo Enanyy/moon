@@ -21,7 +21,7 @@ public class Main : MonoBehaviour
         Instance = this;
         CameraManager.Instance.Init();
        
-        AssetManager.Instance.LoadAsset<TextAsset>("data.bytes", (asset) => {
+        AssetManager.LoadAsset<TextAsset>("data.bytes", (asset) => {
 
             if(asset!=null)
             {

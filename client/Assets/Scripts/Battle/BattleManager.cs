@@ -82,7 +82,7 @@ public class BattleManager
         }
         else
         {
-            AssetManager.Instance.LoadAsset<TextAsset>(congfig, (asset) => {
+            AssetManager.LoadAsset<TextAsset>(congfig, (asset) => {
 
                 if (asset!= null && mParams.ContainsKey(congfig)==false)
                 { 

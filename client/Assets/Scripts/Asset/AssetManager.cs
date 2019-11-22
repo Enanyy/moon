@@ -9,7 +9,7 @@ public class AssetManager : MonoBehaviour
 
     #region Instance
     private static AssetManager mInstance;
-    public static AssetManager Instance
+    private static AssetManager Instance
     {
         get
         {
@@ -39,7 +39,158 @@ public class AssetManager : MonoBehaviour
 
     private List<ISceneLoadTask> mSceneLoadTasks = new List<ISceneLoadTask>();
 
-    
+ 
+    #region 静态公有方法
+    /// <summary>
+    /// key可以是文件名(带后缀)或者文件路径(Assets/...)。
+    /// 注意，当非实例化资源（非GameObject，如Material，Texture，TextAsset等）使用完毕后,需要主动调用Destroy去释放资源
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="key"></param>
+    /// <param name="callback"></param>
+    /// <returns></returns>
+    public static AssetLoadTask<T> LoadAsset<T>(string key, Action<Asset<T>> callback) where T : UnityEngine.Object
+    {
+        AssetLoadTask<T> task = new AssetLoadTask<T>(key.ToLower(), callback);
+
+        LoadAsset(task);
+
+        return task;
+    }
+    /// <summary>
+    /// 自定义LoadTask。当非实例化资源（非GameObject，如Material，Texture，TextAsset等）使用完毕后,需要主动调用Destroy去释放资源
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="task"></param>
+    public static void LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
+    {
+        if (task == null)
+        {
+            return;
+        }
+
+        Instance.StartCoroutine(Instance.LoadAssetAsync(task));
+    }
+
+    private IEnumerator LoadAssetAsync<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
+    {
+        if (status != LoadStatus.Done)
+        {
+            yield return BeginInitialize();
+        }
+
+
+        Bundle bundle = GetOrCreateBundle(task.bundleName);
+
+        yield return bundle.LoadAsset(task);
+    }
+
+    /// <summary>
+    /// 加载场景
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="mode"></param>
+    /// <param name="callback"></param>
+    /// <returns></returns>
+    public static SceneLoadTask LoadScene(string key, LoadSceneMode mode, Action<Scene, LoadSceneMode> callback)
+    {
+        SceneLoadTask task = new SceneLoadTask(key.ToLower(), mode, callback);
+        LoadScene(task);
+        return task;
+    }
+    /// <summary>
+    /// 自定义LoadTask
+    /// </summary>
+    /// <param name="task"></param>
+    public static void LoadScene(ISceneLoadTask task)
+    {
+        if (task == null)
+        {
+            return;
+        }
+        Instance.StartCoroutine(Instance.LoadSceneAsync(task));
+    }
+    private IEnumerator UnloadSceneAsync(Scene scene,Action callback)
+    {
+        var request = SceneManager.UnloadSceneAsync(scene);
+        yield return request;
+        if (callback != null)
+        {
+            callback();
+        }
+    }
+
+    /// <summary>
+    /// 卸载一个Additive场景
+    /// </summary>
+    /// <param name="scene"></param>
+    /// <param name="callback"></param>
+    public static void UnLoadScene(Scene scene, Action callback)
+    {
+        Instance.StartCoroutine(Instance.UnloadSceneAsync(scene, callback));
+    }
+
+
+    public static Bundle GetOrCreateBundle(string bundleName)
+    {
+        Bundle bundle;
+        Instance.mAssetBundleDic.TryGetValue(bundleName, out bundle);
+
+        if(bundle == null)
+        {
+            bundle = new Bundle(bundleName);
+            Instance.mAssetBundleDic.Add(bundleName, bundle);
+        }
+        return bundle;
+    }
+
+    public static void RemoveBundle(Bundle bundle)
+    {
+        if (bundle == null || string.IsNullOrEmpty(bundle.bundleName))
+        {
+            return;
+        }
+
+        Instance.mAssetBundleDic.Remove(bundle.bundleName);
+    }
+
+   
+    /// <summary>
+    /// 获取直接依赖
+    /// </summary>
+    /// <param name="bundleName"></param>
+    /// <returns></returns>
+    public static string[] GetDirectDependencies(string bundleName)
+    {
+        if (string.IsNullOrEmpty(bundleName) || Instance.mAssetManifest == null || Instance.mAssetManifest.assetObject == null)
+        {
+            return null;
+        }
+
+        return Instance.mAssetManifest.assetObject.GetDirectDependencies(bundleName);
+    }
+
+    public static void UnLoad(string bundleName)
+    {
+        Bundle bundle;
+        if(Instance.mAssetBundleDic.TryGetValue(bundleName, out bundle))
+        {
+            bundle.UnLoad();
+        }
+    }
+
+    public static void Destroy()
+    {
+        if (Instance != null)
+        {
+            Destroy(Instance.gameObject);
+            mInstance = null;
+        }
+    }
+    #endregion
+
+    #region 私有方法
+
     private IEnumerator BeginInitialize()
     {
         if (status == LoadStatus.Done)
@@ -76,7 +227,7 @@ public class AssetManager : MonoBehaviour
     {
         mAssetManifest = asset;
 
-        if(mAssetManifest!= null && mAssetManifest.assetObject!= null)
+        if (mAssetManifest != null && mAssetManifest.assetObject != null)
         {
             DontDestroyOnLoad(mAssetManifest.assetObject);
         }
@@ -87,7 +238,7 @@ public class AssetManager : MonoBehaviour
         Debug.Log("Initialize AssetManager Finish!");
     }
 
-  
+
 
     private void Update()
     {
@@ -96,7 +247,7 @@ public class AssetManager : MonoBehaviour
             mLastUnloadTime = Time.time;
 
             mBundleNameList.AddRange(mAssetBundleDic.Keys);
-          
+
             for (int i = 0; i < mBundleNameList.Count; i++)
             {
                 Bundle bundle;
@@ -108,75 +259,7 @@ public class AssetManager : MonoBehaviour
             mBundleNameList.Clear();
         }
     }
-    /// <summary>
-    /// key可以是文件名(带后缀)或者文件路径(Assets/...)。
-    /// 注意，当非实例化资源（非GameObject，如Material，Texture，TextAsset等）使用完毕后,需要主动调用Destroy去释放资源
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="key"></param>
-    /// <param name="callback"></param>
-    /// <returns></returns>
-    public AssetLoadTask<T> LoadAsset<T>(string key, Action<Asset<T>> callback)where  T: UnityEngine.Object
-    {
-        AssetLoadTask<T > task = new AssetLoadTask<T>(key.ToLower(),callback);
-        
-        LoadAsset(task);
 
-        return task;
-    }
-    /// <summary>
-    /// 自定义LoadTask。当非实例化资源（非GameObject，如Material，Texture，TextAsset等）使用完毕后,需要主动调用Destroy去释放资源
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="task"></param>
-    public void LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
-    {
-        if(task== null)
-        {
-            return;
-        }
-        
-        StartCoroutine(LoadAssetAsync(task));
-    }
-
-    private IEnumerator LoadAssetAsync<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
-    {
-        if (status != LoadStatus.Done)
-        {
-            yield return BeginInitialize();
-        }
-       
-
-        Bundle bundle = GetOrCreateBundle(task.bundleName);
-
-        yield return bundle.LoadAsset(task);
-    }
-
-    /// <summary>
-    /// 加载场景
-    /// </summary>
-    /// <param name="key"></param>
-    /// <param name="mode"></param>
-    /// <param name="callback"></param>
-    /// <returns></returns>
-    public SceneLoadTask LoadScene(string key, LoadSceneMode mode, Action<Scene,LoadSceneMode> callback)
-    {
-        SceneLoadTask task = new SceneLoadTask(key.ToLower(), mode, callback);
-        LoadScene(task);
-        return task;
-    }
-    /// <summary>
-    /// 自定义LoadTask
-    /// </summary>
-    /// <param name="task"></param>
-    public void LoadScene(ISceneLoadTask task)
-    {
-        if(task == null)
-        {
-            return;
-        }
-        StartCoroutine(LoadSceneAsync(task));
-    }
 
     private IEnumerator LoadSceneAsync(ISceneLoadTask task)
     {
@@ -204,19 +287,19 @@ public class AssetManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        for(int i =0; i < mSceneLoadTasks.Count;)
+        for (int i = 0; i < mSceneLoadTasks.Count;)
         {
             var task = mSceneLoadTasks[i];
-            if(task.isCancel)
+            if (task.isCancel)
             {
-                if(task.sceneName == scene.name && mode == LoadSceneMode.Additive)
+                if (task.sceneName == scene.name && mode == LoadSceneMode.Additive)
                 {
                     UnLoadScene(scene, null);
                 }
                 mSceneLoadTasks.RemoveAt(i);
                 continue;
             }
-            if(task.sceneName == scene.name)
+            if (task.sceneName == scene.name)
             {
                 task.OnCompleted(scene, mode);
                 mSceneLoadTasks.RemoveAt(i);
@@ -224,81 +307,6 @@ public class AssetManager : MonoBehaviour
             }
             i++;
         }
-    }
-
-    public void UnLoadScene(Scene scene,Action callback)
-    {
-        StartCoroutine(UnloadSceneAsync(scene,callback));
-    }
-
-    private IEnumerator UnloadSceneAsync(Scene scene,Action callback)
-    {
-        var request = SceneManager.UnloadSceneAsync(scene);
-        yield return request;
-        if (callback != null)
-        {
-            callback();
-        }
-    }
-
-    public Bundle GetBundle(string bundleName)
-    {
-        mAssetBundleDic.TryGetValue(bundleName, out Bundle bundle);
-
-        return bundle;
-    }
-
-    public Bundle GetOrCreateBundle(string bundleName)
-    {
-        Bundle bundle = GetBundle(bundleName);
-
-        if(bundle == null)
-        {
-            bundle = new Bundle(bundleName);
-            mAssetBundleDic.Add(bundleName, bundle);
-        }
-        return bundle;
-    }
-
-    public void RemoveBundle(Bundle bundle)
-    {
-        if (bundle == null || string.IsNullOrEmpty(bundle.bundleName))
-        {
-            return;
-        }
-
-        mAssetBundleDic.Remove(bundle.bundleName);
-    }
-
-   
-    /// <summary>
-    /// 获取直接依赖
-    /// </summary>
-    /// <param name="bundleName"></param>
-    /// <returns></returns>
-    public string[] GetDirectDependencies(string bundleName)
-    {
-        if (string.IsNullOrEmpty(bundleName) || mAssetManifest == null || mAssetManifest.assetObject == null)
-        {
-            return null;
-        }
-
-        return mAssetManifest.assetObject.GetDirectDependencies(bundleName);
-    }
-
-    public void UnLoad(string bundleName)
-    {
-        Bundle bundle = GetBundle(bundleName);
-        if (bundle != null)
-        {
-            bundle.UnLoad();
-        }
-    }
-
-    public void Destroy()
-    {
-        Destroy(gameObject);
-        mInstance = null;
     }
     private void OnDestroy()
     {
@@ -320,4 +328,5 @@ public class AssetManager : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
         status = LoadStatus.None;
     }
+    #endregion
 }

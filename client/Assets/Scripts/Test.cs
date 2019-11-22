@@ -19,7 +19,8 @@ public class Test : MonoBehaviour {
     }
     void Start ()
     {
-        //var task =  AssetManager.Instance.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Additive, (scene,mode) => {
+        //var task = AssetManager.Instance.LoadScene("testscene.unity", UnityEngine.SceneManagement.LoadSceneMode.Additive, (scene, mode) =>
+        //{
 
 
         //});
@@ -27,7 +28,7 @@ public class Test : MonoBehaviour {
 
         //return;
 
-        var task = AssetManager.Instance.LoadAsset<GameObject>("cube.prefab", (asset) => { 
+         AssetManager.LoadAsset<GameObject>("cube.prefab", (asset) => { 
             
             if(asset!= null)
             {
@@ -43,7 +44,7 @@ public class Test : MonoBehaviour {
         });
      
 
-        AssetManager.Instance.LoadAsset<GameObject>("cube1.prefab", (asset) =>
+        AssetManager.LoadAsset<GameObject>("cube1.prefab", (asset) =>
         {
 
             if (asset != null)
