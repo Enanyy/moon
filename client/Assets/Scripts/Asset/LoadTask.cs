@@ -52,17 +52,17 @@ public abstract class LoadTask : ILoadTask
         }
         set { mAssetName = value; }
     }
-    private AssetPath mPath;
-    public AssetPath path
+    private AssetFile mFile;
+    public AssetFile path
     {
         get
         {
-            if (mPath == null)
+            if (mFile == null)
             {
-                mPath = AssetPath.Get(key);
+                mFile = AssetPath.Get(key);
                 //Debug.Log(mPath.path);
             }
-            return mPath;
+            return mFile;
         }
     }
     public LoadTask(string key)

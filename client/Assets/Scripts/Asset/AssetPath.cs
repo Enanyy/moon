@@ -4,15 +4,17 @@ using System.IO;
 using System.Xml;
 using UnityEngine;
 
-
-public class AssetPath
+/// <summary>
+/// 资源文件
+/// </summary>
+public class AssetFile
 {
     public string name;
     public string group;
     public string path;
     public long size;
     public string md5;
-   
+
     public void ToXml(XmlNode parent)
     {
         XmlDocument doc;
@@ -27,7 +29,7 @@ public class AssetPath
         XmlElement node = doc.CreateElement("asset");
         parent.AppendChild(node);
 
-        AddAttribute(doc, node, "name", name);      
+        AddAttribute(doc, node, "name", name);
         if (string.IsNullOrEmpty(group) == false)
         {
             AddAttribute(doc, node, "group", group);
@@ -36,9 +38,9 @@ public class AssetPath
         AddAttribute(doc, node, "path", path);
         AddAttribute(doc, node, "size", size.ToString());
         AddAttribute(doc, node, "md5", md5);
-      
+
     }
-    private void AddAttribute(XmlDocument doc,XmlElement node,string name, string value)
+    private void AddAttribute(XmlDocument doc, XmlElement node, string name, string value)
     {
         XmlAttribute type = doc.CreateAttribute(name);
         type.Value = value;
@@ -52,42 +54,31 @@ public class AssetPath
         path = element.GetAttribute("path");
         size = element.GetAttribute("size").ToInt64Ex();
         md5 = element.GetAttribute("md5");
-     
+
     }
+}
+/// <summary>
+/// 资源列表
+/// </summary>
+public class AssetList
+{
+    public string manifest;
+    public int version;
+    public Dictionary<string, AssetFile> assets = new Dictionary<string, AssetFile>();
 
-    #region Static
-
-    public static string manifest;
-    public static int version;
-    public static Dictionary<string, AssetPath> assets = new Dictionary<string, AssetPath>();
-
-    public static AssetMode mode 
+    public void Add(AssetFile asset)
     {
-        get
-        {
-#if UNITY_EDITOR
-             return (AssetMode)PlayerPrefs.GetInt("assetMode");
-
-#else
-             return AssetMode.AssetBundle;
-#endif
-        }
-    } 
-    public const string ASSETSFILE = "assets.txt";
-
-    public static void AddAsset(AssetPath asset)
-    {
-        if(asset == null)
+        if (asset == null)
         {
             return;
         }
-        if(assets.ContainsKey(asset.name) == false)
+        if (assets.ContainsKey(asset.name) == false)
         {
             assets.Add(asset.name, asset);
         }
         else
         {
-            assets[asset.name]= asset;
+            assets[asset.name] = asset;
         }
 
         if (assets.ContainsKey(asset.path) == false)
@@ -110,9 +101,9 @@ public class AssetPath
 #endif
 
     }
-    public static void RemoveAsset(AssetPath asset)
+    public void Remove(AssetFile asset)
     {
-        if(asset== null)
+        if (asset == null)
         {
             return;
         }
@@ -122,6 +113,110 @@ public class AssetPath
         assets.Remove(asset.md5);
 #endif
     }
+
+    public void FromXml(string xml)
+    {
+        try
+        {
+            XmlDocument doc = new XmlDocument();
+
+            doc.LoadXml(xml);
+
+            XmlElement root = doc.DocumentElement;
+
+            manifest = root.GetAttribute("manifest");
+            version = root.GetAttribute("version").ToInt32Ex();
+
+            assets.Clear();
+
+            for (int i = 0; i < root.ChildNodes.Count; ++i)
+            {
+                XmlElement child = root.ChildNodes[i] as XmlElement;
+                AssetFile asset = new AssetFile();
+                asset.FromXml(child);
+                Add(asset);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            throw e;
+        }
+    }
+
+    public string ToXml()
+    {
+        XmlDocument doc = new XmlDocument();
+        XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "utf-8", "yes");
+        doc.InsertBefore(dec, doc.DocumentElement);
+
+        XmlElement root = doc.CreateElement("Assets");
+        if (string.IsNullOrEmpty(manifest) == false)
+        {
+            XmlAttribute attribute = doc.CreateAttribute("manifest");
+            attribute.Value = manifest;
+            root.Attributes.Append(attribute);
+        }
+
+        XmlAttribute ver = doc.CreateAttribute("version");
+        ver.Value = version.ToString();
+        root.Attributes.Append(ver);
+
+        doc.AppendChild(root);
+        HashSet<AssetFile> set = new HashSet<AssetFile>();
+        var it = assets.GetEnumerator();
+        while (it.MoveNext())
+        {
+            if (set.Contains(it.Current.Value) == false)
+            {
+                it.Current.Value.ToXml(root);
+                set.Add(it.Current.Value);
+            }
+        }
+
+        MemoryStream ms = new MemoryStream();
+        XmlTextWriter xw = new XmlTextWriter(ms, System.Text.Encoding.UTF8);
+        xw.Formatting = Formatting.Indented;
+        doc.Save(xw);
+
+        ms = (MemoryStream)xw.BaseStream;
+        byte[] bytes = ms.ToArray();
+        string xml = System.Text.Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
+
+        return xml;
+    }
+
+    public void Clear()
+    {
+        manifest = null;
+        assets.Clear();
+    }
+
+}
+
+public static class AssetPath
+{
+
+
+    #region Static
+
+    public static AssetList list = new AssetList();
+  
+    public static AssetMode mode 
+    {
+        get
+        {
+#if UNITY_EDITOR
+             return (AssetMode)PlayerPrefs.GetInt("assetMode");
+
+#else
+             return AssetMode.AssetBundle;
+#endif
+        }
+    } 
+    public const string ASSETSFILE = "assets.txt";
+
+    
 
     private static string FormatRootPath(string path)
     {
@@ -198,82 +293,10 @@ public class AssetPath
         }
     }
 
-
-    public static void FromXml(string xml)
+    public static AssetFile Get(string key)
     {
-        try
-        {
-            XmlDocument doc = new XmlDocument();
-
-            doc.LoadXml(xml);
-           
-            XmlElement root = doc.DocumentElement;
-
-            manifest = root.GetAttribute("manifest");
-            version = root.GetAttribute("version").ToInt32Ex();
-
-            assets.Clear();
-
-            for (int i = 0; i < root.ChildNodes.Count; ++i)
-            {
-                XmlElement child = root.ChildNodes[i] as XmlElement;
-                AssetPath asset = new AssetPath();
-                asset.FromXml(child);
-                AddAsset(asset);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e.Message);
-            throw e;
-        }
-    } 
-
-    public static string ToXml()
-    {
-        XmlDocument doc = new XmlDocument();
-        XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "utf-8", "yes");
-        doc.InsertBefore(dec, doc.DocumentElement);
-
-        XmlElement root = doc.CreateElement("Assets");
-        if (string.IsNullOrEmpty(manifest) == false)
-        {
-            XmlAttribute attribute = doc.CreateAttribute("manifest");
-            attribute.Value = manifest;
-            root.Attributes.Append(attribute);
-        }
-
-        XmlAttribute ver = doc.CreateAttribute("version");
-        ver.Value = version.ToString();
-        root.Attributes.Append(ver);
-
-        doc.AppendChild(root);
-        HashSet<AssetPath> set = new HashSet<AssetPath>();
-        var it = assets.GetEnumerator();
-        while (it.MoveNext())
-        {
-            if (set.Contains(it.Current.Value) == false)
-            {
-                it.Current.Value.ToXml(root);
-                set.Add(it.Current.Value);
-            }
-        }
-
-        MemoryStream ms = new MemoryStream();
-        XmlTextWriter xw = new XmlTextWriter(ms, System.Text.Encoding.UTF8);
-        xw.Formatting = Formatting.Indented;
-        doc.Save(xw);
-
-        ms = (MemoryStream)xw.BaseStream;
-        byte[] bytes = ms.ToArray();
-        string xml = System.Text.Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
-
-        return xml;
-    }
-    public static AssetPath Get(string key)
-    {
-        AssetPath asset;
-        assets.TryGetValue(key, out asset);
+        AssetFile asset;
+        list.assets.TryGetValue(key, out asset);
         return asset;
     }
 
@@ -323,7 +346,7 @@ public class AssetPath
    
     public static void Clear()
     {
-        assets.Clear();
+        list.Clear();
     }
 #endregion
 }

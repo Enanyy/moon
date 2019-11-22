@@ -73,13 +73,13 @@ public class AssetManager : MonoBehaviour
                 if (string.IsNullOrEmpty(request.downloadHandler.text) == false)
                 {
                     //解析资源列表
-                    AssetPath.FromXml(request.downloadHandler.text);
+                    AssetPath.list.FromXml(request.downloadHandler.text);
 
                     if (AssetPath.mode == AssetMode.AssetBundle)
                     {
-                        Bundle bundle = GetOrCreateBundle(AssetPath.manifest);
+                        Bundle bundle = GetOrCreateBundle(AssetPath.list.manifest);
 
-                        AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.manifest, FinishInitialize);
+                        AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.list.manifest, FinishInitialize);
 
                         task.assetName = "AssetBundleManifest";
 
