@@ -297,19 +297,27 @@ public class AssetManager : MonoBehaviour
 
     public void Destroy()
     {
+        Destroy(gameObject);
+        mInstance = null;
+    }
+    private void OnDestroy()
+    {
         var it = mAssetBundleDic.GetEnumerator();
         while (it.MoveNext())
         {
-            if(it.Current.Value.bundle!= null)
+            var bunlde = it.Current.Value;
+            if (bunlde.bundle != null)
             {
-                it.Current.Value.bundle.Unload(true);
+                bunlde.bundle.Unload(true);
             }
-            it.Current.Value.references.Clear();
-            it.Current.Value.dependences.Clear();
+            bunlde.references.Clear();
+            bunlde.dependences.Clear();
+            bunlde.dependencesby.Clear();
         }
 
-        mAssetBundleDic.Clear(); 
+        mAssetBundleDic.Clear();
         mAssetManifest = null;
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        status = LoadStatus.None;
     }
 }
