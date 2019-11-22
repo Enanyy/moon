@@ -49,7 +49,11 @@ public class AssetManager : MonoBehaviour
     
     private IEnumerator BeginInitialize()
     {     
-        if (status == LoadStatus.Loading)
+        if(status == LoadStatus.Done)
+        {
+            yield break;
+        }
+        else if (status == LoadStatus.Loading)
         {
             yield return new WaitUntil(() => status == LoadStatus.Done);
         }
