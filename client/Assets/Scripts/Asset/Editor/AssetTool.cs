@@ -7,20 +7,22 @@ using Object = UnityEngine.Object;
 
 public static class AssetTool
 {
+    private static AssetList list = new AssetList();
+
     [InitializeOnLoadMethod]
     private static void InitEditor()
     {
         Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
         Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
-        EditorApplication.quitting -= SaveAsset;
-        EditorApplication.quitting += SaveAsset;
+        EditorApplication.quitting -= SaveAssetList;
+        EditorApplication.quitting += SaveAssetList;
         EditorApplication.projectChanged -= AssetChange;
         EditorApplication.projectChanged += AssetChange;
         EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
         EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
         if (EditorApplication.isPlayingOrWillChangePlaymode==false)
         {
-            InitAssetPath();
+            InitAssetList();
         }
     }
 
@@ -28,32 +30,32 @@ public static class AssetTool
     {
         if (state == PlayModeStateChange.EnteredEditMode)
         {
-            InitAssetPath();
+            InitAssetList();
 
             UpdateBuildSettingScene(false);
 
         }
         else if(state == PlayModeStateChange.ExitingEditMode)
         {
-            SaveAsset();
+            SaveAssetList();
 
             UpdateBuildSettingScene(true);
         }
     }
 
-    static void InitAssetPath()
+    static void InitAssetList()
     {
-        Debug.Log("AssetPath Init");
+        Debug.Log("Init AssetList");
 
         string path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETSFILE);
         string xml = File.ReadAllText(path);
-        AssetPath.list.FromXml(xml);
+        list.FromXml(xml);
     }
 
     static void UpdateBuildSettingScene(bool add)
     {
        List<EditorBuildSettingsScene> scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-       var it = AssetPath.list.assets.GetEnumerator();
+       var it = list.assets.GetEnumerator();
        while (it.MoveNext())
        {
            string path = it.Current.Value.path;
@@ -139,7 +141,7 @@ public static class AssetTool
 
         GUILayout.BeginHorizontal();
 
-        bool select = asset != null && AssetPath.list.Contains(asset.name);
+        bool select = asset != null && list.Contains(asset.name);
         bool mixed = IsMixedSelect(editor.targets);
 
         if (mixed)
@@ -175,16 +177,16 @@ public static class AssetTool
             var assetName = EditorGUILayout.DelayedTextField(asset.name, GUILayout.ExpandWidth(true));
             if (assetName != asset.name)
             {
-                AssetPath.list.Remove(asset);
+                list.Remove(asset);
                 asset.name = assetName;
-                AssetPath.list.Add(asset);
-                SaveAsset();
+                list.Add(asset);
+                SaveAssetList();
             }
         }
 
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
-        if (asset != null && AssetPath.list.Contains(asset.name))
+        if (asset != null && list.Contains(asset.name))
         {
             select = string.IsNullOrEmpty(asset.group) == false;
             mixed = IsMixedGroup(editor.targets);
@@ -199,7 +201,7 @@ public static class AssetTool
             if (check == false && select)
             {
                 SetAssetsGroup(editor.targets, "");
-                SaveAsset();
+                SaveAssetList();
             }
             else
             {
@@ -216,7 +218,7 @@ public static class AssetTool
                     {
                         Debug.Log(check + "," + select + "," + asset.group + "," + group);
                         SetAssetsGroup(editor.targets, group);
-                        SaveAsset();
+                        SaveAssetList();
                     }
                 }
 
@@ -234,7 +236,7 @@ public static class AssetTool
             var asset = GetAsset(targets[i]);
             if (asset != null)
             {
-                AssetPath.list.Add(asset);
+                list.Add(asset);
             }
         }
     }
@@ -246,7 +248,7 @@ public static class AssetTool
             var asset = GetAsset(targets[i]);
             if (asset != null)
             {
-                AssetPath.list.Remove(asset);
+                list.Remove(asset);
             }
         }
     }
@@ -277,7 +279,7 @@ public static class AssetTool
             var asset = GetAsset(targets[i]);
             if (asset != null)
             {
-                bool select = AssetPath.list.Contains(asset.name);
+                bool select = list.Contains(asset.name);
                 if (firstSet == false)
                 {
                     firstSelected = select;
@@ -364,19 +366,19 @@ public static class AssetTool
     }
 
     [MenuItem("Tools/Asset/生成资源配置")]
-    static void GenerateAsset()
+    static void GenerateAssetList()
     {
         AssetPath.Clear();
         var it = s_AssetDirs.GetEnumerator();
         while (it.MoveNext())
         {
-            UpdateAsset(AssetPath.list, string.Format("{0}/{1}",Application.dataPath.Replace("Assets",""),it.Current));
+            UpdateAssetList(list, string.Format("{0}/{1}",Application.dataPath.Replace("Assets",""),it.Current));
         }
         
-        SaveAsset();
+        SaveAssetList();
     }
 
-    static void UpdateAsset(AssetList list, string dir)
+    static void UpdateAssetList(AssetList list, string dir)
     {
         DirectoryInfo dirInfo = new DirectoryInfo(dir);
         if (dirInfo.Exists == false)
@@ -425,12 +427,12 @@ public static class AssetTool
     }
 
     [MenuItem("Tools/Asset/保存资源配置")]
-    static void SaveAsset()
+    static void SaveAssetList()
     {
         string assetXmlFile = Application.dataPath + "/"+ AssetPath.ASSETSFILE;
 
         StreamWriter writerXml = new StreamWriter(assetXmlFile);
-        writerXml.Write(AssetPath.list.ToXml());
+        writerXml.Write(list.ToXml());
         writerXml.Close();
         writerXml.Dispose();
         Debug.Log("保存成功:" + assetXmlFile);
@@ -487,8 +489,8 @@ public static class AssetTool
         
         List<string> scenes = new List<string>();
         List<AssetFile> removes = new List<AssetFile>();
-        AssetList list = new AssetList();
-        var it = AssetPath.list.assets.GetEnumerator();
+        AssetList buildList = new AssetList();
+        var it = list.assets.GetEnumerator();
         int count = 0;
         while (it.MoveNext())
         {
@@ -500,9 +502,9 @@ public static class AssetTool
                     if (it.Current.Value.path.EndsWith(".unity"))
                     {
                         scenes.Add(it.Current.Value.path);
-                        if (list.assets.ContainsValue(it.Current.Value) == false)
+                        if (buildList.assets.ContainsValue(it.Current.Value) == false)
                         {
-                            list.assets.Add(it.Current.Value.name, it.Current.Value);
+                            buildList.assets.Add(it.Current.Value.name, it.Current.Value);
                         }
                     }
                     else
@@ -514,18 +516,18 @@ public static class AssetTool
                                 ? it.Current.Value.path
                                 : it.Current.Value.group;
 
-                            if (list.assets.ContainsValue(it.Current.Value) == false)
+                            if (buildList.assets.ContainsValue(it.Current.Value) == false)
                             {
-                                list.assets.Add(it.Current.Value.name, it.Current.Value);
+                                buildList.assets.Add(it.Current.Value.name, it.Current.Value);
                             }
                         }
                     }
                 }
                 else
                 {
-                    if (list.assets.ContainsValue(it.Current.Value) == false)
+                    if (buildList.assets.ContainsValue(it.Current.Value) == false)
                     {
-                        list.assets.Add(it.Current.Value.name, it.Current.Value);
+                        buildList.assets.Add(it.Current.Value.name, it.Current.Value);
                     }
                 }
             }
@@ -534,7 +536,7 @@ public static class AssetTool
                 removes.Add(it.Current.Value);
             }
 
-            EditorUtility.DisplayProgressBar("Set AssetbundleName", "Setting:"+ it.Current.Value.path, count * 1f/ AssetPath.list.assets.Count);
+            EditorUtility.DisplayProgressBar("Set AssetbundleName", "Setting:"+ it.Current.Value.path, count * 1f/ list.assets.Count);
             count++;
         }
         EditorUtility.ClearProgressBar();
@@ -588,22 +590,22 @@ public static class AssetTool
 
         EditorUtility.ClearProgressBar();
 
-        UpdateAsset(list, outputPath);
+        UpdateAssetList(buildList, outputPath);
      
-        list.manifest = EditorUserBuildSettings.activeBuildTarget.ToString();
+        buildList.manifest = EditorUserBuildSettings.activeBuildTarget.ToString();
 
         string assetXmlFile = outputPath + "/" + AssetPath.ASSETSFILE;
 
         StreamWriter writerXml = new StreamWriter(assetXmlFile);
-        writerXml.Write(list.ToXml());
+        writerXml.Write(buildList.ToXml());
         writerXml.Close();
         writerXml.Dispose();
 
         for(int i = 0; i< removes.Count;++i)
         {
-            AssetPath.list.Remove(removes[i]);
+            list.Remove(removes[i]);
         }
-        SaveAsset();
+        SaveAssetList();
 
         Debug.Log("Build Success!");
     }
