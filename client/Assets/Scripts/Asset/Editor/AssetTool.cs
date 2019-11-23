@@ -370,13 +370,13 @@ public static class AssetTool
         var it = s_AssetDirs.GetEnumerator();
         while (it.MoveNext())
         {
-            UpdateAsset(string.Format("{0}/{1}",Application.dataPath.Replace("Assets",""),it.Current));
+            UpdateAsset(AssetPath.list, string.Format("{0}/{1}",Application.dataPath.Replace("Assets",""),it.Current));
         }
         
         SaveAsset();
     }
 
-    static void UpdateAsset(string dir)
+    static void UpdateAsset(AssetList list, string dir)
     {
         DirectoryInfo dirInfo = new DirectoryInfo(dir);
         if (dirInfo.Exists == false)
@@ -419,7 +419,7 @@ public static class AssetTool
 
             asset.md5 = md5;
 
-            AssetPath.list.Add(asset);
+            list.Add(asset);
 
         }
     }
@@ -486,28 +486,52 @@ public static class AssetTool
         }
         
         List<string> scenes = new List<string>();
+        List<AssetFile> removes = new List<AssetFile>();
+        AssetList list = new AssetList();
         var it = AssetPath.list.assets.GetEnumerator();
         int count = 0;
         while (it.MoveNext())
         {
-            //Resources目录不打Bundle
-            if (it.Current.Value.path.Contains("resources/") == false)
+            if (AssetDatabase.LoadAssetAtPath<Object>(it.Current.Value.path))
             {
-                if (it.Current.Value.path.EndsWith(".unity"))
+                //Resources目录不打Bundle
+                if (it.Current.Value.path.Contains("resources/") == false)
                 {
-                    scenes.Add(it.Current.Value.path);
+                    if (it.Current.Value.path.EndsWith(".unity"))
+                    {
+                        scenes.Add(it.Current.Value.path);
+                        if (list.assets.ContainsValue(it.Current.Value) == false)
+                        {
+                            list.assets.Add(it.Current.Value.name, it.Current.Value);
+                        }
+                    }
+                    else
+                    {
+                        AssetImporter importer = AssetImporter.GetAtPath(it.Current.Value.path);
+                        if (importer != null)
+                        {
+                            importer.assetBundleName = string.IsNullOrEmpty(it.Current.Value.group)
+                                ? it.Current.Value.path
+                                : it.Current.Value.group;
+
+                            if (list.assets.ContainsValue(it.Current.Value) == false)
+                            {
+                                list.assets.Add(it.Current.Value.name, it.Current.Value);
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    AssetImporter importer = AssetImporter.GetAtPath(it.Current.Value.path);
-                    if (importer != null)
+                    if (list.assets.ContainsValue(it.Current.Value) == false)
                     {
-                        importer.assetBundleName = string.IsNullOrEmpty(it.Current.Value.group)
-                            ? it.Current.Value.path
-                            : it.Current.Value.group;
-
+                        list.assets.Add(it.Current.Value.name, it.Current.Value);
                     }
                 }
+            }
+            else
+            {
+                removes.Add(it.Current.Value);
             }
 
             EditorUtility.DisplayProgressBar("Set AssetbundleName", "Setting:"+ it.Current.Value.path, count * 1f/ AssetPath.list.assets.Count);
@@ -564,39 +588,27 @@ public static class AssetTool
 
         EditorUtility.ClearProgressBar();
 
-        UpdateAsset(outputPath);
-        
-        RemoveSameAsset();
-
-        AssetPath.list.manifest = EditorUserBuildSettings.activeBuildTarget.ToString();
+        UpdateAsset(list, outputPath);
+     
+        list.manifest = EditorUserBuildSettings.activeBuildTarget.ToString();
 
         string assetXmlFile = outputPath + "/" + AssetPath.ASSETSFILE;
 
         StreamWriter writerXml = new StreamWriter(assetXmlFile);
-        writerXml.Write(AssetPath.list.ToXml());
+        writerXml.Write(list.ToXml());
         writerXml.Close();
         writerXml.Dispose();
+
+        for(int i = 0; i< removes.Count;++i)
+        {
+            AssetPath.list.Remove(removes[i]);
+        }
+        SaveAsset();
 
         Debug.Log("Build Success!");
     }
 
-    static void RemoveSameAsset()
-    {
-        List<string> removes = new List<string>();
-        var it = AssetPath.list.assets.GetEnumerator();
-        while(it.MoveNext())
-        {
-            removes.Add(it.Current.Value.md5);
-            if (it.Current.Value.path != it.Current.Value.name)
-            {
-                removes.Add(it.Current.Value.path);
-            }
-        }
-        for(int i = 0; i < removes.Count; ++i)
-        {
-            AssetPath.list.assets.Remove(removes[i]);
-        }
-    }
+  
 
     [MenuItem("Tools/Asset/Mode/Editor")]
     static void SetEditorMode()
