@@ -297,13 +297,15 @@ public class BundleAsset:Bundle
             return;
         }
         string name = reference.assetName;
-        if(references.ContainsKey(name)==false)
+
+        if(references.TryGetValue(name, out List<IAsset> list) ==false)
         {
-            references.Add(name, new List<IAsset>());
+            list = new List<IAsset>();
+            references.Add(name, list);
         }
-        if(references[name].Contains(reference)==false)
+        if(list.Contains(reference)==false)
         {
-            references[name].Add(reference);
+            list.Add(reference);
         }
     }
 
