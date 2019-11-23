@@ -16,24 +16,35 @@ public class Bundle
 
     public virtual IEnumerator LoadAsync()
     {
-        string path = AssetPath.GetFullPath(bundleName);
-        AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
-
-        status = LoadStatus.Loading;
-
-        yield return request;
-
-        status = LoadStatus.Done;
-
-        if (bundle == null)
+        if (status == LoadStatus.Done)
         {
-            if (request.isDone && request.assetBundle)
+            yield break;
+        }
+        else if (status == LoadStatus.Loading)
+        {
+            yield return new WaitUntil(() => status == LoadStatus.Done);
+        }
+        else
+        {
+            string path = AssetPath.GetFullPath(bundleName);
+            AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
+
+            status = LoadStatus.Loading;
+
+            yield return request;
+
+            status = LoadStatus.Done;
+
+            if (bundle == null)
             {
-                bundle = request.assetBundle;
-            }
-            else
-            {
-                Debug.Log("Can't Load AssetBundle:" + bundleName + "  from :" + path + "!!");
+                if (request.isDone && request.assetBundle)
+                {
+                    bundle = request.assetBundle;
+                }
+                else
+                {
+                    Debug.Log("Can't Load AssetBundle:" + bundleName + "  from :" + path + "!!");
+                }
             }
         }
     }
