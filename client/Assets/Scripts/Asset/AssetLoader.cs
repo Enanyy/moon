@@ -171,9 +171,6 @@ public class AssetLoader : MonoBehaviour
 
     private List<string> mBundleNameList = new List<string>();
     private float mLastUnloadTime;
-
-    private List<ISceneLoadTask> mSceneLoadTasks = new List<ISceneLoadTask>();
-
     private IEnumerator BeginInitialize()
     {
         if (mStatus == LoadStatus.Done)
@@ -215,8 +212,6 @@ public class AssetLoader : MonoBehaviour
         {
             DontDestroyOnLoad(mAssetManifest.assetObject);
         }
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-        SceneManager.sceneLoaded += OnSceneLoaded;
 
         mStatus = LoadStatus.Done;
 
@@ -244,21 +239,9 @@ public class AssetLoader : MonoBehaviour
             yield return BeginInitialize();
         }
 
-        mSceneLoadTasks.Add(task);
-
-        if (AssetPath.mode == AssetMode.AssetBundle)
-        {
-            BundleScene bundle = GetOrCreateBundle<BundleScene>(task.assetName);
-
-            yield return bundle.LoadAsync();
-
-            yield return SceneManager.LoadSceneAsync(task.sceneName, task.mode);
-
-        }
-        else
-        {
-            yield return SceneManager.LoadSceneAsync(task.sceneName);
-        }
+        BundleScene bundle = GetOrCreateBundle<BundleScene>(task.assetName);
+    
+        yield return bundle.LoadSceneAsync(task);
     }
 
     private IEnumerator UnloadSceneAsync(Scene scene, Action callback)
@@ -296,36 +279,7 @@ public class AssetLoader : MonoBehaviour
     }
 
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        for (int i = 0; i < mSceneLoadTasks.Count;)
-        {
-            var task = mSceneLoadTasks[i];
-         
-            if (task.sceneName == scene.name)
-            {
-                BundleScene bundle = GetBundle<BundleScene>(task.assetName);
-                if (bundle != null)
-                {
-                    if (task.isCancel)
-                    {
-                        UnLoadScene(scene, null);
-                        bundle.Unload(true);
-                    }
-                    else
-                    {
-                        bundle.scene = scene;
-                        bundle.mode = mode;
 
-                        task.OnCompleted(scene, mode);
-                    }
-                }
-                mSceneLoadTasks.RemoveAt(i);
-                continue;
-            }
-            i++;
-        }
-    }
     
     private void OnDestroy()
     {
@@ -342,7 +296,6 @@ public class AssetLoader : MonoBehaviour
         mBundleNameList.Clear();
         mAssetBundleDic.Clear();
         mAssetManifest = null;
-        SceneManager.sceneLoaded -= OnSceneLoaded;
         mStatus = LoadStatus.None;
     }
     #endregion

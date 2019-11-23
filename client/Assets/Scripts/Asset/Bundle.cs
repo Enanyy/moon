@@ -16,6 +16,12 @@ public class Bundle
 
     public virtual IEnumerator LoadAsync()
     {
+#if UNITY_EDITOR
+        if (AssetPath.mode == AssetMode.Editor)
+        {
+            yield break;
+        }
+#endif
         if (status == LoadStatus.Done)
         {
             yield break;
@@ -528,12 +534,46 @@ public class BundleAsset:Bundle
 
 public class BundleScene : Bundle
 {
-    public Scene scene { get; set; }
-    public LoadSceneMode mode { get; set; }
+    public Scene scene { get;  private set; }
+    public ISceneLoadTask task { get; private set; }
+
     public BundleScene()
     {
-        SceneManager.sceneUnloaded += OnSceneUnloaded;
+    }
 
+    public IEnumerator LoadSceneAsync(ISceneLoadTask task)
+    {
+        if(task== null)
+        {
+            yield break;
+        }
+        this.task = task;
+
+        //加载Bundle
+        yield return LoadAsync();
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        //加载场景
+        yield return SceneManager.LoadSceneAsync(task.sceneName, task.mode);
+
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if(scene.name == task.sceneName)
+        {
+            this.scene = scene;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+            if (task.isCancel == false)
+            {
+                task.OnCompleted(scene, mode);
+            }
+            else
+            {
+                AssetLoader.UnLoadScene(scene, null);
+            }
+        }
     }
 
     private void OnSceneUnloaded(Scene scene)
@@ -547,7 +587,7 @@ public class BundleScene : Bundle
     public override bool Unload(bool force = false)
     {
         SceneManager.sceneUnloaded -= OnSceneUnloaded;
-
+        SceneManager.sceneLoaded -= OnSceneLoaded;
         Debug.Log("Unload scene bundle:" + bundleName);
 
         return base.Unload(force);
