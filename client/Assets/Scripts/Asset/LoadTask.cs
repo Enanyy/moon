@@ -87,11 +87,17 @@ public class SceneLoadTask : LoadTask, ISceneLoadTask
     public LoadSceneMode mode { get; private set; }
     public Action<Scene, LoadSceneMode> callback { get; private set; }
 
+    private string mSceneName;
+
     public virtual string sceneName
     {
         get
         {
-            return Path.GetFileNameWithoutExtension(assetName);
+            if(string.IsNullOrEmpty(mSceneName))
+            {
+                mSceneName = Path.GetFileNameWithoutExtension(assetName);
+            }
+            return mSceneName;
         }
     }
     public SceneLoadTask(string key, LoadSceneMode mode, Action<Scene, LoadSceneMode> callback) : base(key)

@@ -6,12 +6,11 @@ using UnityEngine.SceneManagement;
 public class Bundle
 {
     public string bundleName { get; set; }
-    public AssetBundle bundle { get; protected set; }
+    public AssetBundle bundle { get; private set; }
 
     public LoadStatus status { get; private set; }
     public Bundle()
     {
-        this.bundleName = bundleName;
         status = LoadStatus.None;
     }
 
