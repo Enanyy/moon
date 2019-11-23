@@ -210,9 +210,6 @@ public class AssetList
 public static class AssetPath
 {
 
-
-    #region Static
-
     public static AssetList list = new AssetList();
   
     public static AssetMode mode 
@@ -396,6 +393,5 @@ public static class AssetPath
     {
         list.Clear();
     }
-#endregion
 }
 

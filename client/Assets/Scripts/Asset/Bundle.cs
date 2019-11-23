@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public abstract class Bundle
+public class Bundle
 {
     public string bundleName { get; set; }
     public AssetBundle bundle { get; protected set; }
@@ -15,7 +15,7 @@ public abstract class Bundle
         status = LoadStatus.None;
     }
 
-    public virtual IEnumerator LoadBundleAsync()
+    public virtual IEnumerator LoadAsync()
     {
         string path = AssetPath.GetFullPath(bundleName);
         AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
@@ -112,7 +112,7 @@ public class BundleAsset:Bundle
         dependencesby = new Dictionary<string, BundleAsset>();
         references = new Dictionary<string, List<IAsset>>();
     }
-    public override IEnumerator LoadBundleAsync()
+    public override IEnumerator LoadAsync()
     {
 #if UNITY_EDITOR
         if (AssetPath.mode == AssetMode.Editor)
@@ -144,11 +144,11 @@ public class BundleAsset:Bundle
             BundleAsset bundleObject = it.Current.Value;
             if (bundleObject.status == LoadStatus.None)
             {
-                yield return bundleObject.LoadBundleAsync();
+                yield return bundleObject.LoadAsync();
             }
         }
 
-        yield return base.LoadBundleAsync();
+        yield return base.LoadAsync();
     }
 
     public IEnumerator LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
@@ -196,7 +196,7 @@ public class BundleAsset:Bundle
 
                 if (asset == null)
                 {
-                    asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetName);
+                    asset = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetName);
                     if (asset)
                     {
                         mAssetDic.Add(assetName, asset);
@@ -215,7 +215,7 @@ public class BundleAsset:Bundle
                 {
                     if (status == LoadStatus.None && task.isCancel == false)
                     {
-                        yield return LoadBundleAsync();
+                        yield return LoadAsync();
                     }
                     else
                     {

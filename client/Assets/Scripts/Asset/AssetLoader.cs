@@ -250,7 +250,7 @@ public class AssetLoader : MonoBehaviour
         {
             BundleScene bundle = GetOrCreateBundle<BundleScene>(task.assetName);
 
-            yield return bundle.LoadBundleAsync();
+            yield return bundle.LoadAsync();
 
             yield return SceneManager.LoadSceneAsync(task.sceneName, task.mode);
 
