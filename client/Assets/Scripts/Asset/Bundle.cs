@@ -167,7 +167,7 @@ public class BundleAsset:Bundle
         yield return base.LoadAsync();
     }
 
-    public IEnumerator LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
+    public IEnumerator LoadAssetAsync<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
     {
         if (task == null || task.isCancel)
         {

@@ -195,7 +195,7 @@ public class AssetLoader : MonoBehaviour
 
                 task.assetName = "AssetBundleManifest";
 
-                yield return bundle.LoadAsset(task);
+                yield return bundle.LoadAssetAsync(task);
 
             }
             else
@@ -229,7 +229,7 @@ public class AssetLoader : MonoBehaviour
 
         BundleAsset bundle = GetOrCreateBundle<BundleAsset>(task.bundleName);
 
-        yield return bundle.LoadAsset(task);
+        yield return bundle.LoadAssetAsync(task);
     }
 
     private IEnumerator LoadSceneAsync(ISceneLoadTask task)
