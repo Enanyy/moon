@@ -32,7 +32,22 @@ public class Test : MonoBehaviour {
 
         //return;
 
-         AssetLoader.LoadAsset<GameObject>("cube.prefab", (asset) => { 
+        AssetLoader.LoadAsset<TextAsset>("data.bytes", (asset) =>
+        {
+            if (asset != null)
+            {
+                byte[] bytes = asset.assetObject.bytes;
+
+                //启动线程加载
+                ThreadQueue.RunAsync(() => DataTableManager.Instance.Init(bytes),
+                    () => {
+                        
+                        asset.Destroy();
+                    });
+            }
+        });
+
+        AssetLoader.LoadAsset<GameObject>("cube.prefab", (asset) => { 
             
             if(asset!= null)
             {
@@ -118,7 +133,7 @@ public class Test : MonoBehaviour {
         }
         if(Input.GetKeyDown(KeyCode.U))
         {
-            AssetLoader.UnLoadScene(mScene, () => {
+            AssetLoader.UnloadScene(mScene, () => {
                 Debug.Log("Unload scene success!");
             });
         }

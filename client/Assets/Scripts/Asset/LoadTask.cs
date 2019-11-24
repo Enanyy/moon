@@ -23,7 +23,7 @@ public abstract class LoadTask : ILoadTask
         {
             if (path != null)
             {
-                return string.IsNullOrEmpty(path.group) ? path.path : path.group;
+                return string.IsNullOrEmpty(path.bundle) ? path.asset : path.bundle;
             }
             return key;
         }
@@ -43,7 +43,7 @@ public abstract class LoadTask : ILoadTask
             {
                 if (path != null)
                 {
-                    return path.path;
+                    return path.asset;
                 }
                 return key;
             }
