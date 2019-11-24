@@ -75,7 +75,7 @@ public class AssetLoader : MonoBehaviour
     /// </summary>
     /// <param name="scene"></param>
     /// <param name="callback"></param>
-    public static void UnLoadScene(Scene scene, Action callback)
+    public static void UnloadScene(Scene scene, Action callback)
     {
         Instance.StartCoroutine(Instance.UnloadSceneAsync(scene, callback));
     }
