@@ -48,8 +48,11 @@ public static class AssetTool
         Debug.Log("Init AssetList");
 
         string path = string.Format("{0}/{1}", Application.dataPath, AssetPath.ASSETSFILE);
-        string xml = File.ReadAllText(path);
-        list.FromXml(xml);
+        if (File.Exists(path))
+        {
+            string xml = File.ReadAllText(path);
+            list.FromXml(xml);
+        }
     }
 
     static void UpdateBuildSettingScene(bool add)
@@ -141,35 +144,35 @@ public static class AssetTool
 
         GUILayout.BeginHorizontal();
 
-        bool select = asset != null && list.Contains(asset.name);
-        bool mixed = IsMixedSelect(editor.targets);
+        bool isSelectAsset = asset != null && list.Contains(asset.name);
+        bool isSelectMixed = IsMixedSelect(editor.targets);
 
-        if (mixed)
+        if (isSelectMixed)
         {
-            select = false;
+            isSelectAsset = false;
         }
         
 
-        bool check;
-        if (mixed)
+        bool isSelectGroup;
+        if (isSelectMixed)
         {
-            check = GUILayout.Toggle(select, "Asset", s_ToggleMixed, GUILayout.ExpandWidth(false));
+            isSelectGroup = GUILayout.Toggle(isSelectAsset, "Asset", s_ToggleMixed, GUILayout.ExpandWidth(false));
         }
         else
         {
-            check = GUILayout.Toggle(select, "Asset", GUILayout.ExpandWidth(false));
+            isSelectGroup = GUILayout.Toggle(isSelectAsset, "Asset", GUILayout.ExpandWidth(false));
         }
-        if (select && check == false)
+        if (isSelectAsset && isSelectGroup == false)
         {
             RemoveAssets(editor.targets);
             asset = null;
         }
-        else if (select == false && check)
+        else if (isSelectAsset == false && isSelectGroup)
         {
             AddAssets(editor.targets);
         }
 
-        if (asset != null && select && editor.targets.Length == 1)
+        if (asset != null && isSelectAsset && editor.targets.Length == 1)
         {
 
             asset.path = assetPath;
@@ -188,33 +191,33 @@ public static class AssetTool
         GUILayout.BeginHorizontal();
         if (asset != null && list.Contains(asset.name))
         {
-            select = string.IsNullOrEmpty(asset.group) == false;
-            mixed = IsMixedGroup(editor.targets);
-            if (mixed)
+            isSelectAsset = string.IsNullOrEmpty(asset.group) == false;
+            isSelectMixed = IsMixedGroup(editor.targets);
+            if (isSelectMixed)
             {
-                check = GUILayout.Toggle(select, "Group", s_ToggleMixed, GUILayout.ExpandWidth(false));
+                isSelectGroup = GUILayout.Toggle(isSelectAsset, "Group", s_ToggleMixed, GUILayout.ExpandWidth(false));
             }
             else
             {
-                check = GUILayout.Toggle(select, "Group", GUILayout.ExpandWidth(false));
+                isSelectGroup = GUILayout.Toggle(isSelectAsset, "Group", GUILayout.ExpandWidth(false));
             }
-            if (check == false && select)
+            if (isSelectGroup == false && isSelectAsset)
             {
                 SetAssetsGroup(editor.targets, "");
                 SaveAssetList();
             }
             else
             {
-                if (check)
+                if (isSelectGroup)
                 {
-                    if (select == false)
+                    if (isSelectAsset == false)
                     {
                         string dir = Path.GetDirectoryName(asset.path);
                         asset.group = dir.Substring(dir.LastIndexOf("\\") + 1);
                     }
 
                     var group = EditorGUILayout.DelayedTextField(asset.group, GUILayout.ExpandWidth(true));
-                    if ( select == false ||  group != asset.group)
+                    if ( isSelectAsset == false ||  group != asset.group)
                     {
                         //Debug.Log(check + "," + select + "," + asset.group + "," + group);
                         SetAssetsGroup(editor.targets, group);
@@ -349,14 +352,14 @@ public static class AssetTool
         }
         if(asset!= null)
         {
-            asset.path = assetPath;
+            asset.path = assetPath.ToLower();
         }
 
         if (asset == null && bytes != null)
         {
             asset = new AssetFile();
-            asset.name = name;
-            asset.path = assetPath;
+            asset.name = name.ToLower();
+            asset.path = assetPath.ToLower();
             asset.md5 = md5;
             asset.size = bytes.Length;
         }
