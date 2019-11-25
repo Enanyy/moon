@@ -112,16 +112,22 @@ public static class AssetTool
         {
             return false;
         }
-        var it = s_AssetDirs.GetEnumerator();
-        while (it.MoveNext())
+        if (s_AssetDirs.Count > 0)
         {
-            if (assetPath.StartsWith(it.Current))
+            var it = s_AssetDirs.GetEnumerator();
+            while (it.MoveNext())
             {
-                return true;
+                if (assetPath.StartsWith(it.Current))
+                {
+                    return true;
+                }
             }
+            return false;
         }
-
-        return true;
+        else
+        {
+            return true;
+        }
     }
     static void OnPostHeaderGUI(Editor editor)
     {
