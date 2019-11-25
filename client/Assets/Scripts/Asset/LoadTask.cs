@@ -11,7 +11,7 @@ public interface ILoadTask
 {
     string bundleName { get; }
     string assetName { get; }
-    bool isCancel { get; }
+    bool isCancel { get; set; }
 }
 public abstract class LoadTask : ILoadTask
 {
@@ -69,10 +69,6 @@ public abstract class LoadTask : ILoadTask
 
     }
     public bool isCancel { get; set; }
-    public void Cancel()
-    {
-        isCancel = true;
-    }
 }
 
 public interface ISceneLoadTask:ILoadTask

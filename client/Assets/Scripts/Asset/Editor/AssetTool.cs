@@ -489,8 +489,8 @@ public static class AssetTool
             var file = it.Current.Value;
             if (AssetDatabase.LoadAssetAtPath<Object>(file.asset))
             {
-                //Resources目录不打Bundle
-                if (file.asset.Contains("resources/") == false)
+                //Resources目录设置了bundle才打bundle
+                if (file.asset.Contains("resources/") == false || string.IsNullOrEmpty(file.bundle) == false)
                 {
                     if (file.asset.EndsWith(".unity"))
                     {
@@ -588,7 +588,7 @@ public static class AssetTool
         foreach(var file in list.assets.Values)
         {
          
-            if (file.asset.Contains("resources/") == false)
+            if (file.asset.Contains("resources/") == false || string.IsNullOrEmpty(file.bundle)==false)
             {
                 if (buildList.Contains(file.name) == false && buildList.assets.ContainsValue(file) == false)
                 {

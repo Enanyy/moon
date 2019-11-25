@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -28,7 +24,7 @@ public class Test : MonoBehaviour {
             mScene = scene;
 
         });
-        //task.Cancel();
+        task.isCancel =true;
 
         //return;
 
@@ -78,7 +74,7 @@ public class Test : MonoBehaviour {
             }
 
         });
-        //task.Cancel();
+        //task.isCancel = true;
 
         Instance = this;
 
