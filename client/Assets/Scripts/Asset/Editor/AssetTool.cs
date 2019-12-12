@@ -581,7 +581,7 @@ public static class AssetTool
 
         SaveBuildList(outputPath);
 
-        Debug.Log("Build Success!");
+        Debug.Log("Build Success! Output:" + outputPath);
     }
 
     static void SaveBuildList(string outputPath)

@@ -271,7 +271,11 @@ public static class AssetPath
         {
             string assetFile = GetAssetFile();
 
-            Debug.Log("AssetMode:" + mode.ToString());
+#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+            //这两个平台用UnityWebRequest加载要加file://
+            assetFile = string.Format("file://{0}", assetFile);
+#endif
+            Debug.Log("AssetMode:" + mode.ToString() + " assetFile:" + assetFile);
 
             using (UnityWebRequest request = UnityWebRequest.Get(assetFile))
             {
@@ -302,20 +306,14 @@ public static class AssetPath
         }
         else
         {
-    #if UNITY_EDITOR_WIN
             return string.Format("{0}/../r/{1}/", Application.dataPath, UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-    #elif UNITY_EDITOR_OSX
-            return string.Format("file://{0}/../r/{1}/", Application.dataPath,UnityEditor.EditorUserBuildSettings.activeBuildTarget);
-    #else
-            return path;
-    #endif
         }
 #else
-    #if UNITY_ANDROID
+#if UNITY_ANDROID
         return string.Format("{0}/r/", path);
-    #elif UNITY_IOS
+#elif UNITY_IOS
         return string.Format("{0}/r/", path);
-    #elif UNITY_STANDALONE_WIN
+#elif UNITY_STANDALONE_WIN
         if (IntPtr.Size == 8) //64 bit
         {
             return string.Format("{0}/../r/StandaloneWindows64/", Application.dataPath);
@@ -324,14 +322,14 @@ public static class AssetPath
         {
             return string.Format("{0}/../r/StandaloneWindows/", Application.dataPath);
         }
-    #elif UNITY_STANDALONE_OSX
-        return string.Format("file://{0}/../r/StandaloneOSX/", Application.dataPath);
-    #else
+#elif UNITY_STANDALONE_OSX
+            return string.Format("{0}/../r/StandaloneOSX/", Application.dataPath);
+#else
         return path;
-    #endif
+#endif
 #endif
 
-    }
+        }
 
     private static string mStreamingAssetsPath;
     /// <summary>
@@ -381,6 +379,7 @@ public static class AssetPath
         {
             path = string.Format("{0}{1}", streamingAssetsPath, path);
         }
+
         if (Application.platform == RuntimePlatform.IPhonePlayer)
         {
             path = Uri.EscapeUriString(path);
@@ -411,6 +410,7 @@ public static class AssetPath
         {
             path = string.Format("{0}{1}", streamingAssetsPath, ASSETSFILE);
         }
+
         if (Application.platform == RuntimePlatform.IPhonePlayer)
         {
             path = Uri.EscapeUriString(path);
