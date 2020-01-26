@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.IO;
 
 public delegate void OnConnectionHandler(Connection c);
-public delegate void OnReceiveHandler(Connection c, byte[] data);
+public delegate void OnReceiveHandler(Packet packet);
 public delegate void OnDebugHandler(string msg);
 
 public class Connection
@@ -19,7 +19,7 @@ public class Connection
     private byte[] mRecvData;
 
     // 长度数据，存放长度信息
-    private byte[] mLengthData;
+    private byte[] mRecvLengthData;
 
     // 当前数据长度
     int mDataNowLength;
@@ -38,7 +38,10 @@ public class Connection
     public bool IsConnected { get; private set; }
 
 
-    private MemoryStream mStream;
+   // private MemoryStream mStream;
+
+    private Packet mSendPacket;
+    private byte[] mSendLengthData;
 
     public int ID { get; private set; }
     public string IP { get; private set; }
@@ -64,9 +67,11 @@ public class Connection
         mCopyData = new byte[MAX_NET_BUFFER];
 
         mDataNowLength = 0;
-        mLengthData = new byte[sizeof(ushort)];
+        mRecvLengthData = new byte[sizeof(ushort)];
 
-        mStream = new MemoryStream();
+        mSendPacket = new Packet(ushort.MaxValue);
+        mSendLengthData = new byte[sizeof(ushort)];
+
     }
 
 
@@ -136,31 +141,29 @@ public class Connection
     }
 
     // 发送数据
-    public bool Send(byte[] data, ushort length)
+    public bool Send(Packet packet)
     {
         if (!IsConnected)
         {
             return false;
         }
 
-        ushort nLength = length;    // 在最前面写入一个2个字节的数据长度
-        byte[] lenData = BitConverter.GetBytes(nLength);
+        ushort nLength = (ushort)packet.position;    // 在最前面写入一个2个字节的数据长度
+        mSendLengthData = BitConverter.GetBytes(nLength);
         if (IsLittleEndian == false)
         {
-            Array.Reverse(lenData);
+            Array.Reverse(mSendLengthData);
         }
-        mStream.Seek(0, SeekOrigin.Begin);
-        mStream.SetLength(0);
-
-        // 写入数据大小
-        mStream.Write(lenData, 0, lenData.Length);
-
-        // 写入数据
-        mStream.Write(data, 0, length);
+        mSendPacket.Clear();
+        //写入数据大小
+        mSendPacket.Write(mSendLengthData, 0, sizeof(ushort));
+        //写入数据
+        mSendPacket.Write(packet.data, 0, packet.position);
+        
 
         try
         {
-            mSocket.BeginSend(mStream.ToArray(), 0, (int)mStream.Length, SocketFlags.None, OnEndSend, null);
+            mSocket.BeginSend(mSendPacket.data, 0, mSendPacket.position, SocketFlags.None, OnEndSend, null);
         }
         catch (SocketException e)
         {
@@ -373,17 +376,17 @@ public class Connection
         if (IsLittleEndian ==false)
         {
             //大端
-            mLengthData[0] = mRecvData[1];
-            mLengthData[1] = mRecvData[0];
+            mRecvLengthData[0] = mRecvData[1];
+            mRecvLengthData[1] = mRecvData[0];
         }
         else
         {
             //小端
-            mLengthData[0] = mRecvData[0];
-            mLengthData[1] = mRecvData[1];
+            mRecvLengthData[0] = mRecvData[0];
+            mRecvLengthData[1] = mRecvData[1];
         }
 
-        int nPackageLen = BitConverter.ToUInt16(mLengthData, 0);
+        int nPackageLen = BitConverter.ToUInt16(mRecvLengthData, 0);
 
         // 如果总长度 < 数据长度+ 数据头， 说明数据还未接收完
         if (nTotalLen < (int)(nPackageLen + sizeof(ushort)))
@@ -395,11 +398,15 @@ public class Connection
         {
             if (null != onReceive)
             {
-                byte[] packet = new byte[nPackageLen];
+                //byte[] packet = new byte[nPackageLen];
 
-                Array.Copy(mRecvData, sizeof(ushort), packet, 0, nPackageLen);
+                Packet packet = NetworkManager.Instance.GetOrCreatePacket(nPackageLen);
+                packet.connection = this;
+                packet.Write(mRecvData, sizeof(ushort), nPackageLen);
+
+               // Array.Copy(mRecvData, sizeof(ushort), packet, 0, nPackageLen);
                 //TRACE.Log(string.Format("m_InfoList.Push(packetData) 1 nPackageLen={0}", nPackageLen));
-                onReceive(this, packet);
+                onReceive( packet);
             }
 
             mDataNowLength = 0;
@@ -414,11 +421,15 @@ public class Connection
                 // 先拷贝一个数据包，提交到列表中
                 if (null != onReceive)
                 {
-                    byte[] packet = new byte[nPackageLen];
+                    //byte[] packet = new byte[nPackageLen];
 
-                    Array.Copy(mCopyData, nReadPos + sizeof(ushort), packet, 0, nPackageLen);
+                    Packet packet = NetworkManager.Instance.GetOrCreatePacket(nPackageLen);
+                    packet.connection = this;
+                    packet.Write(mCopyData, nReadPos + sizeof(ushort), nPackageLen);
 
-                    onReceive(this,packet);
+                    //Array.Copy(mCopyData, nReadPos + sizeof(ushort), packet, 0, nPackageLen);
+
+                    onReceive(packet);
                 }
 
                 nReadPos += nPackageLen + sizeof(ushort);
@@ -435,16 +446,16 @@ public class Connection
                     if (IsLittleEndian == false)
                     {
                         //大端
-                        mLengthData[0] = mRecvData[nReadPos + 1];
-                        mLengthData[1] = mRecvData[nReadPos];
+                        mRecvLengthData[0] = mRecvData[nReadPos + 1];
+                        mRecvLengthData[1] = mRecvData[nReadPos];
                     }
                     else
                     {
                         //小端
-                        mLengthData[0] = mRecvData[nReadPos];
-                        mLengthData[1] = mRecvData[nReadPos + 1];
+                        mRecvLengthData[0] = mRecvData[nReadPos];
+                        mRecvLengthData[1] = mRecvData[nReadPos + 1];
                     }
-                    nPackageLen = BitConverter.ToUInt16(mLengthData, 0);       // 得到下一个包的数据长度
+                    nPackageLen = BitConverter.ToUInt16(mRecvLengthData, 0);       // 得到下一个包的数据长度
 
                     // 否则就把数据拷贝回去，等待剩余数据
                     if (mDataNowLength < nPackageLen + sizeof(ushort))

@@ -3,6 +3,67 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public delegate void PacketHandler(Connection c, byte[] packet);
+public class Packet
+{
+    public Connection connection;
+    private byte[] mData;
+    public byte[] data { get { return mData; } }
+
+    public int position { get; protected set; }
+
+    public int length { get { return mData != null ? mData.Length : 0; } }
+
+    public Packet(int size)
+    {
+        position = 0;
+        Resize(size);
+    }
+
+    public void Write(byte[] sourceArray, int sourceIndex,int length)
+    {
+        if(sourceArray == null)
+        {
+            return;
+        }
+
+        Resize(position + length);
+
+        Array.Copy(sourceArray, sourceIndex, mData, position, length);
+
+        position += length;
+    }
+
+    public void Write(System.IO.MemoryStream stream, int length)
+    {
+        if(stream == null)
+        {
+            return;
+        }
+        Resize(position + length);
+
+        stream.Read(mData, position, length);
+
+        position += length;
+    }
+
+    public void Resize(int size)
+    {
+        if(mData == null)
+        {
+            mData = new byte[Mathf.NextPowerOfTwo(size)];
+        }
+        else if(mData.Length < size)
+        {
+            Array.Resize(ref mData, Mathf.NextPowerOfTwo(size));
+        }
+    }
+
+    public void Clear()
+    {
+        position = 0;
+        connection = null;
+    }
+}
 
 public class NetworkManager 
 {
@@ -25,20 +86,11 @@ public class NetworkManager
 
     #endregion
 
-    internal class Packet
-    {
-        public Connection connection;
-        public byte[] data;
-        public Packet(Connection connection, byte[] data)
-        {
-            this.connection = connection;
-            this.data = data;
-        }
-    }
-
+  
     private Dictionary<int, Connection> mConnectionDic = new Dictionary<int, Connection>();
 
     private ConcurrentQueue<Packet> mPacketList = new ConcurrentQueue<Packet>();
+    private ConcurrentQueue<Packet> mPacketCacheList = new ConcurrentQueue<Packet>();
    
     private Queue<Connection> mConnectResults = new Queue<Connection>();
     private Dictionary<int, OnConnectionHandler> mConnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
@@ -83,6 +135,25 @@ public class NetworkManager
         c.Connect(ip, port);
     }
 
+    public Packet GetOrCreatePacket(int size = 1024)
+    {
+        Packet packet;
+        if(mPacketCacheList.TryDequeue(out packet) ==false )
+        {
+            packet = new Packet(size);
+        }
+        packet.Clear();
+        return packet;
+    }
+    public void ReturnPacket(Packet packet)
+    {
+        if(packet!= null)
+        {
+            packet.Clear();
+            mPacketCacheList.Enqueue(packet);
+        }
+    }
+
     public Connection GetConnection(int id)
     {
         if (mConnectionDic.ContainsKey(id))
@@ -108,6 +179,7 @@ public class NetworkManager
                 {
                     onReceive(data.connection, data.data);
                 }
+                ReturnPacket(data);
             }
         }
         while (mConnectResults.Count > 0)
@@ -139,7 +211,7 @@ public class NetworkManager
     /// <param name="clientID"></param>
     /// <param name="id"></param>
     /// <param name="packet"></param>
-    public void Send(int connectid, byte[] packet)
+    public void Send(int connectid, Packet packet)
     {
         if (packet == null)
         {
@@ -150,10 +222,13 @@ public class NetworkManager
 
         if (client == null)
         {
+            ReturnPacket(packet);
             return;
         }
        
-        client.Send(packet, (ushort)packet.Length);
+        client.Send(packet);
+
+        ReturnPacket(packet);
 
     }
 
@@ -180,16 +255,25 @@ public class NetworkManager
             v.Close(true);
         }
         mConnectionDic.Clear();
+
+
+        while(mPacketCacheList.isEmpty == false)
+        {
+            if(mPacketCacheList.TryDequeue(out Packet packet))
+            {
+                packet.Clear();
+            }
+        }
     }
 
-    private void OnMessage(Connection connection, byte[] packet)
+    private void OnMessage(Packet packet)
     {
         if (packet == null)
         {
             return;
         }
         
-        mPacketList.Enqueue(new Packet(connection,packet));
+        mPacketList.Enqueue(packet);
         
 
     }

@@ -14,7 +14,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
         string fileName = Path.GetFileName(assetPath);
         bool isAnimation = fileName.Contains("@");
         ModelImporter mi = (ModelImporter)assetImporter;
-        mi.optimizeMesh = true;
+        mi.optimizeMeshVertices = true;
         mi.isReadable = false;
         mi.addCollider = false;
         mi.importAnimation = true;
@@ -204,7 +204,7 @@ public class SUFBXPostprocessor : AssetPostprocessor
         }
 
         obj.GetComponent<Animator>().runtimeAnimatorController = animatorController;
-        GameObject go = PrefabUtility.CreatePrefab(prefabPath, obj);
+        GameObject go = PrefabUtility.SaveAsPrefabAsset(obj, prefabPath);
         go.transform.position = Vector3.zero;
         go.transform.rotation = Quaternion.identity;
         go.transform.localScale = Vector3.one;

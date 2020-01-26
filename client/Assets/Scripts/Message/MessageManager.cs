@@ -19,6 +19,8 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
     public MessageID id { get; set; }
     public T message { get; set; }
 
+    private static MemoryStream memoryStream = new MemoryStream();
+
     public Message(MessageID id)
     {
         this.id = id;
@@ -29,34 +31,26 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
 
     public void Send(ConnectID connectid)
     {
-        using (MemoryStream ms = new MemoryStream())
-        {
-            ProtoBuf.Serializer.Serialize<T>(ms, message);
+        memoryStream.Seek(0, SeekOrigin.Begin);
+        
+        ProtoBuf.Serializer.Serialize<T>(memoryStream, message);
 
-            int length = 4 + (int)ms.Position;
-            byte[] packet = new byte[length];
+        int length = 4 + (int)memoryStream.Position;
 
-            Array.Copy(BitConverter.GetBytes((int)id), 0, packet, 0, 4);
-            ms.Seek(0, SeekOrigin.Begin);
-            ms.Read(packet, 4, length - 4);
-           
-            ms.Close();
-            
-            NetworkManager.Instance.Send((int)connectid, packet);
+        Packet packet = NetworkManager.Instance.GetOrCreatePacket(length);
+        packet.Write(BitConverter.GetBytes((int)id), 0, 4);
+        packet.Write(memoryStream, (int)memoryStream.Position);
 
-        }
-
+        NetworkManager.Instance.Send((int)connectid, packet);
     }
 
     protected abstract void OnRecv(Connection connection);
 
     public void Receive(Connection connection, byte[] data, int index, int length)
     {
-        using (MemoryStream ms = new MemoryStream(data,index, length))
-        {
-            message = (T)ProtoBuf.Meta.RuntimeTypeModel.Default.Deserialize(ms, message, typeof(T));
-            OnRecv(connection);
-        }
+        memoryStream.Seek(0, SeekOrigin.Begin);
+        message = (T)ProtoBuf.Meta.RuntimeTypeModel.Default.Deserialize(memoryStream, message, typeof(T));
+        OnRecv(connection);
     }
 }
 
@@ -122,19 +116,19 @@ public class MessageManager
         return message as T;
     }
 
-    public void OnReceive(Connection connection, byte[] packet)
+    public void OnReceive(Packet packet)
     {
         if(packet == null)
         {
             return;
         }
 
-        if (packet.Length >= 4)
+        if (packet.position >= 4)
         { 
-            int id = BitConverter.ToInt32(packet, 0);
+            int id = BitConverter.ToInt32(packet.data, 0);
             if (mMessageDic.ContainsKey(id))
             {
-                mMessageDic[id].Receive(connection, packet, 4, packet.Length - 4);
+                mMessageDic[id].Receive(packet.connection, packet.data, 4, packet.position - 4);
             }
             else
             {
