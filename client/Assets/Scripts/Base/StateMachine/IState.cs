@@ -5,12 +5,12 @@ public interface IState<T> where T:IStateAgent<T>
 {
     T agent { get; set; }
     IState<T> parent { get; set; }
-    void OnEnter();
-    void OnExcute(float deltaTime);
-    void OnExit();
-    void OnCancel();
-    void OnPause();
-    void OnResume();
-    void OnDestroy();
+    void OnStateEnter();
+    void OnStateExcute(float deltaTime);
+    void OnStateExit();
+    void OnStateCancel();
+    void OnStatePause();
+    void OnStateResume();
+    void OnStateDestroy();
     void Clear();
 }

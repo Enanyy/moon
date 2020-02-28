@@ -19,17 +19,17 @@ public class ActionJumpPlugin :ActionPlugin
 
     private float mDistance = 0;
   
-    public override void OnEnter()
+    public override void OnStateEnter()
     {
-        base.OnEnter();
+        base.OnStateEnter();
 
         mTargetPoint = null;
         mDistance = 0;
     }
 
-    public override void OnExcute(float deltaTime)
+    public override void OnStateExcute(float deltaTime)
     {
-        base.OnExcute(deltaTime);
+        base.OnStateExcute(deltaTime);
        
         if (action.paths.Count > 0)
         {
@@ -144,9 +144,9 @@ public class ActionJumpPlugin :ActionPlugin
         }
     }
 
-    public override void OnExit()
+    public override void OnStateExit()
     {
-        base.OnExit();
+        base.OnStateExit();
         mTargetPoint = null;
     }
 }

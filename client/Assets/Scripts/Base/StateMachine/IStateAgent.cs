@@ -2,11 +2,11 @@
 
 public interface IStateAgent<T> where T : IStateAgent<T>
 {
-    void OnEnter(State<T> state);
-    void OnExcute(State<T> state, float deltaTime);
-    void OnExit(State<T> state);
-    void OnCancel(State<T> state);
-    void OnPause(State<T> state);
-    void OnResume(State<T> state);
-    void OnDestroy(State<T> state);
+    void OnAgentEnter(State<T> state);
+    void OnAgentExcute(State<T> state, float deltaTime);
+    void OnAgentExit(State<T> state);
+    void OnAgentCancel(State<T> state);
+    void OnAgentPause(State<T> state);
+    void OnAgentResume(State<T> state);
+    void OnAgentDestroy(State<T> state);
 }

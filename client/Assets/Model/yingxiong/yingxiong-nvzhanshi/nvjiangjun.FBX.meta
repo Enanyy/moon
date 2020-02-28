@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 18eed4cb92d875a4a87fed48eb9292ec
 ModelImporter:
-  serializedVersion: 26
+  serializedVersion: 19300
   internalIDToNameTable:
   - first:
       1: 100000
@@ -599,10 +599,10 @@ ModelImporter:
     second: //RootNode
   - first:
       21: 2100000
-    second: 'Material #24'
+    second: Material #24
   - first:
       21: 2100002
-    second: 'Material #22'
+    second: Material #22
   - first:
       43: 4300000
     second: nvjiangjun_wuqi01
@@ -626,7 +626,7 @@ ModelImporter:
     second: nvjiangjun_wuqi02
   externalObjects: {}
   materials:
-    importMaterials: 0
+    materialImportMode: 0
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -701,7 +701,6 @@ ModelImporter:
   - 027372e5eec8334469b3ec9bb24c5bf5
   - 9cb0c07c7d4a9f949a6cd48b98b77327
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -719,8 +718,10 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

@@ -9,9 +9,9 @@ public class ActionPluginMultitudeAnimation : ActionPluginSingleAnimation
         Play(0);
     }
 
-    public override void OnExcute(float deltaTime)
+    public override void OnStateExcute(float deltaTime)
     {
-        base.OnExcute(deltaTime);
+        base.OnStateExcute(deltaTime);
 
         if(mIndex >= 0)
         {
@@ -43,9 +43,9 @@ public class ActionPluginMultitudeAnimation : ActionPluginSingleAnimation
             PlayAnimation(animation);
         }
     }
-    public override void OnExit()
+    public override void OnStateExit()
     {
-        base.OnExit();
+        base.OnStateExit();
         mIndex = -1;
         mTime = 0;
     }

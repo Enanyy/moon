@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 public class ActionPluginRemove : ActionPlugin
 {
-    public override void OnExit()
+    public override void OnStateExit()
     {
-        base.OnExit();
+        base.OnStateExit();
         BattleManager.Instance.RemoveEntity(agent.id);
     }
 }

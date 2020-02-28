@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 423d92a743baa5a4c8ef05475c92f800
 ModelImporter:
-  serializedVersion: 26
+  serializedVersion: 19300
   internalIDToNameTable:
   - first:
       1: 100000
@@ -428,7 +428,7 @@ ModelImporter:
     second: Og_AiRenA_Mo_Tou
   externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -497,7 +497,6 @@ ModelImporter:
   - 1fafada5994caf94c8e6ffd1980e2955
   - 784a0c1df29dbd64b93b60edfc176c3f
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -515,8 +514,10 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

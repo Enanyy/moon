@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 54a8019b15f3069449ba2b31f871c5ce
 ModelImporter:
-  serializedVersion: 26
+  serializedVersion: 19300
   internalIDToNameTable:
   - first:
       1: 100000
@@ -371,7 +371,7 @@ ModelImporter:
     second: renzhuhuojianpao_wuqi
   externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -439,7 +439,6 @@ ModelImporter:
   - da7eac91c5d6ce647b41975cd237c4d2
   - d61ed61cb81ba724b9b79915acf3f187
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -457,8 +456,10 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

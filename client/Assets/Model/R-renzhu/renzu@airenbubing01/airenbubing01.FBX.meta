@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 97b64c62dcbf4dc4992e721823380ea3
 ModelImporter:
-  serializedVersion: 26
+  serializedVersion: 19300
   internalIDToNameTable:
   - first:
       1: 100000
@@ -371,16 +371,16 @@ ModelImporter:
     second: //RootNode
   - first:
       21: 2100000
-    second: 'Material #22'
+    second: Material #22
   - first:
       21: 2100002
-    second: 'Material #20'
+    second: Material #20
   - first:
       21: 2100004
-    second: 'Material #21'
+    second: Material #21
   - first:
       21: 2100006
-    second: 'Material #23'
+    second: Material #23
   - first:
       23: 2300000
     second: Object05
@@ -419,7 +419,7 @@ ModelImporter:
     second: Object04
   externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -488,7 +488,6 @@ ModelImporter:
   - 772ab49bdc5641e4ba946410f66c9252
   - 3bbf3399b27d36e43ac96797ff61c52d
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -506,8 +505,10 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

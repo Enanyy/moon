@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class ActionPluginSingleAnimation : ActionPlugin
 {
-    public override void OnEnter()
+    public override void OnStateEnter()
     {
-        base.OnEnter();
+        base.OnStateEnter();
         PlayAnimation();
 
     }

@@ -5,9 +5,9 @@ using UnityEngine;
 public class ActionPluginRun : ActionPlugin
 { 
    
-    public override void OnExcute(float deltaTime)
+    public override void OnStateExcute(float deltaTime)
     {
-        base.OnExcute(deltaTime);
+        base.OnStateExcute(deltaTime);
 
         if (action.paths.Count > 1)
         {   

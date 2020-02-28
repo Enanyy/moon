@@ -53,11 +53,11 @@ public class State<T>: IState<T> where T : IStateAgent<T>
         {
             if (mPause && value == false)
             {
-                OnResume();
+                OnStateResume();
             }
             else if (mPause == false && value)
             {
-                OnPause();
+                OnStatePause();
             }
             mPause = value;
         }
@@ -120,36 +120,36 @@ public class State<T>: IState<T> where T : IStateAgent<T>
     /// <summary>
     /// 进入状态
     /// </summary>
-    public virtual void OnEnter()
+    public virtual void OnStateEnter()
     {
         if(agent!=null)
         {
-            agent.OnEnter(this);
+            agent.OnAgentEnter(this);
         }
         for(int i = 0; i <mSubStateList.Count;++i)
         {
-            mSubStateList[i].OnEnter();
+            mSubStateList[i].OnStateEnter();
         }
     }
     /// <summary>
     /// 状态取消
     /// </summary>
-    public virtual void OnCancel()
+    public virtual void OnStateCancel()
     {
         if (agent != null)
         {
-            agent.OnCancel(this);
+            agent.OnAgentCancel(this);
         }
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
-            mSubStateList[i].OnCancel();
+            mSubStateList[i].OnStateCancel();
         }
     }
     /// <summary>
     /// 状态执行
     /// </summary>
     /// <param name="deltaTime"></param>
-    public virtual void OnExcute(float deltaTime)
+    public virtual void OnStateExcute(float deltaTime)
     {
         if (time < duration)
         {
@@ -161,66 +161,66 @@ public class State<T>: IState<T> where T : IStateAgent<T>
         }
         if (agent != null)
         {
-            agent.OnExcute(this,deltaTime);
+            agent.OnAgentExcute(this,deltaTime);
         }
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
-            mSubStateList[i].OnExcute(deltaTime);
+            mSubStateList[i].OnStateExcute(deltaTime);
         }
     }
     /// <summary>
     /// 状态退出
     /// </summary>
-    public virtual void OnExit()
+    public virtual void OnStateExit()
     {
         if (agent != null)
         {
-            agent.OnExit(this);
+            agent.OnAgentExit(this);
         }
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
-            mSubStateList[i].OnExit();
+            mSubStateList[i].OnStateExit();
         }
     }
 
     /// <summary>
     /// 暂停
     /// </summary>
-    public virtual void OnPause()
+    public virtual void OnStatePause()
     {
         if (agent != null)
         {
-            agent.OnPause(this);
+            agent.OnAgentPause(this);
         }
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
-            mSubStateList[i].OnPause();
+            mSubStateList[i].OnStatePause();
         }
     }
     /// <summary>
     /// 恢复
     /// </summary>
-    public virtual void OnResume()
+    public virtual void OnStateResume()
     {
         if (agent != null)
         {
-            agent.OnResume(this);
+            agent.OnAgentResume(this);
         }
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
-            mSubStateList[i].OnResume();
+            mSubStateList[i].OnStateResume();
         }
     }
 
-    public virtual void OnDestroy()
+    public virtual void OnStateDestroy()
     {
         if (agent != null)
         {
-            agent.OnDestroy(this);
+            agent.OnAgentDestroy(this);
         }
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
-            mSubStateList[i].OnDestroy();
+            mSubStateList[i].OnStateDestroy();
         }
     }
 

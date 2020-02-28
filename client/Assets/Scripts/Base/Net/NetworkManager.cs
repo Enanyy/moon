@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate void PacketHandler(Connection c, byte[] packet);
+public delegate void PacketHandler(Packet packet);
 public class Packet
 {
     public Connection connection;
@@ -170,14 +170,13 @@ public class NetworkManager
     {
         while (mPacketList.isEmpty == false)
         {
-
             Packet data;
             if(mPacketList.TryDequeue(out data))
             {
                 //这里分发网络包
                 if (onReceive != null)
                 {
-                    onReceive(data.connection, data.data);
+                    onReceive(data);
                 }
                 ReturnPacket(data);
             }

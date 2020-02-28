@@ -4,9 +4,9 @@ using UnityEngine;
 public class ActionPluginRotate : ActionPlugin
 {
     private BattleEntity mTargetEntity;
-    public override void OnExcute(float deltaTime)
+    public override void OnStateExcute(float deltaTime)
     {
-        base.OnExcute(deltaTime);
+        base.OnStateExcute(deltaTime);
 
         if (action.type == ActionType.Attack)
         {

@@ -27,8 +27,7 @@ public class EffectEntityTime : EffectEntity
             var entity = on as BattleEntity;
             if (entity != null)
             {
-                var model = entity.GetComponent<EntityComponentModel>();
-                if (model != null)
+                if (entity.TryGetComponent(out EntityComponentModel model))
                 {
                     UpdateParticleSystemSpeed(model.animationSpeed);
                     if (time.bone != BonePoint.None && model.gameObject != null)
@@ -85,9 +84,9 @@ public class EffectEntityTime : EffectEntity
         }
     }
 
-    public override void OnExcute(float deltaTime)
+    public override void OnStateExcute(float deltaTime)
     {
-        base.OnExcute(deltaTime);
+        base.OnStateExcute(deltaTime);
         if (action != null)
         {
             EntityParamEffectTime timeParam = param as EntityParamEffectTime;

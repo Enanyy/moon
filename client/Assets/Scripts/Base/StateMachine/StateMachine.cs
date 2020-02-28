@@ -215,15 +215,15 @@ public class StateMachine<T> where T: IStateAgent<T>
         {
             if(current.isCancel)
             {
-                current.OnCancel();
+                current.OnStateCancel();
             }
-            current.OnExit();
+            current.OnStateExit();
             mStateList.RemoveFirst();
         }
 
         if (previous != null)
         {
-            previous.OnDestroy();
+            previous.OnStateDestroy();
         }
 
         //保存上一个状态 
@@ -235,17 +235,17 @@ public class StateMachine<T> where T: IStateAgent<T>
             var state = mStateList.First.Value;
             if (state.IsValid()==false)
             {
-                state.OnCancel();
-                state.OnDestroy();
+                state.OnStateCancel();
+                state.OnStateDestroy();
                 mStateList.RemoveFirst();
             }
             else
             {
                 if (state.duration <= 0)
                 {
-                    state.OnEnter();
-                    state.OnExit();
-                    state.OnDestroy();
+                    state.OnStateEnter();
+                    state.OnStateExit();
+                    state.OnStateDestroy();
                     mStateList.RemoveFirst();
                 }
                 else
@@ -260,7 +260,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         {
             current = mStateList.First.Value;
             //进入当前状态调用Enter方法
-            current.OnEnter();
+            current.OnStateEnter();
             return true;
         }
        
@@ -282,7 +282,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         }
         if (current != null)
         {
-            current.OnExcute(deltaTime);
+            current.OnStateExcute(deltaTime);
         }
     }
 
@@ -310,22 +310,22 @@ public class StateMachine<T> where T: IStateAgent<T>
         {
             if (current.isCancel)
             {
-                current.OnCancel();
+                current.OnStateCancel();
             }
-            current.OnExit();
-            current.OnDestroy();
+            current.OnStateExit();
+            current.OnStateDestroy();
         }
        
         if(previous!=null)
         {
-            previous.OnDestroy();
+            previous.OnStateDestroy();
         }
         
         var it = mStateList.GetEnumerator();
         while(it.MoveNext())
         {
-            it.Current.OnCancel();
-            it.Current.OnDestroy();
+            it.Current.OnStateCancel();
+            it.Current.OnStateDestroy();
         }
         mStateList.Clear();
         previous = null;

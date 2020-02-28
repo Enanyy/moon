@@ -169,8 +169,7 @@ public abstract class EffectEntity :
         {
             return childCount;
         }
-        var model = agent.GetComponent<EntityComponentModel>();
-        if(model== null)
+        if(agent.TryGetComponent(out EntityComponentModel model)==false)
         {
             return childCount;
         }
@@ -236,32 +235,32 @@ public abstract class EffectEntity :
         mTarget = 0;
     }
     #region State
-    public virtual void OnEnter()
+    public virtual void OnStateEnter()
     {
        
     }
 
-    public virtual void OnExcute(float deltaTime)
+    public virtual void OnStateExcute(float deltaTime)
     {
        
     }
 
-    public virtual void OnExit()
+    public virtual void OnStateExit()
     {
        
     }
 
-    public virtual void OnCancel()
+    public virtual void OnStateCancel()
     {
        
     }
 
-    public virtual void OnPause()
+    public virtual void OnStatePause()
     {
         
     }
 
-    public virtual void OnResume()
+    public virtual void OnStateResume()
     {
        
     }
@@ -271,7 +270,7 @@ public abstract class EffectEntity :
        
     }
 
-    public virtual void OnDestroy()
+    public virtual void OnStateDestroy()
     {
 
     }

@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 public class EntityComponentModel :
     AssetEntity,
-    IComponent<BattleEntity>,
+    IComponent,
     IStateAgent<BattleEntity>
 {
     #region Inner Class
@@ -57,7 +57,7 @@ public class EntityComponentModel :
         }
     }
     #endregion
-    public BattleEntity agent { get; set; }
+    public BattleEntity agent { get { return Parent as BattleEntity; } }
     private List<DelayTask> mDelayTasks = new List<DelayTask>();
 
     private AnimationClip mCurrentAnimationClip;
@@ -86,10 +86,18 @@ public class EntityComponentModel :
         }
     }
 
-    public void OnStart()
+    public IComponent Parent { get; set ; }
+    public Dictionary<Type, IComponent> Components { get ; set ; }
+
+    public void OnComponentInitialize()
     {
         animationSpeed = 1;
         LoadModel();
+    }
+
+    public void OnComponentDestroy()
+    {
+        
     }
 
     public void LoadModel()
@@ -161,17 +169,17 @@ public class EntityComponentModel :
         }
 #endif
     }
-    public void OnCancel(State<BattleEntity> state)
+    public void OnAgentCancel(State<BattleEntity> state)
     {
 
     }
 
-    public void OnEnter(State<BattleEntity> state)
+    public void OnAgentEnter(State<BattleEntity> state)
     {
 
     }
 
-    public void OnExcute(State<BattleEntity> state, float deltaTime)
+    public void OnAgentExcute(State<BattleEntity> state, float deltaTime)
     {
         animationSpeed = state.speed;
         if (animator != null && animator.speed != animationSpeed)
@@ -181,11 +189,11 @@ public class EntityComponentModel :
 
     }
 
-    public void OnExit(State<BattleEntity> state)
+    public void OnAgentExit(State<BattleEntity> state)
     {
     }
 
-    public void OnPause(State<BattleEntity> state)
+    public void OnAgentPause(State<BattleEntity> state)
     {
         if (animator != null)
         {
@@ -193,23 +201,18 @@ public class EntityComponentModel :
         }
     }
 
-    public void OnResume(State<BattleEntity> state)
+    public void OnAgentResume(State<BattleEntity> state)
     {
         if (animator != null)
         {
             animator.speed = animationSpeed;
         }
     }
-    public void OnDestroy(State<BattleEntity> state)
+    public void OnAgentDestroy(State<BattleEntity> state)
     {
 
     }
-    public void OnDestroy()
-    {
-
-    }
-
-
+   
 
     public void PlayAnimation(EntityAction action, EntityParamPluginAnimationClip clip)
     {
@@ -354,6 +357,7 @@ public class EntityComponentModel :
         mShapeRenderers.Add(renderer);
     }
 
+  
 
 #endif
 

@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: b73a7f4332f691a47abd4dba4823aad9
 ModelImporter:
-  serializedVersion: 26
+  serializedVersion: 19300
   internalIDToNameTable:
   - first:
       1: 100000
@@ -347,7 +347,7 @@ ModelImporter:
     second: Plane001
   - first:
       21: 2100000
-    second: 'Material #196'
+    second: Material #196
   - first:
       21: 2100002
     second: No Name
@@ -395,7 +395,7 @@ ModelImporter:
     second: orc_army02_m
   externalObjects: {}
   materials:
-    importMaterials: 0
+    materialImportMode: 0
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -463,7 +463,6 @@ ModelImporter:
   - 8a0cccefee57e9f4bb84bf1b7e5d4841
   - a055028eb6bcc004f8645cc07afa293f
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -481,8 +480,10 @@ ModelImporter:
     hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

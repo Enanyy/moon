@@ -52,7 +52,7 @@ public class AssetEntity :IPoolObject
         if (gameObject != null)
         {
             int layer = LayerMask.NameToLayer("Default");
-            gameObject.SetLayer(layer, true);
+            gameObject.SetLayerEx(layer, true);
         }
     }
 

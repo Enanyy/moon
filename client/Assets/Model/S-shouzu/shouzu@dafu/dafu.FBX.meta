@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 24cc28700c6a15747b760563eb3ca0aa
 ModelImporter:
-  serializedVersion: 26
+  serializedVersion: 19300
   internalIDToNameTable:
   - first:
       1: 100000
@@ -239,7 +239,7 @@ ModelImporter:
     second: //RootNode
   - first:
       21: 2100000
-    second: 'Material #198'
+    second: Material #198
   - first:
       43: 4300000
     second: monster06
@@ -251,7 +251,7 @@ ModelImporter:
     second: monster06
   externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -319,7 +319,6 @@ ModelImporter:
   - 9fb035158c243c345a4b7912ec9481f5
   - 701cc8c5e02ebf14bb79795866d4d929
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -337,8 +336,10 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
   additionalBone: 0
   userData: 
   assetBundleName: 
