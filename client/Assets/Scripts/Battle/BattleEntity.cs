@@ -28,7 +28,8 @@ public class BattleEntity:
     IComponent,
     IGameObject,
     IStateAgent<BattleEntity>,
-    IPoolObject
+    IPoolObject,
+    IUpdate
 {
 
     public uint id;             //唯一ID  
@@ -301,6 +302,13 @@ public class BattleEntity:
             machine.OnUpdate(deltaTime);
             
         }
+        this.Foreach((component) => {
+            var update = component as IUpdate;
+            if(update!=null)
+            {
+                update.OnUpdate(deltaTime);
+            }
+        });
     }
 
     public void UpdateProperty(PBMessage.BattleEntityProperty property)

@@ -8,7 +8,8 @@ using UnityEngine;
 public class EntityComponentModel :
     AssetEntity,
     IComponent,
-    IStateAgent<BattleEntity>
+    IStateAgent<BattleEntity>,
+    IUpdate
 {
     #region Inner Class
     class DelayTask : IPoolObject

@@ -4,7 +4,8 @@ using UnityEngine;
 public abstract class EffectEntity :
     AssetEntity,
     IGameObject,
-    IState<BattleEntity>
+    IState<BattleEntity>,
+    IUpdate
 {
     public Vector3 position { get; set; }
     public Quaternion rotation { get; set; }
