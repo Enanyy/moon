@@ -27,7 +27,7 @@ public enum PropertyID
 public class BattleEntity: 
     IComponent,
     IGameObject,
-    IStateAgent<BattleEntity>,
+    IStateAgent,
     IPoolObject,
     IUpdate
 {
@@ -47,7 +47,7 @@ public class BattleEntity:
 
     public Dictionary<uint,IEntityProperty> properties { get; private set; }
 
-    public StateMachine<BattleEntity> machine { get; private set; }
+    public StateMachine machine { get; private set; }
 
 
     public EntityParamModel param { get;private set; }
@@ -135,7 +135,7 @@ public class BattleEntity:
 
     public BattleEntity()
     {
-        machine = new StateMachine<BattleEntity>(this);
+        machine = new StateMachine();
         properties = new Dictionary<uint, IEntityProperty>();
         Clear();
     }
@@ -254,6 +254,7 @@ public class BattleEntity:
                 action = ObjectPool.GetInstance<EntityAction>();
             }
             action.type = actionType;
+            action.SetAgent(this);
             if (first)
             {
                 machine.AddFirst(action);
@@ -274,7 +275,7 @@ public class BattleEntity:
         return machine.GetLast((int)type) as EntityAction;
     }
 
-    public List<State<BattleEntity>> GetActions(ActionType type)
+    public List<State> GetActions(ActionType type)
     {
         return  machine.GetStates((int)type);
     }
@@ -366,11 +367,11 @@ public class BattleEntity:
         Clear();
     }
 
-    public void OnAgentEnter(State<BattleEntity> state)
+    public void OnAgentEnter(State state)
     {       
         this.Foreach((component) => {
 
-            var agent = component as IStateAgent<BattleEntity>;
+            var agent = component as IStateAgent;
             if (agent != null)
             {
                 agent.OnAgentEnter(state);
@@ -378,11 +379,11 @@ public class BattleEntity:
         });
     }
 
-    public void OnAgentExcute(State<BattleEntity> state, float deltaTime)
+    public void OnAgentExcute(State state, float deltaTime)
     {
         this.Foreach((component) =>
         {
-            var agent = component as IStateAgent<BattleEntity>;
+            var agent = component as IStateAgent;
             if (agent != null)
             {
                 agent.OnAgentExcute(state, deltaTime);
@@ -390,11 +391,11 @@ public class BattleEntity:
         });
     }
 
-    public void OnAgentExit(State<BattleEntity> state)
+    public void OnAgentExit(State state)
     {
         this.Foreach((component) =>
         {
-            var agent = component as IStateAgent<BattleEntity>;
+            var agent = component as IStateAgent;
             if (agent != null)
             {
                 agent.OnAgentExit(state);
@@ -402,11 +403,11 @@ public class BattleEntity:
         });
     }
 
-    public void OnAgentCancel(State<BattleEntity> state)
+    public void OnAgentCancel(State state)
     {
         this.Foreach((component) =>
         {
-            var agent = component as IStateAgent<BattleEntity>;
+            var agent = component as IStateAgent;
             if (agent != null)
             {
                 agent.OnAgentCancel(state);
@@ -414,11 +415,11 @@ public class BattleEntity:
         });
     }
 
-    public void OnAgentPause(State<BattleEntity> state)
+    public void OnAgentPause(State state)
     {
         this.Foreach((component) =>
         {
-            var agent = component as IStateAgent<BattleEntity>;
+            var agent = component as IStateAgent;
             if (agent != null)
             {
                 agent.OnAgentPause(state);
@@ -426,11 +427,11 @@ public class BattleEntity:
         });
     }
 
-    public void OnAgentResume(State<BattleEntity> state)
+    public void OnAgentResume(State state)
     {
         this.Foreach((component) =>
         {
-            var agent = component as IStateAgent<BattleEntity>;
+            var agent = component as IStateAgent;
             if (agent != null)
             {
                 agent.OnAgentResume(state);
@@ -438,11 +439,11 @@ public class BattleEntity:
         });
     }
 
-    public void OnAgentDestroy(State<BattleEntity> state)
+    public void OnAgentDestroy(State state)
     {
         this.Foreach((component) =>
         {
-            var agent = component as IStateAgent<BattleEntity>;
+            var agent = component as IStateAgent;
             if (agent != null)
             {
                 agent.OnAgentDestroy(state);

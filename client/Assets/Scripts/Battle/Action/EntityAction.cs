@@ -53,8 +53,9 @@ public class PathPoint:IPoolObject
     }
 }
 
-public class EntityAction : State<BattleEntity>,IPoolObject
+public class EntityAction : State,IPoolObject
 {
+    public BattleEntity agent { get; private set; }
     
     public uint skillid;
     public uint target;
@@ -78,10 +79,10 @@ public class EntityAction : State<BattleEntity>,IPoolObject
         paths.AddLast(point);    
     }
 
-    public override void SetAgent(BattleEntity entity)
+    public virtual void SetAgent(BattleEntity entity)
     {
-        base.SetAgent(entity);
-        if (agent.param == null)
+        agent = entity;
+        if (agent== null || agent.param == null)
         {
             return;
         }
@@ -101,6 +102,8 @@ public class EntityAction : State<BattleEntity>,IPoolObject
                     if (plugin != null)
                     {
                         plugin.Init(plugins[i]);
+                        plugin.agent = agent;
+                        plugin.action = this;
                         AddSubState(plugin);
                     }
                 }
@@ -112,7 +115,63 @@ public class EntityAction : State<BattleEntity>,IPoolObject
             }
         }     
     }
- 
+    public override void OnStateCancel()
+    {
+        base.OnStateCancel();
+        if (agent != null)
+        {
+            agent.OnAgentCancel(this);
+        }
+    }
+    public override void OnStateEnter()
+    {
+        base.OnStateEnter();
+        if (agent != null)
+        {
+            agent.OnAgentEnter(this);
+        }
+    }
+    public override void OnStateExcute(float deltaTime)
+    {
+        base.OnStateExcute(deltaTime);
+        if (agent != null)
+        {
+            agent.OnAgentExcute(this, deltaTime);
+        }
+    }
+    public override void OnStateExit()
+    {
+        base.OnStateExit();
+        if(agent!= null)
+        {
+            agent.OnAgentExit(this);
+        }
+    }
+    public override void OnStatePause()
+    {
+        base.OnStatePause();
+        if(agent!=null)
+        {
+            agent.OnAgentPause(this);
+        }
+    }
+    public override void OnStateResume()
+    {
+        base.OnStateResume();
+        if(agent!=null)
+        {
+            agent.OnAgentResume(this);
+        }
+    }
+    public override void OnStateDestroy()
+    {
+        base.OnStateDestroy();
+        if(agent!= null)
+        {
+            agent.OnAgentDestroy(this);
+        }
+    }
+
     public override void Clear()
     {
         base.Clear();
@@ -170,7 +229,7 @@ public class EntityAction : State<BattleEntity>,IPoolObject
             if (plugin != null)
             {
                 plugin.agent = null;
-                plugin.parent = null;
+                plugin.action = null;
 
                 ObjectPool.ReturnInstance(plugin, plugin.GetType());
             }

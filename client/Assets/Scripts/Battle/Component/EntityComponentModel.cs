@@ -8,7 +8,7 @@ using UnityEngine;
 public class EntityComponentModel :
     AssetEntity,
     IComponent,
-    IStateAgent<BattleEntity>,
+    IStateAgent,
     IUpdate
 {
     #region Inner Class
@@ -170,17 +170,17 @@ public class EntityComponentModel :
         }
 #endif
     }
-    public void OnAgentCancel(State<BattleEntity> state)
+    public void OnAgentCancel(State state)
     {
 
     }
 
-    public void OnAgentEnter(State<BattleEntity> state)
+    public void OnAgentEnter(State state)
     {
 
     }
 
-    public void OnAgentExcute(State<BattleEntity> state, float deltaTime)
+    public void OnAgentExcute(State state, float deltaTime)
     {
         animationSpeed = state.speed;
         if (animator != null && animator.speed != animationSpeed)
@@ -190,11 +190,11 @@ public class EntityComponentModel :
 
     }
 
-    public void OnAgentExit(State<BattleEntity> state)
+    public void OnAgentExit(State state)
     {
     }
 
-    public void OnAgentPause(State<BattleEntity> state)
+    public void OnAgentPause(State state)
     {
         if (animator != null)
         {
@@ -202,14 +202,14 @@ public class EntityComponentModel :
         }
     }
 
-    public void OnAgentResume(State<BattleEntity> state)
+    public void OnAgentResume(State state)
     {
         if (animator != null)
         {
             animator.speed = animationSpeed;
         }
     }
-    public void OnAgentDestroy(State<BattleEntity> state)
+    public void OnAgentDestroy(State state)
     {
 
     }

@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class State<T>: IState<T> where T : IStateAgent<T>
+public class State:IState
 {
     public State()
     {
         Clear();
     }
-    public StateMachine<T> machine { get; private set; }
-    public IState<T> parent { get; set; }
-
+    public StateMachine machine { get; private set; }
+  
     /// <summary>
     /// 状态类型
     /// </summary>
     public int type { get; set; }
-    
-    public T agent { get;  set; }
+   
 
     /// <summary>
     /// 权重
@@ -65,7 +63,7 @@ public class State<T>: IState<T> where T : IStateAgent<T>
     /// <summary>
     /// 子状态
     /// </summary>
-    protected List<IState<T>> mSubStateList = new List<IState<T>>();
+    protected List<IState> mSubStateList = new List<IState>();
    
 
     /// <summary>
@@ -86,12 +84,10 @@ public class State<T>: IState<T> where T : IStateAgent<T>
     /// 添加子状态
     /// </summary>
     /// <param name="state"></param>
-    public void AddSubState(IState<T> state)
+    public void AddSubState(IState state)
     {
         if(mSubStateList.Contains(state)==false)
         {
-            state.agent = agent;
-            state.parent = this;
             mSubStateList.Add(state);
         }
     }
@@ -100,32 +96,16 @@ public class State<T>: IState<T> where T : IStateAgent<T>
     /// 设置状态机
     /// </summary>
     /// <param name="varMachine"></param>
-    public void SetStateMachine(StateMachine<T> varMachine)
+    public void SetStateMachine(StateMachine varMachine)
     {
-        machine = varMachine;
-        SetAgent(machine.agent);
+        machine = varMachine;    
     }
-    /// <summary>
-    /// 设置状态代理
-    /// </summary>
-    /// <param name="agent"></param>
-    public virtual void SetAgent(T agent)
-    {
-        this.agent = agent;
-        for(int i = 0; i < mSubStateList.Count;++i)
-        {
-            mSubStateList[i].agent = agent;
-        }
-    }
+   
     /// <summary>
     /// 进入状态
     /// </summary>
     public virtual void OnStateEnter()
-    {
-        if(agent!=null)
-        {
-            agent.OnAgentEnter(this);
-        }
+    {    
         for(int i = 0; i <mSubStateList.Count;++i)
         {
             mSubStateList[i].OnStateEnter();
@@ -135,11 +115,7 @@ public class State<T>: IState<T> where T : IStateAgent<T>
     /// 状态取消
     /// </summary>
     public virtual void OnStateCancel()
-    {
-        if (agent != null)
-        {
-            agent.OnAgentCancel(this);
-        }
+    {    
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
             mSubStateList[i].OnStateCancel();
@@ -159,10 +135,7 @@ public class State<T>: IState<T> where T : IStateAgent<T>
                 Done();
             }
         }
-        if (agent != null)
-        {
-            agent.OnAgentExcute(this,deltaTime);
-        }
+       
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
             mSubStateList[i].OnStateExcute(deltaTime);
@@ -172,11 +145,7 @@ public class State<T>: IState<T> where T : IStateAgent<T>
     /// 状态退出
     /// </summary>
     public virtual void OnStateExit()
-    {
-        if (agent != null)
-        {
-            agent.OnAgentExit(this);
-        }
+    {     
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
             mSubStateList[i].OnStateExit();
@@ -187,11 +156,7 @@ public class State<T>: IState<T> where T : IStateAgent<T>
     /// 暂停
     /// </summary>
     public virtual void OnStatePause()
-    {
-        if (agent != null)
-        {
-            agent.OnAgentPause(this);
-        }
+    {      
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
             mSubStateList[i].OnStatePause();
@@ -201,11 +166,7 @@ public class State<T>: IState<T> where T : IStateAgent<T>
     /// 恢复
     /// </summary>
     public virtual void OnStateResume()
-    {
-        if (agent != null)
-        {
-            agent.OnAgentResume(this);
-        }
+    {      
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
             mSubStateList[i].OnStateResume();
@@ -213,11 +174,7 @@ public class State<T>: IState<T> where T : IStateAgent<T>
     }
 
     public virtual void OnStateDestroy()
-    {
-        if (agent != null)
-        {
-            agent.OnAgentDestroy(this);
-        }
+    {     
         for (int i = 0; i < mSubStateList.Count; ++i)
         {
             mSubStateList[i].OnStateDestroy();
@@ -235,8 +192,6 @@ public class State<T>: IState<T> where T : IStateAgent<T>
         speed = 1;
         isDone = false;
         mPause = false;
-        agent = default(T);
-        parent = null;
         for(int i = 0; i <mSubStateList.Count; ++i)
         {
             mSubStateList[i].Clear();

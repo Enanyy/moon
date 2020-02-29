@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class ActionPlugin : IState<BattleEntity>,IPoolObject
+public class ActionPlugin : IState,IPoolObject
 {
     public BattleEntity agent { get; set; }
-    public IState<BattleEntity> parent { get; set; }
+   
 
-    public EntityAction action { get { return parent as EntityAction; } }
+    public EntityAction action { get; set; }
 
     public EntityParamPlugin param { get; private set; }
 

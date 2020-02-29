@@ -24,7 +24,10 @@
     </EntityParamPluginSingleAnimation>
     <EntityParamPluginRemove rect="(851,575,240,20)" />
   </EntityParamAction>
-  <EntityParamAnimation animationClip="attack01" length="1.8" mode="Default" rect="(1381,31,240,20)" />
+  <EntityParamAnimation animationClip="attack01" length="1.8" mode="Default" rect="(1225,149,240,20)">
+    <EntityParamEffectTime duration="2" bone="Weapon1" bind="1" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Self" asset="fx_kuloufashi_attack_xuli.prefab" delay="0" offset="(0.0, 0.0, 0.0)" rect="(1586,178,240,20)" />
+    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Target" asset="fx_kuloufashi_attack_hit.prefab" delay="1" offset="(0.0, 0.0, 0.0)" rect="(1412,364,240,20)" />
+  </EntityParamAnimation>
   <EntityParamAnimation animationClip="die" length="2.633333" mode="ClampForever" rect="(1659,34,240,20)" />
   <EntityParamAnimation animationClip="idle" length="1.666667" mode="Loop" rect="(824,32,240,20)" />
   <EntityParamAnimation animationClip="run" length="1" mode="Loop" rect="(1098,22,240,20)" />

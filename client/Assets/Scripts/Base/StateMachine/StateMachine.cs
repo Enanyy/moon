@@ -2,11 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class StateMachine<T> where T: IStateAgent<T>
+public class StateMachine
 {
-    public State<T> previous { get; private set; }
-    public State<T> current { get; private set; }
-    public State<T> next {
+    public State previous { get; private set; }
+    public State current { get; private set; }
+    public State next {
         get {
             if (mStateList.Count > 1)
             {
@@ -15,7 +15,7 @@ public class StateMachine<T> where T: IStateAgent<T>
             else { return null; }
         }
     }
-    private LinkedList<State<T>> mStateList = new LinkedList<State<T>>();
+    private LinkedList<State> mStateList = new LinkedList<State>();
 
 
     private bool mPause;
@@ -31,16 +31,14 @@ public class StateMachine<T> where T: IStateAgent<T>
             }
         }
     }
-    public T agent { get; private set; }
+  
 
-
-    public StateMachine(T agent)
+    public StateMachine()
     {
-        this.agent = agent;
         Clear();
     }
 
-    public bool AddFirst(State<T> state)
+    public bool AddFirst(State state)
     {
         if(state == null)
         {
@@ -61,7 +59,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         return true;
     }
 
-    public bool AddLast(State<T> state)
+    public bool AddLast(State state)
     {
         if(state == null)
         {
@@ -72,7 +70,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         return true;
     }
 
-    public bool AddBefore(State<T> node, State<T> state)
+    public bool AddBefore(State node, State state)
     {
         if (state == null)
         {
@@ -110,7 +108,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         return true;
     }
 
-    public bool AddAfter(State<T> node, State<T> state)
+    public bool AddAfter(State node, State state)
     {
         if (state == null)
         {
@@ -141,7 +139,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         return true;
     }
 
-    public State<T> GetFirst(int type)
+    public State GetFirst(int type)
     {
         var it = mStateList.First;
         while (it != null)
@@ -158,7 +156,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         return null;
     }
 
-    public State<T> GetLast(int type)
+    public State GetLast(int type)
     {
         var it = mStateList.Last;
         while (it != null)
@@ -175,9 +173,9 @@ public class StateMachine<T> where T: IStateAgent<T>
         return null;
     }
 
-    public List<State<T>> GetStates(int type)
+    public List<State> GetStates(int type)
     {
-        List<State<T>> states = new List<State<T>>();
+        List<State> states = new List<State>();
         var it = mStateList.GetEnumerator();
         while (it.MoveNext())
         {
@@ -190,7 +188,7 @@ public class StateMachine<T> where T: IStateAgent<T>
         return states;
     }
 
-    public void Remove(State<T> state)
+    public void Remove(State state)
     {
         if (state == null)
         {

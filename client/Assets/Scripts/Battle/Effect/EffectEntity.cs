@@ -4,7 +4,7 @@ using UnityEngine;
 public abstract class EffectEntity :
     AssetEntity,
     IGameObject,
-    IState<BattleEntity>,
+    IState,
     IUpdate
 {
     public Vector3 position { get; set; }
@@ -29,7 +29,7 @@ public abstract class EffectEntity :
         get { return parent as EntityAction; }
     }
 
-    public  IState<BattleEntity> parent
+    public  IState parent
     {
         get;
         set;     

@@ -1,12 +1,12 @@
 ﻿using System;
 
-public interface IStateAgent<T> where T : IStateAgent<T>
+public interface IStateAgent 
 {
-    void OnAgentEnter(State<T> state);
-    void OnAgentExcute(State<T> state, float deltaTime);
-    void OnAgentExit(State<T> state);
-    void OnAgentCancel(State<T> state);
-    void OnAgentPause(State<T> state);
-    void OnAgentResume(State<T> state);
-    void OnAgentDestroy(State<T> state);
+    void OnAgentEnter(State state);
+    void OnAgentExcute(State state, float deltaTime);
+    void OnAgentExit(State state);
+    void OnAgentCancel(State state);
+    void OnAgentPause(State state);
+    void OnAgentResume(State state);
+    void OnAgentDestroy(State state);
 }
