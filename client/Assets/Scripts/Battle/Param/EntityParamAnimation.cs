@@ -44,7 +44,7 @@ public partial class EntityParamAnimation : EntityParam
             length = mAnimationClip.length;
             mode = mAnimationClip.wrapMode;
         }
-        r.height += 20;
+        r.height += 30;
     }
     public override bool ConnectableTo(ITreeNode node)
     {

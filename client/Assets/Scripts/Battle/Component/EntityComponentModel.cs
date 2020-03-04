@@ -58,7 +58,8 @@ public class EntityComponentModel :
         }
     }
     #endregion
-    public BattleEntity agent { get { return Parent as BattleEntity; } }
+    public BattleEntity agent { get { return this.GetRoot() as BattleEntity; } }
+
     private List<DelayTask> mDelayTasks = new List<DelayTask>();
 
     private AnimationClip mCurrentAnimationClip;
@@ -114,7 +115,7 @@ public class EntityComponentModel :
         }
     }
 
-    protected override void OnAssetLoad(Asset<GameObject> asset)
+    public override void OnAssetLoad(Asset<GameObject> asset)
     {
         base.OnAssetLoad(asset);
 
@@ -306,6 +307,7 @@ public class EntityComponentModel :
                     
                     if (effect != null && effect.Init(child, agent, target, null))
                     {
+                        effect.action = action;
                         action.AddSubState(effect);
                     }
                     else

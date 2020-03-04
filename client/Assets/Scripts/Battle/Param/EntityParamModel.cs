@@ -71,7 +71,7 @@ public partial class EntityParamModel : EntityParam
 
             mPrefab = prefab;
         }
-        r.height += 20;
+        r.height += 30;
 
     }
 

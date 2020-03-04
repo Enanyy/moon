@@ -40,12 +40,6 @@ public  class EffectEntityMove:EffectEntity
         
         base.OnUpdate(deltaTime);
 
-        if (gameObject != null)
-        {
-            gameObject.transform.position = position;
-            gameObject.transform.rotation = rotation;
-        }
-
         if (mTime > 0)
         {
             mTime -= deltaTime;

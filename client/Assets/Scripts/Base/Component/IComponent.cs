@@ -206,6 +206,30 @@ public static class ComponentUtility
         return false;
     }
 
+    public static bool TryGetComponentInParent<T>(this IComponent parent, out T component) where T : IComponent
+    {
+        component = default;
+
+        if(parent == null)
+        {
+            return false;
+        }
+        if(parent.Parent!= null)
+        {
+            if(parent.Parent.GetType() == typeof(T))
+            {
+                component = (T)parent.Parent;
+                return true;
+            }
+            else
+            {
+                return parent.Parent.TryGetComponentInParent(out component);
+            }
+        }
+
+        return false;
+    }
+
     public static void Foreach(this IComponent component, Action<IComponent> callback)
     {
         if (component == null || component.Components == null || callback == null)

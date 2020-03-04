@@ -15,15 +15,15 @@ public class EffectEntityTime : EffectEntity
             OnEnd();
         }
     }
-    protected override void OnAssetLoad(Asset<GameObject> asset)
+    public override void OnAssetLoad(GameObject gameObject)
     {
-        base.OnAssetLoad(asset);
+        base.OnAssetLoad(gameObject);
 
         if (gameObject)
         {
             var time = param as EntityParamEffectTime ;
             var bone = false;
-            var on = GetOnAgent();
+            var on = GetAgent();
             var entity = on as BattleEntity;
             if (entity != null)
             {

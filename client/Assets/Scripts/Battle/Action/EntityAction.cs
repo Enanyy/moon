@@ -17,13 +17,13 @@ public class PathPoint:IPoolObject
 
     }
 
-    public void Init(Vector3 destination, Vector3 velocity, bool done,Action<BattleEntity, Vector3> onArrive = null, Action<BattleEntity, Vector3> failedAction= null)
+    public void Init(Vector3 destination, Vector3 velocity, bool done,Action<BattleEntity, Vector3> arriveAction = null, Action<BattleEntity, Vector3> failedAction= null)
     {
         this.destination = destination;
         this.velocity = velocity;
         this.done = done;
         this.arrive = false;
-        this.mArriveAction = onArrive;
+        this.mArriveAction = arriveAction;
         this.mFailedAction = failedAction;
     }
 
@@ -72,11 +72,25 @@ public class EntityAction : State,IPoolObject
     {
        paths = new LinkedList<PathPoint>();
     }
-    public void AddPathPoint(Vector3 destination,Vector3 velocity, bool done, Action<BattleEntity, Vector3> onArrive= null, Action<BattleEntity, Vector3> failedAction = null)
+    
+    public void AddPathPoint(Vector3 destination,Vector3 velocity, bool done, Action<BattleEntity, Vector3> arriveAction= null, Action<BattleEntity, Vector3> failedAction = null)
     {
         var point = ObjectPool.GetInstance<PathPoint>();
-        point.Init(destination, velocity, done,onArrive,failedAction);
+        point.Init(destination, velocity, done, arriveAction, failedAction);
         paths.AddLast(point);    
+    }
+
+    public void ClearPath()
+    {
+        if (paths != null)
+        {
+            var it = paths.GetEnumerator();
+            while (it.MoveNext())
+            {
+                ObjectPool.ReturnInstance(it.Current);
+            }
+            paths.Clear();
+        }
     }
 
     public virtual void SetAgent(BattleEntity entity)
@@ -180,10 +194,7 @@ public class EntityAction : State,IPoolObject
        
         skillid = 0;
         target = 0;
-        if (paths != null)
-        {
-            paths.Clear();
-        }
+        ClearPath();
     }
 
     public override bool IsValid()

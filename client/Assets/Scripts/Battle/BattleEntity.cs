@@ -266,6 +266,7 @@ public class BattleEntity:
         }
     }
 
+
     public EntityAction GetFirst(ActionType type)
     {
         return machine.GetFirst((int)type) as EntityAction;
@@ -332,7 +333,30 @@ public class BattleEntity:
         }
     }
 
-  
+    public void MoveTo(Vector3 destination, Vector3 velocity , bool done = true, Action<BattleEntity, Vector3> arriveAction = null, Action<BattleEntity, Vector3> failedAction = null)
+    {
+        var run = GetFirst(ActionType.Run);
+        if (run != null)
+        {
+            run.ClearPath();
+            run.AddPathPoint(destination, velocity, done, arriveAction, failedAction);
+        }
+        else
+        {
+            run = ObjectPool.GetInstance<EntityAction>();
+            run.AddPathPoint(destination, velocity, done, arriveAction, failedAction);
+            PlayAction(ActionType.Run, run);
+        }
+    }
+
+    public void Attack(uint target)
+    {
+        var attack = ObjectPool.GetInstance<EntityAction>();
+        attack.target = target;
+
+        PlayAction(ActionType.Attack, attack);
+    }
+
     public void DropBlood(int value)
     {
         if (active)

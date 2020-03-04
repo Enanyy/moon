@@ -27,9 +27,9 @@ public class EffectParabolaEntity : EffectEntity
         }
         else
         {
-            rotation = agent.rotation;
-            mTargetPosition = position + rotation * Vector3.forward * agent.GetProperty<float>(PropertyID.PRO_ATTACK_DISTANCE);
-            mTargetPosition.y = agent.position.y;
+            rotation = entity.rotation;
+            mTargetPosition = position + rotation * Vector3.forward * entity.GetProperty<float>(PropertyID.PRO_ATTACK_DISTANCE);
+            mTargetPosition.y = entity.position.y;
         }
 
         mTargetPosition.y += parabola.heightOffset;
@@ -71,12 +71,7 @@ public class EffectParabolaEntity : EffectEntity
     {
 
         base.OnUpdate(deltaTime);
-        if(gameObject!= null)
-        {
-            gameObject.transform.position = position;
-            gameObject.transform.rotation = rotation;
-        }
-
+       
         if (mFinish == false)
         {
             // 重力模拟

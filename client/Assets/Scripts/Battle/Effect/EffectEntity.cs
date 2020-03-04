@@ -2,17 +2,53 @@
 using System.Collections.Generic;
 using UnityEngine;
 public abstract class EffectEntity :
-    AssetEntity,
+
     IGameObject,
     IState,
-    IUpdate
+    IUpdate,
+    IPoolObject
 {
-    public Vector3 position { get; set; }
-    public Quaternion rotation { get; set; }
-    public float scale { get; set; }
+    public AssetEntity asset { get; private set; }
+    private Vector3 mPosition;
+    public Vector3 position 
+    { 
+        get { return mPosition; }
+        set
+        { 
+            mPosition = value;
+            if(asset!= null&& asset.gameObject)
+            {
+                asset.gameObject.transform.position = mPosition;
+            }
+        }
+    }
+    private Quaternion mRotation;
+    public Quaternion rotation 
+    {
+        get { return mRotation; }
+        set
+        {
+            mRotation = value;
+            if (asset != null && asset.gameObject)
+            {
+                asset.gameObject.transform.rotation = mRotation;
+            }
+        }
+    }
+    private float mScale;
+    public float scale {
+        get { return mScale; }
+        set
+        {
+            mScale = value;
+            if (asset != null && asset.gameObject)
+            {
+                asset.gameObject.transform.localScale = Vector3.one * mScale;
+            }
+        }
+    }
 
-    public EffectEntity parentEffect { get; private set; }
-    public BattleEntity agent { get;  set; }
+    public BattleEntity entity { get;  set; }
 
     private uint mTarget;
     public BattleEntity target
@@ -20,42 +56,38 @@ public abstract class EffectEntity :
         get { return BattleManager.Instance.GetEntity(mTarget); }
     }
 
+    public EntityParamEffect param { get; private set; }
 
-    public EntityParamEffect  param { get; private set; }
+    public EntityAction action { get; set; }
 
- 
-    public EntityAction action
-    {
-        get { return parent as EntityAction; }
-    }
-
-    public  IState parent
-    {
-        get;
-        set;     
-    }
+    public EffectEntity parent { get; set; }
 
     private float mEffectSpeed = 1;
     private ParticleSystem[] mParticleSystems;
     private Animator[] mAnimators;
 
 
-    public virtual bool Init(EntityParamEffect  param, BattleEntity agent, uint target, EffectEntity parent)
+    public virtual bool Init(EntityParamEffect  param, BattleEntity entity, uint target, EffectEntity parent)
     {
         this.param = param;
-        this.agent = agent;
-        this.parentEffect = parent;
+        this.entity = entity;
+        this.parent = parent;
         this.mTarget = target;
-        this.scale = agent.scale;
+        this.scale = entity.scale;
         
-        IGameObject go = GetOnAgent();
+        IGameObject go = GetAgent();
 
         if (go == null)
         {
             return false;
         }
         OnInit(go);
-        LoadAsset(param.asset);
+
+        if(asset == null)
+        {
+            asset = new AssetEntity();
+        }
+        asset.LoadAsset(param.asset, OnAssetLoad);
 
         OnBegin();
         return true;
@@ -75,30 +107,34 @@ public abstract class EffectEntity :
         }
     }
 
-    protected IGameObject GetOnAgent()
+    protected IGameObject GetAgent()
     {
         switch (param.on)
         {
-            case EffectOn.Self: return agent;
-            case EffectOn.Parent: return parentEffect;
+            case EffectOn.Self: return entity;
+            case EffectOn.Parent: return parent;
             case EffectOn.Target: return target;
         }
         return null;
     }
 
-    protected override void OnAssetLoad(Asset<GameObject> asset)
+    public virtual void OnAssetLoad(GameObject gameObject)
     {
-        base.OnAssetLoad(asset);
+       
         if (gameObject != null)
         {
-            gameObject.transform.localScale = agent.scale * Vector3.one;
+            gameObject.transform.localScale = entity.scale * Vector3.one;
             mParticleSystems = gameObject.GetComponentsInChildren<ParticleSystem>();
             mAnimators = gameObject.GetComponentsInChildren<Animator>();
         }
     }
     protected void UpdateParticleSystemSpeed(float speed)
     {
-        if (gameObject == null || gameObject.activeSelf == false)
+        if(asset== null)
+        {
+            return;
+        }
+        if (asset.gameObject == null || asset.gameObject.activeSelf == false)
         {
             return;
         }
@@ -151,26 +187,29 @@ public abstract class EffectEntity :
         }
     }
 
-    public override void Recycle()
+    public virtual void Recycle()
     {
         BattleManager.Instance.RemoveEffect(this);
 
-        base.Recycle();
-
-        if(parentEffect!= null)
+        if(asset!=null)
         {
-            parentEffect.Recycle();
+            asset.Recycle();
+        }
+
+        if(parent!= null)
+        {
+            parent.Recycle();
         }
     }
 
     private int ShowEffect(EffectArise  arise)
     {
         int childCount = 0;
-        if(param== null || agent == null)
+        if(param== null || entity == null)
         {
             return childCount;
         }
-        if(agent.TryGetComponent(out EntityComponentModel model)==false)
+        if(entity.TryGetComponent(out EntityComponentModel model)==false)
         {
             return childCount;
         }
@@ -188,9 +227,10 @@ public abstract class EffectEntity :
                 model.AddDelayTask(child.delay, delegate ()
                 {                  
                     EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
-                    if (effect != null && effect.Init(child, agent, mTarget, null))
+                    if (effect != null && effect.Init(child, entity, mTarget, null))
                     {
                         if (action!= null) {
+                            effect.action = action;
                             action.AddSubState(effect);
                         }
                     }
@@ -204,10 +244,11 @@ public abstract class EffectEntity :
             {
                 EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
 
-                if (effect != null && effect.Init(child, agent, mTarget, null))
+                if (effect != null && effect.Init(child, entity, mTarget, null))
                 {
                     if (action != null)
                     {
+                        effect.action = action;
                         action.AddSubState(effect);
                     }
                 }
@@ -220,19 +261,19 @@ public abstract class EffectEntity :
         return childCount;
     }
 
-    public override void OnConstruct()
+    public virtual void OnConstruct()
     {
-        base.OnConstruct();
+        
     }
 
-    public override void OnDestruct()
+    public virtual void OnDestruct()
     {
-        base.OnDestruct();
+        asset = null;
         mAnimators = null;
         mParticleSystems = null;
         mEffectSpeed = 1;
-        parentEffect = null;
-        agent = null;
+        parent = null;
+        entity = null;
         mTarget = 0;
     }
     #region State

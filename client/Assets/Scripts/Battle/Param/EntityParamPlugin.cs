@@ -21,7 +21,7 @@ public abstract partial class EntityParamPlugin : EntityParam
     {
         base.OnDraw(ref r);
         UnityEditor.EditorGUILayout.LabelField("Plugin",plugin.ToString());
-        r.height += 20;
+        r.height += 30;
     }
 
     public override bool ConnectableTo(ITreeNode node)
@@ -225,6 +225,7 @@ public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimati
                 action.duration = length;
             }
         }
+        r.height += 10;
     }
     public override ITreeNode Clone(ITreeNode node)
     {
@@ -280,10 +281,10 @@ public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimati
             for (int i = 0; i < animations.Count; i++)
             {
                 UnityEditor.EditorGUILayout.LabelField("  Element " + i);
-                r.height += 18;
+                r.height += 20;
 
                 animations[i].beginAt = UnityEditor.EditorGUILayout.FloatField("     Begin At", animations[i].beginAt);
-                r.height += 18;
+                r.height += 20;
 
                 if (string.IsNullOrEmpty(animations[i].animationClip))
                 {
@@ -296,7 +297,7 @@ public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimati
                 int index = names.IndexOf(animations[i].animationClip);
 
                 int j = UnityEditor.EditorGUILayout.Popup("     AnimationClip", index, names.ToArray());
-                r.height += 18;
+                r.height += 20;
 
                 EntityParamAnimation anim = null;
                 if (j >= 0 && j < anims.Count)
@@ -325,7 +326,7 @@ public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimati
 
                 UnityEditor.EditorGUILayout.EndHorizontal();
 
-                r.height += 18;
+                r.height += 20;
 
             }
             if (action != null 
@@ -389,10 +390,10 @@ public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnim
             for (int i = 0; i < animations.Count; i++)
             {
                 UnityEditor.EditorGUILayout.LabelField("  Element " + i);
-                r.height += 18;
+                r.height += 20;
 
                 animations[i].beginAt = UnityEditor.EditorGUILayout.FloatField("     Begin At", animations[i].beginAt);
-                r.height += 18;
+                r.height += 20;
 
                 if (string.IsNullOrEmpty(animations[i].animationClip))
                 {
@@ -405,7 +406,7 @@ public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnim
                 int index = names.IndexOf(animations[i].animationClip);
 
                 int j = UnityEditor.EditorGUILayout.Popup("     AnimationClip", index, names.ToArray());
-                r.height += 18;
+                r.height += 20;
 
                 EntityParamAnimation anim = null;
                 if (j >= 0 && j < anims.Count)
@@ -434,7 +435,7 @@ public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnim
 
                 UnityEditor.EditorGUILayout.EndHorizontal();
 
-                r.height += 18;
+                r.height += 20;
 
                 length += animations[i].length;
 

@@ -80,7 +80,7 @@ public abstract partial class EntityParamEffect : EntityParam
         r.height += 20;
 
         offset = UnityEditor.EditorGUILayout.Vector3Field("Offset", offset);
-        r.height += 25;
+        r.height += 30;
 
 
     }
@@ -166,7 +166,7 @@ public partial class EntityParamEffectTime : EntityParamEffect
             r.height += 20;
         }
         syncAnimationSpeed = UnityEditor.EditorGUILayout.Toggle("SyncAnimationSpeed", syncAnimationSpeed);
-        r.height += 20;
+        r.height += 30;
 
     }
 
@@ -231,7 +231,7 @@ public partial class EntityParamEffectMove : EntityParamEffect
         speed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Speed", speed), 0, float.MaxValue);
         r.height += 20;
         direction = UnityEditor.EditorGUILayout.Vector3Field("Direction", direction);
-        r.height += 25;
+        r.height += 30;
     }
     public override ITreeNode Clone(ITreeNode node)
     {
@@ -337,7 +337,7 @@ public partial class EntityParamEffectParabola : EntityParamEffect
         heightOffset = UnityEditor.EditorGUILayout.FloatField("Height Offset", heightOffset);
         r.height += 20;
         heightLimit = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Height Limit", heightLimit), 0, 100);
-        r.height += 20;
+        r.height += 30;
     }
     public override ITreeNode Clone(ITreeNode node)
     {

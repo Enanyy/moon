@@ -83,7 +83,7 @@ public class Test : MonoBehaviour {
         mEntity = ObjectPool.GetInstance<BattleEntity>();
         mEntity.id = 1;
         mEntity.position = Vector3.zero;
-        mEntity.config = "yingxiong_kulouqishi.txt";
+        mEntity.config = "nvjiangjun.txt";
 
         BattleManager.Instance.AddEntity(mEntity);
         mEntity.active = true;
@@ -91,13 +91,13 @@ public class Test : MonoBehaviour {
         mEntity1 = ObjectPool.GetInstance<BattleEntity>();
         mEntity1.id = 2;
         mEntity1.position = new Vector3(10, 0, 0);
-        mEntity1.config = "nvjiangjun.txt";
+        mEntity1.config = "yingxiong_kulouqishi.txt";
 
         BattleManager.Instance.AddEntity(mEntity1);
         mEntity1.active = true;
 
-        EventNotify.Instance.AddListener(1, OnListen);
-        EventNotify.Instance.Invoke(1);
+        EventSystem.Instance.AddListener(1, OnListen);
+        EventSystem.Instance.Invoke(1);
     }
 
     void OnListen()
@@ -113,18 +113,13 @@ public class Test : MonoBehaviour {
         {
             if (Input.GetKeyDown(KeyCode.A))
             {
-                var attack = ObjectPool.GetInstance<EntityAction>();
-                attack.target = mEntity1.id;
-                
-
-                mEntity.PlayAction(ActionType.Attack,attack);
+                mEntity.Attack(mEntity1.id);
             }
 
             if (Input.GetMouseButtonDown(0))
             {
-                var run = ObjectPool.GetInstance<EntityAction>();
-                run.AddPathPoint(CameraManager.Instance.GetWorldMousePosition(), Vector3.zero, true);
-                mEntity.PlayAction(ActionType.Run,run);
+                mEntity.MoveTo(CameraManager.Instance.GetWorldMousePosition(),Vector3.zero,true);
+              
             }
         }
         if(Input.GetKeyDown(KeyCode.U))

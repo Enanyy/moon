@@ -41,7 +41,7 @@ public partial class EntityParamAction : EntityParam
             duration = DEFAULT_DURATION;
         }
         UnityEditor.EditorGUILayout.EndHorizontal();
-        r.height += 20;
+        r.height += 30;
     }
     public override bool ConnectableTo(ITreeNode node)
     {

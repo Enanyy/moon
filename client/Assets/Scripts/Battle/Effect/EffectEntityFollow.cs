@@ -8,12 +8,7 @@ public class EffectEntityFollow : EffectEntity
     {
         base.OnUpdate(deltaTime);
 
-        if(gameObject!=null)
-        {
-            gameObject.transform.position = position;
-            gameObject.transform.rotation = rotation;
-        }
-
+     
         if (target == null)
         {
             return;
