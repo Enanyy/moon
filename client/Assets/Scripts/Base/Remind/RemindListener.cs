@@ -6,24 +6,21 @@ using UnityEngine.UI;
 public class RemindListener : MonoBehaviour
 {
     [SerializeField]
-    private List<RemindID> mIDs = new List<RemindID>();
+    private List<RemindID> IDs = new List<RemindID>();
     [SerializeField]
     private GameObject target;
     [SerializeField]
     private Text text;
     private void Start()
     {
-        for (int i = 0, max = mIDs.Count; i < max; ++i)
+        for (int i = 0, max = IDs.Count; i < max; ++i)
         {
-            RemindSystem.Instance.RegisterListener(OnCountChanged, (int)mIDs[i]);
+            RemindSystem.Instance.RegisterListener(OnCountChanged, (int)IDs[i]);
         }
     }
     private void OnDestroy()
     {
-        for (int i = 0, max = mIDs.Count; i < max; ++i)
-        {
-            RemindSystem.Instance.UnRegisterListener(OnCountChanged, (int)mIDs[i]);
-        }
+        RemindSystem.Instance.UnRegisterListener(OnCountChanged);
     }
 
     protected virtual void OnCountChanged(int count)

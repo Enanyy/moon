@@ -68,6 +68,14 @@ public class RemindSystem
             }
         }
     }
+    public void UnRegisterListener(Action<int> listener)
+    {
+        if (listener == null)
+        {
+            return;
+        }
+        mListenerDic.Remove(listener);
+    }
 
     public int GetCount(int id)
     {
