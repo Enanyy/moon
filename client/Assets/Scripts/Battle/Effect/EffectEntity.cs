@@ -294,7 +294,7 @@ public abstract class EffectEntity :
 
     public virtual void OnStateCancel()
     {
-       
+        OnEnd();
     }
 
     public virtual void OnStatePause()

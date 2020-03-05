@@ -83,7 +83,7 @@ public class Test : MonoBehaviour {
         mEntity = ObjectPool.GetInstance<BattleEntity>();
         mEntity.id = 1;
         mEntity.position = Vector3.zero;
-        mEntity.config = "nvjiangjun.txt";
+        mEntity.config = "yingxiong_kulouqishi.txt";
 
         BattleManager.Instance.AddEntity(mEntity);
         mEntity.active = true;
@@ -91,7 +91,7 @@ public class Test : MonoBehaviour {
         mEntity1 = ObjectPool.GetInstance<BattleEntity>();
         mEntity1.id = 2;
         mEntity1.position = new Vector3(10, 0, 0);
-        mEntity1.config = "yingxiong_kulouqishi.txt";
+        mEntity1.config = "nvjiangjun.txt";
 
         BattleManager.Instance.AddEntity(mEntity1);
         mEntity1.active = true;

@@ -226,6 +226,30 @@ public class EntityAction : State,IPoolObject
 
         return base.IsValid();
     }
+    public override bool IsCancel()
+    {
+        if (param != null)
+        {
+            if (param.endAt > 0 && time >= param.endAt)
+            {
+                return false;
+            }
+        }
+        return base.IsCancel();
+    }
+
+    public override bool IsSkipping()
+    {
+        if(param!=null)
+        {
+            if ((param.beginAt > 0 && time < param.beginAt) || (param.endAt > 0 && time >= param.endAt))
+            {
+                return true;
+            }
+        }
+
+        return base.IsSkipping();
+    }
 
     public void OnConstruct()
     {

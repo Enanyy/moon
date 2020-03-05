@@ -136,9 +136,22 @@ public class EntityComponentModel :
     {
         mCurrentAnimationClip = null;
         mAnimator = null;
-        mDelayTasks.Clear();
+        ClearDelayTask();
         base.OnDestruct();
     }
+
+    private void ClearDelayTask()
+    {
+        for (int i = 0; i < mDelayTasks.Count; ++i)
+        {
+            if (mDelayTasks[i] != null)
+            {
+                ObjectPool.ReturnInstance(mDelayTasks[i]);
+            }
+        }
+        mDelayTasks.Clear();
+    }
+
     public void OnUpdate(float deltaTime)
     {
         for (int i = mDelayTasks.Count - 1; i >= 0; --i)
@@ -173,7 +186,7 @@ public class EntityComponentModel :
     }
     public void OnAgentCancel(State state)
     {
-
+        ClearDelayTask();
     }
 
     public void OnAgentEnter(State state)

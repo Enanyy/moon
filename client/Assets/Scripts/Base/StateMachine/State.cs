@@ -39,7 +39,10 @@ public class State:IState
     /// <summary>
     /// 是否取消执行的
     /// </summary>
-    public bool isCancel { get { return time < duration; } }
+    public virtual bool IsCancel()
+    { 
+        return time < duration; 
+    }
     /// <summary>
     /// 暂停
     /// </summary>
@@ -79,6 +82,11 @@ public class State:IState
     /// </summary>
     /// <returns></returns>
     public virtual bool IsValid() { return true; }
+    /// <summary>
+    /// 是否可以提前完成
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool IsSkipping() { return false; }
 
     /// <summary>
     /// 添加子状态

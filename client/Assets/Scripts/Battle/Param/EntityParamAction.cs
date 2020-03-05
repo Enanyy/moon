@@ -19,7 +19,8 @@ public partial class EntityParamAction : EntityParam
     public ActionType action;
     public int weight;
     public float duration;
-
+    public float beginAt;
+    public float endAt;
 
 
     public EntityParamAction() { base.type = EntityParamType.Action; }
@@ -36,11 +37,21 @@ public partial class EntityParamAction : EntityParam
         duration = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Duration", duration), 0, float.MaxValue);
         bool loop = duration == DEFAULT_DURATION;
         loop = UnityEditor.EditorGUILayout.Toggle("", loop);
+        UnityEditor.EditorGUILayout.EndHorizontal();
         if (loop)
         {
             duration = DEFAULT_DURATION;
+            beginAt = -1;
+            endAt = -1;
         }
-        UnityEditor.EditorGUILayout.EndHorizontal();
+        else
+        {
+            r.height += 20;
+            beginAt = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("BeginAt", beginAt), 0, duration);
+            r.height += 20;
+            endAt = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("EndAt", endAt), 0, duration);
+        }
+        
         r.height += 30;
     }
     public override bool ConnectableTo(ITreeNode node)
@@ -71,6 +82,8 @@ public partial class EntityParamAction : EntityParam
         param.action = this.action;
         param.weight = this.weight;
         param.duration = this.duration;
+        param.beginAt = this.beginAt;
+        param.endAt = this.endAt;
 
         return base.Clone(param);
     }
@@ -84,6 +97,8 @@ public partial class EntityParamAction : EntityParam
         attributes.Add("action", action.ToString());
         attributes.Add("weight", weight.ToString());
         attributes.Add("duration", duration.ToString());
+        attributes.Add("beginAt", beginAt.ToString());
+        attributes.Add("endAt", endAt.ToString());
 
         return base.ToXml(parent, attributes);
 
@@ -94,6 +109,8 @@ public partial class EntityParamAction : EntityParam
         action = node.GetAttribute("action").ToEnumEx<ActionType>();
         weight = node.GetAttribute("weight").ToInt32Ex();
         duration = node.GetAttribute("duration").ToFloatEx();
+        beginAt = node.GetAttribute("beginAt").ToFloatEx();
+        endAt = node.GetAttribute("endAt").ToFloatEx();
 
         base.ParseXml(node);
     }

@@ -211,7 +211,7 @@ public class StateMachine
         //触发退出状态调用Exit方法
         if (current != null)
         {
-            if(current.isCancel)
+            if(current.IsCancel())
             {
                 current.OnStateCancel();
             }
@@ -274,7 +274,7 @@ public class StateMachine
 
         if (current == null 
             || current.isDone 
-            || (mStateList.Count > 1  && mStateList.First.Next.Value.weight > current.weight))
+            || (mStateList.Count > 1  && (mStateList.First.Next.Value.weight > current.weight || current.IsSkipping())))
         {
             DoNext();
         }
@@ -306,7 +306,7 @@ public class StateMachine
     {
         if(current != null)
         {
-            if (current.isCancel)
+            if (current.IsCancel())
             {
                 current.OnStateCancel();
             }

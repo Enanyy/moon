@@ -353,7 +353,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e03427e731cce844b9ecc69bf597e78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mIDs: 00000000010000000200000003000000
+  IDs: 0200000003000000
   target: {fileID: 1012801125}
   text: {fileID: 1012801127}
 --- !u!1 &961159737
@@ -756,6 +756,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e03427e731cce844b9ecc69bf597e78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mIDs: 0000000001000000
+  IDs: 0000000001000000
   target: {fileID: 1103769164}
   text: {fileID: 0}
