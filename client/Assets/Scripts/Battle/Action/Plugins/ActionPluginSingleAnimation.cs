@@ -5,6 +5,7 @@ using UnityEngine;
 public class ActionPluginSingleAnimation : ActionPlugin
 {
     protected EntityParamPluginAnimationClip mParamAnimationClip;
+    private float mBeginTime;
     public override void OnStateEnter()
     {
         base.OnStateEnter();
@@ -16,6 +17,7 @@ public class ActionPluginSingleAnimation : ActionPlugin
     {
         base.OnStateExit();
         mParamAnimationClip = null;
+        mBeginTime = 0;
     }
     public override void OnStateExcute(float deltaTime)
     {
@@ -51,6 +53,7 @@ public class ActionPluginSingleAnimation : ActionPlugin
         {   
             agent.model.PlayAnimation(action, animationClip);
             mParamAnimationClip = animationClip;
+            mBeginTime = action.time;
         }
     }
 
@@ -75,7 +78,9 @@ public class ActionPluginSingleAnimation : ActionPlugin
             {
                 continue;
             }
-            float previousTime = action.time - deltaTime;
+            float time = action.time - mBeginTime;
+
+            float previousTime = time - deltaTime;
 
             float delay = (child.delay - mParamAnimationClip.beginAt) / (mParamAnimationClip.speed > 0 ? mParamAnimationClip.speed : 1);
 
@@ -85,7 +90,7 @@ public class ActionPluginSingleAnimation : ActionPlugin
                 delay = deltaTime;
             }
 
-            if (previousTime < delay && action.time >= delay)
+            if (previousTime < delay && time >= delay)
             {
                 EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
 
