@@ -66,6 +66,7 @@ public class ActionPluginSingleAnimation : ActionPlugin
         {
             return;
         }
+        deltaTime = action.speed * deltaTime;
 
         for (int i = 0; i < param.children.Count; ++i)
         {
@@ -76,8 +77,9 @@ public class ActionPluginSingleAnimation : ActionPlugin
             }
             float previousTime = action.time - deltaTime;
 
-            float delay = child.delay - mParamAnimationClip.beginAt;
+            float delay = (child.delay - mParamAnimationClip.beginAt) / (mParamAnimationClip.speed > 0 ? mParamAnimationClip.speed : 1);
 
+            
             if (delay < deltaTime)
             {
                 delay = deltaTime;

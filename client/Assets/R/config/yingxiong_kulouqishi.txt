@@ -26,7 +26,7 @@
   </EntityParamAction>
   <EntityParamAnimation animationClip="attack01" length="1.8" mode="Default" rect="(1095,153,240,20)">
     <EntityParamEffectTime duration="2" bone="Weapon1" bind="1" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Self" asset="fx_kuloufashi_attack_xuli.prefab" delay="0" offset="(0.0, 0.0, 0.0)" rect="(1526,153,240,20)" />
-    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Target" asset="fx_kuloufashi_attack_hit.prefab" delay="0.5" offset="(0.0, 0.0, 0.0)" rect="(1270,343,240,20)" />
+    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Target" asset="fx_kuloufashi_attack_hit.prefab" delay="0.8" offset="(0.0, 0.0, 0.0)" rect="(1270,343,240,20)" />
   </EntityParamAnimation>
   <EntityParamAnimation animationClip="die" length="2.633333" mode="ClampForever" rect="(1659,34,240,20)" />
   <EntityParamAnimation animationClip="idle" length="1.666667" mode="Loop" rect="(824,32,240,20)" />
