@@ -1,32 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <EntityParamModel asset="yingxiong_kulouqishi.prefab" scale="1" hitPosition="(0.0, 0.0, 0.0)" rect="(20,20,240,20)">
   <EntityParamAction action="Idle" weight="0" duration="86400" beginAt="-1" endAt="-1" rect="(286,120,240,20)">
-    <EntityParamPluginSingleAnimation rect="(578,146,240,20)">
-      <AnimationClip beginAt="0" animationClip="idle" length="1.666667" />
+    <EntityParamPluginSingleAnimation rect="(581,130,240,20)">
+      <AnimationClip beginAt="0" animationClip="idle" length="1.666667" speed="1" />
     </EntityParamPluginSingleAnimation>
   </EntityParamAction>
   <EntityParamAction action="Run" weight="1" duration="86400" beginAt="-1" endAt="-1" rect="(280,247,240,20)">
     <EntityParamPluginSingleAnimation rect="(567,250,240,20)">
-      <AnimationClip beginAt="0" animationClip="run" length="1" />
+      <AnimationClip beginAt="0" animationClip="run" length="1" speed="1" />
     </EntityParamPluginSingleAnimation>
     <EntityParamPluginRun rect="(858,257,240,20)" />
     <EntityParamPluginRotate rect="(860,303,240,20)" />
   </EntityParamAction>
-  <EntityParamAction action="Attack" weight="2" duration="1.8" beginAt="0.5" endAt="1" rect="(274,396,240,20)">
-    <EntityParamPluginSingleAnimation rect="(558,366,240,20)">
-      <AnimationClip beginAt="0" animationClip="attack01" length="1.8" />
+  <EntityParamAction action="Attack" weight="2" duration="1.104294" beginAt="0.3" endAt="0.8" rect="(274,396,240,20)">
+    <EntityParamPluginSingleAnimation rect="(566,409,240,20)">
+      <AnimationClip beginAt="0" animationClip="attack01" length="1.8" speed="1.63" />
     </EntityParamPluginSingleAnimation>
     <EntityParamPluginRotate rect="(860,366,240,20)" />
   </EntityParamAction>
   <EntityParamAction action="Die" weight="10" duration="2.633333" beginAt="0" endAt="0" rect="(294,544,240,20)">
-    <EntityParamPluginSingleAnimation rect="(578,533,240,20)">
-      <AnimationClip beginAt="0" animationClip="die" length="2.633333" />
+    <EntityParamPluginSingleAnimation rect="(565,570,240,20)">
+      <AnimationClip beginAt="0" animationClip="die" length="2.633333" speed="1" />
     </EntityParamPluginSingleAnimation>
     <EntityParamPluginRemove rect="(851,575,240,20)" />
   </EntityParamAction>
-  <EntityParamAnimation animationClip="attack01" length="1.8" mode="Default" rect="(1156,158,240,20)">
+  <EntityParamAnimation animationClip="attack01" length="1.8" mode="Default" rect="(1095,153,240,20)">
     <EntityParamEffectTime duration="2" bone="Weapon1" bind="1" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Self" asset="fx_kuloufashi_attack_xuli.prefab" delay="0" offset="(0.0, 0.0, 0.0)" rect="(1526,153,240,20)" />
-    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Target" asset="fx_kuloufashi_attack_hit.prefab" delay="0.8" offset="(0.0, 0.0, 0.0)" rect="(1270,343,240,20)" />
+    <EntityParamEffectTime duration="2" bone="None" bind="0" syncAnimationSpeed="0" effectType="Time" arise="ParentBegin" on="Target" asset="fx_kuloufashi_attack_hit.prefab" delay="0.5" offset="(0.0, 0.0, 0.0)" rect="(1270,343,240,20)" />
   </EntityParamAnimation>
   <EntityParamAnimation animationClip="die" length="2.633333" mode="ClampForever" rect="(1659,34,240,20)" />
   <EntityParamAnimation animationClip="idle" length="1.666667" mode="Loop" rect="(824,32,240,20)" />

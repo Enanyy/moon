@@ -224,7 +224,7 @@ public abstract class EffectEntity :
           
             if (child.delay > 0)
             {
-                model.AddDelayTask(child.delay, delegate ()
+                DelayManager.Instance.AddDelayTask(child.delay, delegate ()
                 {                  
                     EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
                     if (effect != null && effect.Init(child, entity, mTarget, null))

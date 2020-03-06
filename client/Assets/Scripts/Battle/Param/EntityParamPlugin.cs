@@ -96,6 +96,7 @@ public class EntityParamPluginAnimationClip
     public float beginAt;
     public string animationClip;
     public float length;
+    public float speed;
 }
 [TreeNodeMenu("Plugin/Animation")]
 public abstract class EntityParamPluginAnimation : EntityParamPlugin
@@ -116,6 +117,7 @@ public abstract class EntityParamPluginAnimation : EntityParamPlugin
             animation.Add("beginAt",animations[i].beginAt.ToString());
             animation.Add("animationClip", animations[i].animationClip);
             animation.Add("length", animations[i].length.ToString());
+            animation.Add("speed", animations[i].speed.ToString());
             CreateXmlNode(node, "AnimationClip", animation);
         }
 
@@ -132,6 +134,7 @@ public abstract class EntityParamPluginAnimation : EntityParamPlugin
                 animation.beginAt = child.GetAttribute("beginAt").ToFloatEx();
                 animation.animationClip = child.GetAttribute("animationClip");
                 animation.length = child.GetAttribute("length").ToFloatEx();
+                animation.speed = child.GetAttribute("speed").ToFloatEx(1);
                 animations.Add(animation);
             }
         }
@@ -173,7 +176,7 @@ public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimati
             for (int i = 0; i < animations.Count; i++)
             {
                 animations[i].beginAt = UnityEditor.EditorGUILayout.FloatField("Begin At", animations[i].beginAt);
-                r.height += 18;
+                r.height += 20;
 
                 if (string.IsNullOrEmpty(animations[i].animationClip))
                 {
@@ -186,7 +189,7 @@ public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimati
                 int index = names.IndexOf(animations[i].animationClip);
 
                 int j = UnityEditor.EditorGUILayout.Popup("AnimationClip", index, names.ToArray());
-                r.height += 18;
+                r.height += 20;
 
                 EntityParamAnimation anim = null;
                 if (j >= 0 && j < anims.Count )
@@ -199,6 +202,9 @@ public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimati
                     animations[i].animationClip = anim.animationClip;
                     animations[i].length = anim.length;
                 }
+
+                animations[i].speed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Speed", animations[i].speed), 0.01f ,10);
+                r.height += 20;
 
                 UnityEditor.EditorGUILayout.BeginHorizontal();
                 animations[i].length = UnityEditor.EditorGUILayout.FloatField("Length", animations[i].length);
@@ -215,9 +221,9 @@ public partial class EntityParamPluginSingleAnimation : EntityParamPluginAnimati
 
                 UnityEditor.EditorGUILayout.EndHorizontal();
 
-                r.height += 18;
+                r.height += 20;
 
-                length += animations[i].length;
+                length += animations[i].length / animations[i].speed ;
 
             }
             if (action != null && action.duration != DEFAULT_DURATION)
@@ -310,6 +316,8 @@ public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimati
                     animations[i].animationClip = anim.animationClip;
                     animations[i].length = anim.length;
                 }
+                animations[i].speed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Speed", animations[i].speed), 0.01f, 10);
+                r.height += 20;
 
                 UnityEditor.EditorGUILayout.BeginHorizontal();
                 animations[i].length = UnityEditor.EditorGUILayout.FloatField("     Length", animations[i].length);
@@ -334,7 +342,7 @@ public partial class EntityParamPluginRamdonAnimation : EntityParamPluginAnimati
                 && animations.Count > 0
                 )
             {
-                action.duration = animations[0].length;
+                action.duration = animations[0].length / animations[0].speed;
             }
         }
     }
@@ -419,6 +427,8 @@ public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnim
                     animations[i].animationClip = anim.animationClip;
                     animations[i].length = anim.length;
                 }
+                animations[i].speed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Speed", animations[i].speed), 0.01f, 10);
+                r.height += 20;
 
                 UnityEditor.EditorGUILayout.BeginHorizontal();
                 animations[i].length = UnityEditor.EditorGUILayout.FloatField("     Length", animations[i].length);
@@ -437,7 +447,7 @@ public partial class EntityParamPluginMultitudeAnimation : EntityParamPluginAnim
 
                 r.height += 20;
 
-                length += animations[i].length;
+                length += animations[i].length / animations[i].speed;
 
             }
             if (action != null

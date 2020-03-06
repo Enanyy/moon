@@ -11,60 +11,14 @@ public class EntityComponentModel :
     IStateAgent,
     IUpdate
 {
-    #region Inner Class
-    class DelayTask : IPoolObject
-    {
-        private float mDelay;
-        private Action mCallback;
-        public void Init(float delay, Action callback)
-        {
-            mDelay = delay;
-
-            mCallback = callback;
-
-        }
-
-        public void OnConstruct()
-        {
-            Clear();
-        }
-
-        public void OnDestruct()
-        {
-            Clear();      
-        }
-
-
-        public bool DoTask(float deltaTime)
-        {
-            if (mDelay > 0)
-            {
-                mDelay -= deltaTime;
-                if (mDelay <= 0)
-                {
-                    if (mCallback != null)
-                    {
-                        mCallback();
-                    }
-                }
-            }
-            return mDelay <= 0;
-        }
-
-        public void Clear()
-        {
-            mDelay = 0;
-            mCallback = null;
-        }
-    }
-    #endregion
+    
     public BattleEntity agent { get { return this.GetRoot() as BattleEntity; } }
 
-    private List<DelayTask> mDelayTasks = new List<DelayTask>();
 
     private AnimationClip mCurrentAnimationClip;
     public float animationSpeed { get; private set; }
 
+    private EntityParamPluginAnimationClip mParamAnimationClip;
 
 
     private Animator mAnimator;
@@ -136,35 +90,15 @@ public class EntityComponentModel :
     {
         mCurrentAnimationClip = null;
         mAnimator = null;
-        ClearDelayTask();
+   
         base.OnDestruct();
     }
 
-    private void ClearDelayTask()
-    {
-        for (int i = 0; i < mDelayTasks.Count; ++i)
-        {
-            if (mDelayTasks[i] != null)
-            {
-                ObjectPool.ReturnInstance(mDelayTasks[i]);
-            }
-        }
-        mDelayTasks.Clear();
-    }
+   
 
     public void OnUpdate(float deltaTime)
     {
-        for (int i = mDelayTasks.Count - 1; i >= 0; --i)
-        {
-            if (mDelayTasks[i] == null || mDelayTasks[i].DoTask(deltaTime * animationSpeed))
-            {
-                if (mDelayTasks[i] != null)
-                {
-                    ObjectPool.ReturnInstance(mDelayTasks[i]);
-                }
-                mDelayTasks.RemoveAt(i);
-            }
-        }
+        
         if (gameObject != null)
         {
             gameObject.transform.position = agent.position;// Vector3.Lerp(gameObject.transform.position, agent.position, deltaTime * 10);
@@ -186,26 +120,26 @@ public class EntityComponentModel :
     }
     public void OnAgentCancel(State state)
     {
-        ClearDelayTask();
+       
     }
 
     public void OnAgentEnter(State state)
     {
-
+        
     }
 
     public void OnAgentExcute(State state, float deltaTime)
     {
-        animationSpeed = state.speed;
+        animationSpeed = state.speed * (mParamAnimationClip != null ? mParamAnimationClip.speed : 1);
         if (animator != null && animator.speed != animationSpeed)
         {
             animator.speed = animationSpeed;
         }
-
     }
 
     public void OnAgentExit(State state)
     {
+        mParamAnimationClip = null;
     }
 
     public void OnAgentPause(State state)
@@ -253,8 +187,9 @@ public class EntityComponentModel :
             animator.speed = action.speed;
             mCurrentAnimationClip = animationClip;
 
-           
-            ShowEffect(action, clip, agent.target);
+            mParamAnimationClip = clip;
+
+
             
         }
     }
@@ -276,75 +211,9 @@ public class EntityComponentModel :
         return null;
     }
 
-    public void AddDelayTask(float delay, Action callback)
-    {
-        if (callback == null)
-        {
-            return;
-        }
-        var delayTask = ObjectPool.GetInstance<DelayTask>();
-        delayTask.Init(delay, callback);
-        mDelayTasks.Add(delayTask);
-    }
    
 
-    private void ShowEffect(EntityAction action, EntityParamPluginAnimationClip clip,uint target)
-    {
-        if (action == null || clip == null || agent.param== null)
-        {
-            return;
-        }
 
-        var param = agent.param.GetAnimation(clip.animationClip);
-        if (param == null)
-        {
-            return;
-        }
-
-
-        for (int i = 0; i < param.children.Count; ++i)
-        {
-            var child = param.children[i] as EntityParamEffect ;
-            if (child== null || string.IsNullOrEmpty(child.asset))
-            {
-                continue;
-            }
-
-            float delay = child.delay - clip.beginAt;
-          
-            if (delay > 0)
-            {
-                AddDelayTask(delay, delegate ()
-                {                 
-                    EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
-                    
-                    if (effect != null && effect.Init(child, agent, target, null))
-                    {
-                        effect.action = action;
-                        action.AddSubState(effect);
-                    }
-                    else
-                    {
-                        BattleManager.Instance.RemoveEffect(effect);
-                    }
-                });
-            }
-            else
-            {
-                
-                EffectEntity effect = BattleManager.Instance.CreateEffect(child.effectType);
-
-                if (effect != null && effect.Init(child, agent, target, null))
-                {
-                    action.AddSubState(effect);
-                }
-                else
-                {
-                    BattleManager.Instance.RemoveEffect(effect);
-                }
-            }
-        }
-    }
 
 #if UNITY_EDITOR
     List<ShapeRenderer> mShapeRenderers=new List<ShapeRenderer>();
