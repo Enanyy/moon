@@ -7,10 +7,48 @@ using System.IO;
 
 public class EntityParamWindow : TreeNodeWindow
 {
+    public string config { get; private set; }
+    /// <summary>
+    /// 运行时选中一个
+    /// </summary>
+    [InitializeOnLoadMethod]
+    public static void SelectEntityParam()
+    {
+        Selection.selectionChanged = () =>
+        {
+            if (Application.isPlaying)
+            {
+                if (Selection.activeGameObject != null)
+                {
+                    if (uint.TryParse(Selection.activeGameObject.name, out uint id))
+                    {
+                        BattleEntity entity = BattleManager.Instance.GetEntity(id);
+                        if (entity != null)
+                        {
+                            var window = GetWindow<EntityParamWindow>();
+                            if (window != null && window.config == entity.config)
+                            {
+                                return;
+                            }
+                            BattleManager.Instance.GetParam(entity.config, (param) =>
+                            {
+                                TreeNodeGraph graph = TreeNodeGraph.CreateGraph(param);
+                                if (graph != null)
+                                {
+                                    window = Open<EntityParamWindow>(graph);
+                                    window.config = entity.config;
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        };
+    }
     [MenuItem("Tools/Param Editor")]
     private static void ShowEditor()
     {
-        Open<EntityParamWindow>(CreateTemplate());
+        Open<EntityParamWindow>(CreateTemplate());      
     }
 
     protected override TreeNodeGraph OnNew()
@@ -95,7 +133,7 @@ public class EntityParamWindow : TreeNodeWindow
     }
 
     [OnOpenAsset]
-    private static bool OnOpenBattleParam(int instanceID, int line)
+    private static bool OnOpeEntityParam(int instanceID, int line)
     {
         var asset = EditorUtility.InstanceIDToObject(instanceID) as TextAsset;
         if (asset != null)

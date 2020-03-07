@@ -6,7 +6,7 @@ using System.Reflection;
 
 public partial class TreeNodeWindow : EditorWindow
 {
-    public static TreeNodeWindow window;
+
     public TreeNodeGraph data;
     private Vector2 mMousePosition;
     private bool mDrawingConnection = false;
@@ -14,18 +14,17 @@ public partial class TreeNodeWindow : EditorWindow
 
     private Rect mToolBarRect;
 
-    private Dictionary<Type,string> mMenuDic = new Dictionary<Type, string>();
+    private Dictionary<Type, string> mMenuDic = new Dictionary<Type, string>();
 
-    public static void Open<T>(TreeNodeGraph graph) where T : TreeNodeWindow
+    public static T Open<T>(TreeNodeGraph graph) where T : TreeNodeWindow
     {
-        if (window == null || window.GetType() != typeof(T))
-        {
-            window = GetWindow<T>();
-            window.titleContent = new GUIContent(typeof(T).Name);
-        }
+        T t = GetWindow<T>();
+        t.titleContent = new GUIContent(typeof(T).Name);
 
-        window.data = graph;
-    }
+        t.data = graph;
+
+        return t;
+    } 
    
 
     private void OnEnable()
@@ -40,8 +39,7 @@ public partial class TreeNodeWindow : EditorWindow
     }
 
     protected void Update()
-    {
-        
+    {       
         Repaint();
     }
 
@@ -49,12 +47,6 @@ public partial class TreeNodeWindow : EditorWindow
     {
         Event e = Event.current;
         mMousePosition = e.mousePosition;
-
-        // create
-        if (window == null)
-        {
-            return;
-        }
 
         //显示上下文菜单。
         if (e.button == 1)

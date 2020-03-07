@@ -51,10 +51,11 @@ public class ActionPluginSingleAnimation : ActionPlugin
     {
         if (agent.model != null && agent.param != null)
         {   
-            agent.model.PlayAnimation(action, animationClip);
-            mParamAnimationClip = animationClip;
-            mBeginTime = action.time;
+            agent.model.PlayAnimation(action, animationClip);         
         }
+
+        mParamAnimationClip = animationClip;
+        mBeginTime = action.time;
     }
 
     private void ShowEffect( float deltaTime)

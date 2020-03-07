@@ -230,7 +230,7 @@ public class EntityAction : State,IPoolObject
     {
         if (param != null)
         {
-            if (param.endAt > 0 && time >= param.endAt)
+            if (param.afterAt > 0 && time >= param.afterAt)
             {
                 return false;
             }
@@ -240,9 +240,9 @@ public class EntityAction : State,IPoolObject
 
     public override bool IsSkipping()
     {
-        if(param!=null)
+        if (param != null && machine.next != null && machine.next.type != (int)type)
         {
-            if ((param.beginAt > 0 && time < param.beginAt) || (param.endAt > 0 && time >= param.endAt))
+            if ((param.beforeAt > 0 && time < param.beforeAt) || (param.afterAt > 0 && time >= param.afterAt))
             {
                 return true;
             }

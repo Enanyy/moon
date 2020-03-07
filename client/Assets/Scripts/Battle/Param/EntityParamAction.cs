@@ -19,8 +19,8 @@ public partial class EntityParamAction : EntityParam
     public ActionType action;
     public int weight;
     public float duration;
-    public float beginAt;
-    public float endAt;
+    public float beforeAt;
+    public float afterAt;
 
 
     public EntityParamAction() { base.type = EntityParamType.Action; }
@@ -41,15 +41,15 @@ public partial class EntityParamAction : EntityParam
         if (loop)
         {
             duration = DEFAULT_DURATION;
-            beginAt = -1;
-            endAt = -1;
+            beforeAt = -1;
+            afterAt = -1;
         }
         else
         {
             r.height += 20;
-            beginAt = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("BeginAt", beginAt), 0, duration);
+            beforeAt = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("BeforeAt", beforeAt), 0, duration);
             r.height += 20;
-            endAt = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("EndAt", endAt), 0, duration);
+            afterAt = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("AfterAt", afterAt), 0, duration);
         }
         
         r.height += 30;
@@ -82,8 +82,8 @@ public partial class EntityParamAction : EntityParam
         param.action = this.action;
         param.weight = this.weight;
         param.duration = this.duration;
-        param.beginAt = this.beginAt;
-        param.endAt = this.endAt;
+        param.beforeAt = this.beforeAt;
+        param.afterAt = this.afterAt;
 
         return base.Clone(param);
     }
@@ -97,8 +97,8 @@ public partial class EntityParamAction : EntityParam
         attributes.Add("action", action.ToString());
         attributes.Add("weight", weight.ToString());
         attributes.Add("duration", duration.ToString());
-        attributes.Add("beginAt", beginAt.ToString());
-        attributes.Add("endAt", endAt.ToString());
+        attributes.Add("beforeAt", beforeAt.ToString());
+        attributes.Add("afterAt", afterAt.ToString());
 
         return base.ToXml(parent, attributes);
 
@@ -109,8 +109,8 @@ public partial class EntityParamAction : EntityParam
         action = node.GetAttribute("action").ToEnumEx<ActionType>();
         weight = node.GetAttribute("weight").ToInt32Ex();
         duration = node.GetAttribute("duration").ToFloatEx();
-        beginAt = node.GetAttribute("beginAt").ToFloatEx();
-        endAt = node.GetAttribute("endAt").ToFloatEx();
+        beforeAt = node.GetAttribute("beforeAt").ToFloatEx();
+        afterAt = node.GetAttribute("afterAt").ToFloatEx();
 
         base.ParseXml(node);
     }

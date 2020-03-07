@@ -1,24 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <EntityParamModel asset="yingxiong_kulouqishi.prefab" scale="1" hitPosition="(0.0, 0.0, 0.0)" rect="(20,20,240,20)">
-  <EntityParamAction action="Idle" weight="0" duration="86400" beginAt="-1" endAt="-1" rect="(286,120,240,20)">
+  <EntityParamAction action="Idle" weight="0" duration="86400" beforeAt="-1" afterAt="-1" rect="(286,120,240,20)">
     <EntityParamPluginSingleAnimation rect="(581,130,240,20)">
       <AnimationClip beginAt="0" animationClip="idle" length="1.666667" speed="1" />
     </EntityParamPluginSingleAnimation>
   </EntityParamAction>
-  <EntityParamAction action="Run" weight="1" duration="86400" beginAt="-1" endAt="-1" rect="(280,247,240,20)">
+  <EntityParamAction action="Run" weight="1" duration="86400" beforeAt="-1" afterAt="-1" rect="(280,247,240,20)">
     <EntityParamPluginSingleAnimation rect="(567,250,240,20)">
       <AnimationClip beginAt="0" animationClip="run" length="1" speed="1" />
     </EntityParamPluginSingleAnimation>
     <EntityParamPluginRun rect="(858,257,240,20)" />
     <EntityParamPluginRotate rect="(860,303,240,20)" />
   </EntityParamAction>
-  <EntityParamAction action="Attack" weight="2" duration="1.104294" beginAt="0.3" endAt="0.8" rect="(274,396,240,20)">
+  <EntityParamAction action="Attack" weight="2" duration="1.104294" beforeAt="0.3" afterAt="0.8" rect="(274,396,240,20)">
     <EntityParamPluginSingleAnimation rect="(566,409,240,20)">
       <AnimationClip beginAt="0" animationClip="attack01" length="1.8" speed="1.63" />
     </EntityParamPluginSingleAnimation>
     <EntityParamPluginRotate rect="(860,366,240,20)" />
   </EntityParamAction>
-  <EntityParamAction action="Die" weight="10" duration="2.633333" beginAt="0" endAt="0" rect="(294,544,240,20)">
+  <EntityParamAction action="Die" weight="10" duration="2.633333" beforeAt="0" afterAt="0" rect="(294,544,240,20)">
     <EntityParamPluginSingleAnimation rect="(565,570,240,20)">
       <AnimationClip beginAt="0" animationClip="die" length="2.633333" speed="1" />
     </EntityParamPluginSingleAnimation>

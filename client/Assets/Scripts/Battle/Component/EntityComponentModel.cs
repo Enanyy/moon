@@ -183,8 +183,14 @@ public class EntityComponentModel :
         {
             animator.Play("empty", 0);
             animator.Update(0);
-            animator.Play(clip.animationClip, 0, clip.beginAt / animationClip.length);
-            animator.speed = action.speed;
+            if (clip.beginAt > 0)
+            {
+                animator.Play(clip.animationClip, 0, clip.beginAt / animationClip.length);
+            }else
+            {
+                animator.CrossFade(clip.animationClip, 0.5f, 0);
+            }
+            animator.speed = action.speed * clip.speed;
             mCurrentAnimationClip = animationClip;
 
             mParamAnimationClip = clip;
