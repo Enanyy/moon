@@ -335,6 +335,7 @@ public class BattleEntity:
 
     public void MoveTo(Vector3 destination, Vector3 velocity , bool done = true, Action<BattleEntity, Vector3> arriveAction = null, Action<BattleEntity, Vector3> failedAction = null)
     {
+
         var run = GetFirst(ActionType.Run);
         if (run != null)
         {
@@ -345,6 +346,9 @@ public class BattleEntity:
         {
             run = ObjectPool.GetInstance<EntityAction>();
             run.AddPathPoint(destination, velocity, done, arriveAction, failedAction);
+
+            machine.ClearQueue();
+
             PlayAction(ActionType.Run, run);
         }
     }

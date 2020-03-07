@@ -300,7 +300,22 @@ public class StateMachine
         }
     }
 
-   
+    public virtual void ClearQueue()
+    {
+        if (mStateList.Count > 1)
+        {
+            var it = mStateList.Last;
+
+            while (it.Previous != null)
+            {
+                it.Value.OnStateCancel();
+                it.Value.OnStateDestroy();
+                it = it.Previous;
+
+                mStateList.RemoveLast();
+            }
+        }
+    }
 
     public virtual void Clear()
     {
@@ -318,14 +333,15 @@ public class StateMachine
         {
             previous.OnStateDestroy();
         }
-        
+
         var it = mStateList.GetEnumerator();
-        while(it.MoveNext())
+        while (it.MoveNext())
         {
             it.Current.OnStateCancel();
             it.Current.OnStateDestroy();
         }
         mStateList.Clear();
+
         previous = null;
         current = null;
     }
