@@ -130,7 +130,22 @@ public class EntityComponentModel :
 
     public void OnAgentExcute(State state, float deltaTime)
     {
-        animationSpeed = state.speed * (mParamAnimationClip != null ? mParamAnimationClip.speed : 1);
+        EntityAction action = state as EntityAction;
+        if (action.type == ActionType.Run)
+        {
+            if (agent.param != null)
+            {
+                animationSpeed = agent.GetProperty<float>(PropertyID.PRO_MOVE_SPEED) / agent.param.defaultSpeed;
+            }
+            else
+            {
+                animationSpeed = 1;
+            }
+        }
+        else
+        {
+            animationSpeed = state.speed * (mParamAnimationClip != null ? mParamAnimationClip.speed : 1);
+        }
         if (animator != null && animator.speed != animationSpeed)
         {
             animator.speed = animationSpeed;
@@ -190,13 +205,11 @@ public class EntityComponentModel :
             {
                 animator.CrossFade(clip.animationClip, 0.5f, 0);
             }
-            animator.speed = action.speed * clip.speed;
+          
             mCurrentAnimationClip = animationClip;
 
             mParamAnimationClip = clip;
-
-
-            
+         
         }
     }
 

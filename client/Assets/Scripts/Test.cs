@@ -84,6 +84,7 @@ public class Test : MonoBehaviour {
         mEntity.id = 1;
         mEntity.position = Vector3.zero;
         mEntity.config = "yingxiong_kulouqishi.txt";
+        mEntity.SetProperty<float>(PropertyID.PRO_MOVE_SPEED, 10);
 
         BattleManager.Instance.AddEntity(mEntity);
         mEntity.active = true;

@@ -9,6 +9,7 @@ public partial class EntityParamModel : EntityParam
     public string asset;
    
     public float scale = 1;
+    public float defaultSpeed = 6;
     public Vector3 hitPosition = Vector3.zero;
 
     public EntityParamModel() { type = EntityParamType.Model; }
@@ -27,6 +28,8 @@ public partial class EntityParamModel : EntityParam
         r.height += 20;
        
         scale = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("Scale", scale), 0, float.MaxValue);
+        r.height += 20;
+        defaultSpeed = Mathf.Clamp(UnityEditor.EditorGUILayout.FloatField("DefaultSpeed", defaultSpeed), 0, float.MaxValue);
         r.height += 20;
         hitPosition = UnityEditor.EditorGUILayout.Vector3Field("HitPosition", hitPosition);
         r.height += 40;
@@ -289,6 +292,7 @@ public partial class EntityParamModel : EntityParam
         attributes.Add("asset", asset);
         
         attributes.Add("scale", scale.ToString());
+        attributes.Add("defaultSpeed", defaultSpeed.ToString());
         attributes.Add("hitPosition", hitPosition.ToString());
 
         return base.ToXml(parent, attributes);
@@ -298,6 +302,7 @@ public partial class EntityParamModel : EntityParam
         asset = node.GetAttribute("asset");
        
         scale = node.GetAttribute("scale").ToFloatEx();
+        defaultSpeed = node.GetAttribute("defaultSpeed").ToFloatEx();
         hitPosition = node.GetAttribute("hitPosition").ToVector3Ex();
         base.ParseXml(node);
     }
