@@ -113,7 +113,7 @@ public class BattleEntity:
     {
         get
         {
-            float radius = GetProperty<float>(PropertyID.PRO_RADIUS);
+            float radius = GetProperty<float>(PropertyID.PRO_RADIUS, 0);
 
             Vector3 forward = rotation * Vector3.forward;
             Vector3 right = rotation * Vector3.right;
@@ -212,8 +212,7 @@ public class BattleEntity:
         uint key = (uint)id;
         if(properties.ContainsKey(key)==false)
         {
-            properties.Add(key, new EntityProperty<T>(value, value));
-          
+            properties.Add(key, new EntityProperty<T>(value, value));         
         }
         else
         {
@@ -221,28 +220,51 @@ public class BattleEntity:
             property.value = value;
         }
     }
+    public void  AddPropertyEvent<T>(PropertyID id,Action<T,T> listener) where T :IEquatable<T>
+    {
+        uint key = (uint)id;
+        if( properties.TryGetValue(key,out IEntityProperty entity))
+        {
+            var property = entity as EntityProperty<T>;
+            property.onValueChanged += listener;
+        }
+    }
 
-    public T GetProperty<T>(PropertyID id, T defaultValue = default(T)) where T:IEquatable<T>
+    public void RemovePropertyEvent<T>(PropertyID id, Action<T, T> listener) where T : IEquatable<T>
+    {
+        uint key = (uint)id;
+        if (properties.TryGetValue(key, out IEntityProperty entity))
+        {
+            var property = entity as EntityProperty<T>;
+            property.onValueChanged -= listener;
+        }
+    }
+    public T GetProperty<T>(PropertyID id, T defaultValue = default) where T:IEquatable<T>
     {
         uint key = (uint) id;
-        if (properties.ContainsKey(key))
+        if (properties.TryGetValue(key,out IEntityProperty entity))
         {
-            var property = properties[key] as EntityProperty<T>;
+            var property = entity as EntityProperty<T>;
             return property.value;
+        }
+        else
+        {
+            var property = new EntityProperty<T>(defaultValue, defaultValue);
+
+            properties.Add(key, property);
         }
 
         return defaultValue;
     }
 
-    public T GetProperty<T, V>(PropertyID id, V defaultValue = default(V)) where T : EntityProperty<V> where V:IEquatable<V>
+    public EntityProperty<T> GetProperty<T>(PropertyID id) where T : IEquatable<T>
     {
         uint key = (uint)id;
-        if (properties.ContainsKey(key))
+        if (properties.TryGetValue(key, out IEntityProperty entity))
         {
-            var property = properties[key] as T;
+            var property = entity as EntityProperty<T>;
             return property;
         }
-
         return null;
     }
     public void PlayAction(ActionType actionType, EntityAction action = null,bool first = false)

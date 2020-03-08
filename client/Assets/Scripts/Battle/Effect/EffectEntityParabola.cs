@@ -28,7 +28,7 @@ public class EffectParabolaEntity : EffectEntity
         else
         {
             rotation = entity.rotation;
-            mTargetPosition = position + rotation * Vector3.forward * entity.GetProperty<float>(PropertyID.PRO_ATTACK_DISTANCE);
+            mTargetPosition = position + rotation * Vector3.forward * entity.GetProperty<float>(PropertyID.PRO_ATTACK_DISTANCE,0);
             mTargetPosition.y = entity.position.y;
         }
 

@@ -15,7 +15,7 @@ public class ActionPluginRun : ActionPlugin
             if (point.arrive == false)
             {
                 Vector3 direction = point.destination - agent.position;  
-                float movespeed = agent.GetProperty<float>(PropertyID.PRO_MOVE_SPEED);
+                float movespeed = agent.GetProperty<float>(PropertyID.PRO_MOVE_SPEED,0);
 
                 float displacement = deltaTime * movespeed;
                 if (direction.magnitude < displacement)

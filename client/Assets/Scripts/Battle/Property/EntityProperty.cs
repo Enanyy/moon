@@ -8,7 +8,6 @@ public interface IEntityProperty
 public class EntityProperty<T>:IEntityProperty where T:IEquatable<T>
 {
     private T mValue;
-
     public T value
     {
         get { return mValue; }
@@ -25,7 +24,9 @@ public class EntityProperty<T>:IEntityProperty where T:IEquatable<T>
 
     public T defaultValue;
 
-    public  EntityProperty(T value, T defaultValue)
+    public event Action<T,T> onValueChanged;
+
+    public EntityProperty(T value, T defaultValue)
     {
         this.value = value;
         this.defaultValue = defaultValue;
@@ -33,7 +34,10 @@ public class EntityProperty<T>:IEntityProperty where T:IEquatable<T>
 
     protected virtual void OnValueChanged(T from, T to)
     {
-
+        if(onValueChanged!=null)
+        {
+            onValueChanged(from, to);
+        }
     }
 
     public void Clear()

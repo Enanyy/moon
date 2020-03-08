@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<EntityParamModel asset="yingxiong_kulouqishi.prefab" scale="1" defaultSpeed="6" hitPosition="(0.0, 0.0, 0.0)" rect="(20,20,240,20)">
+<EntityParamModel asset="yingxiong_kulouqishi.prefab" scale="1" defaultSpeed="2" hitPosition="(0.0, 0.0, 0.0)" rect="(20,20,240,20)">
   <EntityParamAction action="Idle" weight="0" duration="86400" beforeAt="-1" afterAt="-1" rect="(286,120,240,20)">
     <EntityParamPluginSingleAnimation rect="(581,130,240,20)">
       <AnimationClip beginAt="0" animationClip="idle" length="1.666667" speed="1" />
