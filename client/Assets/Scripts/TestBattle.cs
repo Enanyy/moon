@@ -2,13 +2,13 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Test : MonoBehaviour {
+public class TestBattle : MonoBehaviour {
 
 	// Use this for initialization
     public BattleEntity mEntity;
     public BattleEntity mEntity1;
 
-    public static Test Instance { get; private set; }
+    public static TestBattle Instance { get; private set; }
 
     private void Awake()
     {
