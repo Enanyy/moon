@@ -12,7 +12,6 @@ public class MessageTool
     [MenuItem("Tools/Message/生成协议代码(Assembly)")]
     static void GenerateMessageFromAssembly()
     {
-        string codeRegister = "";
         string codeID = "";
         int id = MESSAGEID_BEGIN;
         for (int i = 0; i < 4; i++)
@@ -60,8 +59,7 @@ public class MessageTool
                     {
                         string ID = GetID(classname);
                         codeID += "\t" + ID + " = " + (id++) + ",\n";
-                        codeRegister += "\t\t\tRegister(new " + "MSG_" + classname + "());\n";
-
+                     
                         WriteFile(classname, ID);
                     }
 
@@ -69,7 +67,6 @@ public class MessageTool
 
             }
         }
-        FileEx.ReplaceContent(Application.dataPath + "/Scripts/Message/MessageManager.cs", "//REGISTER_MESSAGE_BEGIN", "//REGISTER_MESSAGE_END", codeRegister);
         FileEx.ReplaceContent(Application.dataPath + "/Scripts/Message/MessageID.cs", "//MESSAGEID_BEGIN", "//MESSAGEID_END", codeID);
     }
     [MenuItem("Tools/Message/生成协议代码(Proto)")]
@@ -78,7 +75,7 @@ public class MessageTool
         string dir = Application.dataPath + "/../../public/proto/";
         string[] protos = Directory.GetFiles(dir, "*.proto");
 
-        string codeRegister = "";
+       
         string codeID = "";
 
         int id = MESSAGEID_BEGIN;
@@ -99,14 +96,12 @@ public class MessageTool
 
                     string ID = GetID(classname);
                     codeID += "\t" + ID +" = " + (id++)+",\n";
-                    codeRegister += "\t\tRegister(new " + "MSG_" + classname + "());\n";
-
+                   
                     WriteFile(classname, ID);
                 }
             }
         }
-
-        FileEx.ReplaceContent(Application.dataPath + "/Scripts/Message/MessageManager.cs", "//REGISTER_MESSAGE_BEGIN", "//REGISTER_MESSAGE_END", codeRegister);
+       
         FileEx.ReplaceContent(Application.dataPath + "/Scripts/Message/MessageID.cs", "//MESSAGEID_BEGIN", "//MESSAGEID_END", codeID);
     }
     static bool IsMessage(string classname)
@@ -150,6 +145,7 @@ public class MessageTool
         {
             string fm = @"using UnityEngine;
 using PBMessage;
+[MessageHandler]
 public class {filename} : Message<{classname}>
 {
     public {filename}() : base(MessageID.{ID})

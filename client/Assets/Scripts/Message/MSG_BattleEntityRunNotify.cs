@@ -1,5 +1,6 @@
 using UnityEngine;
 using PBMessage;
+[MessageHandler]
 public class MSG_BattleEntityRunNotify : Message<BattleEntityRunNotify>
 {
     public MSG_BattleEntityRunNotify() : base(MessageID.BATTLE_ENTITY_RUN_NOTIFY)

@@ -1,5 +1,6 @@
 using UnityEngine;
 using PBMessage;
+[MessageHandler]
 public class MSG_LoginGameReturn : Message<LoginGameReturn>
 {
     public MSG_LoginGameReturn() : base(MessageID.LOGIN_GAME_RETURN)

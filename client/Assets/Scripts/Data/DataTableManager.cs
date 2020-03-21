@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
 /// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
@@ -16,6 +17,10 @@ public interface IDataTable
     DataTableID name { get; }
 
     void Read(SQLiteTable table);
+}
+public class DataTableAttribute:Attribute
+{
+
 }
 public class DataTableManager 
 {
@@ -35,9 +40,7 @@ public class DataTableManager
 
     private readonly Dictionary<DataTableID, IDataTable> mDataTables = new Dictionary<DataTableID, IDataTable>();
 
-    /// <summary>
-    /// 注释XXXX_BEGIN和XXXX_END为替换区域，这些注释不能删除否则自动生成代码会失败，并且自定义内容不能写在注释之间，否则下次自动生成内容时会覆盖掉。
-    /// </summary>
+   
     public bool Init(byte[] bytes)
     {
         if(bytes== null)
@@ -47,10 +50,13 @@ public class DataTableManager
 
         if(SQLite.Instance.Open(bytes))
         {
-//DATATABLE_REGISTER_BEGIN			Register(new DTHero());
-			Register(new DTLanguage());
-			Register(new DTRole());
-//DATATABLE_REGISTER_END
+            List<Type> types = Class.GetTypes(GetType().Assembly, typeof(DataTableAttribute), true);
+            for(int i = 0; i< types.Count;++i)
+            {
+                IDataTable table = (IDataTable)Activator.CreateInstance(types[i]);
+                Register(table);
+            }
+
             SQLite.Instance.Close();
 
             return true;

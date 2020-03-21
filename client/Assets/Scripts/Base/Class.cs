@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 public class Class
 {
@@ -22,6 +23,20 @@ public class Class
             }
         }
 
+        return list;
+    }
+    public static List<Type> GetTypes(Assembly assembly , Type attribute, bool inherit)
+    {
+        List<Type> list = new List<Type>();
+        var types = assembly.GetTypes();
+        for (int j = 0; j < types.Length; ++j)
+        {
+            Type type = types[j];
+            if (type.IsDefined(attribute, inherit))
+            {
+                list.Add(type);
+            }
+        }
         return list;
     }
 }

@@ -20,7 +20,7 @@ public class {classname}
 //TABLE_DEFINITION_BEGIN
 {definition}//TABLE_DEFINITION_END
 }
-
+[DataTable]
 public class {filename} : IDataTable
 {
     public DataTableID name
@@ -143,8 +143,7 @@ public class {filename} : IDataTable
     static void ExportDataTable(string tableName)
     {
         string IDString = "";
-        string registerString = "";
-
+       
         string content = File.ReadAllText(manager);
 
         int beginIndex = content.IndexOf("//DATATABLE_ID_BEGIN");
@@ -160,17 +159,7 @@ public class {filename} : IDataTable
             }
 
         }
-        beginIndex = content.IndexOf("//DATATABLE_REGISTER_BEGIN");
-        endIndex = content.IndexOf("//DATATABLE_REGISTER_END");
-        if (beginIndex >= 0 && endIndex >= 0)
-        {
-            int beginIndexLength = "//DATATABLE_REGISTER_BEGIN".Length;
-            registerString = content.Substring(beginIndex + beginIndexLength, endIndex - beginIndex - beginIndexLength);
-            if (registerString.Length > 0 && registerString[0] == '\r')
-            {
-                registerString = registerString.Substring(1);
-            }
-        }
+       
 
         string className = tableName.Replace("TB_", "TB");
 
@@ -182,14 +171,8 @@ public class {filename} : IDataTable
         {
             IDString += "\t" + tableName + ",\n";
         }
-        if (registerString.Contains(fileName) == false)
-        {
-            registerString += string.Format("\t\t\tRegister(new {0}());\n", fileName);
-        }
 
         content = content.ReplaceEx("//DATATABLE_ID_BEGIN", "//DATATABLE_ID_END", IDString);
-
-        content = content.ReplaceEx("//DATATABLE_REGISTER_BEGIN", "//DATATABLE_REGISTER_END", registerString);
 
         FileEx.SaveFile(manager, content);
 

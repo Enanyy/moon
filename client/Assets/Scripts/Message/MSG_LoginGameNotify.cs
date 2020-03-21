@@ -1,5 +1,6 @@
 using UnityEngine;
 using PBMessage;
+[MessageHandler]
 public class MSG_LoginGameNotify : Message<LoginGameNotify>
 {
     public MSG_LoginGameNotify() : base(MessageID.LOGIN_GAME_NOTIFY)

@@ -14,7 +14,7 @@ public class TBRole
 	public int y;
 //TABLE_DEFINITION_END
 }
-
+[DataTable]
 public class DTRole : IDataTable
 {
     public DataTableID name

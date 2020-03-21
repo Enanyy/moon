@@ -47,7 +47,7 @@ public class TestMessage1
 }
 
 [AttributeUsage(AttributeTargets.Class)]
-public class MessageHandlerAttribute : Attribute
+public class TestMessageAttribute : Attribute
 {
 
 }
@@ -87,7 +87,7 @@ public class MessageListener
     }
 }
 
-[MessageHandler]
+[TestMessage]
 public class TestMessageHandler
 {
     [MessageReciever(1, typeof(MessageReciever<TestMessage>))]
@@ -107,7 +107,7 @@ public class TestAttributes : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        List<Type> types = Class.GetTypes(typeof(MessageHandlerAttribute), true);
+        List<Type> types = Class.GetTypes(GetType().Assembly, typeof(TestMessageAttribute), true);
         
         foreach(var type in types)
         {

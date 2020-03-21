@@ -1,5 +1,6 @@
 using UnityEngine;
 using PBMessage;
+[MessageHandler]
 public class MSG_LoginRequest : Message<LoginRequest>
 {
     public MSG_LoginRequest() : base(MessageID.LOGIN_REQUEST)

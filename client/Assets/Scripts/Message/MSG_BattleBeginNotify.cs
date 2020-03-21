@@ -1,5 +1,6 @@
 using UnityEngine;
 using PBMessage;
+[MessageHandler]
 public class MSG_BattleBeginNotify : Message<BattleBeginNotify>
 {
     public MSG_BattleBeginNotify() : base(MessageID.BATTLE_BEGIN_NOTIFY)

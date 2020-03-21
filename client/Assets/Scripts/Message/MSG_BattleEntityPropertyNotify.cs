@@ -1,5 +1,6 @@
 using UnityEngine;
 using PBMessage;
+[MessageHandler]
 public class MSG_BattleEntityPropertyNotify : Message<BattleEntityPropertyNotify>
 {
     public MSG_BattleEntityPropertyNotify() : base(MessageID.BATTLE_ENTITY_PROPERTY_NOTIFY)

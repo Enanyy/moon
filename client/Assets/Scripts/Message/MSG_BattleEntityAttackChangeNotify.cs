@@ -1,5 +1,7 @@
 using UnityEngine;
 using PBMessage;
+[MessageHandler]
+
 public class MSG_BattleEntityAttackChangeNotify : Message<BattleEntityAttackChangeNotify>
 {
     public MSG_BattleEntityAttackChangeNotify() : base(MessageID.BATTLE_ENTITY_ATTACK_CHANGE_NOTIFY)

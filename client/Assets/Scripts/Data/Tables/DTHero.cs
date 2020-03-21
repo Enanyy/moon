@@ -18,7 +18,7 @@ public class TBHero
 	public float height;
 //DEFINITION_END
 }
-
+[DataTable]
 public class DTHero : IDataTable
 {
     public DataTableID name

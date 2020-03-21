@@ -10,6 +10,7 @@ public class TBLanguage
 //TABLE_DEFINITION_END
 }
 
+[DataTable]
 public class DTLanguage : IDataTable
 {
     public DataTableID name
