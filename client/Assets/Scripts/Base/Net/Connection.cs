@@ -400,7 +400,7 @@ public class Connection
             {
                 //byte[] packet = new byte[nPackageLen];
 
-                Packet packet = NetworkManager.Instance.GetOrCreatePacket(nPackageLen);
+                Packet packet = Packet.CreatePacket(nPackageLen);
                 packet.connection = this;
                 packet.Write(mRecvData, sizeof(ushort), nPackageLen);
 
@@ -423,7 +423,7 @@ public class Connection
                 {
                     //byte[] packet = new byte[nPackageLen];
 
-                    Packet packet = NetworkManager.Instance.GetOrCreatePacket(nPackageLen);
+                    Packet packet = Packet.CreatePacket(nPackageLen);
                     packet.connection = this;
                     packet.Write(mCopyData, nReadPos + sizeof(ushort), nPackageLen);
 

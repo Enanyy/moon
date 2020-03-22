@@ -19,7 +19,6 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
     public MessageID id { get; set; }
     public T message { get; set; }
 
-    private static MemoryStream memoryStream = new MemoryStream();
 
     public Message(MessageID id)
     {
@@ -27,7 +26,10 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
         this.message = new T();
     }
 
-
+    private MemoryStream memoryStream
+    {
+        get { return MessageManager.Instance.memoryStream; }
+    }
 
     public void Send(ConnectID connectid)
     {
@@ -37,7 +39,7 @@ public abstract class Message<T> : IMessage where T : class, ProtoBuf.IExtensibl
 
         int length = 4 + (int)memoryStream.Position;
 
-        Packet packet = NetworkManager.Instance.GetOrCreatePacket(length);
+        Packet packet = Packet.CreatePacket(length);
         packet.Write(BitConverter.GetBytes((int)id), 0, 4);
         packet.Write(memoryStream, (int)memoryStream.Position);
 
@@ -63,7 +65,8 @@ public class MessageManager:Singleton<MessageManager>
 {
     private Dictionary<int,IMessage> mMessageDic = new Dictionary<int,IMessage>();
 
- 
+    public MemoryStream memoryStream = new MemoryStream();
+
     public void Init()
     {
         //根据MessageHandlerAttribute自动注册
@@ -118,6 +121,8 @@ public class MessageManager:Singleton<MessageManager>
     public override void OnDestroy()
     {
         mMessageDic.Clear();
+        memoryStream.Dispose();
+        memoryStream = null;
     }
 }
 

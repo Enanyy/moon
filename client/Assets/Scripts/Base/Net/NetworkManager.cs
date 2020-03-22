@@ -5,6 +5,35 @@ using UnityEngine;
 public delegate void PacketHandler(Packet packet);
 public class Packet
 {
+    private static ConcurrentQueue<Packet> concurrentQueue = new ConcurrentQueue<Packet>();
+    public static Packet CreatePacket(int size = 1024)
+    {
+        Packet packet;
+        if (concurrentQueue.TryDequeue(out packet) == false)
+        {
+            packet = new Packet(size);
+        }
+        packet.Clear();
+        return packet;
+    }
+    public static void ReturnPacket(Packet packet)
+    {
+        if(packet==null)
+        {
+            return;
+        }
+        concurrentQueue.Enqueue(packet);
+    }
+
+    public static void ClearPacket()
+    {
+        while(concurrentQueue.TryDequeue(out Packet packet))
+        {
+            packet.Clear();
+        }
+    }
+
+
     public Connection connection;
     private byte[] mData;
     public byte[] data { get { return mData; } }
@@ -90,8 +119,7 @@ public class NetworkManager
     private Dictionary<int, Connection> mConnectionDic = new Dictionary<int, Connection>();
 
     private ConcurrentQueue<Packet> mPacketList = new ConcurrentQueue<Packet>();
-    private ConcurrentQueue<Packet> mPacketCacheList = new ConcurrentQueue<Packet>();
-   
+  
     private Queue<Connection> mConnectResults = new Queue<Connection>();
     private Dictionary<int, OnConnectionHandler> mConnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
     private Dictionary<int, OnConnectionHandler> mDisconnectHandlerDic = new Dictionary<int, OnConnectionHandler>();
@@ -135,25 +163,6 @@ public class NetworkManager
         c.Connect(ip, port);
     }
 
-    public Packet GetOrCreatePacket(int size = 1024)
-    {
-        Packet packet;
-        if(mPacketCacheList.TryDequeue(out packet) ==false )
-        {
-            packet = new Packet(size);
-        }
-        packet.Clear();
-        return packet;
-    }
-    public void ReturnPacket(Packet packet)
-    {
-        if(packet!= null)
-        {
-            packet.Clear();
-            mPacketCacheList.Enqueue(packet);
-        }
-    }
-
     public Connection GetConnection(int id)
     {
         if (mConnectionDic.ContainsKey(id))
@@ -178,7 +187,7 @@ public class NetworkManager
                 {
                     onReceive(data);
                 }
-                ReturnPacket(data);
+                Packet.ReturnPacket(data);
             }
         }
         while (mConnectResults.Count > 0)
@@ -221,13 +230,13 @@ public class NetworkManager
 
         if (client == null)
         {
-            ReturnPacket(packet);
+            Packet.ReturnPacket(packet);
             return;
         }
        
         client.Send(packet);
 
-        ReturnPacket(packet);
+        Packet.ReturnPacket(packet);
 
     }
 
@@ -255,14 +264,7 @@ public class NetworkManager
         }
         mConnectionDic.Clear();
 
-
-        while(mPacketCacheList.isEmpty == false)
-        {
-            if(mPacketCacheList.TryDequeue(out Packet packet))
-            {
-                packet.Clear();
-            }
-        }
+        Packet.ClearPacket();
     }
 
     private void OnMessage(Packet packet)
