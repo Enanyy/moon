@@ -84,4 +84,9 @@ public class DataTableManager :Singleton<DataTableManager>
         mDataTables.TryGetValue(id, out IDataTable data);
         return data as T;
     }
+
+    public override void OnDestroy()
+    {
+        mDataTables.Clear();
+    }
 }

@@ -114,5 +114,10 @@ public class MessageManager:Singleton<MessageManager>
             }
         } 
     }
+
+    public override void OnDestroy()
+    {
+        mMessageDic.Clear();
+    }
 }
 
