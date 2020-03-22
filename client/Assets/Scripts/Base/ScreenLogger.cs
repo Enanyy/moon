@@ -3,32 +3,11 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
 
-public class ScreenLogger : MonoBehaviour
+public class ScreenLogger : MonoSingleton<ScreenLogger>
 {
-    private static ScreenLogger mInstance;
-    
     public static void SetActive(bool active)
     {
-        if(active)
-        {
-            if (mInstance == null)
-            {
-                mInstance = FindObjectOfType<ScreenLogger>();
-                if (mInstance == null)
-                {
-                    GameObject go = new GameObject(typeof(ScreenLogger).Name);
-                    mInstance = go.AddComponent<ScreenLogger>();
-                }
-            }
-            mInstance.gameObject.SetActive(active);
-        }
-        else
-        {
-            if(mInstance)
-            {
-                mInstance.gameObject.SetActive(active);
-            }
-        }
+        Instance.gameObject.SetActive(active);
     }
 
 #if ENABLE_SCREEN_LOG
@@ -98,15 +77,7 @@ public class ScreenLogger : MonoBehaviour
     static readonly GUIContent saveLabel = new GUIContent("Save", "Save logs to file.");
 
     readonly Rect titleBarRect = new Rect(0, 0, 10000, 20);
-   
-    void Awake()
-    {
-        //Debug.LogError("test 1");
-        //Debug.Log("test 2");
-        //visible = true;
-        DontDestroyOnLoad(gameObject);
-        mInstance = this;
-    }
+  
 
     void OnEnable()
     {

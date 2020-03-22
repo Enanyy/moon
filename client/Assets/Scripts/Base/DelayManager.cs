@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class DelayManager : MonoBehaviour
+public class DelayManager : MonoSingleton<DelayManager>
 {
     #region Inner Class
     class DelayTask : IPoolObject
@@ -52,20 +52,7 @@ public class DelayManager : MonoBehaviour
         }
     }
     #endregion
-    private static DelayManager mInstance;
-    public static DelayManager Instance
-    {
-        get
-        {
-            if(mInstance== null)
-            {
-                GameObject go = new GameObject(typeof(DelayManager).Name);
-                DontDestroyOnLoad(go);
-                mInstance = go.AddComponent<DelayManager>();
-            }
-            return mInstance;
-        }
-    }
+ 
     private List<DelayTask> mDelayTasks = new List<DelayTask>();
 
     // Update is called once per frame

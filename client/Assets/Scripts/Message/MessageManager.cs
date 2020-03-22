@@ -59,23 +59,8 @@ public class MessageHandlerAttribute : Attribute
 
 }
 
-public class MessageManager
+public class MessageManager:Singleton<MessageManager>
 {
-    private static MessageManager mInstance;
-
-    public static MessageManager Instance
-    {
-        get
-        {
-            if (mInstance == null)
-            {
-                mInstance = new MessageManager();
-            }
-
-            return mInstance;
-        }
-    }
-
     private Dictionary<int,IMessage> mMessageDic = new Dictionary<int,IMessage>();
 
  

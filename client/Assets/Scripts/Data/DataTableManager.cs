@@ -22,22 +22,8 @@ public class DataTableAttribute:Attribute
 {
 
 }
-public class DataTableManager 
+public class DataTableManager :Singleton<DataTableManager>
 {
-    private DataTableManager() { }
-    private static DataTableManager _instance;
-    public static DataTableManager Instance
-    {
-        get
-        {
-            if (_instance==null)
-            {
-                _instance = new DataTableManager();
-            }
-            return _instance;
-        }
-    }
-
     private readonly Dictionary<DataTableID, IDataTable> mDataTables = new Dictionary<DataTableID, IDataTable>();
 
    

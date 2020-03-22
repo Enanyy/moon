@@ -3,27 +3,7 @@ using System;
 using System.Threading;
 using UnityEngine;
 
-public  class ThreadQueue :MonoBehaviour  {
-
-    private static ThreadQueue mInstance;
-    private static ThreadQueue Instance
-    {
-        get
-        {
-            if(mInstance == null)
-            {
-                mInstance = FindObjectOfType<ThreadQueue>();
-               
-            }
-            if (mInstance == null)
-            {
-                GameObject go = new GameObject(typeof(ThreadQueue).Name);
-                mInstance = go.AddComponent<ThreadQueue>();
-                DontDestroyOnLoad(go);
-            }
-            return mInstance;
-        }
-    }
+public  class ThreadQueue :MonoSingleton<ThreadQueue>  {
 
 	List<ThreadBase> threads = new List<ThreadBase>();
     public static int maxThreads = 8;

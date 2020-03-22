@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-public class AssetLoader : MonoBehaviour
+public class AssetLoader : MonoSingleton<AssetLoader>
 {
     #region 静态公有方法
     /// <summary>
@@ -151,33 +151,11 @@ public class AssetLoader : MonoBehaviour
         }
     }
 
-    public static void Destroy()
-    {
-        if (Instance != null)
-        {
-            Destroy(Instance.gameObject);
-            mInstance = null;
-        }
-    }
+   
     #endregion
 
     #region 私有方法
-    #region Instance
-    private static AssetLoader mInstance;
-    private static AssetLoader Instance
-    {
-        get
-        {
-            if (mInstance == null)
-            {
-                GameObject go = new GameObject(typeof(AssetLoader).Name);
-                mInstance = go.AddComponent<AssetLoader>();
-                DontDestroyOnLoad(go);
-            }
-            return mInstance;
-        }
-    }
-    #endregion
+   
     private Asset<AssetBundleManifest> mAssetManifest;
 
     private Dictionary<string, Bundle> mAssetBundleDic = new Dictionary<string, Bundle>();
