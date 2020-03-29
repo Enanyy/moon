@@ -271,10 +271,7 @@ public class AssetLoader : MonoSingleton<AssetLoader>
         }
     }
 
-
-
-    
-    private void OnDestroy()
+    public override void OnDestroy()
     {
         mBundleNameList.Clear();
         mBundleNameList.AddRange(mAssetBundleDic.Keys);
