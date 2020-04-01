@@ -273,13 +273,9 @@ public class EventListener<T0, T1, T2, T3, T4, T5, T6, T7> : IEventListener
 /// <summary>
 /// 事件派发器
 /// </summary>
-public class EventSystem
+public class EventSystem : Singleton<EventSystem>
 {
-    private static EventSystem mInstance;
-    public static EventSystem Instance { get { if (mInstance == null) mInstance = new EventSystem(); return mInstance; } }
-
-
-    private Dictionary<int, Dictionary<Type, IEventListener>> mListeners = new Dictionary<int, Dictionary<Type, IEventListener>>();
+    private Dictionary<int, IEventListener> mListeners = new Dictionary<int, IEventListener>();
 
     public void AddListener(int id, Action call)
     {
@@ -287,20 +283,13 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic) == false)
+        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
         {
-            dic = new Dictionary<Type, IEventListener>();
-            mListeners.Add(id, dic);
+            listener = new EventListener();
+            mListeners.Add(id, listener);
         }
-        Type type = typeof(EventListener);
-        if (dic.TryGetValue(type, out IEventListener o) == false)
-        {
-            o = new EventListener();
-            dic.Add(type, o);
-        }
-        EventListener listener = o as EventListener;
-        listener.RemoveListener(call);
-        listener.AddListener(call);
+
+        (listener as EventListener).AddListener(call);
     }
     public void AddListener<T0>(int id, Action<T0> call)
     {
@@ -308,20 +297,14 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic) == false)
-        {
-            dic = new Dictionary<Type, IEventListener>();
-            mListeners.Add(id, dic);
-        }
-        Type type = typeof(EventListener<T0>);
-        if (dic.TryGetValue(type, out IEventListener o) == false)
-        {
-            o = new EventListener<T0>();
-            dic.Add(type, o);
-        }
-        EventListener<T0> listener = o as EventListener<T0>;
 
-        listener.AddListener(call);
+        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        {
+            listener = new EventListener<T0>();
+            mListeners.Add(id, listener);
+        }
+        (listener as EventListener<T0>).AddListener(call);
+
     }
     public void AddListener<T0, T1>(int id, Action<T0, T1> call)
     {
@@ -329,20 +312,12 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic) == false)
+        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
         {
-            dic = new Dictionary<Type, IEventListener>();
-            mListeners.Add(id, dic);
+            listener = new EventListener<T0, T1>();
+            mListeners.Add(id, listener);
         }
-        Type type = typeof(EventListener<T0, T1>);
-        if (dic.TryGetValue(type, out IEventListener o) == false)
-        {
-            o = new EventListener<T0, T1>();
-            dic.Add(type, o);
-        }
-        EventListener<T0, T1> listener = o as EventListener<T0, T1>;
-
-        listener.AddListener(call);
+        (listener as EventListener<T0, T1>).AddListener(call);
     }
     public void AddListener<T0, T1, T2>(int id, Action<T0, T1, T2> call)
     {
@@ -350,20 +325,12 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic) == false)
+        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
         {
-            dic = new Dictionary<Type, IEventListener>();
-            mListeners.Add(id, dic);
+            listener = new EventListener<T0, T1, T2>();
+            mListeners.Add(id, listener);
         }
-        Type type = typeof(EventListener<T0, T1, T2>);
-        if (dic.TryGetValue(type, out IEventListener o) == false)
-        {
-            o = new EventListener<T0, T1, T2>();
-            dic.Add(type, o);
-        }
-        EventListener<T0, T1, T2> listener = o as EventListener<T0, T1, T2>;
-
-        listener.AddListener(call);
+        (listener as EventListener<T0, T1, T2>).AddListener(call);
     }
     public void AddListener<T0, T1, T2, T3>(int id, Action<T0, T1, T2, T3> call)
     {
@@ -371,20 +338,12 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic) == false)
+        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
         {
-            dic = new Dictionary<Type, IEventListener>();
-            mListeners.Add(id, dic);
+            listener = new EventListener<T0, T1, T2, T3>();
+            mListeners.Add(id, listener);
         }
-        Type type = typeof(EventListener<T0, T1, T2, T3>);
-        if (dic.TryGetValue(type, out IEventListener o) == false)
-        {
-            o = new EventListener<T0, T1, T2, T3>();
-            dic.Add(type, o);
-        }
-        EventListener<T0, T1, T2, T3> listener = o as EventListener<T0, T1, T2, T3>;
-
-        listener.AddListener(call);
+        (listener as EventListener<T0, T1, T2, T3>).AddListener(call);
     }
     public void AddListener<T0, T1, T2, T3, T4>(int id, Action<T0, T1, T2, T3, T4> call)
     {
@@ -392,20 +351,12 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic) == false)
+        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
         {
-            dic = new Dictionary<Type, IEventListener>();
-            mListeners.Add(id, dic);
+            listener = new EventListener<T0, T1, T2, T3, T4>();
+            mListeners.Add(id, listener);
         }
-        Type type = typeof(EventListener<T0, T1, T2, T3, T4>);
-        if (dic.TryGetValue(type, out IEventListener o) == false)
-        {
-            o = new EventListener<T0, T1, T2, T3, T4>();
-            dic.Add(type, o);
-        }
-        EventListener<T0, T1, T2, T3, T4> listener = o as EventListener<T0, T1, T2, T3, T4>;
-
-        listener.AddListener(call);
+        (listener as EventListener<T0, T1, T2, T3, T4>).AddListener(call);
     }
     public void AddListener<T0, T1, T2, T3, T4, T5>(int id, Action<T0, T1, T2, T3, T4, T5> call)
     {
@@ -413,20 +364,12 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic) == false)
+        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
         {
-            dic = new Dictionary<Type, IEventListener>();
-            mListeners.Add(id, dic);
+            listener = new EventListener<T0, T1, T2, T3, T4, T5>();
+            mListeners.Add(id, listener);
         }
-        Type type = typeof(EventListener<T0, T1, T2, T3, T4, T5>);
-        if (dic.TryGetValue(type, out IEventListener o) == false)
-        {
-            o = new EventListener<T0, T1, T2, T3, T4, T5>();
-            dic.Add(type, o);
-        }
-        EventListener<T0, T1, T2, T3, T4, T5> listener = o as EventListener<T0, T1, T2, T3, T4, T5>;
-
-        listener.AddListener(call);
+        (listener as EventListener<T0, T1, T2, T3, T4, T5>).AddListener(call);
     }
     public void AddListener<T0, T1, T2, T3, T4, T5, T6>(int id, Action<T0, T1, T2, T3, T4, T5, T6> call)
     {
@@ -434,20 +377,12 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic) == false)
+        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
         {
-            dic = new Dictionary<Type, IEventListener>();
-            mListeners.Add(id, dic);
+            listener = new EventListener<T0, T1, T2, T3, T4, T5, T6>();
+            mListeners.Add(id, listener);
         }
-        Type type = typeof(EventListener<T0, T1, T2, T3, T4, T5, T6>);
-        if (dic.TryGetValue(type, out IEventListener o) == false)
-        {
-            o = new EventListener<T0, T1, T2, T3, T4, T5, T6>();
-            dic.Add(type, o);
-        }
-        EventListener<T0, T1, T2, T3, T4, T5, T6> listener = o as EventListener<T0, T1, T2, T3, T4, T5, T6>;
-
-        listener.AddListener(call);
+        (listener as EventListener<T0, T1, T2, T3, T4, T5, T6>).AddListener(call);
     }
     public void AddListener<T0, T1, T2, T3, T4, T5, T6, T7>(int id, Action<T0, T1, T2, T3, T4, T5, T6, T7> call)
     {
@@ -455,20 +390,12 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic) == false)
+        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
         {
-            dic = new Dictionary<Type, IEventListener>();
-            mListeners.Add(id, dic);
+            listener = new EventListener<T0, T1, T2, T3, T4, T5, T6, T7>();
+            mListeners.Add(id, listener);
         }
-        Type type = typeof(EventListener<T0, T1, T2, T3, T4, T5, T6, T7>);
-        if (dic.TryGetValue(type, out IEventListener o) == false)
-        {
-            o = new EventListener<T0, T1, T2, T3, T4, T5, T6, T7>();
-            dic.Add(type, o);
-        }
-        EventListener<T0, T1, T2, T3, T4, T5, T6, T7> listener = o as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>;
-
-        listener.AddListener(call);
+        (listener as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>).AddListener(call);
     }
 
     public void RemoveListener(int id, Action call)
@@ -477,14 +404,9 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener listener = o as EventListener;
-                listener.RemoveListener(call);
-            }
+            (listener as EventListener).RemoveListener(call);
         }
     }
     public void RemoveListener<T0>(int id, Action<T0> call)
@@ -493,14 +415,9 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0> listener = o as EventListener<T0>;
-                listener.RemoveListener(call);
-            }
+            (listener as EventListener<T0>).RemoveListener(call);
         }
     }
     public void RemoveListener<T0, T1>(int id, Action<T0, T1> call)
@@ -509,14 +426,9 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1> listener = o as EventListener<T0, T1>;
-                listener.RemoveListener(call);
-            }
+            (listener as EventListener<T0, T1>).RemoveListener(call);
         }
     }
     public void RemoveListener<T0, T1, T2>(int id, Action<T0, T1, T2> call)
@@ -525,14 +437,9 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2> listener = o as EventListener<T0, T1, T2>;
-                listener.RemoveListener(call);
-            }
+            (listener as EventListener<T0, T1, T2>).RemoveListener(call);
         }
     }
     public void RemoveListener<T0, T1, T2, T3>(int id, Action<T0, T1, T2, T3> call)
@@ -541,14 +448,9 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3> listener = o as EventListener<T0, T1, T2, T3>;
-                listener.RemoveListener(call);
-            }
+            (listener as EventListener<T0, T1, T2, T3>).RemoveListener(call);
         }
     }
     public void RemoveListener<T0, T1, T2, T3, T4>(int id, Action<T0, T1, T2, T3, T4> call)
@@ -557,14 +459,9 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3, T4>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3, T4> listener = o as EventListener<T0, T1, T2, T3, T4>;
-                listener.RemoveListener(call);
-            }
+            (listener as EventListener<T0, T1, T2, T3, T4>).RemoveListener(call);
         }
     }
     public void RemoveListener<T0, T1, T2, T3, T4, T5>(int id, Action<T0, T1, T2, T3, T4, T5> call)
@@ -573,14 +470,9 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3, T4, T5>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3, T4, T5> listener = o as EventListener<T0, T1, T2, T3, T4, T5>;
-                listener.RemoveListener(call);
-            }
+            (listener as EventListener<T0, T1, T2, T3, T4, T5>).RemoveListener(call);
         }
     }
     public void RemoveListener<T0, T1, T2, T3, T4, T5, T6>(int id, Action<T0, T1, T2, T3, T4, T5, T6> call)
@@ -589,14 +481,9 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3, T4, T5, T6>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3, T4, T5, T6> listener = o as EventListener<T0, T1, T2, T3, T4, T5, T6>;
-                listener.RemoveListener(call);
-            }
+            (listener as EventListener<T0, T1, T2, T3, T4, T5, T6>).RemoveListener(call);
         }
     }
     public void RemoveListener<T0, T1, T2, T3, T4, T5, T6, T7>(int id, Action<T0, T1, T2, T3, T4, T5, T6, T7> call)
@@ -605,130 +492,80 @@ public class EventSystem
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3, T4, T5, T6, T7>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3, T4, T5, T6, T7> listener = o as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>;
-                listener.RemoveListener(call);
-            }
+            (listener as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>).RemoveListener(call);
         }
     }
     public void Invoke(int id)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener listener = o as EventListener;
-                listener.Invoke();
-            }
+            (listener as EventListener).Invoke();
         }
     }
     public void Invoke<T0>(int id, T0 arg0)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0> listener = o as EventListener<T0>;
-                listener.Invoke(arg0);
-            }
+            (listener as EventListener<T0>).Invoke(arg0);
         }
     }
     public void Invoke<T0, T1>(int id, T0 arg0, T1 arg1)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1> listener = o as EventListener<T0, T1>;
-                listener.Invoke(arg0, arg1);
-            }
+            (listener as EventListener<T0, T1>).Invoke(arg0, arg1);
         }
     }
     public void Invoke<T0, T1, T2>(int id, T0 arg0, T1 arg1, T2 arg2)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2> listener = o as EventListener<T0, T1, T2>;
-                listener.Invoke(arg0, arg1, arg2);
-            }
+            (listener as EventListener<T0, T1, T2>).Invoke(arg0, arg1, arg2);
         }
     }
     public void Invoke<T0, T1, T2, T3>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3> listener = o as EventListener<T0, T1, T2, T3>;
-                listener.Invoke(arg0, arg1, arg2, arg3);
-            }
+            (listener as EventListener<T0, T1, T2, T3>).Invoke(arg0, arg1, arg2, arg3);
         }
     }
     public void Invoke<T0, T1, T2, T3, T4>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3, T4>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3, T4> listener = o as EventListener<T0, T1, T2, T3, T4>;
-                listener.Invoke(arg0, arg1, arg2, arg3, arg4);
-            }
+            (listener as EventListener<T0, T1, T2, T3, T4>).Invoke(arg0, arg1, arg2, arg3, arg4);
         }
     }
     public void Invoke<T0, T1, T2, T3, T4, T5>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3, T4, T5>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3, T4, T5> listener = o as EventListener<T0, T1, T2, T3, T4, T5>;
-                listener.Invoke(arg0, arg1, arg2, arg3, arg4, arg5);
-            }
+            (listener as EventListener<T0, T1, T2, T3, T4, T5>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5);
         }
     }
     public void Invoke<T0, T1, T2, T3, T4, T5, T6>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3, T4, T5, T6>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3, T4, T5, T6> listener = o as EventListener<T0, T1, T2, T3, T4, T5, T6>;
-                listener.Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
-            }
+            (listener as EventListener<T0, T1, T2, T3, T4, T5, T6>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
         }
     }
     public void Invoke<T0, T1, T2, T3, T4, T5, T6, T7>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            Type type = typeof(EventListener<T0, T1, T2, T3, T4, T5, T6, T7>);
-            if (dic.TryGetValue(type, out IEventListener o))
-            {
-                EventListener<T0, T1, T2, T3, T4, T5, T6, T7> listener = o as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>;
-                listener.Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-            }
+            (listener as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
         }
     }
 
     public void Clear(int id)
     {
-        if (mListeners.TryGetValue(id, out Dictionary<Type, IEventListener> dic))
+        if (mListeners.TryGetValue(id, out IEventListener listener))
         {
-            dic.Clear();
+            listener.Clear();
         }
         mListeners.Remove(id);
     }

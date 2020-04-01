@@ -11,16 +11,22 @@ public class RemindListener : MonoBehaviour
     private GameObject target;
     [SerializeField]
     private Text text;
+
+    private Reminder reminder;
     private void Start()
     {
+        reminder = new Reminder(OnCountChanged);
+
         for (int i = 0, max = IDs.Count; i < max; ++i)
         {
-            RemindSystem.Instance.RegisterListener(OnCountChanged, (int)IDs[i]);
+            reminder.AddRemindID((int)IDs[i]);
         }
+        RemindSystem.Instance.RegisterListener(reminder);
+
     }
     private void OnDestroy()
     {
-        RemindSystem.Instance.UnRegisterListener(OnCountChanged);
+        RemindSystem.Instance.UnRegisterListener(reminder);
     }
 
     protected virtual void OnCountChanged(int count)

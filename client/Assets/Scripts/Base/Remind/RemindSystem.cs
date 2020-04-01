@@ -7,76 +7,78 @@ public enum RemindStatus
     Off = 0,
     On = 1,
 }
-
-public class RemindSystem
+public class Reminder
 {
-    static RemindSystem mInstance;
-    public static RemindSystem Instance
+    private List<int> mRemindList = new List<int>();
+    private Action<int> mCallback;
+
+    public Reminder(Action<int> call)
     {
-        get
+        mCallback = call;
+    }
+    public Reminder(Action<int> call, params int[] id)
+    {
+        mCallback = call;
+        mRemindList.AddRange(id);
+    }
+
+    public void AddRemindID(int id)
+    {
+        if(mRemindList.Contains(id)==false)
         {
-            if (mInstance == null) mInstance = new RemindSystem();
-            return mInstance;
+            mRemindList.Add(id);
         }
     }
+    public void RemoveRemindID(int id)
+    {
+        if(mRemindList.Remove(id))
+        {
+        }
+    }
+
+    public void CheckStatus()
+    {
+        int count = RemindSystem.Instance.GetCount(mRemindList);
+
+        if(mCallback!=null)
+        {
+            mCallback(count);
+        }
+    }
+
+}
+public class RemindSystem:Singleton<RemindSystem>
+{
 
     private Dictionary<int, int> mCountDic = new Dictionary<int, int>();
-    private Dictionary<Action<int>, List<int>> mListenerDic = new Dictionary<Action<int>, List<int>>();
-
-    public void RegisterListener(Action<int> listener, int id)
+    
+    private List<Reminder> mReminderList = new List<Reminder>();
+    public void RegisterListener(Reminder reminder)
     {
-        if (listener == null)
+        if (reminder == null)
+        {
+            return;
+        }
+        if(mReminderList.Contains(reminder))
+        {
+            mReminderList.Add(reminder);
+
+            reminder.CheckStatus();
+        }     
+    }
+
+    public void UnRegisterListener(Reminder reminder)
+    {
+        if (reminder == null)
         {
             return;
         }
 
-
-        if (mListenerDic.ContainsKey(listener) == false)
-        {
-            mListenerDic.Add(listener, new List<int>());
-        }
-
-        var list = mListenerDic[listener];
-        if (list.Contains(id) == false)
-        {
-            list.Add(id);
-
-            int status = GetCount(list);
-
-            listener(status);
-        }
+        mReminderList.Remove(reminder);
+        reminder.CheckStatus();
+        
     }
-
-    public void UnRegisterListener(Action<int> listener, int id)
-    {
-        if (listener == null)
-        {
-            return;
-        }
-
-        if (mListenerDic.TryGetValue(listener, out List<int> list))
-        {
-            list.Remove(id);
-
-            int count = GetCount(list);
-
-            listener(count);
-
-            if (list.Count <= 0)
-            {
-                mListenerDic.Remove(listener);
-            }
-        }
-    }
-    public void UnRegisterListener(Action<int> listener)
-    {
-        if (listener == null)
-        {
-            return;
-        }
-        mListenerDic.Remove(listener);
-    }
-
+  
     public int GetCount(int id)
     {
         if (mCountDic.TryGetValue(id, out int count))
@@ -110,15 +112,9 @@ public class RemindSystem
             mCountDic.Add(id, count);
         }
 
-        var it = mListenerDic.GetEnumerator();
-        while (it.MoveNext())
+        for (int i = mReminderList.Count -1; i >= 0; --i)
         {
-            if (it.Current.Value.Contains(id))
-            {
-                count = GetCount(it.Current.Value);
-
-                it.Current.Key(count);
-            }
+            mReminderList[i].CheckStatus();
         }
     }
     public void ChangeStatus(int id, RemindStatus status)

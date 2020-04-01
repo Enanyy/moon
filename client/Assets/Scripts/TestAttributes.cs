@@ -128,8 +128,8 @@ public class TestAttributes : MonoBehaviour
             listener.Invoke(msg);
             listener.Invoke(msg1);
         }
-
-
+        Action<int> action = null;
+        var mt = action.GetMethodInfo();
     }
 
 
@@ -144,6 +144,7 @@ public class TestAttributes : MonoBehaviour
 
                 listener.Invoke(msg);
                 listener.Invoke(msg1);
+
             }
         }
     }
