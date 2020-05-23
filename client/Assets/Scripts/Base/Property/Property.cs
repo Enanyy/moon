@@ -1,11 +1,11 @@
 ﻿using System;
 
-public interface IEntityProperty
+public interface IProperty
 {
     void Clear();
 }
 
-public class EntityProperty<T>:IEntityProperty where T:IEquatable<T>
+public class Property<T>:IProperty where T:IEquatable<T>
 {
     private T mValue;
     public T value
@@ -26,7 +26,7 @@ public class EntityProperty<T>:IEntityProperty where T:IEquatable<T>
 
     public event Action<T,T> onValueChanged;
 
-    public EntityProperty(T value, T defaultValue)
+    public Property(T value, T defaultValue)
     {
         this.value = value;
         this.defaultValue = defaultValue;

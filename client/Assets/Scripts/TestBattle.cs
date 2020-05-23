@@ -84,7 +84,7 @@ public class TestBattle : MonoBehaviour {
         mEntity.id = 1;
         mEntity.position = Vector3.zero;
         mEntity.config = "yingxiong_kulouqishi.txt";
-        mEntity.SetProperty<float>(PropertyID.PRO_MOVE_SPEED, 6);
+        mEntity.properties.SetProperty<float>((uint)PropertyID.PRO_MOVE_SPEED, 6);
 
         BattleManager.Instance.AddEntity(mEntity);
         mEntity.active = true;
@@ -97,8 +97,8 @@ public class TestBattle : MonoBehaviour {
         BattleManager.Instance.AddEntity(mEntity1);
         mEntity1.active = true;
 
-        EventSystem.Instance.AddListener(1, OnListen);
-        EventSystem.Instance.Invoke(1);
+        //EventSystem.Instance.AddListener(1, OnListen);
+        //EventSystem.Instance.Invoke(1);
     }
 
     void OnListen()

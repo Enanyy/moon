@@ -218,10 +218,22 @@ public partial class TreeNodeWindow : EditorWindow
         }
     }
 
-  
+
 
 
     #region 显示
+    static GUIStyle _windowStyle;
+    static GUIStyle WindowStyle
+    {
+        get
+        {
+            if (_windowStyle == null)
+            {
+                _windowStyle = new GUIStyle(GUI.skin.window);
+            }
+            return _windowStyle;
+        }
+    }
     /// <summary>
     /// 显示编辑器的主要组件
     /// </summary>
@@ -235,6 +247,8 @@ public partial class TreeNodeWindow : EditorWindow
         }
         for (int i = 0; i < data.nodes.Count; i++)
         {
+            //data.nodes[i].rect = GUILayout.Window(i,data.nodes[i].rect, DrawNode, data.nodes[i].id + "-" + data.nodes[i].name, WindowStyle);
+
             data.nodes[i].rect = GUI.Window(i, data.nodes[i].rect, DrawNode, data.nodes[i].id + "-" + data.nodes[i].name );
 
             DrawConnection(data.nodes[i]);

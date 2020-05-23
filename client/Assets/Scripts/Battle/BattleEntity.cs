@@ -45,7 +45,7 @@ public class BattleEntity:
     public virtual Quaternion rotation { get; set; }
     public float scale { get; set; }
 
-    public Dictionary<uint,IEntityProperty> properties { get; private set; }
+    public Properties properties = new Properties();
 
     public StateMachine machine { get; private set; }
 
@@ -113,7 +113,7 @@ public class BattleEntity:
     {
         get
         {
-            float radius = GetProperty<float>(PropertyID.PRO_RADIUS, 0);
+            float radius = properties.GetProperty<float>((uint)PropertyID.PRO_RADIUS, 0);
 
             Vector3 forward = rotation * Vector3.forward;
             Vector3 right = rotation * Vector3.right;
@@ -136,7 +136,6 @@ public class BattleEntity:
     public BattleEntity()
     {
         machine = new StateMachine();
-        properties = new Dictionary<uint, IEntityProperty>();
         Clear();
     }
 
@@ -196,77 +195,18 @@ public class BattleEntity:
 
     public void ResetProperty()
     {
-        SetProperty(PropertyID.PRO_HP, 0);
-        SetProperty(PropertyID.PRO_MAX_HP, 0);
-        SetProperty(PropertyID.PRO_ATTACK, 0);
-        SetProperty(PropertyID.PRO_DEFENSE, 0);
-        SetProperty(PropertyID.PRO_MOVE_SPEED, 6f);
-        SetProperty(PropertyID.PRO_ATTACK_DURATION, 2f);
-        SetProperty(PropertyID.PRO_SEARCH_DISTANCE, 20f);
-        SetProperty(PropertyID.PRO_ATTACK_DISTANCE, 10f);
-        SetProperty(PropertyID.PRO_RADIUS, 1f);
+        properties.SetProperty((uint)PropertyID.PRO_HP, 0);
+        properties.SetProperty((uint)PropertyID.PRO_MAX_HP, 0);
+        properties.SetProperty((uint)PropertyID.PRO_ATTACK, 0);
+        properties.SetProperty((uint)PropertyID.PRO_DEFENSE, 0);
+        properties.SetProperty((uint)PropertyID.PRO_MOVE_SPEED, 6f);
+        properties.SetProperty((uint)PropertyID.PRO_ATTACK_DURATION, 2f);
+        properties.SetProperty((uint)PropertyID.PRO_SEARCH_DISTANCE, 20f);
+        properties.SetProperty((uint)PropertyID.PRO_ATTACK_DISTANCE, 10f);
+        properties.SetProperty((uint)PropertyID.PRO_RADIUS, 1f);
     }
 
-    public void SetProperty<T>(PropertyID id,T value) where T:IEquatable<T>
-    {
-        uint key = (uint)id;
-        if(properties.ContainsKey(key)==false)
-        {
-            properties.Add(key, new EntityProperty<T>(value, value));         
-        }
-        else
-        {
-            var property = properties[key] as EntityProperty<T>;
-            property.value = value;
-        }
-    }
-    public void  AddPropertyEvent<T>(PropertyID id,Action<T,T> listener) where T :IEquatable<T>
-    {
-        uint key = (uint)id;
-        if( properties.TryGetValue(key,out IEntityProperty entity))
-        {
-            var property = entity as EntityProperty<T>;
-            property.onValueChanged += listener;
-        }
-    }
-
-    public void RemovePropertyEvent<T>(PropertyID id, Action<T, T> listener) where T : IEquatable<T>
-    {
-        uint key = (uint)id;
-        if (properties.TryGetValue(key, out IEntityProperty entity))
-        {
-            var property = entity as EntityProperty<T>;
-            property.onValueChanged -= listener;
-        }
-    }
-    public T GetProperty<T>(PropertyID id, T defaultValue = default) where T:IEquatable<T>
-    {
-        uint key = (uint) id;
-        if (properties.TryGetValue(key,out IEntityProperty entity))
-        {
-            var property = entity as EntityProperty<T>;
-            return property.value;
-        }
-        else
-        {
-            var property = new EntityProperty<T>(defaultValue, defaultValue);
-
-            properties.Add(key, property);
-        }
-
-        return defaultValue;
-    }
-
-    public EntityProperty<T> GetProperty<T>(PropertyID id) where T : IEquatable<T>
-    {
-        uint key = (uint)id;
-        if (properties.TryGetValue(key, out IEntityProperty entity))
-        {
-            var property = entity as EntityProperty<T>;
-            return property;
-        }
-        return null;
-    }
+  
     public void PlayAction(ActionType actionType, EntityAction action = null,bool first = false)
     {
         if (machine != null)
@@ -339,11 +279,11 @@ public class BattleEntity:
     {
         if (property.ratio != 1)
         {
-            SetProperty((PropertyID) property.key, property.value * property.ratio);
+            properties.SetProperty( property.key, property.value * property.ratio);
         }
         else
         {
-            SetProperty((PropertyID)property.key, property.value);
+            properties.SetProperty(property.key, property.value);
         }
     }
 

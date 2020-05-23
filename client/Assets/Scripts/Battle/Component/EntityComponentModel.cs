@@ -135,7 +135,7 @@ public class EntityComponentModel :
         {
             if (agent.param != null)
             {
-                animationSpeed = agent.GetProperty<float>(PropertyID.PRO_MOVE_SPEED, 0) / agent.param.defaultSpeed;
+                animationSpeed = agent.properties.GetProperty<float>((uint)PropertyID.PRO_MOVE_SPEED, 0) / agent.param.defaultSpeed;
             }
             else
             {
@@ -243,9 +243,9 @@ public class EntityComponentModel :
         {
             return;
         }
-        ShowRadius(ShapeType.Radius, agent.GetProperty<float>(PropertyID.PRO_RADIUS,0), Color.green);
-        ShowRadius(ShapeType.SearchDistance, agent.GetProperty<float>(PropertyID.PRO_SEARCH_DISTANCE, 0), Color.yellow);
-        ShowRadius(ShapeType.AttackDistance, agent.GetProperty<float>(PropertyID.PRO_ATTACK_DISTANCE, 0), Color.red);
+        ShowRadius(ShapeType.Radius, agent.properties.GetProperty<float>((uint)PropertyID.PRO_RADIUS,0), Color.green);
+        ShowRadius(ShapeType.SearchDistance, agent.properties.GetProperty<float>((uint)PropertyID.PRO_SEARCH_DISTANCE, 0), Color.yellow);
+        ShowRadius(ShapeType.AttackDistance, agent.properties.GetProperty<float>((uint)PropertyID.PRO_ATTACK_DISTANCE, 0), Color.red);
     }
 
     void ShowRadius(ShapeType type, float radius, Color color)
