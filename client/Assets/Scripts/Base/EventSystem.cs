@@ -4,18 +4,28 @@ using System;
 #region Listener
 public interface IEventListener
 {
+    void AddListener(Delegate action);
+    void RemoveListener(Delegate action);
     void Clear();
 }
 public class EventListener : IEventListener
 {
     public List<Action> listeners = new List<Action>();
 
+    public void AddListener(Delegate action)
+    {
+        AddListener((Action)action);
+    }
     public void AddListener(Action action)
     {
         if (action != null && listeners.Contains(action) == false)
         {
             listeners.Add(action);
         }
+    }
+    public void RemoveListener(Delegate action)
+    {
+        RemoveListener((Action)action);
     }
     public void RemoveListener(Action action)
     {
@@ -39,12 +49,20 @@ public class EventListener<T0> : IEventListener
 {
     public List<Action<T0>> listeners = new List<Action<T0>>();
 
+    public void AddListener(Delegate action)
+    {
+        AddListener((Action<T0>)action);
+    }
     public void AddListener(Action<T0> action)
     {
         if (action != null && listeners.Contains(action) == false)
         {
             listeners.Add(action);
         }
+    }
+    public void RemoveListener(Delegate action)
+    {
+        RemoveListener((Action<T0>)action);
     }
     public void RemoveListener(Action<T0> action)
     {
@@ -68,12 +86,20 @@ public class EventListener<T0, T1> : IEventListener
 {
     public List<Action<T0, T1>> listeners = new List<Action<T0, T1>>();
 
+    public void AddListener(Delegate action)
+    {
+        AddListener((Action<T0,T1>)action);
+    }
     public void AddListener(Action<T0, T1> action)
     {
         if (action != null && listeners.Contains(action) == false)
         {
             listeners.Add(action);
         }
+    }
+    public void RemoveListener(Delegate action)
+    {
+        RemoveListener((Action<T0,T1>)action);
     }
     public void RemoveListener(Action<T0, T1> action)
     {
@@ -97,12 +123,20 @@ public class EventListener<T0, T1, T2> : IEventListener
 {
     public List<Action<T0, T1, T2>> listeners = new List<Action<T0, T1, T2>>();
 
+    public void AddListener(Delegate action)
+    {
+        AddListener((Action<T0, T1,T2>)action);
+    }
     public void AddListener(Action<T0, T1, T2> action)
     {
         if (action != null && listeners.Contains(action) == false)
         {
             listeners.Add(action);
         }
+    }
+    public void RemoveListener(Delegate action)
+    {
+        RemoveListener((Action<T0, T1,T2>)action);
     }
     public void RemoveListener(Action<T0, T1, T2> action)
     {
@@ -125,13 +159,20 @@ public class EventListener<T0, T1, T2> : IEventListener
 public class EventListener<T0, T1, T2, T3> : IEventListener
 {
     public List<Action<T0, T1, T2, T3>> listeners = new List<Action<T0, T1, T2, T3>>();
-
+    public void AddListener(Delegate action)
+    {
+        AddListener((Action<T0, T1,T2,T3>)action);
+    }
     public void AddListener(Action<T0, T1, T2, T3> action)
     {
         if (action != null && listeners.Contains(action) == false)
         {
             listeners.Add(action);
         }
+    }
+    public void RemoveListener(Delegate action)
+    {
+        RemoveListener((Action<T0, T1, T2,T3>)action);
     }
     public void RemoveListener(Action<T0, T1, T2, T3> action)
     {
@@ -156,12 +197,20 @@ public class EventListener<T0, T1, T2, T3, T4> : IEventListener
 {
     public List<Action<T0, T1, T2, T3, T4>> listeners = new List<Action<T0, T1, T2, T3, T4>>();
 
+    public void AddListener(Delegate action)
+    {
+        AddListener((Action<T0, T1, T2, T3,T4>)action);
+    }
     public void AddListener(Action<T0, T1, T2, T3, T4> action)
     {
         if (action != null && listeners.Contains(action) == false)
         {
             listeners.Add(action);
         }
+    }
+    public void RemoveListener(Delegate action)
+    {
+        RemoveListener((Action<T0, T1, T2, T3,T4>)action);
     }
     public void RemoveListener(Action<T0, T1, T2, T3, T4> action)
     {
@@ -184,13 +233,20 @@ public class EventListener<T0, T1, T2, T3, T4> : IEventListener
 public class EventListener<T0, T1, T2, T3, T4, T5> : IEventListener
 {
     public List<Action<T0, T1, T2, T3, T4, T5>> listeners = new List<Action<T0, T1, T2, T3, T4, T5>>();
-
+    public void AddListener(Delegate action)
+    {
+        AddListener((Action<T0, T1, T2, T3, T4,T5>)action);
+    }
     public void AddListener(Action<T0, T1, T2, T3, T4, T5> action)
     {
         if (action != null && listeners.Contains(action) == false)
         {
             listeners.Add(action);
         }
+    }
+    public void RemoveListener(Delegate action)
+    {
+        RemoveListener((Action<T0, T1, T2, T3, T4,T5>)action);
     }
     public void RemoveListener(Action<T0, T1, T2, T3, T4, T5> action)
     {
@@ -214,12 +270,20 @@ public class EventListener<T0, T1, T2, T3, T4, T5, T6> : IEventListener
 {
     public List<Action<T0, T1, T2, T3, T4, T5, T6>> listeners = new List<Action<T0, T1, T2, T3, T4, T5, T6>>();
 
+    public void AddListener(Delegate action)
+    {
+        AddListener((Action<T0, T1, T2, T3, T4, T5,T6>)action);
+    }
     public void AddListener(Action<T0, T1, T2, T3, T4, T5, T6> action)
     {
         if (action != null && listeners.Contains(action) == false)
         {
             listeners.Add(action);
         }
+    }
+    public void RemoveListener(Delegate action)
+    {
+        RemoveListener((Action<T0, T1, T2, T3, T4, T5,T6>)action);
     }
     public void RemoveListener(Action<T0, T1, T2, T3, T4, T5, T6> action)
     {
@@ -244,12 +308,20 @@ public class EventListener<T0, T1, T2, T3, T4, T5, T6, T7> : IEventListener
 {
     public List<Action<T0, T1, T2, T3, T4, T5, T6, T7>> listeners = new List<Action<T0, T1, T2, T3, T4, T5, T6, T7>>();
 
+    public void AddListener(Delegate action)
+    {
+        AddListener((Action<T0, T1, T2, T3, T4, T5, T6,T7>)action);
+    }
     public void AddListener(Action<T0, T1, T2, T3, T4, T5, T6, T7> action)
     {
         if (action != null && listeners.Contains(action) == false)
         {
             listeners.Add(action);
         }
+    }
+    public void RemoveListener(Delegate action)
+    {
+        RemoveListener((Action<T0, T1, T2, T3, T4, T5, T6,T7>)action);
     }
     public void RemoveListener(Action<T0, T1, T2, T3, T4, T5, T6, T7> action)
     {
@@ -275,299 +347,679 @@ public class EventListener<T0, T1, T2, T3, T4, T5, T6, T7> : IEventListener
 /// </summary>
 public class EventSystem : Singleton<EventSystem>
 {
-    private Dictionary<int, IEventListener> mListeners = new Dictionary<int, IEventListener>();
+    private struct EventIndex : IEquatable<EventIndex>
+    {
+        public uint type;
+        public uint id;
 
-    public void AddListener(int id, Action call)
+        public EventIndex(uint eventType, uint eventId)
+        {
+            type = eventType;
+            id = eventId;
+        }
+
+        public bool Equals(EventIndex other)
+        {
+            return other.type == type && other.id == id;
+        }
+        public static bool operator ==(EventIndex l, EventIndex r)
+        {
+            return l.Equals(r);
+        }
+        public static bool operator !=(EventIndex l, EventIndex r)
+        {
+            return !l.Equals(r);
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            return Equals((EventIndex)obj);
+        }
+        public override int GetHashCode()
+        {
+            return (type ^ id).GetHashCode();
+        }
+    }
+    private struct EventID : IEquatable<EventID>
+    {
+        public EventIndex index;
+        public uint target;
+
+
+        public EventID(uint eventType, uint eventId, uint eventTarget)
+        {
+            index = new EventIndex(eventType, eventId);
+            target = eventTarget;
+        }
+        public EventID(EventIndex eventIndex, uint eventTarget)
+        {
+            index = eventIndex;
+            target = eventTarget;
+        }
+
+        public bool Equals(EventID other)
+        {
+            return other.index.Equals(index) && other.target == target;
+        }
+        public static bool operator ==(EventID l, EventID r)
+        {
+            return l.Equals(r);
+        }
+        public static bool operator !=(EventID l, EventID r)
+        {
+            return !l.Equals(r);
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            return Equals((EventID)obj);
+        }
+        public override int GetHashCode()
+        {
+            return (index.GetHashCode()^target).GetHashCode();
+        }
+
+    }
+
+    private Dictionary<EventIndex, List<EventID>> mEventID = new Dictionary<EventIndex, List<EventID>>();
+    private Dictionary<EventID, IEventListener> mListeners = new Dictionary<EventID, IEventListener>();
+
+    public void AddListener(uint type, uint id, uint target, Action call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        EventIndex index = new EventIndex(type, id);
+        EventID eventID = new EventID(index, target);
+        if (mEventID.TryGetValue(index, out List<EventID> list) == false)
+        {
+            list = new List<EventID>();
+            mEventID.Add(index, list);
+        }
+        if (list.Contains(eventID) == false)
+        {
+            list.Add(eventID);
+        }
+        if (mListeners.TryGetValue(eventID, out IEventListener listener) == false)
         {
             listener = new EventListener();
-            mListeners.Add(id, listener);
+            mListeners.Add(eventID, listener);
         }
 
-        (listener as EventListener).AddListener(call);
+        listener.AddListener(call);
     }
-    public void AddListener<T0>(int id, Action<T0> call)
+    public void AddListener<T0>(uint type, uint id, uint target, Action<T0> call)
     {
         if (call == null)
         {
             return;
         }
-
-        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        EventIndex index = new EventIndex(type, id);
+        EventID eventID = new EventID(index, target);
+        if (mEventID.TryGetValue(index, out List<EventID> list) == false)
+        {
+            list = new List<EventID>();
+            mEventID.Add(index, list);
+        }
+        if (list.Contains(eventID) == false)
+        {
+            list.Add(eventID);
+        }
+        if (mListeners.TryGetValue(eventID, out IEventListener listener) == false)
         {
             listener = new EventListener<T0>();
-            mListeners.Add(id, listener);
+            mListeners.Add(eventID, listener);
         }
-        (listener as EventListener<T0>).AddListener(call);
+
+        listener.AddListener(call);
 
     }
-    public void AddListener<T0, T1>(int id, Action<T0, T1> call)
+    public void AddListener<T0, T1>(uint type, uint id, uint target, Action<T0, T1> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        EventIndex index = new EventIndex(type, id);
+        EventID eventID = new EventID(index, target);
+        if (mEventID.TryGetValue(index, out List<EventID> list) == false)
+        {
+            list = new List<EventID>();
+            mEventID.Add(index, list);
+        }
+        if (list.Contains(eventID) == false)
+        {
+            list.Add(eventID);
+        }
+        if (mListeners.TryGetValue(eventID, out IEventListener listener) == false)
         {
             listener = new EventListener<T0, T1>();
-            mListeners.Add(id, listener);
+            mListeners.Add(eventID, listener);
         }
-        (listener as EventListener<T0, T1>).AddListener(call);
+        listener.AddListener(call);
     }
-    public void AddListener<T0, T1, T2>(int id, Action<T0, T1, T2> call)
+    public void AddListener<T0, T1, T2>(uint type, uint id, uint target, Action<T0, T1, T2> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        EventIndex index = new EventIndex(type, id);
+        EventID eventID = new EventID(index, target);
+        if (mEventID.TryGetValue(index, out List<EventID> list) == false)
+        {
+            list = new List<EventID>();
+            mEventID.Add(index, list);
+        }
+        if (list.Contains(eventID) == false)
+        {
+            list.Add(eventID);
+        }
+        if (mListeners.TryGetValue(eventID, out IEventListener listener) == false)
         {
             listener = new EventListener<T0, T1, T2>();
-            mListeners.Add(id, listener);
+            mListeners.Add(eventID, listener);
         }
-        (listener as EventListener<T0, T1, T2>).AddListener(call);
+        listener.AddListener(call);
     }
-    public void AddListener<T0, T1, T2, T3>(int id, Action<T0, T1, T2, T3> call)
+    public void AddListener<T0, T1, T2, T3>(uint type, uint id, uint target, Action<T0, T1, T2, T3> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        EventIndex index = new EventIndex(type, id);
+        EventID eventID = new EventID(index, target);
+        if (mEventID.TryGetValue(index, out List<EventID> list) == false)
+        {
+            list = new List<EventID>();
+            mEventID.Add(index, list);
+        }
+        if (list.Contains(eventID) == false)
+        {
+            list.Add(eventID);
+        }
+        if (mListeners.TryGetValue(eventID, out IEventListener listener) == false)
         {
             listener = new EventListener<T0, T1, T2, T3>();
-            mListeners.Add(id, listener);
+            mListeners.Add(eventID, listener);
         }
-        (listener as EventListener<T0, T1, T2, T3>).AddListener(call);
+        listener.AddListener(call);
     }
-    public void AddListener<T0, T1, T2, T3, T4>(int id, Action<T0, T1, T2, T3, T4> call)
+    public void AddListener<T0, T1, T2, T3, T4>(uint type, uint id, uint target, Action<T0, T1, T2, T3, T4> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        EventIndex index = new EventIndex(type, id);
+        EventID eventID = new EventID(index, target);
+        if (mEventID.TryGetValue(index, out List<EventID> list) == false)
+        {
+            list = new List<EventID>();
+            mEventID.Add(index, list);
+        }
+        if (list.Contains(eventID) == false)
+        {
+            list.Add(eventID);
+        }
+        if (mListeners.TryGetValue(eventID, out IEventListener listener) == false)
         {
             listener = new EventListener<T0, T1, T2, T3, T4>();
-            mListeners.Add(id, listener);
+            mListeners.Add(eventID, listener);
         }
-        (listener as EventListener<T0, T1, T2, T3, T4>).AddListener(call);
+        listener.AddListener(call);
     }
-    public void AddListener<T0, T1, T2, T3, T4, T5>(int id, Action<T0, T1, T2, T3, T4, T5> call)
+    public void AddListener<T0, T1, T2, T3, T4, T5>(uint type, uint id, uint target, Action<T0, T1, T2, T3, T4, T5> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        EventIndex index = new EventIndex(type, id);
+        EventID eventID = new EventID(index, target);
+        if (mEventID.TryGetValue(index, out List<EventID> list) == false)
+        {
+            list = new List<EventID>();
+            mEventID.Add(index, list);
+        }
+        if (list.Contains(eventID) == false)
+        {
+            list.Add(eventID);
+        }
+        if (mListeners.TryGetValue(eventID, out IEventListener listener) == false)
         {
             listener = new EventListener<T0, T1, T2, T3, T4, T5>();
-            mListeners.Add(id, listener);
+            mListeners.Add(eventID, listener);
         }
-        (listener as EventListener<T0, T1, T2, T3, T4, T5>).AddListener(call);
+        listener.AddListener(call);
     }
-    public void AddListener<T0, T1, T2, T3, T4, T5, T6>(int id, Action<T0, T1, T2, T3, T4, T5, T6> call)
+    public void AddListener<T0, T1, T2, T3, T4, T5, T6>(uint type, uint id, uint target, Action<T0, T1, T2, T3, T4, T5, T6> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        EventIndex index = new EventIndex(type, id);
+        EventID eventID = new EventID(index, target);
+        if (mEventID.TryGetValue(index, out List<EventID> list) == false)
+        {
+            list = new List<EventID>();
+            mEventID.Add(index, list);
+        }
+        if (list.Contains(eventID) == false)
+        {
+            list.Add(eventID);
+        }
+        if (mListeners.TryGetValue(eventID, out IEventListener listener) == false)
         {
             listener = new EventListener<T0, T1, T2, T3, T4, T5, T6>();
-            mListeners.Add(id, listener);
+            mListeners.Add(eventID, listener);
         }
-        (listener as EventListener<T0, T1, T2, T3, T4, T5, T6>).AddListener(call);
+        listener.AddListener(call);
     }
-    public void AddListener<T0, T1, T2, T3, T4, T5, T6, T7>(int id, Action<T0, T1, T2, T3, T4, T5, T6, T7> call)
+    public void AddListener<T0, T1, T2, T3, T4, T5, T6, T7>(uint type, uint id, uint target, Action<T0, T1, T2, T3, T4, T5, T6, T7> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener) == false)
+        EventIndex index = new EventIndex(type, id);
+        EventID eventID = new EventID(index, target);
+        if (mEventID.TryGetValue(index, out List<EventID> list) == false)
+        {
+            list = new List<EventID>();
+            mEventID.Add(index, list);
+        }
+        if (list.Contains(eventID) == false)
+        {
+            list.Add(eventID);
+        }
+        if (mListeners.TryGetValue(eventID, out IEventListener listener) == false)
         {
             listener = new EventListener<T0, T1, T2, T3, T4, T5, T6, T7>();
-            mListeners.Add(id, listener);
+            mListeners.Add(eventID, listener);
         }
-        (listener as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>).AddListener(call);
+        listener.AddListener(call);
     }
 
-    public void RemoveListener(int id, Action call)
+    public void RemoveListener(uint type, uint id, uint target, Action call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventID eventID = new EventID(type, id, target);
+
+        if (mListeners.TryGetValue(eventID, out IEventListener listener))
         {
-            (listener as EventListener).RemoveListener(call);
+            listener.RemoveListener(call);
         }
     }
-    public void RemoveListener<T0>(int id, Action<T0> call)
+    public void RemoveListener<T0>(uint type, uint id, uint target, Action<T0> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventID eventID = new EventID(type, id, target);
+
+        if (mListeners.TryGetValue(eventID, out IEventListener listener))
         {
-            (listener as EventListener<T0>).RemoveListener(call);
+            listener.RemoveListener(call);
         }
     }
-    public void RemoveListener<T0, T1>(int id, Action<T0, T1> call)
+    public void RemoveListener<T0, T1>(uint type, uint id, uint target, Action<T0, T1> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventID eventID = new EventID(type, id, target);
+
+        if (mListeners.TryGetValue(eventID, out IEventListener listener))
         {
-            (listener as EventListener<T0, T1>).RemoveListener(call);
+            listener.RemoveListener(call);
         }
     }
-    public void RemoveListener<T0, T1, T2>(int id, Action<T0, T1, T2> call)
+    public void RemoveListener<T0, T1, T2>(uint type, uint id, uint target, Action<T0, T1, T2> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventID eventID = new EventID(type, id, target);
+
+        if (mListeners.TryGetValue(eventID, out IEventListener listener))
         {
-            (listener as EventListener<T0, T1, T2>).RemoveListener(call);
+            listener.RemoveListener(call);
         }
     }
-    public void RemoveListener<T0, T1, T2, T3>(int id, Action<T0, T1, T2, T3> call)
+    public void RemoveListener<T0, T1, T2, T3>(uint type, uint id, uint target, Action<T0, T1, T2, T3> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventID eventID = new EventID(type, id, target);
+
+        if (mListeners.TryGetValue(eventID, out IEventListener listener))
         {
-            (listener as EventListener<T0, T1, T2, T3>).RemoveListener(call);
+            listener.RemoveListener(call);
         }
     }
-    public void RemoveListener<T0, T1, T2, T3, T4>(int id, Action<T0, T1, T2, T3, T4> call)
+    public void RemoveListener<T0, T1, T2, T3, T4>(uint type, uint id, uint target, Action<T0, T1, T2, T3, T4> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventID eventID = new EventID(type, id, target);
+
+        if (mListeners.TryGetValue(eventID, out IEventListener listener))
         {
-            (listener as EventListener<T0, T1, T2, T3, T4>).RemoveListener(call);
+            listener.RemoveListener(call);
         }
     }
-    public void RemoveListener<T0, T1, T2, T3, T4, T5>(int id, Action<T0, T1, T2, T3, T4, T5> call)
+    public void RemoveListener<T0, T1, T2, T3, T4, T5>(uint type, uint id, uint target, Action<T0, T1, T2, T3, T4, T5> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventID eventID = new EventID(type, id, target);
+
+        if (mListeners.TryGetValue(eventID, out IEventListener listener))
         {
-            (listener as EventListener<T0, T1, T2, T3, T4, T5>).RemoveListener(call);
+            listener.RemoveListener(call);
         }
     }
-    public void RemoveListener<T0, T1, T2, T3, T4, T5, T6>(int id, Action<T0, T1, T2, T3, T4, T5, T6> call)
+    public void RemoveListener<T0, T1, T2, T3, T4, T5, T6>(uint type, uint id, uint target, Action<T0, T1, T2, T3, T4, T5, T6> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventID eventID = new EventID(type, id, target);
+
+        if (mListeners.TryGetValue(eventID, out IEventListener listener))
         {
-            (listener as EventListener<T0, T1, T2, T3, T4, T5, T6>).RemoveListener(call);
+            listener.RemoveListener(call);
         }
     }
-    public void RemoveListener<T0, T1, T2, T3, T4, T5, T6, T7>(int id, Action<T0, T1, T2, T3, T4, T5, T6, T7> call)
+    public void RemoveListener<T0, T1, T2, T3, T4, T5, T6, T7>(uint type, uint id, uint target, Action<T0, T1, T2, T3, T4, T5, T6, T7> call)
     {
         if (call == null)
         {
             return;
         }
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventID eventID = new EventID(type, id, target);
+        if (mListeners.TryGetValue(eventID, out IEventListener listener))
         {
-            (listener as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>).RemoveListener(call);
+            listener.RemoveListener(call);
         }
     }
-    public void Invoke(int id)
+    public void Invoke(uint type, uint id, uint target, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+        if (all == false)
         {
-            (listener as EventListener).Invoke();
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        (listener as EventListener).Invoke();
+                    }
+                }
+            }
+        }
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                (listener as EventListener).Invoke();
+            }
         }
     }
-    public void Invoke<T0>(int id, T0 arg0)
+    public void Invoke<T0>(uint type, uint id, uint target, T0 arg0, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+        if (all == false)
         {
-            (listener as EventListener<T0>).Invoke(arg0);
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        (listener as EventListener<T0>).Invoke(arg0);
+                    }
+                }
+            }
+        }
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                (listener as EventListener<T0>).Invoke(arg0);
+            }
         }
     }
-    public void Invoke<T0, T1>(int id, T0 arg0, T1 arg1)
+    public void Invoke<T0, T1>(uint type, uint id, uint target, T0 arg0, T1 arg1, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+        if (all == false)
         {
-            (listener as EventListener<T0, T1>).Invoke(arg0, arg1);
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        (listener as EventListener<T0, T1>).Invoke(arg0, arg1);
+                    }
+                }
+            }
+        }
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                (listener as EventListener<T0, T1>).Invoke(arg0, arg1);
+            }
         }
     }
-    public void Invoke<T0, T1, T2>(int id, T0 arg0, T1 arg1, T2 arg2)
+    public void Invoke<T0, T1, T2>(uint type, uint id, uint target, T0 arg0, T1 arg1, T2 arg2, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+        if (all == false)
         {
-            (listener as EventListener<T0, T1, T2>).Invoke(arg0, arg1, arg2);
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        (listener as EventListener<T0, T1, T2>).Invoke(arg0, arg1, arg2);
+                    }
+                }
+            }
+        }
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                (listener as EventListener<T0, T1, T2>).Invoke(arg0, arg1, arg2);
+            }
         }
     }
-    public void Invoke<T0, T1, T2, T3>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+    public void Invoke<T0, T1, T2, T3>(uint type, uint id, uint target, T0 arg0, T1 arg1, T2 arg2, T3 arg3, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+        if (all == false)
         {
-            (listener as EventListener<T0, T1, T2, T3>).Invoke(arg0, arg1, arg2, arg3);
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        (listener as EventListener<T0, T1, T2, T3>).Invoke(arg0, arg1, arg2, arg3);
+                    }
+                }
+            }
+        }
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                (listener as EventListener<T0, T1, T2, T3>).Invoke(arg0, arg1, arg2, arg3);
+            }
         }
     }
-    public void Invoke<T0, T1, T2, T3, T4>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+    public void Invoke<T0, T1, T2, T3, T4>(uint type, uint id, uint target, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+        if (all == false)
         {
-            (listener as EventListener<T0, T1, T2, T3, T4>).Invoke(arg0, arg1, arg2, arg3, arg4);
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        (listener as EventListener<T0, T1, T2, T3, T4>).Invoke(arg0, arg1, arg2, arg3, arg4);
+                    }
+                }
+            }
+        }
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                (listener as EventListener<T0, T1, T2, T3, T4>).Invoke(arg0, arg1, arg2, arg3, arg4);
+            }
         }
     }
-    public void Invoke<T0, T1, T2, T3, T4, T5>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+    public void Invoke<T0, T1, T2, T3, T4, T5>(uint type, uint id, uint target, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+        if (all == false)
         {
-            (listener as EventListener<T0, T1, T2, T3, T4, T5>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5);
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        (listener as EventListener<T0, T1, T2, T3, T4, T5>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5);
+                    }
+                }
+            }
+        }
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                (listener as EventListener<T0, T1, T2, T3, T4, T5>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5);
+            }
         }
     }
-    public void Invoke<T0, T1, T2, T3, T4, T5, T6>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+    public void Invoke<T0, T1, T2, T3, T4, T5, T6>(uint type, uint id, uint target, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+        if (all == false)
         {
-            (listener as EventListener<T0, T1, T2, T3, T4, T5, T6>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        (listener as EventListener<T0, T1, T2, T3, T4, T5, T6>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+                    }
+                }
+            }
+        }
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                (listener as EventListener<T0, T1, T2, T3, T4, T5, T6>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+            }
         }
     }
-    public void Invoke<T0, T1, T2, T3, T4, T5, T6, T7>(int id, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+    public void Invoke<T0, T1, T2, T3, T4, T5, T6, T7>(uint type, uint id, uint target, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+        if (all == false)
         {
-            (listener as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        (listener as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+                    }
+                }
+            }
+        }
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                (listener as EventListener<T0, T1, T2, T3, T4, T5, T6, T7>).Invoke(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            }
         }
     }
 
-    public void Clear(int id)
+    public void Clear(uint type, uint id, uint target, bool all = false)
     {
-        if (mListeners.TryGetValue(id, out IEventListener listener))
+        EventIndex index = new EventIndex(type, id);
+
+        if (all)
         {
-            listener.Clear();
+            if (mEventID.TryGetValue(index, out List<EventID> list))
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (mListeners.TryGetValue(list[i], out IEventListener listener))
+                    {
+                        listener.Clear();
+                    }
+                    mListeners.Remove(list[i]);
+                }
+                mEventID.Remove(index);
+            }
         }
-        mListeners.Remove(id);
+        else
+        {
+            EventID eventID = new EventID(index, target);
+            if (mListeners.TryGetValue(eventID, out IEventListener listener))
+            {
+                listener.Clear();
+            }
+            mListeners.Remove(eventID);
+        }
     }
     public void Clear()
     {
