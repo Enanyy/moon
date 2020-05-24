@@ -150,6 +150,13 @@ public class AssetLoader : MonoSingleton<AssetLoader>
             bundle.Unload();
         }
     }
+    /// <summary>
+    /// 卸载未使用的
+    /// </summary>
+    public static void UnloadUnuseBundle()
+    {
+        Instance.UnloadUnuse();
+    }
 
    
     #endregion
@@ -164,6 +171,11 @@ public class AssetLoader : MonoSingleton<AssetLoader>
 
     private List<string> mBundleNameList = new List<string>();
     private float mLastUnloadTime;
+
+    private void Awake()
+    {
+        SceneManager.sceneUnloaded += OnUnloadScene;
+    }
     private IEnumerator BeginInitialize()
     {
         if (mStatus == LoadStatus.Done)
@@ -247,27 +259,40 @@ public class AssetLoader : MonoSingleton<AssetLoader>
         }
     }
 
+    private void OnUnloadScene(Scene scene)
+    {
+        UnloadUnuse();
+    }
+
+    private void UnloadUnuse()
+    {
+        mBundleNameList.Clear();
+        mBundleNameList.AddRange(mAssetBundleDic.Keys);
+
+        for (int i = 0; i < mBundleNameList.Count; i++)
+        {
+            Bundle bundle;
+            if (mAssetBundleDic.TryGetValue(mBundleNameList[i], out bundle))
+            {
+                var bundleAsset = bundle as BundleAsset;
+                if (bundleAsset != null)
+                {
+                    bundleAsset.RemoveReference();
+                }
+            }
+        }
+        mBundleNameList.Clear();
+    }
+
+
     private void Update()
     {
         if (Time.time - mLastUnloadTime > unloadInterval)
         {
             mLastUnloadTime = Time.time;
 
-            mBundleNameList.AddRange(mAssetBundleDic.Keys);
+            UnloadUnuse();
 
-            for (int i = 0; i < mBundleNameList.Count; i++)
-            {
-                Bundle bundle;
-                if (mAssetBundleDic.TryGetValue(mBundleNameList[i], out bundle))
-                {
-                    var bundleAsset = bundle as BundleAsset;
-                    if (bundleAsset != null)
-                    {
-                        bundleAsset.RemoveReference();
-                    }
-                }
-            }
-            mBundleNameList.Clear();
         }
     }
 
@@ -287,6 +312,7 @@ public class AssetLoader : MonoSingleton<AssetLoader>
         mAssetBundleDic.Clear();
         mAssetManifest = null;
         mStatus = LoadStatus.None;
+        SceneManager.sceneUnloaded -= OnUnloadScene;
     }
     #endregion
 }
