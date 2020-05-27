@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 public class TestBattle : MonoBehaviour {
 
@@ -97,14 +99,24 @@ public class TestBattle : MonoBehaviour {
         BattleManager.Instance.AddEntity(mEntity1);
         mEntity1.active = true;
 
-        //EventSystem.Instance.AddListener(1, OnListen);
-        //EventSystem.Instance.Invoke(1);
+        EventSystem.Instance.AddListener(1, 1,0,OnListen);
+        EventSystem.Instance.Invoke(1,1,0);
+
+        EventListener listener = new EventListener();
+        listener.AddListener((Action)OnListen);
+        listener.Invoke();
+        listener.AddListener((Action<int>)OnListen);
+        listener.Invoke(1);
     }
 
     void OnListen()
     {
         Debug.Log("EventNotify test");
     }    
+    void OnListen(int a)
+    {
+        Debug.Log(a);
+    }
 
     // Update is called once per frame
     void Update () {
